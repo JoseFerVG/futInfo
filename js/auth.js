@@ -1,12 +1,13 @@
 /**
- * Módulo de Autenticación con Firebase y Registro de Ficha FIFA
+ * Módulo de Autenticación con Google (Firebase Auth) y Perfil de Ficha FIFA
  */
 import { auth, db, isFirebaseConfigured } from './firebase-config.js';
 import { store } from './store.js';
 
-const AUTH_USER_KEY = 'futinfo_fifa_auth_user_v2';
-const AUTH_ACCOUNTS_KEY = 'futinfo_fifa_accounts_v2';
+const AUTH_USER_KEY = 'futinfo_fifa_auth_user_v3';
+const AUTH_ACCOUNTS_KEY = 'futinfo_fifa_accounts_v3';
 
+// Cuentas demo predeterminadas
 const DEFAULT_ACCOUNTS = [
   {
     id: 'usr_admin',
@@ -14,6 +15,7 @@ const DEFAULT_ACCOUNTS = [
     email: 'mister@rector.es',
     password: 'rector2026',
     role: 'admin',
+    photoURL: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80',
     playerId: null
   },
   {
@@ -22,6 +24,7 @@ const DEFAULT_ACCOUNTS = [
     email: 'charly@rector.es',
     password: 'rector2026',
     role: 'player',
+    photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     playerId: 'p1'
   }
 ];
@@ -72,10 +75,109 @@ class AuthService {
     return this.currentUser && this.currentUser.role === 'admin';
   }
 
+  /**
+   * Inicio de Sesión y Registro con Google (Firebase Auth GoogleAuthProvider)
+   */
+  async signInWithGoogle() {
+    // Si Firebase está configurado, abrimos el popup oficial de Google
+    if (isFirebaseConfigured() && auth) {
+      try {
+        const { GoogleAuthProvider, signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        
+        const userCredential = await signInWithPopup(auth, provider);
+        const fbUser = userCredential.user;
+
+        const cleanEmail = (fbUser.email || '').toLowerCase();
+        const isMister = cleanEmail.includes('mister') || cleanEmail.includes('admin') || cleanEmail.includes('josef');
+        const existingPlayer = store.getPlayers().find(p => p.email.toLowerCase() === cleanEmail);
+
+        const userObj = {
+          id: fbUser.uid,
+          name: fbUser.displayName || cleanEmail.split('@')[0],
+          email: cleanEmail,
+          photoURL: fbUser.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanEmail}`,
+          role: isMister ? 'admin' : 'player',
+          playerId: existingPlayer ? existingPlayer.id : null,
+          isFirebase: true,
+          isNew: !existingPlayer && !isMister
+        };
+
+        this.currentUser = userObj;
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
+        this.notify();
+        return { success: true, user: userObj, isNew: userObj.isNew };
+      } catch (error) {
+        console.error("Error en Google Sign-In con Firebase:", error);
+        throw new Error(this.translateFirebaseError(error.code) || error.message);
+      }
+    }
+
+    // Modo Local / Simulación con cuenta de Google
+    const defaultEmail = 'josef.caniles.murcia@gmail.com';
+    const cleanEmail = defaultEmail.toLowerCase();
+    const isMister = true; // El creador es el Míster del Torneo del Rector
+    const existingPlayer = store.getPlayers().find(p => p.email.toLowerCase() === cleanEmail);
+
+    const userObj = {
+      id: 'google_user_' + Date.now(),
+      name: 'Jose Fernando',
+      email: cleanEmail,
+      photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+      role: 'admin',
+      playerId: existingPlayer ? existingPlayer.id : null,
+      isFirebase: false,
+      isNew: !existingPlayer
+    };
+
+    this.currentUser = userObj;
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
+    this.notify();
+    return { success: true, user: userObj, isNew: userObj.isNew };
+  }
+
+  /**
+   * Completar la ficha FIFA del jugador tras iniciar sesión con Google
+   */
+  async completePlayerCard(cardData) {
+    if (!this.currentUser) throw new Error('Debes iniciar sesión con Google primero.');
+
+    const newPlayer = store.addPlayer({
+      name: this.currentUser.name,
+      nickname: cardData.nickname || this.currentUser.name.split(' ')[0],
+      email: this.currentUser.email,
+      avatar: this.currentUser.photoURL || cardData.avatar,
+      number: parseInt(cardData.number, 10) || 7,
+      rating: parseInt(cardData.rating, 10) || 82,
+      faculty: cardData.faculty || 'inf',
+      preferredFoot: cardData.preferredFoot || 'Diestro',
+      studentId: cardData.studentId || '',
+      phone: cardData.phone || '',
+      roleBest: cardData.roleBest || 'DC',
+      roleSecond: cardData.roleSecond || 'MC',
+      roleThird: cardData.roleThird || 'DFC',
+      roleWorst: cardData.roleWorst || 'POR',
+      pac: cardData.pac || 82,
+      sho: cardData.sho || 80,
+      pas: cardData.pas || 80,
+      dri: cardData.dri || 82,
+      def: cardData.def || 65,
+      phy: cardData.phy || 78,
+      chemStyle: cardData.chemStyle || 'BAS'
+    });
+
+    this.currentUser.playerId = newPlayer.id;
+    this.currentUser.isNew = false;
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(this.currentUser));
+    this.notify();
+    return newPlayer;
+  }
+
   async signIn(email, password) {
     const cleanEmail = email.trim().toLowerCase();
 
-    // Si Firebase está configurado, usar Firebase Authentication
+    // Firebase Auth
     if (isFirebaseConfigured() && auth) {
       try {
         const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
@@ -89,6 +191,7 @@ class AuthService {
           id: fbUser.uid,
           name: fbUser.displayName || cleanEmail.split('@')[0],
           email: fbUser.email,
+          photoURL: fbUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
           role: isMister ? 'admin' : 'player',
           playerId: existingPlayer ? existingPlayer.id : null,
           isFirebase: true
@@ -99,12 +202,11 @@ class AuthService {
         this.notify();
         return { success: true, user: userObj };
       } catch (error) {
-        console.warn("Fallo login en Firebase:", error.message);
         throw new Error(this.translateFirebaseError(error.code));
       }
     }
 
-    // Modo LocalStorage / Offline
+    // Modo Local
     const accounts = JSON.parse(localStorage.getItem(AUTH_ACCOUNTS_KEY) || '[]');
     const found = accounts.find(a => a.email.toLowerCase() === cleanEmail && a.password === password);
 
@@ -114,6 +216,7 @@ class AuthService {
         id: found.id,
         name: found.name,
         email: found.email,
+        photoURL: found.photoURL || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
         role: found.role || 'player',
         playerId: existingPlayer ? existingPlayer.id : found.playerId,
         isFirebase: false
@@ -123,98 +226,8 @@ class AuthService {
       this.notify();
       return { success: true, user: userObj };
     } else {
-      throw new Error('Credenciales incorrectas. (Prueba con mister@rector.es / rector2026)');
+      throw new Error('Credenciales incorrectas. (Prueba con Google o mister@rector.es)');
     }
-  }
-
-  async signUpWithPlayerCard(formData) {
-    const cleanEmail = formData.email.trim().toLowerCase();
-    const isMister = formData.role === 'admin';
-
-    // 1. Si es jugador, creamos su Ficha FIFA en el store
-    let createdPlayer = null;
-    if (!isMister) {
-      createdPlayer = store.addPlayer({
-        name: formData.name,
-        nickname: formData.nickname || formData.name.split(' ')[0],
-        number: parseInt(formData.number, 10) || 7,
-        rating: parseInt(formData.rating, 10) || 80,
-        faculty: formData.faculty || 'inf',
-        preferredFoot: formData.preferredFoot || 'Diestro',
-        studentId: formData.studentId || '',
-        phone: formData.phone || '',
-        email: cleanEmail,
-        roleBest: formData.roleBest,
-        roleSecond: formData.roleSecond,
-        roleThird: formData.roleThird,
-        roleWorst: formData.roleWorst,
-        pac: formData.pac || 80,
-        sho: formData.sho || 75,
-        pas: formData.pas || 78,
-        dri: formData.dri || 80,
-        def: formData.def || 65,
-        phy: formData.phy || 75,
-        chemStyle: formData.chemStyle || 'BAS'
-      });
-    }
-
-    // 2. Si Firebase está activo, crear en Firebase Authentication
-    if (isFirebaseConfigured() && auth) {
-      try {
-        const { createUserWithEmailAndPassword, updateProfile } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-        const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, formData.password);
-        await updateProfile(userCredential.user, { displayName: formData.name });
-
-        const userObj = {
-          id: userCredential.user.uid,
-          name: formData.name,
-          email: cleanEmail,
-          role: formData.role || 'player',
-          playerId: createdPlayer ? createdPlayer.id : null,
-          isFirebase: true
-        };
-
-        this.currentUser = userObj;
-        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
-        this.notify();
-        return { success: true, user: userObj };
-      } catch (error) {
-        console.warn("Fallo registro en Firebase:", error.message);
-        throw new Error(this.translateFirebaseError(error.code));
-      }
-    }
-
-    // 3. Registro Local
-    const accounts = JSON.parse(localStorage.getItem(AUTH_ACCOUNTS_KEY) || '[]');
-    if (accounts.some(a => a.email.toLowerCase() === cleanEmail)) {
-      throw new Error('Ya existe una cuenta con este correo.');
-    }
-
-    const newAccount = {
-      id: 'usr_' + Date.now(),
-      name: formData.name,
-      email: cleanEmail,
-      password: formData.password,
-      role: formData.role || 'player',
-      playerId: createdPlayer ? createdPlayer.id : null
-    };
-
-    accounts.push(newAccount);
-    localStorage.setItem(AUTH_ACCOUNTS_KEY, JSON.stringify(accounts));
-
-    const userObj = {
-      id: newAccount.id,
-      name: newAccount.name,
-      email: newAccount.email,
-      role: newAccount.role,
-      playerId: newAccount.playerId,
-      isFirebase: false
-    };
-
-    this.currentUser = userObj;
-    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
-    this.notify();
-    return { success: true, user: userObj };
   }
 
   async signOut() {
@@ -237,12 +250,16 @@ class AuthService {
       case 'auth/wrong-password':
       case 'auth/invalid-credential':
         return 'Usuario o contraseña no válidos.';
+      case 'auth/popup-closed-by-user':
+        return 'Se cerró la ventana de Google antes de completar el inicio de sesión.';
+      case 'auth/popup-blocked':
+        return 'El navegador bloqueó la ventana emergente de Google. Permite las ventanas emergentes para continuar.';
+      case 'auth/cancelled-popup-request':
+        return 'Operación cancelada.';
       case 'auth/email-already-in-use':
         return 'Este correo electrónico ya está registrado.';
-      case 'auth/invalid-email':
-        return 'El formato del correo electrónico no es válido.';
-      case 'auth/weak-password':
-        return 'La contraseña debe tener al menos 6 caracteres.';
+      case 'auth/network-request-failed':
+        return 'Error de red. Comprueba tu conexión a internet.';
       default:
         return 'Error de autenticación: ' + (code || 'Inténtalo de nuevo.');
     }

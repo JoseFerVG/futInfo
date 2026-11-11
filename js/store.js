@@ -4,9 +4,9 @@
  */
 
 const STORAGE_KEYS = {
-  PLAYERS: 'futinfo_fifa_players_v2',
-  MATCHES: 'futinfo_fifa_matches_v2',
-  SETTINGS: 'futinfo_fifa_settings_v2'
+  PLAYERS: 'futinfo_fifa_players_v3',
+  MATCHES: 'futinfo_fifa_matches_v3',
+  SETTINGS: 'futinfo_fifa_settings_v3'
 };
 
 // Facultades disponibles para afinidad de Química FUT
@@ -19,7 +19,6 @@ export const FACULTIES = [
   { id: 'psi', name: 'Psicología y Educación', short: 'PSI', color: '#ec4899', icon: '🧠' }
 ];
 
-// Roles para Fútbol 7 y Fútbol Sala
 export const ROLES_F7 = [
   { code: 'POR', name: 'Portero (GK)', category: 'GK' },
   { code: 'DFC', name: 'Defensa Central (CB)', category: 'DEF' },
@@ -42,7 +41,7 @@ export const ROLES_FUTSAL = [
   { code: 'UNI', name: 'Universal (Polivalente)', category: 'MID' }
 ];
 
-// Jugadores con estética FIFA FUT (valoraciones, atributos y roles de mejor a peor)
+// Jugadores iniciales FIFA FUT
 const DEFAULT_PLAYERS = [
   {
     id: 'p1',
@@ -50,7 +49,7 @@ const DEFAULT_PLAYERS = [
     nickname: 'Charly',
     number: 1,
     rating: 83,
-    cardType: 'gold', // 'gold', 'totw', 'special'
+    cardType: 'gold',
     faculty: 'inf',
     chemStyle: 'CAT',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
@@ -68,8 +67,7 @@ const DEFAULT_PLAYERS = [
     goals: 0,
     assists: 1,
     yellowCards: 0,
-    redCards: 0,
-    feeStatus: 'pagado'
+    redCards: 0
   },
   {
     id: 'p2',
@@ -95,8 +93,7 @@ const DEFAULT_PLAYERS = [
     goals: 1,
     assists: 0,
     yellowCards: 2,
-    redCards: 0,
-    feeStatus: 'pagado'
+    redCards: 0
   },
   {
     id: 'p3',
@@ -122,8 +119,7 @@ const DEFAULT_PLAYERS = [
     goals: 2,
     assists: 1,
     yellowCards: 1,
-    redCards: 0,
-    feeStatus: 'pendiente'
+    redCards: 0
   },
   {
     id: 'p4',
@@ -149,8 +145,7 @@ const DEFAULT_PLAYERS = [
     goals: 4,
     assists: 6,
     yellowCards: 0,
-    redCards: 0,
-    feeStatus: 'pagado'
+    redCards: 0
   },
   {
     id: 'p5',
@@ -176,8 +171,7 @@ const DEFAULT_PLAYERS = [
     goals: 7,
     assists: 5,
     yellowCards: 1,
-    redCards: 0,
-    feeStatus: 'pagado'
+    redCards: 0
   },
   {
     id: 'p6',
@@ -203,8 +197,7 @@ const DEFAULT_PLAYERS = [
     goals: 9,
     assists: 2,
     yellowCards: 0,
-    redCards: 0,
-    feeStatus: 'pagado'
+    redCards: 0
   },
   {
     id: 'p7',
@@ -230,8 +223,7 @@ const DEFAULT_PLAYERS = [
     goals: 5,
     assists: 4,
     yellowCards: 1,
-    redCards: 0,
-    feeStatus: 'pendiente'
+    redCards: 0
   },
   {
     id: 'p8',
@@ -257,8 +249,7 @@ const DEFAULT_PLAYERS = [
     goals: 1,
     assists: 2,
     yellowCards: 2,
-    redCards: 0,
-    feeStatus: 'parcial'
+    redCards: 0
   }
 ];
 
@@ -283,8 +274,7 @@ const DEFAULT_SETTINGS = {
   activeFormationFutsal: '1-1-2-1',
   startingLineupF7: ['p1', 'p3', 'p2', 'p8', 'p4', 'p5', 'p6'],
   startingLineupFutsal: ['p1', 'p2', 'p4', 'p5', 'p6'],
-  benchPlayers: ['p7'],
-  feeAmount: 35
+  benchPlayers: ['p7']
 };
 
 const DEFAULT_MATCHES = [
@@ -393,12 +383,12 @@ export class TeamStore {
 
   addPlayer(data) {
     const defaultStats = {
-      pac: parseInt(data.pac, 10) || 75,
-      sho: parseInt(data.sho, 10) || 70,
-      pas: parseInt(data.pas, 10) || 75,
-      dri: parseInt(data.dri, 10) || 75,
+      pac: parseInt(data.pac, 10) || 80,
+      sho: parseInt(data.sho, 10) || 75,
+      pas: parseInt(data.pas, 10) || 78,
+      dri: parseInt(data.dri, 10) || 80,
       def: parseInt(data.def, 10) || 70,
-      phy: parseInt(data.phy, 10) || 75
+      phy: parseInt(data.phy, 10) || 76
     };
 
     const calculatedRating = Math.round(
@@ -434,8 +424,7 @@ export class TeamStore {
       goals: parseInt(data.goals, 10) || 0,
       assists: parseInt(data.assists, 10) || 0,
       yellowCards: 0,
-      redCards: 0,
-      feeStatus: data.feeStatus || 'pendiente'
+      redCards: 0
     };
 
     this.players.push(newPlayer);
@@ -643,7 +632,6 @@ export class TeamStore {
 
     const topScorers = [...this.players].sort((a, b) => b.goals - a.goals);
     const topAssists = [...this.players].sort((a, b) => b.assists - a.assists);
-    const totalCollected = this.players.filter(p => p.feeStatus === 'pagado').length * this.settings.feeAmount;
 
     return {
       played: finishedMatches.length,
@@ -651,8 +639,7 @@ export class TeamStore {
       totalGF, totalGA,
       diff: totalGF - totalGA,
       topScorers,
-      topAssists,
-      totalCollected
+      topAssists
     };
   }
 

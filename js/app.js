@@ -1,19 +1,19 @@
 /**
  * Controlador Principal - FIFA Ultimate Team (FUT) Torneo del Rector
+ * Con Google Sign-In y Fichas de Jugador
  */
-import { store, FACULTIES, ROLES_F7, ROLES_FUTSAL } from './store.js';
+import { store, FACULTIES } from './store.js';
 import { authService } from './auth.js';
 import { 
   initFirebaseServices, 
   saveFirebaseConfig, 
-  clearFirebaseConfig, 
   getActiveConfig 
 } from './firebase-config.js';
 
 class FutApp {
   constructor() {
     this.currentTab = 'pitch';
-    this.selectedStarterIndex = null; // Para intercambio de jugadores estilo FIFA FUT
+    this.selectedStarterIndex = null;
     this.init();
   }
 
@@ -56,7 +56,7 @@ class FutApp {
       badge.className = 'flex items-center gap-1.5 text-emerald-400 font-semibold';
       badge.innerHTML = `
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>🔥 Firebase Cloud Conectado</span>
+        <span>🔥 Firebase & Google Auth (Nube)</span>
       `;
     } else {
       badge.className = 'flex items-center gap-1.5 text-amber-400 font-medium';
@@ -168,9 +168,7 @@ class FutApp {
     const setupBackdropDismiss = (dialog) => {
       if (!dialog) return;
       dialog.addEventListener('click', (e) => {
-        if (e.target === dialog) {
-          dialog.close();
-        }
+        if (e.target === dialog) dialog.close();
       });
     };
 
@@ -178,90 +176,75 @@ class FutApp {
     document.getElementById('btn-close-login')?.addEventListener('click', () => loginDialog.close());
     setupBackdropDismiss(loginDialog);
 
+    const setupDialog = document.getElementById('player-card-setup-dialog');
+    document.getElementById('btn-close-setup')?.addEventListener('click', () => setupDialog.close());
+    setupBackdropDismiss(setupDialog);
+
     const inspectDialog = document.getElementById('player-inspect-dialog');
     document.getElementById('btn-close-inspect')?.addEventListener('click', () => inspectDialog.close());
     setupBackdropDismiss(inspectDialog);
 
-    document.getElementById('btn-add-player-card')?.addEventListener('click', () => {
-      loginDialog.showModal();
-      document.getElementById('tab-register-btn')?.click();
+    document.getElementById('btn-open-create-card')?.addEventListener('click', () => {
+      const user = authService.getCurrentUser();
+      if (!user) {
+        loginDialog.showModal();
+      } else {
+        this.openPlayerSetupModal(user);
+      }
     });
   }
 
   setupForms() {
-    // Tabs Login vs Registro
-    const tLog = document.getElementById('tab-login-btn');
-    const tReg = document.getElementById('tab-register-btn');
-    const fLog = document.getElementById('form-login');
-    const fReg = document.getElementById('form-register-card');
-
-    tLog?.addEventListener('click', () => {
-      tLog.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 transition';
-      tReg.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition';
-      fLog.classList.remove('hidden');
-      fReg.classList.add('hidden');
-    });
-
-    tReg?.addEventListener('click', () => {
-      tReg.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 transition';
-      tLog.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition';
-      fReg.classList.remove('hidden');
-      fLog.classList.add('hidden');
-    });
-
-    // Login submit
-    fLog?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      const pass = document.getElementById('login-password').value;
-      const errBox = document.getElementById('login-error');
+    // 1. Botón Oficial de Google Sign-In
+    document.getElementById('btn-google-signin')?.addEventListener('click', async () => {
+      const errBox = document.getElementById('google-auth-error');
       errBox.classList.add('hidden');
 
       try {
-        await authService.signIn(email, pass);
+        const res = await authService.signInWithGoogle();
         document.getElementById('login-dialog').close();
+
+        // Si es un jugador nuevo o no tiene carta todavía, abrimos el configurador de Ficha FIFA
+        if (res.isNew || !res.user.playerId) {
+          this.openPlayerSetupModal(res.user);
+        }
       } catch (err) {
         errBox.textContent = err.message;
         errBox.classList.remove('hidden');
       }
     });
 
-    // Registro con Ficha de Jugador (Roles de mejor a peor)
-    fReg?.addEventListener('submit', async (e) => {
+    // 2. Formulario para Completar Ficha de Jugador FIFA (Roles de mejor a peor)
+    document.getElementById('form-setup-card')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const errBox = document.getElementById('register-error');
-      errBox.classList.add('hidden');
 
-      const formData = {
-        name: document.getElementById('reg-name').value,
-        nickname: document.getElementById('reg-nickname').value,
-        email: document.getElementById('reg-email').value,
-        password: document.getElementById('reg-password').value,
-        number: document.getElementById('reg-number').value,
-        faculty: document.getElementById('reg-faculty').value,
-        preferredFoot: document.getElementById('reg-foot').value,
-        roleBest: document.getElementById('reg-role-best').value,
-        roleSecond: document.getElementById('reg-role-second').value,
-        roleThird: document.getElementById('reg-role-third').value,
-        roleWorst: document.getElementById('reg-role-worst').value,
-        pac: document.getElementById('reg-pac').value,
-        sho: document.getElementById('reg-sho').value,
-        pas: document.getElementById('reg-pas').value,
-        dri: document.getElementById('reg-dri').value,
-        def: document.getElementById('reg-def').value,
-        phy: document.getElementById('reg-phy').value
+      const cardData = {
+        nickname: document.getElementById('setup-nickname').value,
+        number: document.getElementById('setup-number').value,
+        faculty: document.getElementById('setup-faculty').value,
+        preferredFoot: document.getElementById('setup-foot').value,
+        roleBest: document.getElementById('setup-role-best').value,
+        roleSecond: document.getElementById('setup-role-second').value,
+        roleThird: document.getElementById('setup-role-third').value,
+        roleWorst: document.getElementById('setup-role-worst').value,
+        pac: document.getElementById('setup-pac').value,
+        sho: document.getElementById('setup-sho').value,
+        pas: document.getElementById('setup-pas').value,
+        dri: document.getElementById('setup-dri').value,
+        def: document.getElementById('setup-def').value,
+        phy: document.getElementById('setup-phy').value
       };
 
       try {
-        await authService.signUpWithPlayerCard(formData);
-        document.getElementById('login-dialog').close();
+        await authService.completePlayerCard(cardData);
+        document.getElementById('player-card-setup-dialog').close();
+        alert('¡Tu Carta FIFA FUT ha sido creada con éxito y añadida al equipo!');
       } catch (err) {
-        errBox.textContent = err.message;
-        errBox.classList.remove('hidden');
+        alert(err.message);
       }
     });
 
-    // Firebase config form
+    // 3. Formulario Firebase
     document.getElementById('form-firebase')?.addEventListener('submit', (e) => {
       e.preventDefault();
       const config = {
@@ -278,6 +261,17 @@ class FutApp {
         store.resetToDefault();
       }
     });
+  }
+
+  openPlayerSetupModal(user) {
+    const dialog = document.getElementById('player-card-setup-dialog');
+    document.getElementById('setup-user-name').textContent = user.name;
+    document.getElementById('setup-user-email').textContent = user.email;
+    if (user.photoURL) {
+      document.getElementById('setup-user-avatar').src = user.photoURL;
+    }
+    document.getElementById('setup-nickname').value = user.name.split(' ')[0];
+    dialog.showModal();
   }
 
   switchTab(tabId) {
@@ -304,11 +298,11 @@ class FutApp {
 
     if (user) {
       const isMister = user.role === 'admin';
+      const userPhoto = user.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80';
+
       container.innerHTML = `
         <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl">
-          <div class="w-7 h-7 rounded-lg ${isMister ? 'bg-amber-500 text-slate-950' : 'bg-emerald-600 text-white'} flex items-center justify-center font-black text-xs">
-            ${isMister ? '👔' : '🏃'}
-          </div>
+          <img src="${userPhoto}" alt="${user.name}" class="w-7 h-7 rounded-lg object-cover border ${isMister ? 'border-amber-400' : 'border-emerald-400'}">
           <div class="hidden sm:block text-left">
             <div class="text-xs font-bold text-white leading-tight truncate max-w-[120px]">${user.name}</div>
             <div class="text-[10px] ${isMister ? 'text-amber-400' : 'text-emerald-400'} font-semibold">
@@ -324,9 +318,14 @@ class FutApp {
       document.getElementById('btn-logout')?.addEventListener('click', () => authService.signOut());
     } else {
       container.innerHTML = `
-        <button id="btn-open-login" class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition">
-          <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
-          <span>Entrar / Registro</span>
+        <button id="btn-open-login" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-xs flex items-center gap-2 shadow-lg transition">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Acceder con Google</span>
         </button>
       `;
 
@@ -350,7 +349,6 @@ class FutApp {
     this.renderPitch();
     this.renderAlbumCards();
     this.renderMatches();
-    this.renderCuotas();
     this.renderSpecialists();
     this.updateAdminVisibility();
 
@@ -358,7 +356,7 @@ class FutApp {
     if (count) count.textContent = store.getPlayers().length;
   }
 
-  // ==================== RENDER PIZARRA FIFA (ESTADIO Y CARTAS) ====================
+  // ==================== RENDER PIZARRA FIFA FUT ====================
   renderPitch() {
     const slotsContainer = document.getElementById('pitch-slots-container');
     const benchContainer = document.getElementById('pitch-bench-container');
@@ -369,9 +367,7 @@ class FutApp {
     const isF7 = settings.modality === 'f7';
     const activeFormation = store.getActiveFormation();
 
-    // 1. Definición de formaciones y coordenadas en porcentaje
     const tacticalFormations = {
-      // Fútbol 7
       '1-3-2-1': {
         slots: [
           { role: 'POR', top: 85, left: 50 },
@@ -383,7 +379,7 @@ class FutApp {
           { role: 'DC', top: 20, left: 50 }
         ],
         links: [
-          [0, 1], [0, 2], [0, 3], // POR con defensas
+          [0, 1], [0, 2], [0, 3],
           [1, 2], [2, 3], [1, 4], [3, 5],
           [2, 4], [2, 5],
           [4, 5], [4, 6], [5, 6]
@@ -421,8 +417,6 @@ class FutApp {
           [4, 5], [4, 6], [5, 6]
         ]
       },
-
-      // Fútbol Sala (5 jugadores)
       '1-1-2-1': {
         slots: [
           { role: 'POR', top: 86, left: 50 },
@@ -470,16 +464,14 @@ class FutApp {
     const startingPlayers = store.getStartingLineup();
     const slotRoles = formationConfig.slots.map(s => s.role);
 
-    // 2. Calcular Química y Rating del Equipo estilo FIFA
+    // Calcular Química y Rating
     const chemRatingData = store.calculateTeamChemistryAndRating(slotRoles);
-    
-    // Actualizar HUD
     document.getElementById('hud-team-rating').textContent = chemRatingData.rating;
     document.getElementById('hud-team-chemistry').textContent = chemRatingData.chemistry;
     const bar = document.getElementById('hud-chem-bar');
     if (bar) bar.style.width = `${chemRatingData.chemistry}%`;
 
-    // 3. Dibujar Líneas de Química SVG
+    // Dibujar Líneas de Química
     let svgHtml = '';
     formationConfig.links.forEach(([fromIdx, toIdx]) => {
       const fromSlot = formationConfig.slots[fromIdx];
@@ -487,9 +479,9 @@ class FutApp {
       const p1 = startingPlayers[fromIdx];
       const p2 = startingPlayers[toIdx];
 
-      let chemClass = 'orange'; // normal
+      let chemClass = 'orange';
       if (p1 && p2) {
-        if (p1.faculty === p2.faculty) chemClass = 'green'; // Misma facultad
+        if (p1.faculty === p2.faculty) chemClass = 'green';
         else if (p1.rolesHierarchy && p1.rolesHierarchy.worst === fromSlot.role) chemClass = 'red';
       }
 
@@ -499,7 +491,7 @@ class FutApp {
     });
     svgLines.innerHTML = svgHtml;
 
-    // 4. Renderizar las Cartas FUT sobre el césped
+    // Renderizar Cartas sobre el Césped
     slotsContainer.innerHTML = formationConfig.slots.map((slot, index) => {
       const player = startingPlayers[index];
       const isSelected = this.selectedStarterIndex === index;
@@ -515,7 +507,6 @@ class FutApp {
         `;
       }
 
-      // Evaluar si juega en su mejor rol, secundario o peor
       let statusClass = 'wrong';
       if (player.rolesHierarchy) {
         if (player.rolesHierarchy.best === slot.role) statusClass = 'exact';
@@ -530,7 +521,6 @@ class FutApp {
              style="top: ${slot.top}%; left: ${slot.left}%;"
              onclick="window.futApp.selectStarter(${index})">
           
-          <!-- CARTA FUT DE JUGADOR -->
           <div class="fut-card ${cardTypeClass}">
             <div class="fut-card-header">
               <div class="fut-card-badge-col">
@@ -554,7 +544,6 @@ class FutApp {
             </div>
           </div>
 
-          <!-- PEDESTAL HEXAGONAL CON ESTADO DE ROL -->
           <div class="fut-pos-pedestal ${statusClass}">
             <span class="fut-pos-dot"></span>
             <span>${slot.role}</span>
@@ -564,14 +553,14 @@ class FutApp {
       `;
     }).join('');
 
-    // 5. Renderizar Banquillo de Suplentes
+    // Banquillo
     const allPlayers = store.getPlayers();
     const startingIds = new Set(startingPlayers.map(p => p.id));
     const bench = allPlayers.filter(p => !startingIds.has(p.id));
 
     if (bench.length === 0) {
       benchContainer.innerHTML = `
-        <div class="text-xs text-slate-500 py-2">No hay suplentes en la recámara. ¡Registra más jugadores para el banquillo!</div>
+        <div class="text-xs text-slate-500 py-2">No hay suplentes en la recámara. ¡Crea más cartas con Google para el banquillo!</div>
       `;
     } else {
       benchContainer.innerHTML = bench.map(p => {
@@ -612,7 +601,6 @@ class FutApp {
       this.selectedStarterIndex = null;
       this.renderPitch();
     } else {
-      // Intercambiar dos titulares entre sí
       const starting = store.getStartingLineup();
       const p1 = starting[this.selectedStarterIndex];
       const p2 = starting[index];
@@ -635,7 +623,7 @@ class FutApp {
     }
   }
 
-  // ==================== 2. ÁLBUM DE CARTAS FUT ====================
+  // ==================== ÁLBUM DE CARTAS ====================
   renderAlbumCards() {
     const grid = document.getElementById('album-cards-grid');
     if (!grid) return;
@@ -648,8 +636,6 @@ class FutApp {
       return `
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-amber-400/50 transition">
           <div class="flex items-center justify-center mb-4">
-            
-            <!-- CARTA FIFA FUT GRANDE -->
             <div class="fut-card ${cardClass}" style="width: 140px; height: 195px; border-radius: 10px 10px 18px 18px;">
               <div class="fut-card-header" style="height: 105px; padding: 6px 8px 0 8px;">
                 <div class="fut-card-badge-col">
@@ -677,10 +663,8 @@ class FutApp {
                 </div>
               </div>
             </div>
-
           </div>
 
-          <!-- Jerarquía de Roles de Mejor a Peor -->
           <div class="space-y-1.5 text-xs bg-slate-950 p-3 rounded-xl border border-slate-800 mb-3">
             <div class="flex items-center justify-between text-emerald-400 font-bold">
               <span>🥇 Mejor Posición:</span>
@@ -700,7 +684,6 @@ class FutApp {
             </div>
           </div>
 
-          <!-- Botón de inspeccionar -->
           <button onclick="window.futApp.inspectPlayer('${p.id}')" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-300 border border-slate-700 flex items-center justify-center gap-1.5">
             <i data-lucide="eye" class="w-3.5 h-3.5"></i>
             <span>Ver Ficha Técnica Completa</span>
@@ -712,7 +695,7 @@ class FutApp {
     this.refreshIcons();
   }
 
-  // ==================== 3. INSPECCIONAR JUGADOR EN MODAL ====================
+  // ==================== INSPECCIONAR JUGADOR ====================
   inspectPlayer(playerId) {
     const p = store.getPlayerById(playerId);
     if (!p) return;
@@ -736,7 +719,6 @@ class FutApp {
         </div>
       </div>
 
-      <!-- Jerarquía de Roles -->
       <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
         <h5 class="text-xs font-bold uppercase text-amber-400 tracking-wider">Afinidad de Posiciones (Roles)</h5>
         <div class="grid grid-cols-2 gap-2 text-xs">
@@ -759,7 +741,6 @@ class FutApp {
         </div>
       </div>
 
-      <!-- Barras de Atributos FIFA -->
       <div class="space-y-2 bg-slate-950 p-4 rounded-xl border border-slate-800">
         <h5 class="text-xs font-bold uppercase text-slate-400 tracking-wider">Atributos FIFA</h5>
         ${this.renderStatBar('Ritmo (PAC)', p.stats.pac)}
@@ -795,7 +776,7 @@ class FutApp {
     `;
   }
 
-  // ==================== 4. PARTIDOS & ASISTENCIA ====================
+  // ==================== PARTIDOS & ASISTENCIA ====================
   renderMatches() {
     const container = document.getElementById('matches-container');
     const headline = document.getElementById('next-match-headline');
@@ -857,49 +838,6 @@ class FutApp {
     alert('¡Tu disponibilidad para el próximo partido ha quedado registrada!');
   }
 
-  // ==================== 5. CUOTAS ====================
-  renderCuotas() {
-    const tbody = document.getElementById('cuotas-tbody');
-    const display = document.getElementById('total-collected-display');
-    if (!tbody) return;
-
-    const stats = store.getStats();
-    if (display) display.textContent = `${stats.totalCollected} €`;
-
-    const players = store.getPlayers();
-    tbody.innerHTML = players.map(p => {
-      const fac = FACULTIES.find(f => f.id === p.faculty) || FACULTIES[0];
-      const isPaid = p.feeStatus === 'pagado';
-
-      return `
-        <tr class="hover:bg-slate-900/60">
-          <td class="py-3 px-4 font-mono font-bold text-amber-400">#${p.number}</td>
-          <td class="py-3 px-4 font-bold text-white">${p.name}</td>
-          <td class="py-3 px-4 text-xs">${fac.icon} ${fac.name}</td>
-          <td class="py-3 px-4 font-semibold text-emerald-400 text-xs">${p.rolesHierarchy.best}</td>
-          <td class="py-3 px-4 text-center">
-            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isPaid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">
-              ${isPaid ? '✅ Pagado (35€)' : '❌ Pendiente'}
-            </span>
-          </td>
-          <td class="py-3 px-4 text-center admin-only">
-            <button onclick="window.futApp.toggleFee('${p.id}')" class="px-2 py-1 rounded bg-slate-800 text-xs text-slate-300 hover:text-white">
-              Cambiar
-            </button>
-          </td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  toggleFee(playerId) {
-    const p = store.getPlayerById(playerId);
-    if (!p) return;
-    const next = p.feeStatus === 'pagado' ? 'pendiente' : 'pagado';
-    store.updatePlayer(playerId, { feeStatus: next });
-  }
-
-  // Especialistas a balón parado
   renderSpecialists() {
     const settings = store.getSettings();
     const players = store.getPlayers();
@@ -917,9 +855,9 @@ class FutApp {
   }
 
   quickLogin(email, pass) {
-    document.getElementById('login-email').value = email;
-    document.getElementById('login-password').value = pass;
-    document.getElementById('form-login').dispatchEvent(new Event('submit', { cancelable: true }));
+    authService.signIn(email, pass).then(() => {
+      document.getElementById('login-dialog').close();
+    }).catch(err => alert(err.message));
   }
 }
 
