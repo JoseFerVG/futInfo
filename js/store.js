@@ -451,6 +451,12 @@ export class TeamStore {
     return { ...this.settings };
   }
 
+  updateSettings(newSettings) {
+    this.settings = { ...this.settings, ...newSettings };
+    this.notify();
+    return this.settings;
+  }
+
   setModality(modality) {
     if (modality === 'f7' || modality === 'futsal') {
       this.settings.modality = modality;

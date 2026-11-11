@@ -201,7 +201,28 @@ class AuthService {
   async signIn(email, password) {
     const cleanEmail = email.trim().toLowerCase();
 
-    // Firebase Auth
+    // 1. Comprobar si es cuenta local / demo (ej. mister@rector.es o charly@rector.es)
+    const accounts = JSON.parse(localStorage.getItem(AUTH_ACCOUNTS_KEY) || '[]');
+    const localMatch = accounts.find(a => a.email.toLowerCase() === cleanEmail && a.password === password);
+
+    if (localMatch) {
+      const existingPlayer = store.getPlayers().find(p => p.id === localMatch.playerId || p.email.toLowerCase() === cleanEmail);
+      const userObj = {
+        id: localMatch.id,
+        name: localMatch.name,
+        email: localMatch.email,
+        photoURL: localMatch.photoURL || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+        role: localMatch.role || 'player',
+        playerId: existingPlayer ? existingPlayer.id : localMatch.playerId,
+        isFirebase: false
+      };
+      this.currentUser = userObj;
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
+      this.notify();
+      return { success: true, user: userObj };
+    }
+
+    // 2. Si no es cuenta local y Firebase está configurado, usar Firebase Auth
     if (isFirebaseConfigured() && auth) {
       try {
         const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
@@ -230,28 +251,7 @@ class AuthService {
       }
     }
 
-    // Modo Local
-    const accounts = JSON.parse(localStorage.getItem(AUTH_ACCOUNTS_KEY) || '[]');
-    const found = accounts.find(a => a.email.toLowerCase() === cleanEmail && a.password === password);
-
-    if (found) {
-      const existingPlayer = store.getPlayers().find(p => p.id === found.playerId || p.email.toLowerCase() === cleanEmail);
-      const userObj = {
-        id: found.id,
-        name: found.name,
-        email: found.email,
-        photoURL: found.photoURL || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-        role: found.role || 'player',
-        playerId: existingPlayer ? existingPlayer.id : found.playerId,
-        isFirebase: false
-      };
-      this.currentUser = userObj;
-      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
-      this.notify();
-      return { success: true, user: userObj };
-    } else {
-      throw new Error('Credenciales incorrectas. (Prueba con Google o mister@rector.es)');
-    }
+    throw new Error('Credenciales incorrectas. (Prueba con Google o mister@rector.es)');
   }
 
   async signOut() {

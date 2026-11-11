@@ -220,12 +220,12 @@ class FutApp {
     setupBackdropDismiss(resultDialog);
 
     document.getElementById('btn-open-create-card')?.addEventListener('click', () => {
-      const user = authService.getCurrentUser();
-      if (!user) {
-        loginDialog.showModal();
-      } else {
-        this.openPlayerSetupModal(user);
-      }
+      const user = authService.getCurrentUser() || {
+        name: 'Nuevo Jugador',
+        email: `fichaje_${Date.now()}@rector.es`,
+        photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+      };
+      this.openPlayerSetupModal(user);
     });
   }
 
