@@ -1,20 +1,19 @@
 /**
- * Módulo de Autenticación
- * Integra Firebase Authentication con fallback automático a LocalStorage
+ * Módulo de Autenticación con Firebase y Registro de Ficha FIFA
  */
-import { auth, isFirebaseConfigured } from './firebase-config.js';
+import { auth, db, isFirebaseConfigured } from './firebase-config.js';
+import { store } from './store.js';
 
-const AUTH_USER_KEY = 'futinfo_auth_user_v1';
-const AUTH_ACCOUNTS_KEY = 'futinfo_auth_accounts_v1';
+const AUTH_USER_KEY = 'futinfo_fifa_auth_user_v2';
+const AUTH_ACCOUNTS_KEY = 'futinfo_fifa_accounts_v2';
 
-// Cuentas demo predeterminadas para acceso rápido
 const DEFAULT_ACCOUNTS = [
   {
     id: 'usr_admin',
-    name: 'Míster José Fernando',
+    name: 'Míster José Fer',
     email: 'mister@rector.es',
     password: 'rector2026',
-    role: 'admin', // Míster / Capitán
+    role: 'admin',
     playerId: null
   },
   {
@@ -22,7 +21,7 @@ const DEFAULT_ACCOUNTS = [
     name: 'Carlos Ruiz',
     email: 'charly@rector.es',
     password: 'rector2026',
-    role: 'player', // Jugador
+    role: 'player',
     playerId: 'p1'
   }
 ];
@@ -35,12 +34,10 @@ class AuthService {
   }
 
   init() {
-    // Inicializar cuentas locales si no existen
     if (!localStorage.getItem(AUTH_ACCOUNTS_KEY)) {
       localStorage.setItem(AUTH_ACCOUNTS_KEY, JSON.stringify(DEFAULT_ACCOUNTS));
     }
 
-    // Restaurar sesión activa
     const saved = localStorage.getItem(AUTH_USER_KEY);
     if (saved) {
       try {
@@ -78,19 +75,22 @@ class AuthService {
   async signIn(email, password) {
     const cleanEmail = email.trim().toLowerCase();
 
-    // Si Firebase está conectado, usar Firebase Auth
+    // Si Firebase está configurado, usar Firebase Authentication
     if (isFirebaseConfigured() && auth) {
       try {
         const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
         const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, password);
         const fbUser = userCredential.user;
 
-        // Determinar rol (admin por defecto si coincide con mister o se guarda en perfil)
+        const isMister = cleanEmail.includes('mister') || cleanEmail.includes('admin');
+        const existingPlayer = store.getPlayers().find(p => p.email.toLowerCase() === cleanEmail);
+
         const userObj = {
           id: fbUser.uid,
           name: fbUser.displayName || cleanEmail.split('@')[0],
           email: fbUser.email,
-          role: cleanEmail.includes('mister') || cleanEmail.includes('admin') ? 'admin' : 'player',
+          role: isMister ? 'admin' : 'player',
+          playerId: existingPlayer ? existingPlayer.id : null,
           isFirebase: true
         };
 
@@ -104,17 +104,18 @@ class AuthService {
       }
     }
 
-    // Modo LocalStorage / Demo
+    // Modo LocalStorage / Offline
     const accounts = JSON.parse(localStorage.getItem(AUTH_ACCOUNTS_KEY) || '[]');
     const found = accounts.find(a => a.email.toLowerCase() === cleanEmail && a.password === password);
 
     if (found) {
+      const existingPlayer = store.getPlayers().find(p => p.id === found.playerId || p.email.toLowerCase() === cleanEmail);
       const userObj = {
         id: found.id,
         name: found.name,
         email: found.email,
         role: found.role || 'player',
-        playerId: found.playerId || null,
+        playerId: existingPlayer ? existingPlayer.id : found.playerId,
         isFirebase: false
       };
       this.currentUser = userObj;
@@ -126,22 +127,50 @@ class AuthService {
     }
   }
 
-  async signUp(name, email, password, role = 'player', playerId = null) {
-    const cleanEmail = email.trim().toLowerCase();
+  async signUpWithPlayerCard(formData) {
+    const cleanEmail = formData.email.trim().toLowerCase();
+    const isMister = formData.role === 'admin';
 
-    // Si Firebase está configurado
+    // 1. Si es jugador, creamos su Ficha FIFA en el store
+    let createdPlayer = null;
+    if (!isMister) {
+      createdPlayer = store.addPlayer({
+        name: formData.name,
+        nickname: formData.nickname || formData.name.split(' ')[0],
+        number: parseInt(formData.number, 10) || 7,
+        rating: parseInt(formData.rating, 10) || 80,
+        faculty: formData.faculty || 'inf',
+        preferredFoot: formData.preferredFoot || 'Diestro',
+        studentId: formData.studentId || '',
+        phone: formData.phone || '',
+        email: cleanEmail,
+        roleBest: formData.roleBest,
+        roleSecond: formData.roleSecond,
+        roleThird: formData.roleThird,
+        roleWorst: formData.roleWorst,
+        pac: formData.pac || 80,
+        sho: formData.sho || 75,
+        pas: formData.pas || 78,
+        dri: formData.dri || 80,
+        def: formData.def || 65,
+        phy: formData.phy || 75,
+        chemStyle: formData.chemStyle || 'BAS'
+      });
+    }
+
+    // 2. Si Firebase está activo, crear en Firebase Authentication
     if (isFirebaseConfigured() && auth) {
       try {
         const { createUserWithEmailAndPassword, updateProfile } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-        const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
-        await updateProfile(userCredential.user, { displayName: name });
+        const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, formData.password);
+        await updateProfile(userCredential.user, { displayName: formData.name });
 
         const userObj = {
           id: userCredential.user.uid,
-          name: name,
+          name: formData.name,
           email: cleanEmail,
-          role: role,
-          playerId: playerId,
+          role: formData.role || 'player',
+          playerId: createdPlayer ? createdPlayer.id : null,
           isFirebase: true
         };
 
@@ -155,19 +184,19 @@ class AuthService {
       }
     }
 
-    // Registro Local
+    // 3. Registro Local
     const accounts = JSON.parse(localStorage.getItem(AUTH_ACCOUNTS_KEY) || '[]');
     if (accounts.some(a => a.email.toLowerCase() === cleanEmail)) {
-      throw new Error('Ya existe una cuenta registrada con este correo electrónico.');
+      throw new Error('Ya existe una cuenta con este correo.');
     }
 
     const newAccount = {
       id: 'usr_' + Date.now(),
-      name,
+      name: formData.name,
       email: cleanEmail,
-      password,
-      role,
-      playerId
+      password: formData.password,
+      role: formData.role || 'player',
+      playerId: createdPlayer ? createdPlayer.id : null
     };
 
     accounts.push(newAccount);

@@ -1,8 +1,22 @@
-/* Estilos personalizados para el Gestor del Torneo del Rector */
+/* Estilos FIFA Ultimate Team (FUT) - Torneo del Rector */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Teko:wght@500;600;700&display=swap');
 
 :root {
-  --pitch-green: #15803d;
-  --pitch-line: rgba(255, 255, 255, 0.65);
+  --fut-gold-1: #f9e27c;
+  --fut-gold-2: #d6a738;
+  --fut-gold-3: #9b7216;
+  --fut-gold-dark: #443209;
+  --fut-dark-bg: #090e17;
+  --chem-green: #00e676;
+  --chem-orange: #ff9100;
+  --chem-red: #ff1744;
+}
+
+/* Tipografía de cartas FIFA */
+.font-fifa {
+  font-family: 'Teko', sans-serif;
+  letter-spacing: 0.5px;
 }
 
 /* Reglas obligatorias de Modern Web Guidance para diálogos nativos */
@@ -17,19 +31,18 @@ dialog:modal {
 dialog::backdrop {
   overflow: hidden;
   overscroll-behavior: contain;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(6px);
+  background: rgba(4, 7, 13, 0.85);
+  backdrop-filter: blur(8px);
 }
 
-/* Animación de apertura y cierre de modal */
 dialog[open] {
-  animation: modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: modal-zoom 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes modal-in {
+@keyframes modal-zoom {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(8px);
+    transform: scale(0.94) translateY(12px);
   }
   to {
     opacity: 1;
@@ -37,194 +50,421 @@ dialog[open] {
   }
 }
 
-/* Campo de fútbol táctico */
-.football-pitch {
-  background: linear-gradient(to bottom, #166534 0%, #15803d 50%, #166534 100%);
+/* ==================== ESTADIO Y CAMPO FIFA FUT EN PERSPECTIVA ==================== */
+.fut-stadium-container {
+  background: radial-gradient(circle at 50% 20%, #1a2a40 0%, #0c1421 60%, #060a12 100%);
   position: relative;
-  border-radius: 1rem;
-  border: 3px solid rgba(255, 255, 255, 0.85);
-  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.3), 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   overflow: hidden;
-  min-height: 480px;
-  user-select: none;
+  min-height: 640px;
 }
 
-/* Bandas de césped */
-.football-pitch::before {
+/* Fondo con focos de estadio FIFA */
+.fut-stadium-container::before {
   content: "";
   position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 40px,
-    rgba(0, 0, 0, 0.05) 40px,
-    rgba(0, 0, 0, 0.05) 80px
-  );
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  background: radial-gradient(ellipse at 50% -20%, rgba(56, 189, 248, 0.25), transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Césped con perspectiva 3D */
+.fut-pitch {
+  position: relative;
+  width: 100%;
+  height: 620px;
+  background: 
+    linear-gradient(to bottom, rgba(16, 120, 60, 0.85) 0%, rgba(20, 140, 70, 0.95) 45%, rgba(14, 105, 50, 1) 100%),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 45px,
+      rgba(0, 0, 0, 0.08) 45px,
+      rgba(0, 0, 0, 0.08) 90px
+    );
+  border-radius: 1rem;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+/* Líneas del terreno de juego FIFA */
+.pitch-line-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
   pointer-events: none;
 }
 
-/* Línea de medio campo */
-.pitch-half-line {
+.pitch-line-half {
   position: absolute;
   top: 50%;
-  left: 0;
-  right: 0;
+  left: 5%;
+  right: 5%;
   height: 2px;
-  background: var(--pitch-line);
+  background: rgba(255, 255, 255, 0.45);
   transform: translateY(-50%);
+  pointer-events: none;
 }
 
-/* Círculo central */
-.pitch-center-circle {
+.pitch-penalty-box-bottom {
   position: absolute;
-  top: 50%;
+  bottom: 0;
   left: 50%;
-  width: 110px;
+  transform: translateX(-50%);
+  width: 58%;
   height: 110px;
-  border: 2px solid var(--pitch-line);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
+  border-top: 2px solid rgba(255, 255, 255, 0.45);
+  border-left: 2px solid rgba(255, 255, 255, 0.45);
+  border-right: 2px solid rgba(255, 255, 255, 0.45);
+  pointer-events: none;
 }
 
-.pitch-center-dot {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  background: white;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/* Áreas de penalti */
-.pitch-penalty-area-top {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 55%;
-  height: 90px;
-  border-bottom: 2px solid var(--pitch-line);
-  border-left: 2px solid var(--pitch-line);
-  border-right: 2px solid var(--pitch-line);
-}
-
-.pitch-goal-area-top {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30%;
-  height: 40px;
-  border-bottom: 2px solid var(--pitch-line);
-  border-left: 2px solid var(--pitch-line);
-  border-right: 2px solid var(--pitch-line);
-}
-
-.pitch-penalty-area-bottom {
+.pitch-goal-box-bottom {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 55%;
-  height: 90px;
-  border-top: 2px solid var(--pitch-line);
-  border-left: 2px solid var(--pitch-line);
-  border-right: 2px solid var(--pitch-line);
+  width: 28%;
+  height: 48px;
+  border-top: 2px solid rgba(255, 255, 255, 0.45);
+  border-left: 2px solid rgba(255, 255, 255, 0.45);
+  border-right: 2px solid rgba(255, 255, 255, 0.45);
+  pointer-events: none;
 }
 
-.pitch-goal-area-bottom {
+.pitch-penalty-box-top {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 30%;
-  height: 40px;
-  border-top: 2px solid var(--pitch-line);
-  border-left: 2px solid var(--pitch-line);
-  border-right: 2px solid var(--pitch-line);
+  width: 58%;
+  height: 100px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+  border-left: 2px solid rgba(255, 255, 255, 0.35);
+  border-right: 2px solid rgba(255, 255, 255, 0.35);
+  pointer-events: none;
 }
 
-/* Ficha de jugador en la pizarra */
-.pitch-player-node {
+/* Red de la portería en primer plano (inferior) */
+.pitch-goal-net {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 42px;
+  background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.35) 4px, rgba(255, 255, 255, 0.35) 5px),
+              repeating-linear-gradient(-45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.35) 4px, rgba(255, 255, 255, 0.35) 5px);
+  border-top: 3px solid rgba(255, 255, 255, 0.9);
+  border-left: 3px solid rgba(255, 255, 255, 0.9);
+  border-right: 3px solid rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Líneas de química SVG interactivas */
+.chem-lines-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 8;
+}
+
+.chem-link {
+  stroke-width: 4px;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
+  transition: stroke 0.3s ease;
+}
+
+.chem-link.green {
+  stroke: var(--chem-green);
+  filter: drop-shadow(0 0 6px rgba(0, 230, 118, 0.7));
+}
+
+.chem-link.orange {
+  stroke: var(--chem-orange);
+  filter: drop-shadow(0 0 6px rgba(255, 145, 0, 0.7));
+}
+
+.chem-link.red {
+  stroke: var(--chem-red);
+  filter: drop-shadow(0 0 6px rgba(255, 23, 68, 0.7));
+}
+
+/* ==================== CARTA DE FIFA ULTIMATE TEAM (FUT CARD) ==================== */
+.fut-card-slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: absolute;
-  transform: translate(-50%, -50%);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 15;
   cursor: pointer;
-  z-index: 10;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0.1s;
 }
 
-.pitch-player-node:hover {
-  transform: translate(-50%, -50%) scale(1.12);
-  z-index: 20;
+.fut-card-slot:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  z-index: 30;
 }
 
-.pitch-player-jersey {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7);
-  border: 2px solid #ffffff;
-  color: white;
+/* Forma clásica de la carta FUT */
+.fut-card {
+  position: relative;
+  width: 90px;
+  height: 124px;
+  border-radius: 8px 8px 14px 14px;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 14px),
+    calc(100% - 14px) 100%,
+    14px 100%,
+    0 calc(100% - 14px)
+  );
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Variantes de cartas FUT */
+.fut-card-gold {
+  background: linear-gradient(135deg, #fce074 0%, #dfb443 25%, #c79624 50%, #f6e69f 75%, #b37e10 100%);
+  color: #2b1f06;
+}
+
+.fut-card-totw {
+  background: linear-gradient(135deg, #2b2b2b 0%, #151515 40%, #000000 70%, #d4af37 100%);
+  color: #f7d358;
+  border: 1px solid #d4af37;
+}
+
+.fut-card-special {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 40%, #0284c7 70%, #38bdf8 100%);
+  color: #ffffff;
+}
+
+/* Efecto de brillo metálico FUT */
+.fut-card::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 60%
+  );
+  transform: rotate(25deg);
+  pointer-events: none;
+}
+
+/* Cabecera de la carta FUT */
+.fut-card-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 6px 0 6px;
+  height: 68px;
+}
+
+.fut-card-badge-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.9;
+  z-index: 2;
+}
+
+.fut-card-rating {
+  font-family: 'Teko', sans-serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.fut-card-pos {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-top: -2px;
+}
+
+.fut-card-emblem {
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+
+/* Foto recortada del jugador */
+.fut-card-avatar-wrap {
+  position: absolute;
+  right: 2px;
+  top: 4px;
+  width: 58px;
+  height: 65px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.fut-card-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Franja del nombre del jugador */
+.fut-card-name-plate {
+  text-align: center;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 4px;
+  margin: 0 4px;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 2;
+}
+
+/* Química / Atributo en la parte inferior */
+.fut-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 3px 6px;
+  font-family: 'Teko', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 2;
+}
+
+.fut-chem-style-badge {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.55rem;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ==================== PEDESTAL DE POSICIÓN HEXAGONAL ==================== */
+.fut-pos-pedestal {
+  margin-top: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Outfit', sans-serif;
   font-weight: 800;
-  font-size: 1rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  background: #0f172a;
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  gap: 4px;
 }
 
-.pitch-player-jersey.gk {
-  background: radial-gradient(circle at 30% 30%, #fbbf24, #d97706);
-}
-
-.pitch-player-name {
-  background: rgba(15, 23, 42, 0.9);
-  color: white;
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 9999px;
-  margin-top: 4px;
-  white-space: nowrap;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Tarjetas de jugadores */
-.player-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.player-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.15);
-}
-
-/* Estilos de scrollbar moderna */
-::-webkit-scrollbar {
+/* Indicador de posición de rol (Mejor / Segundo / Peor) */
+.fut-pos-dot {
   width: 6px;
   height: 6px;
+  border-radius: 50%;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
+.fut-pos-pedestal.exact {
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.5);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+}
+.fut-pos-pedestal.exact .fut-pos-dot {
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
 }
 
-.dark ::-webkit-scrollbar-track {
-  background: #1e293b;
+.fut-pos-pedestal.secondary {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+.fut-pos-pedestal.secondary .fut-pos-dot {
+  background: #f59e0b;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+.fut-pos-pedestal.wrong {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.5);
+}
+.fut-pos-pedestal.wrong .fut-pos-dot {
+  background: #ef4444;
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: #475569;
+/* ==================== HUD SUPERIOR ESTILO FIFA ==================== */
+.fut-hud-box {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  padding: 0.75rem 1.25rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.fut-chem-bar-fill {
+  background: linear-gradient(to right, #ef4444, #f59e0b 50%, #22c55e 100%);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==================== CARTA DE ENTRENADOR (MANAGER CARD) ==================== */
+.fut-manager-card {
+  width: 60px;
+  height: 82px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #dfb443 0%, #c79624 50%, #9b7216 100%);
+  color: #2b1f06;
+  position: relative;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Banquillo / Suplentes */
+.fut-bench-tray {
+  background: rgba(10, 15, 26, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow-x: auto;
 }
