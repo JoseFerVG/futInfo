@@ -125,7 +125,7 @@
   </header>
 
   <!-- CONTENIDO PRINCIPAL -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <main class="flex-1 max-w-[1600px] w-full mx-auto px-2 sm:px-4 lg:px-6 py-4">
 
     <!-- ==================== 1. VISTA PIZARRA FIFA ULTIMATE TEAM ==================== -->
     <section id="view-pitch" class="tab-view space-y-5">
@@ -151,7 +151,7 @@
         </div>
 
         <!-- EL CAMPO DE FÚTBOL FIFA CON HUDs FLOTANTES -->
-        <div id="pitch-wrapper" class="fut-pitch relative flex-1 min-h-[580px] sm:min-h-[640px]">
+        <div id="pitch-wrapper" class="fut-pitch relative">
           
           <!-- HUD Izquierdo: Formación y Tarjeta del Míster FIFA 18 -->
           <div class="fut-left-dock">
@@ -206,12 +206,40 @@
             </div>
           </div>
 
-          <!-- Demarcación del Campo en Perspectiva -->
-          <div class="pitch-line-circle"></div>
-          <div class="pitch-line-half"></div>
-          <div class="pitch-penalty-box-top"></div>
-          <div class="pitch-penalty-box-bottom"></div>
-          <div class="pitch-goal-box-bottom"></div>
+          <!-- SPRINT 1: Gradas del estadio en penumbra + valla LED perimetral -->
+          <div class="fut-stands" aria-hidden="true">
+            <div class="fut-stands-crowd"></div>
+            <div class="fut-led-board">
+              <div class="fut-led-track">
+                <span>EA SPORTS</span><span class="led-cyan">FUT</span><span>TORNEO DEL RECTOR</span><span class="led-gold">ULTIMATE TEAM</span>
+                <span>EA SPORTS</span><span class="led-cyan">FUT</span><span>TORNEO DEL RECTOR</span><span class="led-gold">ULTIMATE TEAM</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SPRINT 1: Escena 3D — césped con perspectiva isométrica (rotateX 24º) -->
+          <div class="fut-pitch-scene" aria-hidden="true">
+            <div class="fut-pitch-turf">
+              <div class="turf-outline"></div>
+              <div class="pitch-line-half"></div>
+              <div class="pitch-line-circle"></div>
+              <div class="pitch-center-spot"></div>
+              <div class="pitch-penalty-box-top"></div>
+              <div class="pitch-goal-box-top"></div>
+              <div class="pitch-penalty-box-bottom"></div>
+              <div class="pitch-goal-box-bottom"></div>
+              <div class="pitch-penalty-arc"></div>
+            </div>
+          </div>
+
+          <!-- SPRINT 1: Focos volumétricos estilo Champions League -->
+          <div class="fut-floodlights" aria-hidden="true">
+            <span class="fut-beam beam-1"></span>
+            <span class="fut-beam beam-2"></span>
+            <span class="fut-beam beam-3"></span>
+            <span class="fut-beam beam-4"></span>
+          </div>
+          <div class="fut-vignette" aria-hidden="true"></div>
 
           <!-- Portería 3D Foreground -->
           <div class="pitch-goal-net-3d"></div>
@@ -222,6 +250,26 @@
 
           <!-- Nodos de Cartas de Jugadores -->
           <div id="pitch-slots-container"></div>
+
+          <!-- SPRINT 3: MENÚ RADIAL DE CONSOLA / ACTION WHEEL -->
+          <div id="fut-radial-menu" class="fut-radial-menu hidden" style="top: 50%; left: 50%;">
+            <button type="button" id="btn-radial-sub" class="fut-radial-btn radial-top" title="[X] Sustituir con Suplente">
+              <span class="gamepad-badge x-btn">X</span>
+              <span class="radial-label">Sustituir</span>
+            </button>
+            <button type="button" id="btn-radial-inspect" class="fut-radial-btn radial-right" title="[Y] Ver Ficha Técnica">
+              <span class="gamepad-badge y-btn">Y</span>
+              <span class="radial-label">Ficha</span>
+            </button>
+            <button type="button" id="btn-radial-captain" class="fut-radial-btn radial-left" title="[A] Hacer Capitán">
+              <span class="gamepad-badge a-btn">A</span>
+              <span class="radial-label">Capitán</span>
+            </button>
+            <button type="button" id="btn-radial-cancel" class="fut-radial-btn radial-bottom" title="[B] Salir">
+              <span class="gamepad-badge b-btn">B</span>
+              <span class="radial-label">Cerrar</span>
+            </button>
+          </div>
         </div>
 
         <!-- BANQUILLO DE SUPLENTES FUT -->
@@ -759,6 +807,39 @@
       </form>
     </div>
   </dialog>
+
+  <!-- SPRINT 3: CINEMÁTICA DE WALKOUT / APERTURA DE CROMO FIFA FUT -->
+  <div id="fut-walkout-overlay" class="fut-walkout-screen hidden">
+    <div class="walkout-spotlight spotlight-1"></div>
+    <div class="walkout-spotlight spotlight-2"></div>
+    <div class="walkout-sparks-bg"></div>
+
+    <div class="walkout-stage">
+      <!-- Paso 1: Escudo de Facultad -->
+      <div id="walkout-crest-step" class="walkout-step">
+        <div id="walkout-crest-icon" class="text-7xl animate-bounce">💻</div>
+        <div id="walkout-crest-name" class="font-fifa text-2xl text-amber-300 uppercase tracking-widest mt-2">FACULTAD</div>
+      </div>
+
+      <!-- Paso 2: Posición Principal -->
+      <div id="walkout-pos-step" class="walkout-step hidden">
+        <div id="walkout-pos-pill" class="font-fifa text-5xl text-slate-950 font-black px-6 py-1 bg-amber-400 rounded-xl shadow-2xl">DC</div>
+      </div>
+
+      <!-- Paso 3: Carta Gigante y Revelación -->
+      <div id="walkout-card-step" class="walkout-step hidden flex flex-col items-center">
+        <div id="walkout-card-host" class="walkout-card-host"></div>
+        <div class="mt-4 text-center">
+          <div id="walkout-rating-ticker" class="font-fifa text-8xl font-black text-amber-400 leading-none drop-shadow-[0_0_25px_rgba(251,191,36,0.8)]">00</div>
+          <div id="walkout-player-nickname" class="font-fifa text-4xl font-black text-white uppercase tracking-widest mt-1">FICHAJE ESTRELLA</div>
+          <p id="walkout-status-text" class="text-xs text-amber-300/80 font-bold mt-1">¡Nuevo Jugador Fichado para el Torneo del Rector!</p>
+          <button type="button" id="btn-close-walkout" class="mt-4 px-8 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-2xl hover:scale-105 active:scale-95 transition">
+            ⚡ Confirmar Fichaje y Entrar a la Plantilla
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- SCRIPTS -->
   <script type="module" src="js/app.js"></script>

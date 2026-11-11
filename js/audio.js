@@ -147,6 +147,114 @@ class FUTAudioEngine {
       osc.stop(t + 0.22);
     } catch (_) {}
   }
+
+  // Tictac rápido del contador de media (Rating counter tick)
+  playRatingTick() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1400, t);
+      osc.frequency.exponentialRampToValueAtTime(1800, t + 0.02);
+
+      gain.gain.setValueAtTime(0.08, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.025);
+    } catch (_) {}
+  }
+
+  // Explosión cinematográfica de Walkout / Revelación de sobre
+  playWalkoutExplosion() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const t = this.ctx.currentTime;
+
+      // 1. Sub-bass cañonazo de estadio
+      const sub = this.ctx.createOscillator();
+      const subGain = this.ctx.createGain();
+      sub.type = 'sine';
+      sub.frequency.setValueAtTime(140, t);
+      sub.frequency.exponentialRampToValueAtTime(35, t + 0.6);
+
+      subGain.gain.setValueAtTime(0.45, t);
+      subGain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+
+      sub.connect(subGain);
+      subGain.connect(this.ctx.destination);
+      sub.start(t);
+      sub.stop(t + 0.7);
+
+      // 2. Chispas doradas / fuegos artificiales
+      const freqs = [784, 987.77, 1318.51, 1567.98];
+      freqs.forEach((f, idx) => {
+        const chime = this.ctx.createOscillator();
+        const chimeGain = this.ctx.createGain();
+
+        chime.type = 'triangle';
+        chime.frequency.setValueAtTime(f, t + idx * 0.06);
+
+        chimeGain.gain.setValueAtTime(0, t + idx * 0.06);
+        chimeGain.gain.linearRampToValueAtTime(0.12, t + idx * 0.06 + 0.03);
+        chimeGain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.06 + 0.5);
+
+        chime.connect(chimeGain);
+        chimeGain.connect(this.ctx.destination);
+        chime.start(t + idx * 0.06);
+        chime.stop(t + idx * 0.06 + 0.5);
+      });
+    } catch (_) {}
+  }
+
+  // Fanfarria triunfal de fichaje completado
+  playFanfare() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const t = this.ctx.currentTime;
+      const notes = [
+        { f: 523.25, time: 0, dur: 0.15 },
+        { f: 659.25, time: 0.12, dur: 0.15 },
+        { f: 783.99, time: 0.24, dur: 0.2 },
+        { f: 1046.50, time: 0.4, dur: 0.6 }
+      ];
+
+      notes.forEach(({ f, time, dur }) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(f, t + time);
+
+        // Suave filtro pasa-bajos para tono cálido de metal
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(2200, t + time);
+
+        gain.gain.setValueAtTime(0, t + time);
+        gain.gain.linearRampToValueAtTime(0.12, t + time + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + time + dur);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(t + time);
+        osc.stop(t + time + dur);
+      });
+    } catch (_) {}
+  }
 }
 
 export const futAudio = new FUTAudioEngine();

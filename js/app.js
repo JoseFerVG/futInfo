@@ -33,6 +33,7 @@ class FutApp {
   constructor() {
     this.currentTab = 'pitch';
     this.selectedStarterIndex = null;
+    this.activeRadialIndex = null;
     this.init();
   }
 
@@ -55,6 +56,13 @@ class FutApp {
 
     // 4. Configurar eventos
     this.bindEvents();
+
+    // Sprint 1: re-proyectar el césped 3D al cambiar entre móvil y escritorio
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => this.renderPitch(), 150);
+    });
 
     // 5. Render inicial
     this.renderAll();
@@ -166,6 +174,39 @@ class FutApp {
     // Botón cerrar cajón de sustitución
     document.getElementById('btn-close-sub-drawer')?.addEventListener('click', () => {
       this.closeSubDrawer();
+    });
+
+    // Control de Teclado estilo consola para el Menú Radial
+    window.addEventListener('keydown', (e) => {
+      if (this.activeRadialIndex !== null) {
+        const key = e.key.toLowerCase();
+        if (key === 'x') {
+          e.preventDefault();
+          document.getElementById('btn-radial-sub')?.click();
+        } else if (key === 'y') {
+          e.preventDefault();
+          document.getElementById('btn-radial-inspect')?.click();
+        } else if (key === 'a') {
+          e.preventDefault();
+          document.getElementById('btn-radial-captain')?.click();
+        } else if (key === 'b' || key === 'escape') {
+          e.preventDefault();
+          this.closeRadialMenu(true);
+        }
+      } else if (e.key === 'Escape') {
+        this.closeSubDrawer();
+      }
+    });
+
+    // Shader Holográfico Dinámico reactivo al cursor / puntero
+    document.addEventListener('pointermove', (e) => {
+      const card = e.target.closest('.fut-card');
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty('--glare-x', `${x.toFixed(1)}%`);
+      card.style.setProperty('--glare-y', `${y.toFixed(1)}%`);
     });
 
     // Modales setup
@@ -316,9 +357,12 @@ class FutApp {
       };
 
       try {
-        await authService.completePlayerCard(cardData);
+        const newPlayer = await authService.completePlayerCard(cardData);
         document.getElementById('player-card-setup-dialog').close();
         this.showToast('¡Tu Carta FIFA FUT ha sido generada con éxito!', '🎴');
+        if (newPlayer) {
+          this.triggerWalkout(newPlayer);
+        }
       } catch (err) {
         alert(err.message);
       }
@@ -710,11 +754,14 @@ class FutApp {
     const bar = document.getElementById('hud-chem-bar');
     if (bar) bar.style.width = `${chemRatingData.chemistry}%`;
 
-    // Dibujar Líneas de Química Vectoriales (Unidas a los Pedestales en 3D)
+    // Dibujar Líneas de Química Vectoriales (Unidas a los Pedestales en 3D con Pulso Cinético)
+    // Sprint 1 & 2: todas las posiciones pasan por projectSlot() y tienen casing oscuro + núcleo de neón pulsante
+    const projected = formationConfig.slots.map(s => this.projectSlot(s));
     let svgHtml = '';
     formationConfig.links.forEach(([fromIdx, toIdx]) => {
       const fromSlot = formationConfig.slots[fromIdx];
-      const toSlot = formationConfig.slots[toIdx];
+      const a = projected[fromIdx];
+      const b = projected[toIdx];
       const p1 = startingPlayers[fromIdx];
       const p2 = startingPlayers[toIdx];
 
@@ -724,10 +771,12 @@ class FutApp {
         else if (p1.rolesHierarchy && p1.rolesHierarchy.worst === fromSlot.role) chemClass = 'red';
       }
 
-      // Conexión anclada exactamente a la base del pedestal
-      const yOffset = 7;
+      // Conexión anclada a la base del pedestal con doble trazo (casing + energía)
+      const y1 = a.top + 7.5 * a.scale;
+      const y2 = b.top + 7.5 * b.scale;
       svgHtml += `
-        <line x1="${fromSlot.left}%" y1="${fromSlot.top + yOffset}%" x2="${toSlot.left}%" y2="${toSlot.top + yOffset}%" class="chem-link ${chemClass}" />
+        <line x1="${a.left}%" y1="${y1}%" x2="${b.left}%" y2="${y2}%" class="chem-link-bg" />
+        <line x1="${a.left}%" y1="${y1}%" x2="${b.left}%" y2="${y2}%" class="chem-link-pulse ${chemClass}" />
       `;
     });
     svgLines.innerHTML = svgHtml;
@@ -736,10 +785,12 @@ class FutApp {
     slotsContainer.innerHTML = formationConfig.slots.map((slot, index) => {
       const player = startingPlayers[index];
       const isSelected = this.selectedStarterIndex === index;
+      const pr = projected[index];
+      const slotStyle = `top: ${pr.top}%; left: ${pr.left}%; --depth-scale: ${pr.scale}; z-index: ${pr.z};`;
 
       if (!player) {
         return `
-          <div class="fut-card-slot" style="top: ${slot.top}%; left: ${slot.left}%;">
+          <div class="fut-card-slot" style="${slotStyle}">
             <div class="fut-card bg-slate-900/60 border border-dashed border-slate-700 flex items-center justify-center text-slate-500 font-bold text-xs">
               + Vacío
             </div>
@@ -761,10 +812,14 @@ class FutApp {
 
       return `
         <div class="fut-card-slot ${isSelected ? 'swap-active' : ''}" 
-             style="top: ${slot.top}%; left: ${slot.left}%;"
+             style="${slotStyle}"
+             data-slot-index="${index}"
              onclick="window.futApp.selectStarter(${index})">
           
           <div class="fut-card ${cardTypeClass}">
+            <!-- Capa Holográfica Reactiva -->
+            <div class="fut-card-holo-layer"></div>
+
             <div class="fut-card-header">
               <div class="fut-card-badge-col">
                 <span class="fut-card-rating">${player.rating}</span>
@@ -840,6 +895,27 @@ class FutApp {
     }
   }
 
+  /**
+   * Sprint 1 — Proyección en perspectiva de un slot táctico.
+   * Convierte coordenadas "planas" (top/left 0-100 de la pizarra) en coordenadas
+   * de pantalla sobre el césped inclinado 24º: los jugadores del fondo se juntan
+   * hacia el centro y se encogen; el portero queda grande y cerca de cámara.
+   */
+  projectSlot(slot) {
+    const t = Math.min(1, Math.max(0, (slot.top - 15) / 75)); // 0 = fondo, 1 = cámara
+    const depth = Math.pow(t, 1.7); // curva de cámara: las filas cercanas se separan más
+    const isMobile = window.matchMedia('(max-width: 640px)').matches;
+    const minScale = isMobile ? 0.8 : 0.74;
+    const scale = +(minScale + (1 - minScale) * t).toFixed(3);
+    const spread = 0.7 + 0.3 * t;
+    return {
+      top: +(24 + depth * 67).toFixed(2),
+      left: +(50 + (slot.left - 50) * spread).toFixed(2),
+      scale,
+      z: 18 + Math.round(t * 20)
+    };
+  }
+
   getActiveSlotRole(index) {
     const settings = store.getSettings();
     const isF7 = settings.modality === 'f7';
@@ -854,6 +930,69 @@ class FutApp {
     };
     const list = tacticalFormations[activeFormation] || tacticalFormations[isF7 ? '1-3-2-1' : '1-1-2-1'];
     return list[index] || 'MC';
+  }
+
+  openRadialMenu(index, pr) {
+    const radial = document.getElementById('fut-radial-menu');
+    if (!radial) return;
+
+    this.activeRadialIndex = index;
+    radial.style.top = `${pr.top}%`;
+    radial.style.left = `${pr.left}%`;
+    radial.classList.remove('hidden');
+
+    const starting = store.getStartingLineup();
+    const starter = starting[index];
+    if (!starter) return;
+
+    // Configurar acciones del menú radial de consola
+    const btnSub = document.getElementById('btn-radial-sub');
+    const btnInspect = document.getElementById('btn-radial-inspect');
+    const btnCaptain = document.getElementById('btn-radial-captain');
+    const btnCancel = document.getElementById('btn-radial-cancel');
+
+    if (btnSub) {
+      btnSub.onclick = (e) => {
+        e.stopPropagation();
+        this.closeRadialMenu(false);
+        this.openSubDrawer(index);
+      };
+    }
+
+    if (btnInspect) {
+      btnInspect.onclick = (e) => {
+        e.stopPropagation();
+        this.closeRadialMenu(true);
+        this.inspectPlayer(starter.id);
+      };
+    }
+
+    if (btnCaptain) {
+      btnCaptain.onclick = (e) => {
+        e.stopPropagation();
+        store.setSpecialist('captain', starter.id);
+        futAudio.playSuccess();
+        this.showToast(`👑 ${starter.nickname} nombrado Capitán`, '👑');
+        this.closeRadialMenu(true);
+      };
+    }
+
+    if (btnCancel) {
+      btnCancel.onclick = (e) => {
+        e.stopPropagation();
+        this.closeRadialMenu(true);
+      };
+    }
+  }
+
+  closeRadialMenu(resetSelection = true) {
+    const radial = document.getElementById('fut-radial-menu');
+    if (radial) radial.classList.add('hidden');
+    this.activeRadialIndex = null;
+    if (resetSelection) {
+      this.selectedStarterIndex = null;
+      this.renderPitch();
+    }
   }
 
   openSubDrawer(starterIndex) {
@@ -915,8 +1054,7 @@ class FutApp {
   closeSubDrawer() {
     const drawer = document.getElementById('fut-sub-drawer');
     if (drawer) drawer.classList.remove('drawer-open');
-    this.selectedStarterIndex = null;
-    this.renderPitch();
+    this.closeRadialMenu(true);
   }
 
   selectStarter(index) {
@@ -925,8 +1063,23 @@ class FutApp {
     if (this.selectedStarterIndex === null) {
       this.selectedStarterIndex = index;
       this.renderPitch();
-      this.openSubDrawer(index);
-      this.showToast('Toca otro titular, un suplente del banquillo o el menú para cambiarlo', '⚡');
+      const settings = store.getSettings();
+      const isF7 = settings.modality === 'f7';
+      const activeFormation = store.getActiveFormation();
+      const tacticalFormations = {
+        '1-3-2-1': [{ top: 85, left: 50 }, { top: 64, left: 22 }, { top: 68, left: 50 }, { top: 64, left: 78 }, { top: 43, left: 36 }, { top: 43, left: 64 }, { top: 20, left: 50 }],
+        '1-2-3-1': [{ top: 85, left: 50 }, { top: 68, left: 33 }, { top: 68, left: 67 }, { top: 45, left: 20 }, { top: 43, left: 50 }, { top: 45, left: 80 }, { top: 20, left: 50 }],
+        '1-3-1-2': [{ top: 85, left: 50 }, { top: 66, left: 22 }, { top: 70, left: 50 }, { top: 66, left: 78 }, { top: 45, left: 50 }, { top: 20, left: 35 }, { top: 20, left: 65 }],
+        '1-1-2-1': [{ top: 86, left: 50 }, { top: 66, left: 50 }, { top: 44, left: 25 }, { top: 44, left: 75 }, { top: 20, left: 50 }],
+        '1-2-2': [{ top: 86, left: 50 }, { top: 66, left: 33 }, { top: 66, left: 67 }, { top: 26, left: 33 }, { top: 26, left: 67 }],
+        '1-3-0': [{ top: 86, left: 50 }, { top: 52, left: 22 }, { top: 62, left: 50 }, { top: 52, left: 78 }, { top: 30, left: 50 }]
+      };
+      const conf = tacticalFormations[activeFormation] || tacticalFormations[isF7 ? '1-3-2-1' : '1-1-2-1'];
+      const slot = conf[index] || { top: 50, left: 50 };
+      const pr = this.projectSlot(slot);
+
+      this.openRadialMenu(index, pr);
+      this.showToast('Usa el menú radial o toca otro titular para intercambiar', '🎮');
     } else if (this.selectedStarterIndex === index) {
       this.closeSubDrawer();
     } else {
@@ -958,6 +1111,99 @@ class FutApp {
       futAudio.playCardSelect();
       this.inspectPlayer(benchPlayerId);
     }
+  }
+
+  // ==================== CINEMÁTICA WALKOUT FIFA FUT ====================
+  triggerWalkout(player) {
+    const overlay = document.getElementById('fut-walkout-overlay');
+    if (!overlay) return;
+
+    const fac = FACULTIES.find(f => f.id === player.faculty) || FACULTIES[0];
+    const crestStep = document.getElementById('walkout-crest-step');
+    const posStep = document.getElementById('walkout-pos-step');
+    const cardStep = document.getElementById('walkout-card-step');
+    const cardHost = document.getElementById('walkout-card-host');
+    const ticker = document.getElementById('walkout-rating-ticker');
+    const nameTag = document.getElementById('walkout-player-nickname');
+
+    // Resetear visibilidad de pasos
+    crestStep.classList.remove('hidden');
+    posStep.classList.add('hidden');
+    cardStep.classList.add('hidden');
+
+    document.getElementById('walkout-crest-icon').textContent = fac.icon;
+    document.getElementById('walkout-crest-name').textContent = fac.name.toUpperCase();
+    document.getElementById('walkout-pos-pill').textContent = player.rolesHierarchy ? player.rolesHierarchy.best : 'DC';
+
+    overlay.classList.remove('hidden');
+    futAudio.playWalkoutExplosion();
+
+    // Paso 2: Revelar Posición a los 750ms
+    setTimeout(() => {
+      crestStep.classList.add('hidden');
+      posStep.classList.remove('hidden');
+      futAudio.playCardSelect();
+    }, 750);
+
+    // Paso 3: Revelar Carta y Ticker a los 1500ms
+    setTimeout(() => {
+      posStep.classList.add('hidden');
+      cardStep.classList.remove('hidden');
+
+      const cardClass = player.cardType === 'totw' ? 'fut-card-totw' : (player.cardType === 'special' ? 'fut-card-special' : 'fut-card-gold');
+      const chemCode = player.chemStyle || 'BAS';
+      const chemIcon = CHEM_STYLE_ICONS[chemCode] || '⚖️';
+      const bestRole = player.rolesHierarchy ? player.rolesHierarchy.best : 'DC';
+
+      cardHost.innerHTML = `
+        <div class="fut-card ${cardClass}">
+          <div class="fut-card-holo-layer"></div>
+          <div class="fut-card-header">
+            <div class="fut-card-badge-col">
+              <span class="fut-card-rating">${player.rating}</span>
+              <span class="fut-card-pos">${bestRole}</span>
+              <span class="fut-card-emblem">${fac.icon}</span>
+            </div>
+            <div class="fut-card-avatar-wrap">
+              <img src="${player.avatar}" alt="${player.name}" class="fut-card-avatar">
+            </div>
+          </div>
+          <div class="fut-card-name-plate">
+            ${player.nickname || player.name}
+          </div>
+          <div class="fut-card-footer">
+            <span class="fut-chem-style-badge">
+              <span>${chemIcon}</span>
+              <span>${chemCode}</span>
+            </span>
+          </div>
+        </div>
+      `;
+
+      nameTag.textContent = (player.nickname || player.name).toUpperCase();
+
+      // Animación del Ticker de Media (Rating counter)
+      let currentVal = Math.max(40, player.rating - 24);
+      ticker.textContent = currentVal;
+      const targetVal = player.rating;
+      const interval = setInterval(() => {
+        if (currentVal < targetVal) {
+          currentVal++;
+          ticker.textContent = currentVal;
+          futAudio.playRatingTick();
+        } else {
+          clearInterval(interval);
+          futAudio.playFanfare();
+        }
+      }, 35);
+    }, 1500);
+
+    // Cerrar Walkout
+    document.getElementById('btn-close-walkout').onclick = () => {
+      overlay.classList.add('hidden');
+      futAudio.playSuccess();
+      this.renderAll();
+    };
   }
 
   // ==================== ÁLBUM DE CARTAS ====================
