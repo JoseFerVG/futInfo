@@ -1,0 +1,230 @@
+/* Estilos personalizados para el Gestor del Torneo del Rector */
+
+:root {
+  --pitch-green: #15803d;
+  --pitch-line: rgba(255, 255, 255, 0.65);
+}
+
+/* Reglas obligatorias de Modern Web Guidance para diálogos nativos */
+dialog:modal {
+  overscroll-behavior: contain;
+  border: none;
+  padding: 0;
+  max-width: 95vw;
+  width: 100%;
+}
+
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+}
+
+/* Animación de apertura y cierre de modal */
+dialog[open] {
+  animation: modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Campo de fútbol táctico */
+.football-pitch {
+  background: linear-gradient(to bottom, #166534 0%, #15803d 50%, #166534 100%);
+  position: relative;
+  border-radius: 1rem;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.3), 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  min-height: 480px;
+  user-select: none;
+}
+
+/* Bandas de césped */
+.football-pitch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 40px,
+    rgba(0, 0, 0, 0.05) 40px,
+    rgba(0, 0, 0, 0.05) 80px
+  );
+  pointer-events: none;
+}
+
+/* Línea de medio campo */
+.pitch-half-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--pitch-line);
+  transform: translateY(-50%);
+}
+
+/* Círculo central */
+.pitch-center-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 110px;
+  height: 110px;
+  border: 2px solid var(--pitch-line);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pitch-center-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Áreas de penalti */
+.pitch-penalty-area-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55%;
+  height: 90px;
+  border-bottom: 2px solid var(--pitch-line);
+  border-left: 2px solid var(--pitch-line);
+  border-right: 2px solid var(--pitch-line);
+}
+
+.pitch-goal-area-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30%;
+  height: 40px;
+  border-bottom: 2px solid var(--pitch-line);
+  border-left: 2px solid var(--pitch-line);
+  border-right: 2px solid var(--pitch-line);
+}
+
+.pitch-penalty-area-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55%;
+  height: 90px;
+  border-top: 2px solid var(--pitch-line);
+  border-left: 2px solid var(--pitch-line);
+  border-right: 2px solid var(--pitch-line);
+}
+
+.pitch-goal-area-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30%;
+  height: 40px;
+  border-top: 2px solid var(--pitch-line);
+  border-left: 2px solid var(--pitch-line);
+  border-right: 2px solid var(--pitch-line);
+}
+
+/* Ficha de jugador en la pizarra */
+.pitch-player-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  z-index: 10;
+}
+
+.pitch-player-node:hover {
+  transform: translate(-50%, -50%) scale(1.12);
+  z-index: 20;
+}
+
+.pitch-player-jersey {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7);
+  border: 2px solid #ffffff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.pitch-player-jersey.gk {
+  background: radial-gradient(circle at 30% 30%, #fbbf24, #d97706);
+}
+
+.pitch-player-name {
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  margin-top: 4px;
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Tarjetas de jugadores */
+.player-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.player-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos de scrollbar moderna */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>futInfo - Torneo del Rector</title>
+  <meta name="description" content="Plataforma de gestión para tu equipo de fútbol en el Torneo del Rector">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              900: '#0c4a6e'
+            },
+            pitch: {
+              light: '#16a34a',
+              dark: '#15803d',
+              border: '#22c55e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    h1, h2, h3, h4, .font-display {
+      font-family: 'Outfit', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- NAVBAR SUPERIOR -->
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo & Equipo -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-brand-500/20 text-white font-extrabold text-lg">
+            ⚽
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="nav-team-name" class="font-display font-bold text-lg tracking-tight text-white">Furia Rector FC</span>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">Torneo del Rector</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+              <span id="firebase-status-badge" class="flex items-center gap-1 text-amber-400">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>Modo Local (Demo)</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Usuario / Login & Ajustes -->
+        <div class="flex items-center gap-3">
+          <!-- Botón Conectar Firebase -->
+          <button id="btn-open-firebase-modal" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Configurar BBDD Firebase Gratis">
+            <i data-lucide="database" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>BBDD Firebase</span>
+          </button>
+
+          <!-- Perfil / Acceso -->
+          <div id="auth-container" class="flex items-center gap-2">
+            <!-- Renderizado dinámicamente: botón login o perfil de usuario -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Menú de pestañas / Navegación principal -->
+    <nav class="bg-slate-900/60 border-t border-slate-800/80 px-4 sm:px-6 lg:px-8 overflow-x-auto">
+      <div class="max-w-7xl mx-auto flex space-x-1 sm:space-x-4 py-2 text-sm font-medium">
+        <button data-tab="dashboard" class="tab-btn active px-3.5 py-2 rounded-lg flex items-center gap-2 transition text-brand-400 bg-brand-500/10">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Resumen</span>
+        </button>
+        <button data-tab="plantilla" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span>Plantilla (<span id="tab-player-count">0</span>)</span>
+        </button>
+        <button data-tab="tactica" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
+          <i data-lucide="shield" class="w-4 h-4"></i>
+          <span>Pizarra & Convocatoria</span>
+        </button>
+        <button data-tab="partidos" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
+          <i data-lucide="calendar" class="w-4 h-4"></i>
+          <span>Partidos</span>
+        </button>
+        <button data-tab="cuotas" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
+          <i data-lucide="wallet" class="w-4 h-4"></i>
+          <span>Tesorería / Cuotas</span>
+        </button>
+        <button data-tab="ajustes" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+          <span>Ajustes</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- 1. VISTA DASHBOARD -->
+    <section id="view-dashboard" class="tab-view space-y-6">
+      
+      <!-- Banner Próximo Partido -->
+      <div id="dashboard-next-match-banner" class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-brand-950/60 to-slate-900 border border-brand-500/30 p-6 sm:p-8 shadow-2xl">
+        <!-- Render dinámico del próximo partido -->
+      </div>
+
+      <!-- Tarjetas de Estadísticas Rápidas -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col">
+          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">
+            <span>Partidos Jugados</span>
+            <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
+          </div>
+          <span id="stat-matches-played" class="text-2xl sm:text-3xl font-extrabold text-white">0</span>
+          <span id="stat-matches-w-d-l" class="text-xs text-slate-400 mt-1">0V - 0E - 0D</span>
+        </div>
+
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col">
+          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">
+            <span>Goles a Favor</span>
+            <i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>
+          </div>
+          <span id="stat-goals-for" class="text-2xl sm:text-3xl font-extrabold text-emerald-400">0</span>
+          <span id="stat-goals-diff" class="text-xs text-slate-400 mt-1">Diferencia: +0</span>
+        </div>
+
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col">
+          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">
+            <span>Pichichi Actual</span>
+            <i data-lucide="flame" class="w-4 h-4 text-orange-400"></i>
+          </div>
+          <span id="stat-top-scorer-name" class="text-lg sm:text-xl font-bold text-white truncate">-</span>
+          <span id="stat-top-scorer-goals" class="text-xs text-slate-400 mt-1">0 goles</span>
+        </div>
+
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col">
+          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">
+            <span>Bote Recaudado</span>
+            <i data-lucide="coins" class="w-4 h-4 text-sky-400"></i>
+          </div>
+          <span id="stat-fees-collected" class="text-2xl sm:text-3xl font-extrabold text-sky-400">0€</span>
+          <span id="stat-fees-ratio" class="text-xs text-slate-400 mt-1">0 / 0 pagados</span>
+        </div>
+      </div>
+
+      <!-- Resumen de Convocatoria & Acciones Rápidas -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Mi Asistencia Rápida para el próximo partido (Para Jugadores) -->
+        <div class="lg:col-span-1 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400"></i>
+              <h3 class="font-display font-bold text-base text-white">Mi Asistencia al Partido</h3>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">
+              Indica tu disponibilidad para que el míster organice la alineación y convocatoria del Torneo del Rector.
+            </p>
+            <div id="quick-attendance-controls" class="space-y-2">
+              <button onclick="window.futApp.quickVote('asistira')" class="w-full py-2.5 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 flex items-center justify-center gap-2 font-medium text-sm transition">
+                <span>✅ Sí, asistiré</span>
+              </button>
+              <button onclick="window.futApp.quickVote('duda')" class="w-full py-2.5 px-3 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 flex items-center justify-center gap-2 font-medium text-sm transition">
+                <span>🤔 Duda (exámenes / trabajo)</span>
+              </button>
+              <button onclick="window.futApp.quickVote('no_puede')" class="w-full py-2.5 px-3 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 flex items-center justify-center gap-2 font-medium text-sm transition">
+                <span>❌ No puedo asistir</span>
+              </button>
+            </div>
+            <div id="my-attendance-status-label" class="mt-3 text-center text-xs font-semibold text-slate-300">
+              Estado actual: <span class="text-brand-400 font-bold" id="my-current-vote-text">Sin confirmar</span>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-800">
+            <button onclick="window.futApp.switchTab('tactica')" class="w-full py-2 text-xs font-medium text-brand-400 hover:text-brand-300 flex items-center justify-center gap-1">
+              <span>Ver convocatoria y pizarra completa</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabla Pichichi / Asistencias -->
+        <div class="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="award" class="w-5 h-5 text-amber-400"></i>
+              <h3 class="font-display font-bold text-base text-white">Máximos Goleadores y Asistentes</h3>
+            </div>
+            <span class="text-xs text-slate-400">Torneo del Rector</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="text-xs uppercase bg-slate-800/50 text-slate-400">
+                <tr>
+                  <th class="py-2.5 px-3 rounded-l-lg">#</th>
+                  <th class="py-2.5 px-3">Jugador</th>
+                  <th class="py-2.5 px-3 text-center">Goles</th>
+                  <th class="py-2.5 px-3 text-center">Asistencias</th>
+                  <th class="py-2.5 px-3 text-center rounded-r-lg">Tarjetas (A/R)</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-leaderboard-body" class="divide-y divide-slate-800/60 text-slate-300">
+                <!-- Filas renderizadas por JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- 2. VISTA PLANTILLA -->
+    <section id="view-plantilla" class="tab-view hidden space-y-6">
+      
+      <!-- Barra de Filtros y Acciones -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-900/80 border border-slate-800 p-4 rounded-2xl">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider mr-2">Filtrar:</span>
+          <button data-filter="ALL" class="player-filter-btn active px-3 py-1 text-xs rounded-lg bg-brand-600 text-white font-medium">Todos</button>
+          <button data-filter="GK" class="player-filter-btn px-3 py-1 text-xs rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium">Porteros</button>
+          <button data-filter="DEF" class="player-filter-btn px-3 py-1 text-xs rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium">Defensas</button>
+          <button data-filter="MID" class="player-filter-btn px-3 py-1 text-xs rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium">Centrocampistas</button>
+          <button data-filter="FWD" class="player-filter-btn px-3 py-1 text-xs rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium">Delanteros</button>
+        </div>
+
+        <button id="btn-add-player" class="admin-only px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm flex items-center gap-2 shadow-lg shadow-brand-600/30 transition">
+          <i data-lucide="user-plus" class="w-4 h-4"></i>
+          <span>Añadir Jugador</span>
+        </button>
+      </div>
+
+      <!-- Grid de Fichas de Jugadores -->
+      <div id="players-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Render dinámico de las tarjetas -->
+      </div>
+
+    </section>
+
+    <!-- 3. VISTA PIZARRA TÁCTICA & CONVOCATORIA -->
+    <section id="view-tactica" class="tab-view hidden space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Columna Pizarra Táctica (Campo de Fútbol) -->
+        <div class="lg:col-span-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <h2 class="font-display font-bold text-xl text-white flex items-center gap-2">
+                <span>Pizarra Táctica</span>
+                <span id="tactical-match-label" class="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-normal">Fútbol 7</span>
+              </h2>
+              <p class="text-xs text-slate-400">Alineación táctica para el Torneo del Rector.</p>
+            </div>
+
+            <!-- Selector de Formación -->
+            <div class="flex items-center gap-2">
+              <label for="formation-selector" class="text-xs text-slate-400">Formación:</label>
+              <select id="formation-selector" class="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-brand-500">
+                <option value="3-2-1">F7: 1-3-2-1 (Equilibrada)</option>
+                <option value="2-3-1">F7: 1-2-3-1 (Control y toque)</option>
+                <option value="3-1-2">F7: 1-3-1-2 (Ofensiva)</option>
+                <option value="4-3-3">F11: 1-4-3-3 (Clásica)</option>
+                <option value="4-4-2">F11: 1-4-4-2 (Sólida)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Cancha de Fútbol CSS -->
+          <div id="tactical-pitch" class="football-pitch relative flex-1 min-h-[460px] sm:min-h-[520px]">
+            <!-- Líneas del campo -->
+            <div class="pitch-half-line"></div>
+            <div class="pitch-center-circle"></div>
+            <div class="pitch-center-dot"></div>
+            <div class="pitch-penalty-area-top"></div>
+            <div class="pitch-goal-area-top"></div>
+            <div class="pitch-penalty-area-bottom"></div>
+            <div class="pitch-goal-area-bottom"></div>
+
+            <!-- Nodos interactivos de los jugadores colocados sobre el césped -->
+            <div id="pitch-players-container"></div>
+          </div>
+
+          <div class="mt-4 flex items-center justify-between text-xs text-slate-400">
+            <span>💡 Haz clic en cualquier jugador en la pizarra para ver sus detalles o cambiarlo.</span>
+            <span class="text-emerald-400 font-medium">Portería propia: abajo</span>
+          </div>
+
+        </div>
+
+        <!-- Columna Lista de Convocatoria y Disponibilidad -->
+        <div class="lg:col-span-4 space-y-5">
+          
+          <!-- Resumen de Convocados -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
+            <h3 class="font-display font-bold text-base text-white mb-2 flex items-center justify-between">
+              <span>Convocatoria de Jugadores</span>
+              <span id="callup-summary-badge" class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold">0 Confirmados</span>
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Estado de asistencia en tiempo real para el próximo partido.</p>
+
+            <div id="callup-players-list" class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+              <!-- Render de lista con botones de estado -->
+            </div>
+          </div>
+
+          <!-- Leyenda de colores -->
+          <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 text-xs text-slate-400 space-y-1.5">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+              <span><strong>Disponible:</strong> Confirmó su asistencia</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+              <span><strong>Duda:</strong> Examen / trabajo / lesión leve</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+              <span><strong>Baja:</strong> No puede jugar esta jornada</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- 4. VISTA PARTIDOS -->
+    <section id="view-partidos" class="tab-view hidden space-y-6">
+      
+      <div class="flex items-center justify-between bg-slate-900/80 border border-slate-800 p-4 rounded-2xl">
+        <div>
+          <h2 class="font-display font-bold text-xl text-white">Calendario y Resultados</h2>
+          <p class="text-xs text-slate-400">Jornadas del Torneo del Rector de Fútbol.</p>
+        </div>
+        <button id="btn-add-match" class="admin-only px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm flex items-center gap-2 shadow-lg shadow-brand-600/30 transition">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Nuevo Partido</span>
+        </button>
+      </div>
+
+      <div id="matches-list" class="space-y-4">
+        <!-- Render dinámico de los partidos -->
+      </div>
+
+    </section>
+
+    <!-- 5. VISTA CUOTAS Y TESORERÍA -->
+    <section id="view-cuotas" class="tab-view hidden space-y-6">
+      
+      <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="font-display font-bold text-xl text-white">Control de Pagos y Ficha</h2>
+            <p class="text-xs text-slate-400">Gestión de la cuota de inscripción del Torneo del Rector y equipación.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <div class="text-xs text-slate-400">Cuota por jugador:</div>
+              <div class="text-lg font-extrabold text-brand-400" id="cuota-amount-display">35 €</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="text-xs uppercase bg-slate-800/60 text-slate-400">
+              <tr>
+                <th class="py-3 px-4 rounded-l-lg">Dorsal</th>
+                <th class="py-3 px-4">Jugador</th>
+                <th class="py-3 px-4">Matrícula / DNI</th>
+                <th class="py-3 px-4">Teléfono</th>
+                <th class="py-3 px-4 text-center">Estado Pago</th>
+                <th class="py-3 px-4 text-center rounded-r-lg admin-only">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="cuotas-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+              <!-- Render dinámico -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 6. VISTA AJUSTES & FIREBASE -->
+    <section id="view-ajustes" class="tab-view hidden space-y-6">
+      
+      <!-- Panel de Conexión Firebase Gratis -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+            🔥
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-lg text-white">Conexión a Base de Datos Firebase (Gratis)</h3>
+            <p class="text-xs text-slate-400">Usa el plan gratuito Spark de Google Firebase para tener base de datos en tiempo real y login para todo tu equipo.</p>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3 mb-6">
+          <h4 class="text-xs font-semibold text-brand-400 uppercase tracking-wider">¿Cómo activar Firebase en 3 minutos?</h4>
+          <ol class="list-decimal list-inside text-xs text-slate-300 space-y-1.5 leading-relaxed">
+            <li>Entra en la consola gratuita de <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer" class="text-brand-400 hover:underline font-semibold">Firebase Console</a> con tu cuenta de Google.</li>
+            <li>Crea un proyecto (ejemplo: <code>torneo-rector-fc</code>). El plan gratuito incluye 1 GB de Firestore y 50k usuarios de Auth.</li>
+            <li>En la sección <strong>Compilación</strong>: activa <strong>Authentication</strong> (proveedor Correo electrónico/contraseña) y crea una base de datos <strong>Firestore Database</strong>.</li>
+            <li>En la rueda de engranaje (Configuración del proyecto), añade una app Web <code>&lt;/&gt;</code> y copia tu <code>firebaseConfig</code>.</li>
+            <li>Pega abajo tus credenciales y pulsa <strong>Guardar y Conectar</strong>.</li>
+          </ol>
+        </div>
+
+        <form id="form-firebase-config" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">API Key</label>
+              <input type="text" id="fb-api-key" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Project ID</label>
+              <input type="text" id="fb-project-id" placeholder="mi-equipo-rector" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Auth Domain</label>
+              <input type="text" id="fb-auth-domain" placeholder="mi-equipo-rector.firebaseapp.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">App ID</label>
+              <input type="text" id="fb-app-id" placeholder="1:123456789:web:abcdef" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:ring-2 focus:ring-brand-500">
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button type="submit" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-2 transition shadow-lg shadow-amber-500/20">
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Guardar y Conectar Firebase</span>
+            </button>
+            <button type="button" id="btn-clear-firebase" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition">
+              Restablecer a Modo Local
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Configuración del Equipo -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+        <h3 class="font-display font-bold text-lg text-white mb-4">Información del Equipo y Torneo</h3>
+        <form id="form-team-settings" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Nombre del Equipo</label>
+              <input type="text" id="set-team-name" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Nombre del Torneo</label>
+              <input type="text" id="set-tournament-name" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Nombre del Míster / Capitán</label>
+              <input type="text" id="set-coach-name" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Modalidad por Defecto</label>
+              <select id="set-modality" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+                <option value="f7">Fútbol 7 (7 contra 7)</option>
+                <option value="f11">Fútbol 11 (11 contra 11)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+            <button type="submit" class="admin-only px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm transition">
+              Guardar Cambios
+            </button>
+            <button type="button" id="btn-reset-demo" class="px-3 py-1.5 text-xs text-rose-400 hover:text-rose-300">
+              Restablecer Datos de Demostración
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==================== MODALES NATIVOS <dialog> ACCESIBLES ==================== -->
+
+  <!-- 1. MODAL LOGIN & REGISTRO -->
+  <dialog id="login-dialog" aria-labelledby="login-dialog-title" class="rounded-2xl bg-slate-900 text-slate-100 border border-slate-700/80 shadow-2xl p-0 max-w-md w-full">
+    <div class="p-6">
+      
+      <!-- Encabezado -->
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold">⚽</div>
+          <h2 id="login-dialog-title" class="font-display font-bold text-xl text-white">Acceso a futInfo</h2>
+        </div>
+        <button type="button" id="btn-close-login" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Selector Iniciar Sesión / Registrarse -->
+      <div class="flex rounded-xl bg-slate-950 p-1 mb-5 border border-slate-800">
+        <button type="button" id="tab-login-btn" class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-brand-600 text-white transition">
+          Iniciar Sesión
+        </button>
+        <button type="button" id="tab-register-btn" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">
+          Crear Cuenta
+        </button>
+      </div>
+
+      <!-- Formulario Iniciar Sesión -->
+      <form id="form-login" class="space-y-4">
+        <div>
+          <label for="login-email" class="block text-xs font-medium text-slate-300 mb-1">Correo Electrónico</label>
+          <input type="email" id="login-email" required placeholder="mister@rector.es" autocomplete="email" autofocus class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <div>
+          <label for="login-password" class="block text-xs font-medium text-slate-300 mb-1">Contraseña</label>
+          <input type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div id="login-error-msg" class="hidden text-xs text-rose-400 p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20"></div>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-lg shadow-brand-600/30 transition">
+          Entrar al Equipo
+        </button>
+
+        <div class="pt-2 border-t border-slate-800 text-center">
+          <p class="text-xs text-slate-400 mb-2">Cuentas rápidas de prueba:</p>
+          <div class="flex gap-2 justify-center">
+            <button type="button" onclick="window.futApp.quickFillLogin('mister@rector.es', 'rector2026')" class="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-brand-300 border border-slate-700 font-medium">
+              👔 Entrar como Míster
+            </button>
+            <button type="button" onclick="window.futApp.quickFillLogin('charly@rector.es', 'rector2026')" class="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-medium">
+              🏃 Entrar como Jugador
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Formulario Registrarse -->
+      <form id="form-register" class="space-y-3.5 hidden">
+        <div>
+          <label for="reg-name" class="block text-xs font-medium text-slate-300 mb-1">Nombre Completo</label>
+          <input type="text" id="reg-name" required placeholder="Tu Nombre y Apellidos" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <div>
+          <label for="reg-email" class="block text-xs font-medium text-slate-300 mb-1">Correo Universitario o Personal</label>
+          <input type="email" id="reg-email" required placeholder="usuario@alumnos.edu" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <div>
+          <label for="reg-password" class="block text-xs font-medium text-slate-300 mb-1">Contraseña</label>
+          <input type="password" id="reg-password" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <div>
+          <label for="reg-role" class="block text-xs font-medium text-slate-300 mb-1">Rol en el Equipo</label>
+          <select id="reg-role" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <option value="player">🏃 Jugador (marcar asistencia, ver táctica)</option>
+            <option value="admin">👔 Míster / Capitán (gestión completa)</option>
+          </select>
+        </div>
+
+        <div id="register-error-msg" class="hidden text-xs text-rose-400 p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20"></div>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition">
+          Registrarme en el Equipo
+        </button>
+      </form>
+
+    </div>
+  </dialog>
+
+  <!-- 2. MODAL AÑADIR / EDITAR JUGADOR -->
+  <dialog id="player-dialog" aria-labelledby="player-dialog-title" class="rounded-2xl bg-slate-900 text-slate-100 border border-slate-700/80 shadow-2xl p-0 max-w-lg w-full">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 id="player-dialog-title" class="font-display font-bold text-xl text-white">Ficha de Jugador</h2>
+        <button type="button" id="btn-close-player" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-player" class="space-y-4">
+        <input type="hidden" id="player-id">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Nombre Completo *</label>
+            <input type="text" id="player-name" required placeholder="Ej: Carlos Ruiz" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Apodo / Nombre en camiseta</label>
+            <input type="text" id="player-nickname" placeholder="Ej: Charly" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Dorsal *</label>
+            <input type="number" id="player-number" required min="1" max="99" value="7" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Posición *</label>
+            <select id="player-category" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+              <option value="GK">Portero (GK)</option>
+              <option value="DEF">Defensa (DEF)</option>
+              <option value="MID">Centrocampista (MID)</option>
+              <option value="FWD">Delantero (FWD)</option>
+            </select>
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-xs font-medium text-slate-300 mb-1">Posición Detallada</label>
+            <input type="text" id="player-position" placeholder="Ej: Lateral / Extremo" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Matrícula Universitaria / DNI</label>
+            <input type="text" id="player-student-id" placeholder="UNI-123456" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Teléfono (WhatsApp)</label>
+            <input type="tel" id="player-phone" placeholder="600 000 000" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Goles</label>
+            <input type="number" id="player-goals" min="0" value="0" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Asistencias</label>
+            <input type="number" id="player-assists" min="0" value="0" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Cuota Torneo</label>
+            <select id="player-fee-status" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+              <option value="pagado">Pagado</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="parcial">Parcial</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" id="btn-cancel-player" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white text-sm">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm transition">Guardar Jugador</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- 3. MODAL CREAR / EDITAR PARTIDO -->
+  <dialog id="match-dialog" aria-labelledby="match-dialog-title" class="rounded-2xl bg-slate-900 text-slate-100 border border-slate-700/80 shadow-2xl p-0 max-w-lg w-full">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 id="match-dialog-title" class="font-display font-bold text-xl text-white">Programar Partido</h2>
+        <button type="button" id="btn-close-match" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-match" class="space-y-4">
+        <input type="hidden" id="match-id">
+        
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Equipo Rival *</label>
+          <input type="text" id="match-rival" required placeholder="Ej: Veterinaria FC" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Fecha *</label>
+            <input type="date" id="match-date" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Hora *</label>
+            <input type="time" id="match-time" required value="20:00" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Instalación / Pista Deportiva</label>
+          <input type="text" id="match-field" placeholder="Ej: Campo Césped Universitario 1" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Notas de la Convocatoria</label>
+          <textarea id="match-notes" rows="2" placeholder="Camiseta con la que jugamos, hora de llegada al vestuario..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:ring-2 focus:ring-brand-500"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" id="btn-cancel-match" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white text-sm">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm transition">Guardar Partido</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- 4. MODAL REGISTRAR RESULTADO DE PARTIDO -->
+  <dialog id="match-result-dialog" aria-labelledby="result-dialog-title" class="rounded-2xl bg-slate-900 text-slate-100 border border-slate-700/80 shadow-2xl p-0 max-w-md w-full">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 id="result-dialog-title" class="font-display font-bold text-xl text-white">Acta del Partido</h2>
+        <button type="button" id="btn-close-result" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-match-result" class="space-y-4">
+        <input type="hidden" id="result-match-id">
+        
+        <div class="flex items-center justify-center gap-4 py-3 bg-slate-950 rounded-xl border border-slate-800">
+          <div class="text-center">
+            <span id="result-team-name" class="block text-xs font-semibold text-brand-400 mb-1 truncate max-w-[110px]">Furia Rector</span>
+            <input type="number" id="result-goals-for" min="0" value="0" class="w-16 text-center text-2xl font-extrabold bg-slate-900 border border-slate-700 rounded-lg py-1 text-white">
+          </div>
+          <span class="text-xl font-bold text-slate-500">-</span>
+          <div class="text-center">
+            <span id="result-rival-name" class="block text-xs font-semibold text-slate-300 mb-1 truncate max-w-[110px]">Rival</span>
+            <input type="number" id="result-goals-against" min="0" value="0" class="w-16 text-center text-2xl font-extrabold bg-slate-900 border border-slate-700 rounded-lg py-1 text-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Goleadores del Equipo</label>
+          <input type="text" id="result-scorers" placeholder="Ej: Charly (2), Lucas (1)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">MVP del Partido</label>
+          <input type="text" id="result-mvp" placeholder="Ej: Hugo Fernández" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" id="btn-cancel-result" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white text-sm">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition">Finalizar Partido</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- SCRIPTS MODULARES -->
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>
