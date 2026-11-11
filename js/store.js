@@ -9,14 +9,50 @@ const STORAGE_KEYS = {
   SETTINGS: 'futinfo_fifa_settings_v3'
 };
 
-// Facultades disponibles para afinidad de Química FUT
+// Facultades disponibles para afiliar jugadores
 export const FACULTIES = [
-  { id: 'inf', name: 'Ingeniería Informática', short: 'INF', color: '#0ea5e9', icon: '💻' },
-  { id: 'med', name: 'Medicina y Salud', short: 'MED', color: '#10b981', icon: '🩺' },
-  { id: 'der', name: 'Derecho y ADE', short: 'DER', color: '#f59e0b', icon: '⚖️' },
-  { id: 'cafd', name: 'Ciencias del Deporte', short: 'CAFD', color: '#ef4444', icon: '⚡' },
-  { id: 'eco', name: 'Economía y Empresa', short: 'ECO', color: '#8b5cf6', icon: '📈' },
-  { id: 'psi', name: 'Psicología y Educación', short: 'PSI', color: '#ec4899', icon: '🧠' }
+  { 
+    id: 'inf', 
+    name: 'Ingeniería Informática', 
+    short: 'INF', 
+    color: '#0ea5e9', 
+    icon: '<svg class="w-3.5 h-3.5 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2"/><line x1="2" x2="22" y1="20" y2="20"/></svg>' 
+  },
+  { 
+    id: 'med', 
+    name: 'Medicina y Salud', 
+    short: 'MED', 
+    color: '#10b981', 
+    icon: '<svg class="w-3.5 h-3.5 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14v1a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-1"/><path d="M5 4v6a4 4 0 0 0 8 0V4"/><line x1="3" x2="7" y1="4" y2="4"/><line x1="17" x2="21" y1="4" y2="4"/><circle cx="12" cy="19" r="2"/></svg>' 
+  },
+  { 
+    id: 'der', 
+    name: 'Derecho y ADE', 
+    short: 'DER', 
+    color: '#f59e0b', 
+    icon: '<svg class="w-3.5 h-3.5 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>' 
+  },
+  { 
+    id: 'cafd', 
+    name: 'Ciencias del Deporte', 
+    short: 'CAFD', 
+    color: '#ef4444', 
+    icon: '<svg class="w-3.5 h-3.5 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>' 
+  },
+  { 
+    id: 'eco', 
+    name: 'Economía y Empresa', 
+    short: 'ECO', 
+    color: '#8b5cf6', 
+    icon: '<svg class="w-3.5 h-3.5 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>' 
+  },
+  { 
+    id: 'psi', 
+    name: 'Psicología y Educación', 
+    short: 'PSI', 
+    color: '#ec4899', 
+    icon: '<svg class="w-3.5 h-3.5 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 1 5 5v1.2a4 4 0 0 1 2 3.8 4 4 0 0 1-1.4 3 3.5 3.5 0 0 1-1.6 4V21a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2a3.5 3.5 0 0 1-1.6-4 4 4 0 0 1-1.4-3 4 4 0 0 1 2-3.8V7a5 5 0 0 1 5-5Z"/></svg>' 
+  }
 ];
 
 export const ROLES_F7 = [
@@ -517,42 +553,10 @@ export class TeamStore {
     const sumRating = startingPlayers.reduce((acc, p) => acc + (p.rating || 75), 0);
     const avgRating = Math.round(sumRating / startingPlayers.length);
 
-    let totalChem = 0;
-    const playerChems = [];
-
-    startingPlayers.forEach((p, idx) => {
-      const assignedRole = slotRoles[idx] || 'MC';
-      let chem = 3;
-
-      if (p.rolesHierarchy) {
-        if (p.rolesHierarchy.best === assignedRole) chem += 4;
-        else if (p.rolesHierarchy.second === assignedRole) chem += 2;
-        else if (p.rolesHierarchy.third === assignedRole) chem += 1;
-        else if (p.rolesHierarchy.worst === assignedRole) chem -= 2;
-      }
-
-      if (this.settings.manager && this.settings.manager.faculty === p.faculty) {
-        chem += 1;
-      }
-
-      startingPlayers.forEach((other, oIdx) => {
-        if (idx !== oIdx && other.faculty === p.faculty) {
-          chem += 1;
-        }
-      });
-
-      chem = Math.max(1, Math.min(10, chem));
-      playerChems.push({ playerId: p.id, chem, assignedRole });
-      totalChem += chem;
-    });
-
-    const maxPossible = startingPlayers.length * 10;
-    const normalizedChem = Math.min(100, Math.round((totalChem / maxPossible) * 100));
-
     return {
       rating: avgRating,
-      chemistry: normalizedChem,
-      playerChems
+      chemistry: 100,
+      playerChems: []
     };
   }
 

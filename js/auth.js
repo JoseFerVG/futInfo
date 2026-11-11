@@ -185,7 +185,7 @@ class AuthService {
       try {
         const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
         await setDoc(doc(db, 'players', newPlayer.id), newPlayer);
-        console.log("☁️ Jugador guardado en Cloud Firestore!");
+        console.log("[Firestore] Jugador guardado en Cloud Firestore!");
       } catch (e) {
         console.warn("Nota: Guardado en local. En Firestore:", e.message);
       }

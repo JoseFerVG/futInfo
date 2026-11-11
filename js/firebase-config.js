@@ -52,7 +52,7 @@ export async function initFirebaseServices() {
   const config = getActiveConfig();
   
   if (!isFirebaseConfigured(config)) {
-    console.info("⚡ futInfo en modo Local / Demo");
+    console.info("[futInfo] Modo Local / Demo");
     return { isConnected: false, app: null, auth: null, db: null };
   }
 
@@ -66,7 +66,7 @@ export async function initFirebaseServices() {
     db = getFirestore(app);
     isInitialized = true;
 
-    console.log("🔥 Firebase inicializado con éxito para el proyecto futinfo-382e8!");
+    console.log("[Firebase] Inicializado con éxito para el proyecto futinfo-382e8!");
     return { isConnected: true, app, auth, db };
   } catch (error) {
     console.warn("Aviso al inicializar Firebase SDK:", error);

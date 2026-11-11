@@ -11,24 +11,6 @@ import {
   getActiveConfig 
 } from './firebase-config.js';
 
-// Iconos oficiales de Estilos de Química FIFA 18
-const CHEM_STYLE_ICONS = {
-  'CAT': '🧤',
-  'SHA': '⚡',
-  'MRK': '🏃',
-  'BAS': '⚖️',
-  'PWR': '💥',
-  'GLA': '⚔️',
-  'GRD': '🛡️',
-  'HUN': '🏹',
-  'ENG': '⚙️',
-  'ANC': '⚓',
-  'SNI': '🎯',
-  'FIN': '🔥',
-  'HWK': '🦅',
-  'MAW': '🪄'
-};
-
 class FutApp {
   constructor() {
     this.currentTab = 'pitch';
@@ -69,14 +51,18 @@ class FutApp {
     this.refreshIcons();
   }
 
-  showToast(message, icon = '⚽') {
+  showToast(message, icon = 'shield') {
     const container = document.getElementById('fut-toast-container');
     if (!container) return;
 
     const toast = document.createElement('div');
     toast.className = 'fut-toast';
-    toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+    const iconHtml = (typeof icon === 'string' && icon.startsWith('<'))
+      ? icon
+      : `<i data-lucide="${icon}" class="w-4 h-4 text-amber-400"></i>`;
+    toast.innerHTML = `<span class="flex items-center justify-center">${iconHtml}</span><span>${message}</span>`;
     container.appendChild(toast);
+    if (window.lucide) window.lucide.createIcons();
 
     setTimeout(() => {
       toast.style.opacity = '0';
@@ -99,7 +85,7 @@ class FutApp {
       badge.className = 'flex items-center gap-1.5 text-emerald-400 font-semibold';
       badge.innerHTML = `
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>🔥 Firebase & Google Auth (Nube)</span>
+        <span>Firebase & Google Auth (Nube)</span>
       `;
     } else {
       badge.className = 'flex items-center gap-1.5 text-amber-400 font-medium';
@@ -124,7 +110,7 @@ class FutApp {
       this.updateModalityButtons(mod);
       this.populateFormationsSelect();
       this.renderPitch();
-      this.showToast(`Cambiado a ${mod === 'f7' ? 'Fútbol 7' : 'Fútbol Sala'}`, '🥅');
+      this.showToast(`Cambiado a ${mod === 'f7' ? 'Fútbol 7' : 'Fútbol Sala'}`, 'shield');
     };
 
     document.getElementById('btn-mode-f7')?.addEventListener('click', () => setModality('f7'));
@@ -138,7 +124,7 @@ class FutApp {
       selectFormation.addEventListener('change', (e) => {
         store.setFormation(e.target.value);
         this.renderPitch();
-        this.showToast(`Formación cambiada a ${e.target.value}`, '📋');
+        this.showToast(`Formación cambiada a ${e.target.value}`, 'clipboard');
       });
     }
 
@@ -147,7 +133,7 @@ class FutApp {
       document.getElementById(`spec-${role}`)?.addEventListener('change', (e) => {
         store.setSpecialist(role, e.target.value);
         futAudio.playSuccess();
-        this.showToast('Especialista actualizado', '👑');
+        this.showToast('Especialista actualizado', 'crown');
       });
     });
 
@@ -167,7 +153,7 @@ class FutApp {
         const muted = futAudio.toggleMute();
         updateAudioIcon();
         if (!muted) futAudio.playSuccess();
-        this.showToast(muted ? 'Efectos de audio desactivados' : 'Efectos de audio FUT activados', muted ? '🔇' : '🔊');
+        this.showToast(muted ? 'Efectos de audio desactivados' : 'Efectos de audio FUT activados', muted ? 'volume-x' : 'volume-2');
       });
     }
 
@@ -324,7 +310,7 @@ class FutApp {
       try {
         const res = await authService.signInWithGoogle();
         document.getElementById('login-dialog').close();
-        this.showToast(`¡Bienvenido, ${res.user.name}!`, '👋');
+        this.showToast(`¡Bienvenido, ${res.user.name}!`, 'user-check');
 
         if (res.isNew || !res.user.playerId) {
           this.openPlayerSetupModal(res.user);
@@ -359,7 +345,7 @@ class FutApp {
       try {
         const newPlayer = await authService.completePlayerCard(cardData);
         document.getElementById('player-card-setup-dialog').close();
-        this.showToast('¡Tu Carta FIFA FUT ha sido generada con éxito!', '🎴');
+        this.showToast('¡Tu Carta FIFA FUT ha sido generada con éxito!', 'sparkles');
         if (newPlayer) {
           this.triggerWalkout(newPlayer);
         }
@@ -385,10 +371,10 @@ class FutApp {
 
       if (id) {
         store.updateMatch(id, data);
-        this.showToast('Partido actualizado', '📅');
+        this.showToast('Partido actualizado', 'calendar');
       } else {
         store.addMatch(data);
-        this.showToast('Nuevo partido programado en el calendario', '✅');
+        this.showToast('Nuevo partido programado en el calendario', 'check-circle-2');
       }
 
       document.getElementById('match-dialog').close();
@@ -412,7 +398,7 @@ class FutApp {
       });
 
       document.getElementById('match-result-dialog').close();
-      this.showToast('Acta finalizada y estadísticas actualizadas', '🏆');
+      this.showToast('Acta finalizada y estadísticas actualizadas', 'trophy');
     });
 
     // 5. Configuración del Equipo
@@ -423,7 +409,7 @@ class FutApp {
         tournament: document.getElementById('set-tournament-name').value,
         coachName: document.getElementById('set-coach-name').value
       });
-      this.showToast('Datos del equipo guardados', '👔');
+      this.showToast('Datos del equipo guardados', 'user-check');
     });
 
     // 6. Formulario Firebase
@@ -441,7 +427,7 @@ class FutApp {
     document.getElementById('btn-reset-data')?.addEventListener('click', () => {
       if (confirm('¿Restablecer datos de prueba?')) {
         store.resetToDefault();
-        this.showToast('Datos de prueba restablecidos', '🔄');
+        this.showToast('Datos de prueba restablecidos', 'repeat');
       }
     });
   }
@@ -505,7 +491,7 @@ class FutApp {
   deleteMatch(id) {
     if (confirm('¿Eliminar este partido del calendario?')) {
       store.deleteMatch(id);
-      this.showToast('Partido eliminado', '🗑️');
+      this.showToast('Partido eliminado', 'trash-2');
     }
   }
 
@@ -552,7 +538,7 @@ class FutApp {
 
       document.getElementById('btn-logout')?.addEventListener('click', () => {
         authService.signOut();
-        this.showToast('Sesión cerrada correctamente', '👋');
+        this.showToast('Sesión cerrada correctamente', 'user-check');
       });
     } else {
       container.innerHTML = `
@@ -733,12 +719,13 @@ class FutApp {
     const startingPlayers = store.getStartingLineup();
     const slotRoles = formationConfig.slots.map(s => s.role);
 
-    // Calcular Química y Rating
+    // Rating general y jugadores activos
     const chemRatingData = store.calculateTeamChemistryAndRating(slotRoles);
     const rEl = document.getElementById('hud-team-rating');
-    const cEl = document.getElementById('hud-team-chemistry');
     if (rEl) rEl.textContent = chemRatingData.rating;
-    if (cEl) cEl.textContent = chemRatingData.chemistry;
+
+    const startersEl = document.getElementById('hud-team-starters');
+    if (startersEl) startersEl.textContent = startingPlayers.length;
     
     const starsEl = document.querySelector('.fut-stars');
     if (starsEl) {
@@ -751,35 +738,9 @@ class FutApp {
       modBadge.textContent = isF7 ? 'FUT 7 DRAFT' : 'FUTSAL DRAFT';
     }
 
-    const bar = document.getElementById('hud-chem-bar');
-    if (bar) bar.style.width = `${chemRatingData.chemistry}%`;
-
-    // Dibujar Líneas de Química Vectoriales (Unidas a los Pedestales en 3D con Pulso Cinético)
-    // Sprint 1 & 2: todas las posiciones pasan por projectSlot() y tienen casing oscuro + núcleo de neón pulsante
+    // Sin líneas de química
+    if (svgLines) svgLines.innerHTML = '';
     const projected = formationConfig.slots.map(s => this.projectSlot(s));
-    let svgHtml = '';
-    formationConfig.links.forEach(([fromIdx, toIdx]) => {
-      const fromSlot = formationConfig.slots[fromIdx];
-      const a = projected[fromIdx];
-      const b = projected[toIdx];
-      const p1 = startingPlayers[fromIdx];
-      const p2 = startingPlayers[toIdx];
-
-      let chemClass = 'orange';
-      if (p1 && p2) {
-        if (p1.faculty === p2.faculty) chemClass = 'green';
-        else if (p1.rolesHierarchy && p1.rolesHierarchy.worst === fromSlot.role) chemClass = 'red';
-      }
-
-      // Conexión anclada a la base del pedestal con doble trazo (casing + energía)
-      const y1 = a.top + 7.5 * a.scale;
-      const y2 = b.top + 7.5 * b.scale;
-      svgHtml += `
-        <line x1="${a.left}%" y1="${y1}%" x2="${b.left}%" y2="${y2}%" class="chem-link-bg" />
-        <line x1="${a.left}%" y1="${y1}%" x2="${b.left}%" y2="${y2}%" class="chem-link-pulse ${chemClass}" />
-      `;
-    });
-    svgLines.innerHTML = svgHtml;
 
     // Renderizar Cartas sobre el Césped
     slotsContainer.innerHTML = formationConfig.slots.map((slot, index) => {
@@ -799,16 +760,8 @@ class FutApp {
         `;
       }
 
-      let statusClass = 'wrong';
-      if (player.rolesHierarchy) {
-        if (player.rolesHierarchy.best === slot.role) statusClass = 'exact';
-        else if (player.rolesHierarchy.second === slot.role || player.rolesHierarchy.third === slot.role) statusClass = 'secondary';
-      }
-
       const facultyObj = FACULTIES.find(f => f.id === player.faculty) || FACULTIES[0];
       const cardTypeClass = player.cardType === 'totw' ? 'fut-card-totw' : (player.cardType === 'special' ? 'fut-card-special' : 'fut-card-gold');
-      const chemCode = player.chemStyle || 'BAS';
-      const chemIcon = CHEM_STYLE_ICONS[chemCode] || '⚖️';
 
       return `
         <div class="fut-card-slot ${isSelected ? 'swap-active' : ''}" 
@@ -835,17 +788,11 @@ class FutApp {
               ${player.nickname || player.name.split(' ')[0]}
             </div>
 
-            <div class="fut-card-footer">
-              <span class="fut-chem-style-badge">
-                <span>${chemIcon}</span>
-                <span>${chemCode}</span>
-              </span>
-            </div>
+            <div class="fut-card-footer"></div>
           </div>
 
-          <div class="fut-pos-pedestal ${statusClass}">
+          <div class="fut-pos-pedestal">
             <span>${slot.role}</span>
-            <span class="fut-pos-dot"></span>
           </div>
 
         </div>
@@ -882,12 +829,7 @@ class FutApp {
               <div class="fut-card-name-plate" style="font-size: 0.6rem; padding: 1px 2px;">
                 ${p.nickname}
               </div>
-              <div class="fut-card-footer" style="font-size: 0.65rem;">
-                <span class="fut-chem-style-badge" style="font-size: 0.5rem; padding: 0 4px;">
-                  <span>${CHEM_STYLE_ICONS[p.chemStyle] || '⚖️'}</span>
-                  <span>${p.chemStyle || 'BAS'}</span>
-                </span>
-              </div>
+              <div class="fut-card-footer"></div>
             </div>
           </div>
         `;
@@ -902,17 +844,16 @@ class FutApp {
    * hacia el centro y se encogen; el portero queda grande y cerca de cámara.
    */
   projectSlot(slot) {
-    const t = Math.min(1, Math.max(0, (slot.top - 15) / 75)); // 0 = fondo, 1 = cámara
-    const depth = Math.pow(t, 1.7); // curva de cámara: las filas cercanas se separan más
+    // Escala sutil en perspectiva sobre el estadio FIFA de fondo
+    const t = Math.min(1, Math.max(0, (slot.top - 18) / 68));
     const isMobile = window.matchMedia('(max-width: 640px)').matches;
-    const minScale = isMobile ? 0.8 : 0.74;
-    const scale = +(minScale + (1 - minScale) * t).toFixed(3);
-    const spread = 0.7 + 0.3 * t;
+    const baseScale = isMobile ? 0.82 : 0.88;
+    const scale = +(baseScale + 0.16 * t).toFixed(3);
     return {
-      top: +(24 + depth * 67).toFixed(2),
-      left: +(50 + (slot.left - 50) * spread).toFixed(2),
+      top: slot.top,
+      left: slot.left,
       scale,
-      z: 18 + Math.round(t * 20)
+      z: 12 + Math.round(t * 20)
     };
   }
 
@@ -972,7 +913,7 @@ class FutApp {
         e.stopPropagation();
         store.setSpecialist('captain', starter.id);
         futAudio.playSuccess();
-        this.showToast(`👑 ${starter.nickname} nombrado Capitán`, '👑');
+        this.showToast(`${starter.nickname} nombrado Capitán`, 'crown');
         this.closeRadialMenu(true);
       };
     }
@@ -1017,14 +958,14 @@ class FutApp {
       list.innerHTML = `<div class="text-xs text-slate-400 col-span-full py-2">No hay suplentes disponibles en el banquillo. ¡Crea más cartas con Google!</div>`;
     } else {
       list.innerHTML = bench.map(p => {
-        let fitText = '❌ Fuera de puesto';
+        let fitText = '<i data-lucide="x" class="w-3 h-3 inline"></i> Fuera de Puesto';
         let fitColor = 'text-rose-400';
         if (p.rolesHierarchy) {
           if (p.rolesHierarchy.best === role) {
-            fitText = '⭐ Posición Natural (100%)';
+            fitText = '<i data-lucide="check" class="w-3 h-3 inline"></i> Posición Principal';
             fitColor = 'text-emerald-400';
           } else if (p.rolesHierarchy.second === role || p.rolesHierarchy.third === role) {
-            fitText = '⚡ Posición Secundaria (75%)';
+            fitText = '<i data-lucide="minus" class="w-3 h-3 inline"></i> Posición Secundaria';
             fitColor = 'text-amber-400';
           }
         }
@@ -1048,6 +989,7 @@ class FutApp {
       }).join('');
     }
 
+    this.refreshIcons();
     drawer.classList.add('drawer-open');
   }
 
@@ -1079,7 +1021,7 @@ class FutApp {
       const pr = this.projectSlot(slot);
 
       this.openRadialMenu(index, pr);
-      this.showToast('Usa el menú radial o toca otro titular para intercambiar', '🎮');
+      this.showToast('Usa el menú o toca otro titular para intercambiar', 'gamepad-2');
     } else if (this.selectedStarterIndex === index) {
       this.closeSubDrawer();
     } else {
@@ -1090,8 +1032,7 @@ class FutApp {
         store.swapStartingPlayer(this.selectedStarterIndex, p2.id);
         store.swapStartingPlayer(index, p1.id);
         futAudio.playCardSwap();
-        futAudio.playChemChime();
-        this.showToast(`Intercambiados ${p1.nickname} y ${p2.nickname}`, '🔄');
+        this.showToast(`Intercambiados ${p1.nickname} y ${p2.nickname}`, 'repeat');
       }
       this.closeSubDrawer();
     }
@@ -1104,9 +1045,8 @@ class FutApp {
       const incoming = store.getPlayerById(benchPlayerId);
       store.swapStartingPlayer(this.selectedStarterIndex, benchPlayerId);
       futAudio.playCardSwap();
-      futAudio.playChemChime();
       this.closeSubDrawer();
-      this.showToast(`Entra ${incoming?.nickname || 'Jugador'} por ${replaced?.nickname || 'Jugador'}`, '🔄');
+      this.showToast(`Entra ${incoming?.nickname || 'Jugador'} por ${replaced?.nickname || 'Jugador'}`, 'repeat');
     } else {
       futAudio.playCardSelect();
       this.inspectPlayer(benchPlayerId);
@@ -1151,8 +1091,6 @@ class FutApp {
       cardStep.classList.remove('hidden');
 
       const cardClass = player.cardType === 'totw' ? 'fut-card-totw' : (player.cardType === 'special' ? 'fut-card-special' : 'fut-card-gold');
-      const chemCode = player.chemStyle || 'BAS';
-      const chemIcon = CHEM_STYLE_ICONS[chemCode] || '⚖️';
       const bestRole = player.rolesHierarchy ? player.rolesHierarchy.best : 'DC';
 
       cardHost.innerHTML = `
@@ -1171,12 +1109,7 @@ class FutApp {
           <div class="fut-card-name-plate">
             ${player.nickname || player.name}
           </div>
-          <div class="fut-card-footer">
-            <span class="fut-chem-style-badge">
-              <span>${chemIcon}</span>
-              <span>${chemCode}</span>
-            </span>
-          </div>
+          <div class="fut-card-footer"></div>
         </div>
       `;
 
@@ -1250,19 +1183,19 @@ class FutApp {
 
           <div class="space-y-1.5 text-xs bg-slate-950 p-3 rounded-xl border border-slate-800 mb-3">
             <div class="flex items-center justify-between text-emerald-400 font-bold">
-              <span>🥇 Mejor Posición:</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="award" class="w-3.5 h-3.5"></i> Principal:</span>
               <span>${p.rolesHierarchy.best}</span>
             </div>
             <div class="flex items-center justify-between text-sky-400">
-              <span>🥈 Segunda:</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i> Segunda:</span>
               <span>${p.rolesHierarchy.second}</span>
             </div>
             <div class="flex items-center justify-between text-amber-400">
-              <span>🥉 Tercera:</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> Alternativa:</span>
               <span>${p.rolesHierarchy.third}</span>
             </div>
             <div class="flex items-center justify-between text-rose-400 font-semibold">
-              <span>❌ Peor Rol:</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Menos Favorable:</span>
               <span>${p.rolesHierarchy.worst}</span>
             </div>
           </div>
@@ -1306,19 +1239,19 @@ class FutApp {
         <h5 class="text-xs font-bold uppercase text-amber-400 tracking-wider">Afinidad de Posiciones (Roles)</h5>
         <div class="grid grid-cols-2 gap-2 text-xs">
           <div class="p-2 rounded bg-emerald-950/40 border border-emerald-500/30">
-            <span class="block text-[10px] text-emerald-400 font-bold">1º MEJOR ROL (100% QUÍMICA)</span>
+            <span class="block text-[10px] text-emerald-400 font-bold">1º POSICIÓN PRINCIPAL</span>
             <span class="font-black text-white text-sm">${p.rolesHierarchy.best}</span>
           </div>
           <div class="p-2 rounded bg-sky-950/40 border border-sky-500/30">
-            <span class="block text-[10px] text-sky-400 font-bold">2º SEGUNDO ROL (75%)</span>
+            <span class="block text-[10px] text-sky-400 font-bold">2º POSICIÓN SECUNDARIA</span>
             <span class="font-black text-white text-sm">${p.rolesHierarchy.second}</span>
           </div>
           <div class="p-2 rounded bg-amber-950/40 border border-amber-500/30">
-            <span class="block text-[10px] text-amber-400 font-bold">3º TERCER ROL (50%)</span>
+            <span class="block text-[10px] text-amber-400 font-bold">3º POSICIÓN ALTERNATIVA</span>
             <span class="font-black text-white text-sm">${p.rolesHierarchy.third}</span>
           </div>
           <div class="p-2 rounded bg-rose-950/40 border border-rose-500/30">
-            <span class="block text-[10px] text-rose-400 font-bold">4º PEOR ROL (RIESGO 20%)</span>
+            <span class="block text-[10px] text-rose-400 font-bold">4º MENOS FAVORABLE</span>
             <span class="font-black text-white text-sm">${p.rolesHierarchy.worst}</span>
           </div>
         </div>
@@ -1355,7 +1288,7 @@ class FutApp {
     if (confirm(`¿Eliminar al jugador ${p?.name || ''} de la plantilla?`)) {
       store.deletePlayer(playerId);
       document.getElementById('player-inspect-dialog')?.close();
-      this.showToast('Jugador eliminado', '🗑️');
+      this.showToast('Jugador eliminado', 'trash-2');
     }
   }
 
@@ -1388,7 +1321,7 @@ class FutApp {
 
     if (nextMatch && headline) {
       headline.textContent = `${settings.teamName} vs ${nextMatch.rival}`;
-      details.innerHTML = `📅 <strong>${nextMatch.date}</strong> a las <strong>${nextMatch.time} h</strong> | 📍 ${nextMatch.field} (${nextMatch.modality === 'f7' ? 'Fútbol 7' : 'Fútbol Sala'})`;
+      details.innerHTML = `<span class="inline-flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-400"></i> <strong>${nextMatch.date}</strong> a las <strong>${nextMatch.time} h</strong></span> | <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-400"></i> ${nextMatch.field} (${nextMatch.modality === 'f7' ? 'Fútbol 7' : 'Fútbol Sala'})</span>`;
 
       // Desglose de Asistencia
       if (breakdown) {
@@ -1407,7 +1340,7 @@ class FutApp {
         breakdown.innerHTML = `
           <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20 text-xs">
             <div class="font-bold text-emerald-400 mb-1 flex items-center justify-between">
-              <span>✅ Confirmados</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Confirmados</span>
               <span class="px-1.5 py-0.5 rounded bg-emerald-500/20">${confirmed.length}</span>
             </div>
             <div class="text-[11px] text-slate-300">
@@ -1417,7 +1350,7 @@ class FutApp {
 
           <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/20 text-xs">
             <div class="font-bold text-amber-400 mb-1 flex items-center justify-between">
-              <span>🤔 Dudas</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="help-circle" class="w-3.5 h-3.5"></i> Dudas</span>
               <span class="px-1.5 py-0.5 rounded bg-amber-500/20">${doubts.length}</span>
             </div>
             <div class="text-[11px] text-slate-300">
@@ -1427,7 +1360,7 @@ class FutApp {
 
           <div class="p-3 rounded-xl bg-rose-950/30 border border-rose-500/20 text-xs">
             <div class="font-bold text-rose-400 mb-1 flex items-center justify-between">
-              <span>❌ Bajas</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Bajas</span>
               <span class="px-1.5 py-0.5 rounded bg-rose-500/20">${absent.length}</span>
             </div>
             <div class="text-[11px] text-slate-300">
@@ -1455,14 +1388,14 @@ class FutApp {
               ${settings.teamName} ${isFinished ? `<span class="text-amber-400 font-mono font-black">${m.goalsFor} - ${m.goalsAgainst}</span>` : 'vs'} ${m.rival}
             </h4>
             <div class="text-xs text-slate-400 flex items-center gap-3 mt-0.5">
-              <span>📅 ${m.date} - ${m.time}h</span>
-              <span>📍 ${m.field}</span>
+              <span class="inline-flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3 text-slate-400"></i> ${m.date} - ${m.time}h</span>
+              <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> ${m.field}</span>
             </div>
-            ${m.scorers ? `<div class="text-xs text-slate-300 mt-1">⚽ <strong>Goles:</strong> ${m.scorers}</div>` : ''}
+            ${m.scorers ? `<div class="text-xs text-slate-300 mt-1 flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5 text-amber-400"></i> <strong>Goles:</strong> ${m.scorers}</div>` : ''}
           </div>
 
           <div class="flex items-center gap-2">
-            ${isFinished && m.mvp ? `<span class="text-xs text-amber-400 font-bold mr-2">⭐ MVP: ${m.mvp}</span>` : ''}
+            ${isFinished && m.mvp ? `<span class="text-xs text-amber-400 font-bold mr-2 flex items-center gap-1"><i data-lucide="star" class="w-3.5 h-3.5"></i> MVP: ${m.mvp}</span>` : ''}
 
             ${!isFinished ? `
               <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1">
@@ -1495,14 +1428,14 @@ class FutApp {
 
     const nextMatch = store.getNextMatch();
     if (!nextMatch) {
-      this.showToast('No hay partido próximo programado.', '⚠️');
+      this.showToast('No hay partido próximo programado.', 'alert-triangle');
       return;
     }
 
     const playerId = user.playerId || (store.getPlayers()[0]?.id);
     store.setAttendance(nextMatch.id, playerId, status);
     const text = status === 'asistira' ? 'Asistencia confirmada' : (status === 'duda' ? 'Marcado como duda' : 'Baja confirmada');
-    this.showToast(text, status === 'asistira' ? '✅' : (status === 'duda' ? '🤔' : '❌'));
+    this.showToast(text, status === 'asistira' ? 'check-circle-2' : (status === 'duda' ? 'help-circle' : 'x-circle'));
   }
 
   renderSpecialists() {
@@ -1524,7 +1457,7 @@ class FutApp {
   quickLogin(email, pass) {
     authService.signIn(email, pass).then((res) => {
       document.getElementById('login-dialog').close();
-      this.showToast(`Conectado como ${res.user.name}`, '👔');
+      this.showToast(`Conectado como ${res.user.name}`, 'user-check');
     }).catch(err => alert(err.message));
   }
 }
