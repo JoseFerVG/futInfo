@@ -78,8 +78,12 @@
           </div>
         </div>
 
-        <!-- Selector de Modalidad F7 / Fútbol Sala & Perfil -->
+        <!-- Selector de Modalidad F7 / Fútbol Sala & Perfil & Sonido -->
         <div class="flex items-center gap-3">
+          <button id="btn-toggle-audio" title="Efectos de Sonido FUT" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-400 transition flex items-center justify-center">
+            <i data-lucide="volume-2" class="w-4 h-4"></i>
+          </button>
+
           <div class="hidden sm:flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs font-bold">
             <button id="btn-mode-f7" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 shadow-md transition flex items-center gap-1.5">
               <span>⚽ Fútbol 7</span>
@@ -127,103 +131,111 @@
     <section id="view-pitch" class="tab-view space-y-5">
       
       <!-- Contenedor del Estadio FIFA FUT -->
-      <div class="fut-stadium-container relative p-4 sm:p-6 flex flex-col justify-between">
+      <div class="fut-stadium-container relative p-3 sm:p-5 flex flex-col justify-between">
         
-        <!-- HUD SUPERIOR FIFA -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 z-20 mb-4">
-          
-          <!-- Box Izquierdo: Formación y Míster -->
-          <div class="fut-hud-box flex items-center gap-4">
-            <div>
-              <div class="text-[11px] font-black uppercase text-amber-400 tracking-wider">Alineación del Equipo</div>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-xs text-slate-400">Formación:</span>
-                <select id="select-active-formation" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs font-bold text-white focus:ring-2 focus:ring-amber-400 cursor-pointer">
-                </select>
-              </div>
-              <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                <span id="current-modality-label" class="font-bold text-white">Fútbol 7</span>
-              </div>
-            </div>
+        <!-- Valla Publicitaria LED Superior (Adboard FIFA 18) -->
+        <div class="pitch-adboard-strip mb-3 rounded-lg">
+          <span><span class="ea-badge">EA SPORTS</span> <span class="brand-glow">FIFA 18 ULTIMATE TEAM</span> • TORNEO DEL RECTOR • <span class="brand-glow">FUT SQUAD BUILDER</span></span>
+          <span class="hidden md:inline-flex"><span class="brand-glow">UNIVERSIDAD</span> • MODALIDAD F7 & SALA • <span class="brand-glow">QUÍMICA ACTIVA</span></span>
+        </div>
 
-            <!-- Tarjeta del Míster FIFA -->
-            <div class="fut-manager-card border border-amber-400/40">
-              <div class="p-1 flex items-center justify-between text-[9px] font-bold">
-                <span>👔 M</span>
-                <span>🇪🇸</span>
-              </div>
-              <div class="flex-1 overflow-hidden">
-                <img id="manager-avatar" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80" alt="Míster" class="w-full h-full object-cover object-top">
-              </div>
-              <div class="bg-slate-950/90 text-[8px] font-extrabold text-amber-300 text-center py-0.5 truncate px-1">
-                <span id="manager-name-tag">Míster José</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Selector Modalidad Móvil -->
-          <div class="sm:hidden flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs font-bold w-full justify-center">
-            <button id="btn-mode-f7-mobile" class="flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-bold">Fútbol 7</button>
-            <button id="btn-mode-futsal-mobile" class="flex-1 py-1 rounded-lg text-slate-400 font-bold">Fútbol Sala</button>
-          </div>
-
-          <!-- Box Derecho: Rating y Química FUT -->
-          <div class="fut-hud-box flex items-center gap-6">
-            <div>
-              <div class="flex items-center justify-between text-xs text-slate-400 font-semibold mb-1">
-                <span>Rating</span>
-                <span class="text-amber-400 text-xs">★★★★★</span>
-              </div>
-              <div class="flex items-baseline gap-1">
-                <span id="hud-team-rating" class="font-fifa text-3xl font-bold text-white leading-none">83</span>
-                <span class="text-[10px] text-slate-400 font-bold uppercase">Media</span>
-              </div>
-            </div>
-
-            <div class="w-36">
-              <div class="flex items-center justify-between text-xs font-semibold mb-1">
-                <span class="text-slate-400">Chemistry</span>
-                <span id="hud-team-chemistry" class="text-emerald-400 font-fifa text-xl leading-none">94</span>
-              </div>
-              <div class="w-full h-2.5 rounded-full bg-slate-900 border border-slate-700 overflow-hidden">
-                <div id="hud-chem-bar" class="fut-chem-bar-fill h-full rounded-full" style="width: 94%;"></div>
-              </div>
-            </div>
-          </div>
-
+        <!-- Selector Modalidad Móvil -->
+        <div class="sm:hidden flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs font-bold w-full justify-center mb-3">
+          <button id="btn-mode-f7-mobile" class="flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-bold">Fútbol 7</button>
+          <button id="btn-mode-futsal-mobile" class="flex-1 py-1 rounded-lg text-slate-400 font-bold">Fútbol Sala</button>
         </div>
 
         <!-- Mensaje de aviso de intercambio -->
-        <div id="swap-banner" class="hidden mb-2 py-1.5 px-3 rounded-xl bg-amber-500 text-slate-950 font-black text-xs text-center animate-bounce">
+        <div id="swap-banner" class="hidden mb-2 py-1.5 px-3 rounded-xl bg-amber-500 text-slate-950 font-black text-xs text-center animate-bounce z-40">
           ⚡ Toca otro jugador del campo o del banquillo para intercambiar posición
         </div>
 
-        <!-- EL CAMPO DE FÚTBOL FIFA -->
-        <div id="pitch-wrapper" class="fut-pitch relative flex-1 min-h-[500px]">
+        <!-- EL CAMPO DE FÚTBOL FIFA CON HUDs FLOTANTES -->
+        <div id="pitch-wrapper" class="fut-pitch relative flex-1 min-h-[580px] sm:min-h-[640px]">
+          
+          <!-- HUD Izquierdo: Formación y Tarjeta del Míster FIFA 18 -->
+          <div class="fut-left-dock">
+            <div class="fut-dock-header">
+              <span id="current-modality-badge">FUT 7 DRAFT</span>
+            </div>
+            <div class="fut-dock-section">
+              <div class="fut-dock-label">Formation</div>
+              <select id="select-active-formation" class="fut-dock-select">
+              </select>
+            </div>
+            <div class="fut-dock-section">
+              <div class="fut-dock-label">Manager</div>
+              <div class="fut-manager-card-box">
+                <div class="fut-manager-card-fut18">
+                  <div class="mgr-badge-col">
+                    <span>(i)</span>
+                    <span class="mt-0.5">M</span>
+                    <span class="mt-1 text-xs">🇪🇸</span>
+                  </div>
+                  <div class="mgr-photo-wrap">
+                    <img id="manager-avatar" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80" alt="Míster">
+                  </div>
+                  <div class="mgr-name-plate">
+                    <span id="manager-name-tag">Míster José</span>
+                  </div>
+                  <div class="mgr-league-tag">
+                    <span>RECTOR 1</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HUD Derecho: Rating & Chemistry FIFA 18 -->
+          <div class="fut-right-dock">
+            <div class="fut-stat-row">
+              <span class="fut-stat-label">Rating</span>
+              <div class="fut-stat-val-group">
+                <span id="hud-team-rating" class="fut-stat-number">83</span>
+                <span class="fut-stars">★★★★★</span>
+              </div>
+            </div>
+            <div class="fut-stat-row">
+              <span class="fut-stat-label">Chemistry</span>
+              <div class="fut-stat-val-group">
+                <span id="hud-team-chemistry" class="fut-stat-number text-cyan-400">94</span>
+                <div class="fut-chem-segmented-bar">
+                  <div id="hud-chem-bar" class="fut-chem-segmented-fill" style="width: 94%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Demarcación del Campo en Perspectiva -->
           <div class="pitch-line-circle"></div>
           <div class="pitch-line-half"></div>
           <div class="pitch-penalty-box-top"></div>
           <div class="pitch-penalty-box-bottom"></div>
           <div class="pitch-goal-box-bottom"></div>
-          <div class="pitch-goal-net"></div>
 
+          <!-- Portería 3D Foreground -->
+          <div class="pitch-goal-net-3d"></div>
+          <div class="pitch-goal-bottom-bar"></div>
+
+          <!-- Grafo SVG de Enlaces de Química -->
           <svg id="chem-lines-svg" class="chem-lines-svg"></svg>
+
+          <!-- Nodos de Cartas de Jugadores -->
           <div id="pitch-slots-container"></div>
         </div>
 
         <!-- BANQUILLO DE SUPLENTES FUT -->
-        <div class="mt-4 rounded-xl bg-slate-950/80 border border-slate-800 p-3">
+        <div class="mt-4 rounded-xl bg-slate-950/85 border border-slate-800 p-3 shadow-lg">
           <div class="flex items-center justify-between mb-2">
             <span class="text-xs font-bold uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
               <i data-lucide="users" class="w-3.5 h-3.5"></i>
-              <span>Banquillo de Suplentes (Toca para intercambiar)</span>
+              <span>Banquillo de Suplentes (Toca para sustituir)</span>
             </span>
-            <span class="text-[11px] text-slate-400">Selecciona un titular y un suplente para el cambio</span>
+            <span class="text-[11px] text-slate-400">Toca cualquier suplente para dar relevo al jugador activo</span>
           </div>
 
           <div id="pitch-bench-container" class="flex items-center gap-3 overflow-x-auto py-1">
-            <!-- Render de suplentes -->
+            <!-- Render dinámico de suplentes -->
           </div>
         </div>
 
@@ -396,6 +408,22 @@
         </form>
       </div>
     </section>
+
+    <!-- CAJÓN DE SUSTITUCIÓN RÁPIDA (SUBSTITUTION DRAWER) -->
+    <div id="fut-sub-drawer">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-amber-400 font-fifa text-2xl font-bold tracking-wider uppercase">🔄 Sustitución Rápida</span>
+            <span id="sub-drawer-target-player" class="text-xs bg-slate-800 text-slate-200 px-2.5 py-1 rounded-lg font-bold">Cambiar Jugador</span>
+          </div>
+          <button type="button" id="btn-close-sub-drawer" class="text-slate-400 hover:text-white text-xs font-bold px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg transition">Cerrar ✕</button>
+        </div>
+        <div id="sub-drawer-bench-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          <!-- Render dinámico de suplentes -->
+        </div>
+      </div>
+    </div>
 
   </main>
 

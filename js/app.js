@@ -4,11 +4,30 @@
  */
 import { store, FACULTIES } from './store.js';
 import { authService } from './auth.js';
+import { futAudio } from './audio.js';
 import { 
   initFirebaseServices, 
   saveFirebaseConfig, 
   getActiveConfig 
 } from './firebase-config.js';
+
+// Iconos oficiales de Estilos de Química FIFA 18
+const CHEM_STYLE_ICONS = {
+  'CAT': '🧤',
+  'SHA': '⚡',
+  'MRK': '🏃',
+  'BAS': '⚖️',
+  'PWR': '💥',
+  'GLA': '⚔️',
+  'GRD': '🛡️',
+  'HUN': '🏹',
+  'ENG': '⚙️',
+  'ANC': '⚓',
+  'SNI': '🎯',
+  'FIN': '🔥',
+  'HWK': '🦅',
+  'MAW': '🪄'
+};
 
 class FutApp {
   constructor() {
@@ -119,8 +138,34 @@ class FutApp {
     ['captain', 'penalties', 'freekicks', 'corners'].forEach(role => {
       document.getElementById(`spec-${role}`)?.addEventListener('change', (e) => {
         store.setSpecialist(role, e.target.value);
+        futAudio.playSuccess();
         this.showToast('Especialista actualizado', '👑');
       });
+    });
+
+    // Control de Efectos de Sonido FUT
+    const btnAudio = document.getElementById('btn-toggle-audio');
+    if (btnAudio) {
+      const updateAudioIcon = () => {
+        const isMuted = futAudio.isMuted();
+        btnAudio.innerHTML = isMuted 
+          ? '<i data-lucide="volume-x" class="w-4 h-4 text-rose-400"></i>' 
+          : '<i data-lucide="volume-2" class="w-4 h-4 text-amber-400"></i>';
+        this.refreshIcons();
+      };
+      updateAudioIcon();
+
+      btnAudio.addEventListener('click', () => {
+        const muted = futAudio.toggleMute();
+        updateAudioIcon();
+        if (!muted) futAudio.playSuccess();
+        this.showToast(muted ? 'Efectos de audio desactivados' : 'Efectos de audio FUT activados', muted ? '🔇' : '🔊');
+      });
+    }
+
+    // Botón cerrar cajón de sustitución
+    document.getElementById('btn-close-sub-drawer')?.addEventListener('click', () => {
+      this.closeSubDrawer();
     });
 
     // Modales setup
@@ -646,12 +691,26 @@ class FutApp {
 
     // Calcular Química y Rating
     const chemRatingData = store.calculateTeamChemistryAndRating(slotRoles);
-    document.getElementById('hud-team-rating').textContent = chemRatingData.rating;
-    document.getElementById('hud-team-chemistry').textContent = chemRatingData.chemistry;
+    const rEl = document.getElementById('hud-team-rating');
+    const cEl = document.getElementById('hud-team-chemistry');
+    if (rEl) rEl.textContent = chemRatingData.rating;
+    if (cEl) cEl.textContent = chemRatingData.chemistry;
+    
+    const starsEl = document.querySelector('.fut-stars');
+    if (starsEl) {
+      const r = chemRatingData.rating;
+      starsEl.textContent = r >= 85 ? '★★★★★' : (r >= 80 ? '★★★★½' : '★★★★☆');
+    }
+
+    const modBadge = document.getElementById('current-modality-badge');
+    if (modBadge) {
+      modBadge.textContent = isF7 ? 'FUT 7 DRAFT' : 'FUTSAL DRAFT';
+    }
+
     const bar = document.getElementById('hud-chem-bar');
     if (bar) bar.style.width = `${chemRatingData.chemistry}%`;
 
-    // Dibujar Líneas de Química
+    // Dibujar Líneas de Química Vectoriales (Unidas a los Pedestales en 3D)
     let svgHtml = '';
     formationConfig.links.forEach(([fromIdx, toIdx]) => {
       const fromSlot = formationConfig.slots[fromIdx];
@@ -665,8 +724,10 @@ class FutApp {
         else if (p1.rolesHierarchy && p1.rolesHierarchy.worst === fromSlot.role) chemClass = 'red';
       }
 
+      // Conexión anclada exactamente a la base del pedestal
+      const yOffset = 7;
       svgHtml += `
-        <line x1="${fromSlot.left}%" y1="${fromSlot.top}%" x2="${toSlot.left}%" y2="${toSlot.top}%" class="chem-link ${chemClass}" />
+        <line x1="${fromSlot.left}%" y1="${fromSlot.top + yOffset}%" x2="${toSlot.left}%" y2="${toSlot.top + yOffset}%" class="chem-link ${chemClass}" />
       `;
     });
     svgLines.innerHTML = svgHtml;
@@ -695,6 +756,8 @@ class FutApp {
 
       const facultyObj = FACULTIES.find(f => f.id === player.faculty) || FACULTIES[0];
       const cardTypeClass = player.cardType === 'totw' ? 'fut-card-totw' : (player.cardType === 'special' ? 'fut-card-special' : 'fut-card-gold');
+      const chemCode = player.chemStyle || 'BAS';
+      const chemIcon = CHEM_STYLE_ICONS[chemCode] || '⚖️';
 
       return `
         <div class="fut-card-slot ${isSelected ? 'swap-active' : ''}" 
@@ -718,15 +781,16 @@ class FutApp {
             </div>
 
             <div class="fut-card-footer">
-              <span class="fut-chem-style-badge">${player.chemStyle || 'BAS'}</span>
-              <span>PAC ${player.stats.pac}</span>
-              <span>SHO ${player.stats.sho}</span>
+              <span class="fut-chem-style-badge">
+                <span>${chemIcon}</span>
+                <span>${chemCode}</span>
+              </span>
             </div>
           </div>
 
           <div class="fut-pos-pedestal ${statusClass}">
-            <span class="fut-pos-dot"></span>
             <span>${slot.role}</span>
+            <span class="fut-pos-dot"></span>
           </div>
 
         </div>
@@ -764,7 +828,10 @@ class FutApp {
                 ${p.nickname}
               </div>
               <div class="fut-card-footer" style="font-size: 0.65rem;">
-                <span>${p.preferredFoot}</span>
+                <span class="fut-chem-style-badge" style="font-size: 0.5rem; padding: 0 4px;">
+                  <span>${CHEM_STYLE_ICONS[p.chemStyle] || '⚖️'}</span>
+                  <span>${p.chemStyle || 'BAS'}</span>
+                </span>
               </div>
             </div>
           </div>
@@ -773,14 +840,95 @@ class FutApp {
     }
   }
 
+  getActiveSlotRole(index) {
+    const settings = store.getSettings();
+    const isF7 = settings.modality === 'f7';
+    const activeFormation = store.getActiveFormation();
+    const tacticalFormations = {
+      '1-3-2-1': ['POR', 'LI', 'DFC', 'LD', 'MC', 'MC', 'DC'],
+      '1-2-3-1': ['POR', 'DFC', 'DFC', 'EI', 'MC', 'ED', 'DC'],
+      '1-3-1-2': ['POR', 'LI', 'DFC', 'LD', 'MCO', 'DC', 'DC'],
+      '1-1-2-1': ['POR', 'CIE', 'ALI', 'ALD', 'PIV'],
+      '1-2-2': ['POR', 'CIE', 'CIE', 'PIV', 'PIV'],
+      '1-3-0': ['POR', 'ALI', 'CIE', 'ALD', 'MC']
+    };
+    const list = tacticalFormations[activeFormation] || tacticalFormations[isF7 ? '1-3-2-1' : '1-1-2-1'];
+    return list[index] || 'MC';
+  }
+
+  openSubDrawer(starterIndex) {
+    const drawer = document.getElementById('fut-sub-drawer');
+    const list = document.getElementById('sub-drawer-bench-list');
+    const targetTag = document.getElementById('sub-drawer-target-player');
+    if (!drawer || !list) return;
+
+    const starting = store.getStartingLineup();
+    const starter = starting[starterIndex];
+    const role = this.getActiveSlotRole(starterIndex);
+
+    if (targetTag && starter) {
+      targetTag.textContent = `Cambiar a ${starter.nickname} (${role})`;
+    }
+
+    const allPlayers = store.getPlayers();
+    const startingIds = new Set(starting.map(p => p.id));
+    const bench = allPlayers.filter(p => !startingIds.has(p.id));
+
+    if (bench.length === 0) {
+      list.innerHTML = `<div class="text-xs text-slate-400 col-span-full py-2">No hay suplentes disponibles en el banquillo. ¡Crea más cartas con Google!</div>`;
+    } else {
+      list.innerHTML = bench.map(p => {
+        let fitText = '❌ Fuera de puesto';
+        let fitColor = 'text-rose-400';
+        if (p.rolesHierarchy) {
+          if (p.rolesHierarchy.best === role) {
+            fitText = '⭐ Posición Natural (100%)';
+            fitColor = 'text-emerald-400';
+          } else if (p.rolesHierarchy.second === role || p.rolesHierarchy.third === role) {
+            fitText = '⚡ Posición Secundaria (75%)';
+            fitColor = 'text-amber-400';
+          }
+        }
+
+        return `
+          <div class="sub-bench-card" onclick="window.futApp.selectBench('${p.id}')">
+            <div class="flex items-center gap-2.5">
+              <img src="${p.avatar}" alt="${p.name}" class="w-10 h-10 rounded-full object-cover border border-amber-400/50 shadow">
+              <div>
+                <div class="text-xs font-bold text-white leading-tight">${p.name}</div>
+                <div class="text-[10px] ${fitColor} font-bold">${fitText}</div>
+                <div class="text-[9px] text-slate-400 font-semibold">Facultad: ${p.faculty.toUpperCase()} • ${p.preferredFoot}</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="font-fifa text-2xl font-bold text-amber-400 leading-none">${p.rating}</div>
+              <span class="inline-block mt-1 text-[9px] uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-extrabold border border-amber-500/30">Dar Relevo</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    drawer.classList.add('drawer-open');
+  }
+
+  closeSubDrawer() {
+    const drawer = document.getElementById('fut-sub-drawer');
+    if (drawer) drawer.classList.remove('drawer-open');
+    this.selectedStarterIndex = null;
+    this.renderPitch();
+  }
+
   selectStarter(index) {
+    futAudio.playCardSelect();
+
     if (this.selectedStarterIndex === null) {
       this.selectedStarterIndex = index;
       this.renderPitch();
-      this.showToast('Toca otro jugador del campo o del banquillo para intercambiar posición', '⚡');
+      this.openSubDrawer(index);
+      this.showToast('Toca otro titular, un suplente del banquillo o el menú para cambiarlo', '⚡');
     } else if (this.selectedStarterIndex === index) {
-      this.selectedStarterIndex = null;
-      this.renderPitch();
+      this.closeSubDrawer();
     } else {
       const starting = store.getStartingLineup();
       const p1 = starting[this.selectedStarterIndex];
@@ -788,10 +936,11 @@ class FutApp {
       if (p1 && p2) {
         store.swapStartingPlayer(this.selectedStarterIndex, p2.id);
         store.swapStartingPlayer(index, p1.id);
+        futAudio.playCardSwap();
+        futAudio.playChemChime();
         this.showToast(`Intercambiados ${p1.nickname} y ${p2.nickname}`, '🔄');
       }
-      this.selectedStarterIndex = null;
-      this.renderPitch();
+      this.closeSubDrawer();
     }
   }
 
@@ -801,10 +950,12 @@ class FutApp {
       const replaced = starting[this.selectedStarterIndex];
       const incoming = store.getPlayerById(benchPlayerId);
       store.swapStartingPlayer(this.selectedStarterIndex, benchPlayerId);
-      this.selectedStarterIndex = null;
-      this.renderPitch();
+      futAudio.playCardSwap();
+      futAudio.playChemChime();
+      this.closeSubDrawer();
       this.showToast(`Entra ${incoming?.nickname || 'Jugador'} por ${replaced?.nickname || 'Jugador'}`, '🔄');
     } else {
+      futAudio.playCardSelect();
       this.inspectPlayer(benchPlayerId);
     }
   }

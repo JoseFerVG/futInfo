@@ -1,13 +1,15 @@
 /* Estilos FIFA Ultimate Team (FUT) - Torneo del Rector */
+/* Diseño Broadcast Ultra Pro idéntico a EA SPORTS FIFA 18 FUT */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Teko:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Teko:wght@500;600;700&display=swap');
 
 :root {
-  --fut-gold-1: #f9e27c;
-  --fut-gold-2: #d6a738;
-  --fut-gold-3: #9b7216;
-  --fut-gold-dark: #443209;
-  --fut-dark-bg: #090e17;
+  --fut-gold-1: #fce074;
+  --fut-gold-2: #dfb443;
+  --fut-gold-3: #c79624;
+  --fut-gold-dark: #3b2805;
+  --fut-cyan: #00f0ff;
+  --fut-cyan-glow: rgba(0, 240, 255, 0.6);
   --chem-green: #00e676;
   --chem-orange: #ff9100;
   --chem-red: #ff1744;
@@ -49,69 +51,138 @@ dialog[open] {
   }
 }
 
-/* ==================== ESTADIO Y CAMPO FIFA FUT EN PERSPECTIVA ==================== */
+/* ==================== ESTADIO Y PITCH FIFA FUT BROADCAST ==================== */
 .fut-stadium-container {
-  background: radial-gradient(circle at 50% 20%, #1a2a40 0%, #0c1421 60%, #060a12 100%);
+  background: radial-gradient(circle at 50% 15%, #152238 0%, #0a101d 55%, #05080f 100%);
   position: relative;
   border-radius: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   overflow: hidden;
-  min-height: 640px;
+  min-height: 680px;
 }
 
+/* Gradas de estadio y focos superiores */
 .fut-stadium-container::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 220px;
-  background: radial-gradient(ellipse at 50% -20%, rgba(56, 189, 248, 0.25), transparent 70%);
+  height: 180px;
+  background: 
+    radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.35) 0%, transparent 60%),
+    radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.35) 0%, transparent 60%),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.9) 0%, transparent 100%);
   pointer-events: none;
   z-index: 1;
 }
 
-/* Césped */
+/* Valla Publicitaria LED Superior (Adboard FIFA) */
+.pitch-adboard-strip {
+  width: 100%;
+  height: 24px;
+  background: linear-gradient(90deg, #090e17 0%, #0f1c30 25%, #090e17 50%, #0f1c30 75%, #090e17 100%);
+  border-bottom: 2px solid rgba(0, 240, 255, 0.6);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  font-family: 'Teko', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #e2e8f0;
+  overflow: hidden;
+  user-select: none;
+  z-index: 6;
+  position: relative;
+}
+
+.pitch-adboard-strip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
+  white-space: nowrap;
+}
+
+.pitch-adboard-strip .brand-glow {
+  color: #00f0ff;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
+  font-weight: 700;
+}
+
+.pitch-adboard-strip .ea-badge {
+  background: #ffffff;
+  color: #020617;
+  padding: 0 6px;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+/* El Césped con Textura en Perspectiva FIFA */
 .fut-pitch {
   position: relative;
   width: 100%;
-  height: 620px;
+  height: 640px;
   background: 
-    linear-gradient(to bottom, rgba(16, 120, 60, 0.85) 0%, rgba(20, 140, 70, 0.95) 45%, rgba(14, 105, 50, 1) 100%),
+    radial-gradient(ellipse at 50% 100%, rgba(20, 160, 80, 0.9) 0%, rgba(12, 105, 50, 0.95) 60%, rgba(7, 65, 30, 1) 100%),
     repeating-linear-gradient(
       to bottom,
       transparent 0,
-      transparent 45px,
-      rgba(0, 0, 0, 0.08) 45px,
-      rgba(0, 0, 0, 0.08) 90px
+      transparent 40px,
+      rgba(0, 0, 0, 0.09) 40px,
+      rgba(0, 0, 0, 0.09) 80px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.015) 0,
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 1px,
+      transparent 20px
     );
-  border-radius: 1rem;
-  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.5);
+  border-radius: 0.75rem;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.65);
   overflow: hidden;
 }
 
-/* Líneas del terreno */
+/* Líneas del terreno en perspectiva */
 .pitch-line-circle {
   position: absolute;
-  top: 50%;
+  top: 48%;
   left: 50%;
-  width: 140px;
-  height: 140px;
+  width: 160px;
+  height: 80px;
   border: 2px solid rgba(255, 255, 255, 0.45);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
 }
 
 .pitch-line-half {
   position: absolute;
-  top: 50%;
-  left: 5%;
-  right: 5%;
+  top: 48%;
+  left: 3%;
+  right: 3%;
   height: 2px;
   background: rgba(255, 255, 255, 0.45);
   transform: translateY(-50%);
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+}
+
+.pitch-penalty-box-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 54%;
+  height: 90px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+  border-left: 2px solid rgba(255, 255, 255, 0.4);
+  border-right: 2px solid rgba(255, 255, 255, 0.4);
   pointer-events: none;
 }
 
@@ -141,97 +212,321 @@ dialog[open] {
   pointer-events: none;
 }
 
-.pitch-penalty-box-top {
+/* Portería 3D en primer plano (Foreground Goal Net) */
+.pitch-goal-net-3d {
   position: absolute;
-  top: 0;
+  bottom: -4px;
   left: 50%;
   transform: translateX(-50%);
-  width: 58%;
-  height: 100px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.35);
-  border-left: 2px solid rgba(255, 255, 255, 0.35);
-  border-right: 2px solid rgba(255, 255, 255, 0.35);
-  pointer-events: none;
-}
-
-.pitch-goal-net {
-  position: absolute;
-  bottom: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 220px;
-  height: 42px;
-  background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.35) 4px, rgba(255, 255, 255, 0.35) 5px),
-              repeating-linear-gradient(-45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.35) 4px, rgba(255, 255, 255, 0.35) 5px);
-  border-top: 3px solid rgba(255, 255, 255, 0.9);
-  border-left: 3px solid rgba(255, 255, 255, 0.9);
-  border-right: 3px solid rgba(255, 255, 255, 0.9);
+  width: 260px;
+  height: 52px;
+  background: 
+    repeating-linear-gradient(55deg, transparent, transparent 5px, rgba(255, 255, 255, 0.45) 5px, rgba(255, 255, 255, 0.45) 6px),
+    repeating-linear-gradient(-55deg, transparent, transparent 5px, rgba(255, 255, 255, 0.45) 5px, rgba(255, 255, 255, 0.45) 6px);
+  border-top: 4px solid #ffffff;
+  border-left: 4px solid #ffffff;
+  border-right: 4px solid #ffffff;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.7);
   pointer-events: none;
   z-index: 5;
 }
 
-/* Líneas de química SVG */
+.pitch-goal-bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 290px;
+  height: 14px;
+  background: linear-gradient(to bottom, #1e293b, #090d16);
+  border-radius: 4px 4px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+  z-index: 6;
+}
+
+/* ==================== HUD SUPERIOR IZQUIERDO (FUT DOCK) ==================== */
+.fut-left-dock {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  width: 170px;
+  background: rgba(18, 24, 38, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.5rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+
+.fut-dock-header {
+  background: linear-gradient(90deg, #2a2046 0%, #3e3168 100%);
+  color: #ffffff;
+  font-family: 'Teko', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-bottom: 2px solid #a855f7;
+}
+
+.fut-dock-section {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.fut-dock-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.fut-dock-select {
+  width: 100%;
+  background: #090e17;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 6px;
+  cursor: pointer;
+  outline: none;
+}
+
+.fut-dock-select:focus {
+  border-color: #f59e0b;
+}
+
+.fut-manager-card-box {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.fut-manager-card-fut18 {
+  width: 76px;
+  height: 104px;
+  background: linear-gradient(135deg, #fce074 0%, #dfb443 30%, #c79624 60%, #9b7216 100%);
+  border-radius: 6px 6px 12px 12px;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0 calc(100% - 10px)
+  );
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+  color: #2b1f06;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+.fut-manager-card-fut18::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.25) 50%, transparent 60%);
+  transform: rotate(25deg);
+  pointer-events: none;
+}
+
+.mgr-badge-col {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 800;
+  font-size: 0.65rem;
+  line-height: 1;
+  z-index: 2;
+}
+
+.mgr-photo-wrap {
+  width: 100%;
+  height: 64px;
+  overflow: hidden;
+}
+
+.mgr-photo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.mgr-name-plate {
+  background: #111827;
+  color: #f9e27c;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-align: center;
+  padding: 1px 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mgr-league-tag {
+  background: #000000;
+  color: #ffffff;
+  font-family: 'Teko', sans-serif;
+  font-size: 0.72rem;
+  text-align: center;
+  padding: 0 2px;
+  letter-spacing: 0.5px;
+}
+
+/* ==================== HUD SUPERIOR DERECHO (RATING & CHEMISTRY 1:1) ==================== */
+.fut-right-dock {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 30;
+  background: rgba(18, 24, 38, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.5rem;
+  padding: 8px 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 210px;
+}
+
+.fut-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fut-stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  text-transform: capitalize;
+}
+
+.fut-stat-val-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fut-stat-number {
+  font-family: 'Teko', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.fut-stars {
+  color: #ffd700;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+}
+
+.fut-chem-segmented-bar {
+  width: 90px;
+  height: 11px;
+  background: #090e17;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.fut-chem-segmented-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0088cc 0%, #00d2ff 60%, #00f0ff 100%);
+  box-shadow: 0 0 10px var(--fut-cyan-glow);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==================== LÍNEAS DE QUÍMICA VECTORIAL (SVG GRAPH) ==================== */
 .chem-lines-svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 8;
+  z-index: 10;
 }
 
 .chem-link {
-  stroke-width: 4px;
+  stroke-width: 3.5px;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
-  transition: stroke 0.3s ease;
+  transition: stroke 0.3s ease, filter 0.3s ease;
 }
 
 .chem-link.green {
   stroke: var(--chem-green);
-  filter: drop-shadow(0 0 6px rgba(0, 230, 118, 0.7));
+  filter: drop-shadow(0 0 6px rgba(0, 230, 118, 0.85));
 }
 
 .chem-link.orange {
   stroke: var(--chem-orange);
-  filter: drop-shadow(0 0 6px rgba(255, 145, 0, 0.7));
+  filter: drop-shadow(0 0 6px rgba(255, 145, 0, 0.85));
 }
 
 .chem-link.red {
   stroke: var(--chem-red);
-  filter: drop-shadow(0 0 6px rgba(255, 23, 68, 0.7));
+  filter: drop-shadow(0 0 6px rgba(255, 23, 68, 0.85));
 }
 
-/* ==================== CARTA DE FIFA ULTIMATE TEAM (FUT CARD) ==================== */
+/* ==================== CARTAS FUT Y SLOTS SOBRE EL CÉSPED ==================== */
 .fut-card-slot {
   position: absolute;
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 15;
+  z-index: 18;
   cursor: pointer;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0.1s;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0.1s;
 }
 
 .fut-card-slot:hover {
-  transform: translate(-50%, -50%) scale(1.08);
-  z-index: 30;
+  transform: translate(-50%, -50%) scale(1.09);
+  z-index: 35;
 }
 
-/* Efecto de selección para intercambio */
 .fut-card-slot.swap-active {
-  transform: translate(-50%, -50%) scale(1.12);
-  z-index: 40;
-  filter: drop-shadow(0 0 12px #f59e0b);
-  animation: swap-pulse 1.2s infinite alternate;
+  transform: translate(-50%, -50%) scale(1.14);
+  z-index: 45;
+  filter: drop-shadow(0 0 16px #f59e0b);
+  animation: swap-pulse 1.1s infinite alternate;
 }
 
 @keyframes swap-pulse {
   from { filter: drop-shadow(0 0 8px #f59e0b); }
-  to { filter: drop-shadow(0 0 18px #fbbf24); }
+  to { filter: drop-shadow(0 0 20px #fbbf24); }
 }
 
+/* Estructura heráldica de la carta FUT */
 .fut-card {
   position: relative;
   width: 90px;
@@ -245,11 +540,12 @@ dialog[open] {
     14px 100%,
     0 calc(100% - 14px)
   );
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.6);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   user-select: none;
+  transition: box-shadow 0.2s ease;
 }
 
 .fut-card-gold {
@@ -258,7 +554,7 @@ dialog[open] {
 }
 
 .fut-card-totw {
-  background: linear-gradient(135deg, #2b2b2b 0%, #151515 40%, #000000 70%, #d4af37 100%);
+  background: linear-gradient(135deg, #2c2c2c 0%, #151515 40%, #000000 70%, #d4af37 100%);
   color: #f7d358;
   border: 1px solid #d4af37;
 }
@@ -268,28 +564,35 @@ dialog[open] {
   color: #ffffff;
 }
 
+/* Hologram Shimmer */
 .fut-card::after {
   content: "";
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  top: -60%;
+  left: -60%;
+  width: 220%;
+  height: 220%;
   background: linear-gradient(
     45deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.25) 50%,
-    transparent 60%
+    transparent 38%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 62%
   );
   transform: rotate(25deg);
   pointer-events: none;
+  transition: transform 0.6s ease;
+}
+
+.fut-card:hover::after {
+  transform: rotate(25deg) translateY(20%);
 }
 
 .fut-card-header {
   display: flex;
   justify-content: space-between;
   padding: 4px 6px 0 6px;
-  height: 68px;
+  height: 70px;
+  position: relative;
 }
 
 .fut-card-badge-col {
@@ -297,12 +600,12 @@ dialog[open] {
   flex-direction: column;
   align-items: center;
   line-height: 0.9;
-  z-index: 2;
+  z-index: 3;
 }
 
 .fut-card-rating {
   font-family: 'Teko', sans-serif;
-  font-size: 1.55rem;
+  font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
@@ -310,7 +613,7 @@ dialog[open] {
 .fut-card-pos {
   font-family: 'Outfit', sans-serif;
   font-size: 0.65rem;
-  font-weight: 800;
+  font-weight: 900;
   text-transform: uppercase;
   margin-top: -2px;
 }
@@ -325,7 +628,7 @@ dialog[open] {
   right: 2px;
   top: 4px;
   width: 58px;
-  height: 65px;
+  height: 66px;
   overflow: hidden;
   z-index: 1;
 }
@@ -335,7 +638,7 @@ dialog[open] {
   height: 100%;
   object-fit: cover;
   object-position: top center;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.45));
 }
 
 .fut-card-name-plate {
@@ -358,56 +661,64 @@ dialog[open] {
 .fut-card-footer {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  padding: 3px 6px;
-  font-family: 'Teko', sans-serif;
-  font-size: 0.75rem;
-  font-weight: 600;
+  justify-content: center;
+  padding: 3px 4px;
   z-index: 2;
 }
 
+/* Badge de Estilo de Química idéntico a FIFA 18 (MRK, SHA, PWR, CAT, etc.) */
 .fut-chem-style-badge {
   font-family: 'Outfit', sans-serif;
-  font-size: 0.55rem;
-  font-weight: 800;
-  padding: 1px 4px;
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.65);
+  font-size: 0.58rem;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: #ffffff;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* ==================== PEDESTAL DE POSICIÓN HEXAGONAL ==================== */
+/* ==================== PEDESTAL 3D HEXAGONAL FIFA 18 ==================== */
 .fut-pos-pedestal {
   margin-top: 3px;
+  width: 54px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 8px;
-  border-radius: 4px;
   font-family: 'Outfit', sans-serif;
-  font-weight: 800;
-  font-size: 0.62rem;
+  font-weight: 900;
+  font-size: 0.65rem;
   text-transform: uppercase;
-  background: #0f172a;
-  color: #94a3b8;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
-  gap: 4px;
+  background: linear-gradient(180deg, #232d3f 0%, #111726 100%);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
+  position: relative;
+  z-index: 12;
 }
 
 .fut-pos-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: #64748b;
 }
 
+/* Estado de afinidad en el pedestal */
 .fut-pos-pedestal.exact {
-  color: #22c55e;
-  border-color: rgba(34, 197, 94, 0.5);
-  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+  color: #ffffff;
+  border-color: rgba(34, 197, 94, 0.8);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
 }
 .fut-pos-pedestal.exact .fut-pos-dot {
   background: #22c55e;
@@ -415,48 +726,63 @@ dialog[open] {
 }
 
 .fut-pos-pedestal.secondary {
-  color: #f59e0b;
-  border-color: rgba(245, 158, 11, 0.5);
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+  color: #ffffff;
+  border-color: rgba(245, 158, 11, 0.8);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
 }
 .fut-pos-pedestal.secondary .fut-pos-dot {
   background: #f59e0b;
+  box-shadow: 0 0 6px #f59e0b;
 }
 
 .fut-pos-pedestal.wrong {
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, 0.5);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.8);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
 }
 .fut-pos-pedestal.wrong .fut-pos-dot {
   background: #ef4444;
+  box-shadow: 0 0 6px #ef4444;
 }
 
-/* HUD Superior */
-.fut-hud-box {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 1rem;
-  padding: 0.75rem 1.25rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+/* ==================== CAJÓN DE SUSTITUCIÓN RÁPIDA (SUBSTITUTION DRAWER) ==================== */
+#fut-sub-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 15, 26, 0.96);
+  backdrop-filter: blur(16px);
+  border-top: 2px solid #f59e0b;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+  z-index: 90;
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 1rem 1.5rem 1.5rem 1.5rem;
+  max-height: 48vh;
+  overflow-y: auto;
 }
 
-.fut-chem-bar-fill {
-  background: linear-gradient(to right, #ef4444, #f59e0b 50%, #22c55e 100%);
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+#fut-sub-drawer.drawer-open {
+  transform: translateY(0);
 }
 
-.fut-manager-card {
-  width: 60px;
-  height: 82px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #dfb443 0%, #c79624 50%, #9b7216 100%);
-  color: #2b1f06;
-  position: relative;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+.sub-bench-card {
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(19, 28, 46, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.sub-bench-card:hover {
+  background: rgba(30, 44, 72, 0.9);
+  border-color: #f59e0b;
+  transform: translateY(-2px);
 }
 
 /* ==================== TOAST NOTIFICATIONS ==================== */
@@ -503,11 +829,45 @@ dialog[open] {
 /* ==================== RESPONSIVE EN MÓVILES (<640px) ==================== */
 @media (max-width: 640px) {
   .fut-pitch {
-    height: 540px;
+    height: 560px;
+  }
+  .fut-left-dock {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px;
+  }
+  .fut-dock-header {
+    display: none;
+  }
+  .fut-dock-section {
+    padding: 0 4px;
+    border-bottom: none;
+    flex: 1;
+  }
+  .fut-manager-card-box {
+    padding: 0;
+  }
+  .fut-manager-card-fut18 {
+    width: 54px;
+    height: 74px;
+  }
+  .fut-right-dock {
+    position: relative;
+    top: 0;
+    right: 0;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    min-width: unset;
   }
   .fut-card {
-    width: 72px;
-    height: 104px;
+    width: 70px;
+    height: 102px;
     border-radius: 6px 6px 10px 10px;
   }
   .fut-card-header {
@@ -533,20 +893,16 @@ dialog[open] {
     margin: 0 2px;
   }
   .fut-card-footer {
-    font-size: 0.6rem;
-    padding: 1px 3px;
+    padding: 1px 2px;
   }
   .fut-chem-style-badge {
-    font-size: 0.45rem;
-    padding: 0 2px;
+    font-size: 0.48rem;
+    padding: 0 3px;
   }
   .fut-pos-pedestal {
+    width: 44px;
+    height: 18px;
     font-size: 0.55rem;
-    padding: 1px 5px;
     margin-top: 2px;
-  }
-  .fut-pos-dot {
-    width: 5px;
-    height: 5px;
   }
 }
