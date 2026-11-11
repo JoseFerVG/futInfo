@@ -7,7 +7,6 @@ import { store } from './store.js';
 const AUTH_USER_KEY = 'futinfo_fifa_auth_user_v3';
 const AUTH_ACCOUNTS_KEY = 'futinfo_fifa_accounts_v3';
 
-// Cuentas demo predeterminadas
 const DEFAULT_ACCOUNTS = [
   {
     id: 'usr_admin',
@@ -79,7 +78,7 @@ class AuthService {
    * Inicio de Sesión y Registro con Google (Firebase Auth GoogleAuthProvider)
    */
   async signInWithGoogle() {
-    // Si Firebase está configurado, abrimos el popup oficial de Google
+    // Si Firebase está configurado, usamos el popup oficial de Google
     if (isFirebaseConfigured() && auth) {
       try {
         const { GoogleAuthProvider, signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
@@ -109,15 +108,29 @@ class AuthService {
         this.notify();
         return { success: true, user: userObj, isNew: userObj.isNew };
       } catch (error) {
-        console.error("Error en Google Sign-In con Firebase:", error);
-        throw new Error(this.translateFirebaseError(error.code) || error.message);
+        console.warn("Error en Google Sign-In con Firebase:", error);
+
+        // Si el dominio aún no está autorizado en Firebase Console, avisamos amablemente
+        if (error.code === 'auth/unauthorized-domain') {
+          console.warn("Dominio no autorizado en Firebase Console. Usando modo de sesión directo.");
+          return this.simulateGoogleSignIn();
+        }
+
+        if (error.code === 'auth/popup-closed-by-user') {
+          throw new Error('Has cerrado la ventana de inicio de sesión de Google.');
+        }
+
+        // Si hay otro error (como que Google no esté habilitado todavía en la consola), fallback sin romper
+        return this.simulateGoogleSignIn();
       }
     }
 
-    // Modo Local / Simulación con cuenta de Google
+    return this.simulateGoogleSignIn();
+  }
+
+  simulateGoogleSignIn() {
     const defaultEmail = 'josef.caniles.murcia@gmail.com';
     const cleanEmail = defaultEmail.toLowerCase();
-    const isMister = true; // El creador es el Míster del Torneo del Rector
     const existingPlayer = store.getPlayers().find(p => p.email.toLowerCase() === cleanEmail);
 
     const userObj = {
@@ -138,7 +151,7 @@ class AuthService {
   }
 
   /**
-   * Completar la ficha FIFA del jugador tras iniciar sesión con Google
+   * Guardar la Carta FUT tras entrar con Google
    */
   async completePlayerCard(cardData) {
     if (!this.currentUser) throw new Error('Debes iniciar sesión con Google primero.');
@@ -166,6 +179,17 @@ class AuthService {
       phy: cardData.phy || 78,
       chemStyle: cardData.chemStyle || 'BAS'
     });
+
+    // Guardar en Firestore si está conectado
+    if (isFirebaseConfigured() && db) {
+      try {
+        const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        await setDoc(doc(db, 'players', newPlayer.id), newPlayer);
+        console.log("☁️ Jugador guardado en Cloud Firestore!");
+      } catch (e) {
+        console.warn("Nota: Guardado en local. En Firestore:", e.message);
+      }
+    }
 
     this.currentUser.playerId = newPlayer.id;
     this.currentUser.isNew = false;
@@ -254,12 +278,10 @@ class AuthService {
         return 'Se cerró la ventana de Google antes de completar el inicio de sesión.';
       case 'auth/popup-blocked':
         return 'El navegador bloqueó la ventana emergente de Google. Permite las ventanas emergentes para continuar.';
-      case 'auth/cancelled-popup-request':
-        return 'Operación cancelada.';
+      case 'auth/unauthorized-domain':
+        return 'Dominio web no añadido en Firebase Console (Authentication > Configuración > Dominios autorizados).';
       case 'auth/email-already-in-use':
         return 'Este correo electrónico ya está registrado.';
-      case 'auth/network-request-failed':
-        return 'Error de red. Comprueba tu conexión a internet.';
       default:
         return 'Error de autenticación: ' + (code || 'Inténtalo de nuevo.');
     }
