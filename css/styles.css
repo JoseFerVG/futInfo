@@ -13,7 +13,6 @@
   --chem-red: #ff1744;
 }
 
-/* Tipografía de cartas FIFA */
 .font-fifa {
   font-family: 'Teko', sans-serif;
   letter-spacing: 0.5px;
@@ -61,7 +60,6 @@ dialog[open] {
   min-height: 640px;
 }
 
-/* Fondo con focos de estadio FIFA */
 .fut-stadium-container::before {
   content: "";
   position: absolute;
@@ -74,7 +72,7 @@ dialog[open] {
   z-index: 1;
 }
 
-/* Césped con perspectiva 3D */
+/* Césped */
 .fut-pitch {
   position: relative;
   width: 100%;
@@ -93,7 +91,7 @@ dialog[open] {
   overflow: hidden;
 }
 
-/* Líneas del terreno de juego FIFA */
+/* Líneas del terreno */
 .pitch-line-circle {
   position: absolute;
   top: 50%;
@@ -156,7 +154,6 @@ dialog[open] {
   pointer-events: none;
 }
 
-/* Red de la portería en primer plano (inferior) */
 .pitch-goal-net {
   position: absolute;
   bottom: -2px;
@@ -173,7 +170,7 @@ dialog[open] {
   z-index: 5;
 }
 
-/* Líneas de química SVG interactivas */
+/* Líneas de química SVG */
 .chem-lines-svg {
   position: absolute;
   inset: 0;
@@ -218,11 +215,23 @@ dialog[open] {
 }
 
 .fut-card-slot:hover {
-  transform: translate(-50%, -50%) scale(1.1);
+  transform: translate(-50%, -50%) scale(1.08);
   z-index: 30;
 }
 
-/* Forma clásica de la carta FUT */
+/* Efecto de selección para intercambio */
+.fut-card-slot.swap-active {
+  transform: translate(-50%, -50%) scale(1.12);
+  z-index: 40;
+  filter: drop-shadow(0 0 12px #f59e0b);
+  animation: swap-pulse 1.2s infinite alternate;
+}
+
+@keyframes swap-pulse {
+  from { filter: drop-shadow(0 0 8px #f59e0b); }
+  to { filter: drop-shadow(0 0 18px #fbbf24); }
+}
+
 .fut-card {
   position: relative;
   width: 90px;
@@ -243,7 +252,6 @@ dialog[open] {
   user-select: none;
 }
 
-/* Variantes de cartas FUT */
 .fut-card-gold {
   background: linear-gradient(135deg, #fce074 0%, #dfb443 25%, #c79624 50%, #f6e69f 75%, #b37e10 100%);
   color: #2b1f06;
@@ -260,7 +268,6 @@ dialog[open] {
   color: #ffffff;
 }
 
-/* Efecto de brillo metálico FUT */
 .fut-card::after {
   content: "";
   position: absolute;
@@ -278,7 +285,6 @@ dialog[open] {
   pointer-events: none;
 }
 
-/* Cabecera de la carta FUT */
 .fut-card-header {
   display: flex;
   justify-content: space-between;
@@ -314,7 +320,6 @@ dialog[open] {
   margin-top: 2px;
 }
 
-/* Foto recortada del jugador */
 .fut-card-avatar-wrap {
   position: absolute;
   right: 2px;
@@ -333,7 +338,6 @@ dialog[open] {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-/* Franja del nombre del jugador */
 .fut-card-name-plate {
   text-align: center;
   font-family: 'Outfit', sans-serif;
@@ -351,7 +355,6 @@ dialog[open] {
   z-index: 2;
 }
 
-/* Química / Atributo en la parte inferior */
 .fut-card-footer {
   display: flex;
   align-items: center;
@@ -395,7 +398,6 @@ dialog[open] {
   gap: 4px;
 }
 
-/* Indicador de posición de rol (Mejor / Segundo / Peor) */
 .fut-pos-dot {
   width: 6px;
   height: 6px;
@@ -429,7 +431,7 @@ dialog[open] {
   background: #ef4444;
 }
 
-/* ==================== HUD SUPERIOR ESTILO FIFA ==================== */
+/* HUD Superior */
 .fut-hud-box {
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(10px);
@@ -444,7 +446,6 @@ dialog[open] {
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ==================== CARTA DE ENTRENADOR (MANAGER CARD) ==================== */
 .fut-manager-card {
   width: 60px;
   height: 82px;
@@ -458,13 +459,94 @@ dialog[open] {
   overflow: hidden;
 }
 
-/* Banquillo / Suplentes */
-.fut-bench-tray {
-  background: rgba(10, 15, 26, 0.9);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px 16px;
+/* ==================== TOAST NOTIFICATIONS ==================== */
+#fut-toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.fut-toast {
+  pointer-events: auto;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  font-size: 0.82rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 12px;
-  overflow-x: auto;
+  gap: 0.5rem;
+  animation: toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==================== RESPONSIVE EN MÓVILES (<640px) ==================== */
+@media (max-width: 640px) {
+  .fut-pitch {
+    height: 540px;
+  }
+  .fut-card {
+    width: 72px;
+    height: 104px;
+    border-radius: 6px 6px 10px 10px;
+  }
+  .fut-card-header {
+    height: 56px;
+    padding: 2px 4px 0 4px;
+  }
+  .fut-card-rating {
+    font-size: 1.25rem;
+  }
+  .fut-card-pos {
+    font-size: 0.55rem;
+  }
+  .fut-card-emblem {
+    font-size: 0.65rem;
+  }
+  .fut-card-avatar-wrap {
+    width: 44px;
+    height: 54px;
+  }
+  .fut-card-name-plate {
+    font-size: 0.58rem;
+    padding: 1px 2px;
+    margin: 0 2px;
+  }
+  .fut-card-footer {
+    font-size: 0.6rem;
+    padding: 1px 3px;
+  }
+  .fut-chem-style-badge {
+    font-size: 0.45rem;
+    padding: 0 2px;
+  }
+  .fut-pos-pedestal {
+    font-size: 0.55rem;
+    padding: 1px 5px;
+    margin-top: 2px;
+  }
+  .fut-pos-dot {
+    width: 5px;
+    height: 5px;
+  }
 }
