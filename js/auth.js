@@ -131,13 +131,13 @@ class AuthService {
   simulateGoogleSignIn() {
     const defaultEmail = 'josef.caniles.murcia@gmail.com';
     const cleanEmail = defaultEmail.toLowerCase();
-    const existingPlayer = store.getPlayers().find(p => p.email.toLowerCase() === cleanEmail);
+    const existingPlayer = store.getPlayers().find(p => p.email && p.email.toLowerCase() === cleanEmail);
 
     const userObj = {
-      id: 'google_user_' + Date.now(),
+      id: 'google_user_josef',
       name: 'Jose Fernando',
       email: cleanEmail,
-      photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+      photoURL: existingPlayer?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
       role: 'admin',
       playerId: existingPlayer ? existingPlayer.id : null,
       isFirebase: false,
@@ -151,51 +151,86 @@ class AuthService {
   }
 
   /**
-   * Guardar la Carta FUT tras entrar con Google
+   * Guardar o Actualizar la Carta FUT del usuario (Estricto: 1 carta por usuario)
    */
   async completePlayerCard(cardData) {
     if (!this.currentUser) throw new Error('Debes iniciar sesión con Google primero.');
 
-    const newPlayer = store.addPlayer({
-      name: this.currentUser.name,
-      nickname: cardData.nickname || this.currentUser.name.split(' ')[0],
-      email: this.currentUser.email,
-      avatar: this.currentUser.photoURL || cardData.avatar,
-      number: parseInt(cardData.number, 10) || 7,
-      rating: parseInt(cardData.rating, 10) || 82,
-      faculty: cardData.faculty || 'inf',
-      preferredFoot: cardData.preferredFoot || 'Diestro',
-      studentId: cardData.studentId || '',
-      phone: cardData.phone || '',
-      roleBest: cardData.roleBest || 'DC',
-      roleSecond: cardData.roleSecond || 'MC',
-      roleThird: cardData.roleThird || 'DFC',
-      roleWorst: cardData.roleWorst || 'POR',
-      pac: cardData.pac || 82,
-      sho: cardData.sho || 80,
-      pas: cardData.pas || 80,
-      dri: cardData.dri || 82,
-      def: cardData.def || 65,
-      phy: cardData.phy || 78,
-      chemStyle: cardData.chemStyle || 'BAS'
-    });
+    const cleanEmail = (this.currentUser.email || '').toLowerCase();
+    const existingPlayer = store.getPlayers().find(p => 
+      (this.currentUser.playerId && p.id === this.currentUser.playerId) ||
+      (p.email && p.email.toLowerCase() === cleanEmail)
+    );
 
-    // Guardar en Firestore si está conectado
-    if (isFirebaseConfigured() && db) {
-      try {
-        const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-        await setDoc(doc(db, 'players', newPlayer.id), newPlayer);
-        console.log("[Firestore] Jugador guardado en Cloud Firestore!");
-      } catch (e) {
-        console.warn("Nota: Guardado en local. En Firestore:", e.message);
-      }
+    const avatarUrl = cardData.avatar || this.currentUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+
+    let targetPlayer;
+    if (existingPlayer) {
+      // ACTUALIZAR CARTA EXISTENTE (evita duplicados)
+      targetPlayer = store.updatePlayer(existingPlayer.id, {
+        name: this.currentUser.name || existingPlayer.name,
+        nickname: cardData.nickname || existingPlayer.nickname,
+        avatar: avatarUrl,
+        number: parseInt(cardData.number, 10) || existingPlayer.number,
+        faculty: cardData.faculty || existingPlayer.faculty,
+        preferredFoot: cardData.preferredFoot || existingPlayer.preferredFoot,
+        rolesHierarchy: {
+          best: cardData.roleBest || existingPlayer.rolesHierarchy?.best || 'DC',
+          second: cardData.roleSecond || existingPlayer.rolesHierarchy?.second || 'MC',
+          third: cardData.roleThird || existingPlayer.rolesHierarchy?.third || 'DFC',
+          worst: cardData.roleWorst || existingPlayer.rolesHierarchy?.worst || 'POR'
+        },
+        stats: {
+          pac: parseInt(cardData.pac, 10) || existingPlayer.stats?.pac || 80,
+          sho: parseInt(cardData.sho, 10) || existingPlayer.stats?.sho || 80,
+          pas: parseInt(cardData.pas, 10) || existingPlayer.stats?.pas || 80,
+          dri: parseInt(cardData.dri, 10) || existingPlayer.stats?.dri || 80,
+          def: parseInt(cardData.def, 10) || existingPlayer.stats?.def || 65,
+          phy: parseInt(cardData.phy, 10) || existingPlayer.stats?.phy || 75
+        }
+      });
+    } else {
+      // CREAR PRIMERA Y ÚNICA CARTA
+      targetPlayer = store.addPlayer({
+        name: this.currentUser.name,
+        nickname: cardData.nickname || this.currentUser.name.split(' ')[0],
+        email: this.currentUser.email,
+        avatar: avatarUrl,
+        number: parseInt(cardData.number, 10) || 7,
+        rating: parseInt(cardData.rating, 10) || 82,
+        faculty: cardData.faculty || 'inf',
+        preferredFoot: cardData.preferredFoot || 'Diestro',
+        studentId: cardData.studentId || '',
+        phone: cardData.phone || '',
+        roleBest: cardData.roleBest || 'DC',
+        roleSecond: cardData.roleSecond || 'MC',
+        roleThird: cardData.roleThird || 'DFC',
+        roleWorst: cardData.roleWorst || 'POR',
+        pac: parseInt(cardData.pac, 10) || 82,
+        sho: parseInt(cardData.sho, 10) || 80,
+        pas: parseInt(cardData.pas, 10) || 80,
+        dri: parseInt(cardData.dri, 10) || 82,
+        def: parseInt(cardData.def, 10) || 65,
+        phy: parseInt(cardData.phy, 10) || 78
+      });
     }
 
-    this.currentUser.playerId = newPlayer.id;
+    // Actualizar inmediatamente el usuario en memoria y en localStorage
+    this.currentUser.playerId = targetPlayer.id;
+    this.currentUser.photoURL = avatarUrl;
     this.currentUser.isNew = false;
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(this.currentUser));
     this.notify();
-    return newPlayer;
+
+    // Guardar en Firestore de forma no bloqueante si está conectado
+    if (isFirebaseConfigured() && db && targetPlayer) {
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
+        .then(({ doc, setDoc }) => setDoc(doc(db, 'players', targetPlayer.id), targetPlayer))
+        .then(() => console.log("[Firestore] Jugador guardado en Cloud Firestore!"))
+        .catch(e => console.warn("Nota: Guardado local. Firestore:", e.message));
+    }
+
+    return targetPlayer;
   }
 
   async signIn(email, password) {

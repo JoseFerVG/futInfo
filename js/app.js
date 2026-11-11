@@ -16,6 +16,8 @@ class FutApp {
     this.currentTab = 'pitch';
     this.selectedStarterIndex = null;
     this.activeRadialIndex = null;
+    this.store = store;
+    this.authService = authService;
     this.init();
   }
 
@@ -210,17 +212,17 @@ class FutApp {
 
     if (bF7 && bFutsal) {
       if (isF7) {
-        bF7.className = 'px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold shadow-md transition flex items-center gap-1.5';
-        bFutsal.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5';
+        bF7.className = 'px-3.5 py-1.5 rounded-lg bg-slate-900 text-amber-400 font-black shadow-sm transition flex items-center gap-1.5';
+        bFutsal.className = 'px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
       } else {
-        bFutsal.className = 'px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold shadow-md transition flex items-center gap-1.5';
-        bF7.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5';
+        bFutsal.className = 'px-3.5 py-1.5 rounded-lg bg-slate-900 text-amber-400 font-black shadow-sm transition flex items-center gap-1.5';
+        bF7.className = 'px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
       }
     }
 
     if (bF7m && bFutsalm) {
-      bF7m.className = isF7 ? 'flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-bold' : 'flex-1 py-1 rounded-lg text-slate-400 font-bold';
-      bFutsalm.className = !isF7 ? 'flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-bold' : 'flex-1 py-1 rounded-lg text-slate-400 font-bold';
+      bF7m.className = isF7 ? 'flex-1 py-1.5 rounded-lg bg-slate-900 text-amber-400 font-black' : 'flex-1 py-1.5 rounded-lg text-slate-600 font-bold';
+      bFutsalm.className = !isF7 ? 'flex-1 py-1.5 rounded-lg bg-slate-900 text-amber-400 font-black' : 'flex-1 py-1.5 rounded-lg text-slate-600 font-bold';
     }
 
     if (label) {
@@ -321,11 +323,48 @@ class FutApp {
       }
     });
 
-    // 2. Ficha de Jugador FIFA
+    // Subir foto desde el PC / Móvil
+    const fileInput = document.getElementById('setup-avatar-file');
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (loadEvt) => {
+            const dataUrl = loadEvt.target.result;
+            const imgEl = document.getElementById('setup-user-avatar');
+            const urlInput = document.getElementById('setup-avatar-url');
+            if (imgEl) imgEl.src = dataUrl;
+            if (urlInput) urlInput.value = dataUrl;
+            this.showToast('Foto de perfil cargada con éxito', 'camera');
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    // Presets rápidos de fotos de futbolistas
+    document.querySelectorAll('.avatar-preset-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const av = btn.dataset.avatar;
+        if (av) {
+          const imgEl = document.getElementById('setup-user-avatar');
+          const urlInput = document.getElementById('setup-avatar-url');
+          if (imgEl) imgEl.src = av;
+          if (urlInput) urlInput.value = av;
+          document.querySelectorAll('.avatar-preset-btn').forEach(b => b.classList.remove('border-amber-400'));
+          btn.classList.add('border-amber-400');
+        }
+      });
+    });
+
+    // 2. Ficha de Jugador FIFA (Estricto: 1 carta por usuario con edición y foto)
     document.getElementById('form-setup-card')?.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const cardData = {
+        avatar: document.getElementById('setup-avatar-url')?.value || document.getElementById('setup-user-avatar')?.src,
         nickname: document.getElementById('setup-nickname').value,
         number: document.getElementById('setup-number').value,
         faculty: document.getElementById('setup-faculty').value,
@@ -343,10 +382,11 @@ class FutApp {
       };
 
       try {
+        const wasNew = !authService.getCurrentUser()?.playerId;
         const newPlayer = await authService.completePlayerCard(cardData);
         document.getElementById('player-card-setup-dialog').close();
-        this.showToast('¡Tu Carta FIFA FUT ha sido generada con éxito!', 'sparkles');
-        if (newPlayer) {
+        this.showToast(wasNew ? '¡Tu Carta FIFA FUT ha sido generada con éxito!' : '¡Carta actualizada correctamente!', 'sparkles');
+        if (wasNew && newPlayer) {
           this.triggerWalkout(newPlayer);
         }
       } catch (err) {
@@ -434,13 +474,57 @@ class FutApp {
 
   openPlayerSetupModal(user) {
     const dialog = document.getElementById('player-card-setup-dialog');
-    document.getElementById('setup-user-name').textContent = user.name;
-    document.getElementById('setup-user-email').textContent = user.email;
-    if (user.photoURL) {
-      document.getElementById('setup-user-avatar').src = user.photoURL;
+    if (!dialog) return;
+
+    const existing = store.getPlayers().find(p => 
+      (user.playerId && p.id === user.playerId) || 
+      (p.email && p.email.toLowerCase() === (user.email || '').toLowerCase())
+    );
+
+    const titleEl = document.getElementById('setup-title');
+    const submitBtn = document.querySelector('#form-setup-card button[type="submit"]');
+
+    if (existing) {
+      if (titleEl) titleEl.textContent = 'Editar mi Carta FUT Oficial';
+      if (submitBtn) submitBtn.textContent = 'Guardar Cambios de mi Carta';
+      document.getElementById('setup-nickname').value = existing.nickname || user.name.split(' ')[0];
+      document.getElementById('setup-number').value = existing.number || 10;
+      document.getElementById('setup-faculty').value = existing.faculty || 'inf';
+      document.getElementById('setup-foot').value = existing.preferredFoot || 'Diestro';
+      if (existing.rolesHierarchy) {
+        document.getElementById('setup-role-best').value = existing.rolesHierarchy.best || 'DC';
+        document.getElementById('setup-role-second').value = existing.rolesHierarchy.second || 'MC';
+        document.getElementById('setup-role-third').value = existing.rolesHierarchy.third || 'DFC';
+        document.getElementById('setup-role-worst').value = existing.rolesHierarchy.worst || 'POR';
+      }
+      if (existing.stats) {
+        document.getElementById('setup-pac').value = existing.stats.pac || 82;
+        document.getElementById('setup-sho').value = existing.stats.sho || 80;
+        document.getElementById('setup-pas').value = existing.stats.pas || 80;
+        document.getElementById('setup-dri').value = existing.stats.dri || 82;
+        document.getElementById('setup-def').value = existing.stats.def || 60;
+        document.getElementById('setup-phy').value = existing.stats.phy || 78;
+      }
+      const avatarUrl = existing.avatar || user.photoURL;
+      const imgEl = document.getElementById('setup-user-avatar');
+      const urlInput = document.getElementById('setup-avatar-url');
+      if (imgEl) imgEl.src = avatarUrl;
+      if (urlInput) urlInput.value = avatarUrl;
+    } else {
+      if (titleEl) titleEl.textContent = 'Crea tu Carta FIFA Ultimate Team';
+      if (submitBtn) submitBtn.textContent = 'Guardar y Generar mi Carta FUT';
+      document.getElementById('setup-nickname').value = user.name ? user.name.split(' ')[0] : 'Crack';
+      const avatarUrl = user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+      const imgEl = document.getElementById('setup-user-avatar');
+      const urlInput = document.getElementById('setup-avatar-url');
+      if (imgEl) imgEl.src = avatarUrl;
+      if (urlInput) urlInput.value = avatarUrl;
     }
-    document.getElementById('setup-nickname').value = user.name.split(' ')[0];
+
+    document.getElementById('setup-user-name').textContent = user.name || 'Jugador FUT';
+    document.getElementById('setup-user-email').textContent = user.email || '';
     dialog.showModal();
+    this.refreshIcons();
   }
 
   openMatchModal(id = null) {
@@ -500,9 +584,9 @@ class FutApp {
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       if (btn.dataset.tab === tabId) {
-        btn.className = 'tab-btn active px-4 py-2 rounded-xl flex items-center gap-2 transition text-amber-400 bg-amber-500/10 border border-amber-500/30';
+        btn.className = 'tab-btn active px-4 py-2 rounded-xl flex items-center gap-2 transition text-white bg-slate-900 border border-slate-800 shadow-sm';
       } else {
-        btn.className = 'tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-transparent';
+        btn.className = 'tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 border border-transparent';
       }
     });
 
@@ -519,30 +603,37 @@ class FutApp {
 
     if (user) {
       const isMister = user.role === 'admin';
-      const userPhoto = user.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80';
+      const userPhoto = user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
 
       container.innerHTML = `
-        <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl">
-          <img src="${userPhoto}" alt="${user.name}" class="w-7 h-7 rounded-lg object-cover border ${isMister ? 'border-amber-400' : 'border-emerald-400'}">
-          <div class="hidden sm:block text-left">
-            <div class="text-xs font-bold text-white leading-tight truncate max-w-[120px]">${user.name}</div>
-            <div class="text-[10px] ${isMister ? 'text-amber-400' : 'text-emerald-400'} font-semibold">
-              ${isMister ? 'Míster (Admin)' : 'Jugador'}
+        <div class="flex items-center gap-2 bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-xl shadow-sm">
+          <div class="flex items-center gap-2 cursor-pointer group" id="btn-open-my-profile" title="Ver / Editar mi Carta y Foto de Perfil">
+            <img src="${userPhoto}" alt="${user.name}" class="w-7 h-7 rounded-lg object-cover border-2 ${isMister ? 'border-amber-500' : 'border-emerald-500'} group-hover:scale-105 transition">
+            <div class="hidden sm:block text-left">
+              <div class="text-xs font-black text-slate-900 leading-tight truncate max-w-[120px] group-hover:text-amber-600 transition">${user.name}</div>
+              <div class="text-[10px] ${isMister ? 'text-amber-600' : 'text-emerald-600'} font-bold">
+                ${isMister ? 'Míster (Admin)' : 'Jugador'}
+              </div>
             </div>
           </div>
-          <button id="btn-logout" class="ml-1 p-1 text-slate-400 hover:text-rose-400 rounded transition" title="Cerrar Sesión">
+          <button id="btn-logout" class="ml-1.5 p-1 text-slate-400 hover:text-rose-600 rounded transition" title="Cerrar Sesión" aria-label="Cerrar Sesión">
             <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
           </button>
         </div>
       `;
 
-      document.getElementById('btn-logout')?.addEventListener('click', () => {
+      document.getElementById('btn-open-my-profile')?.addEventListener('click', () => {
+        this.openPlayerSetupModal(user);
+      });
+
+      document.getElementById('btn-logout')?.addEventListener('click', (e) => {
+        e.stopPropagation();
         authService.signOut();
         this.showToast('Sesión cerrada correctamente', 'user-check');
       });
     } else {
       container.innerHTML = `
-        <button id="btn-open-login" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-xs flex items-center gap-2 shadow-lg transition">
+        <button id="btn-open-login" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-sm transition active:scale-95">
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -955,34 +1046,34 @@ class FutApp {
     const bench = allPlayers.filter(p => !startingIds.has(p.id));
 
     if (bench.length === 0) {
-      list.innerHTML = `<div class="text-xs text-slate-400 col-span-full py-2">No hay suplentes disponibles en el banquillo. ¡Crea más cartas con Google!</div>`;
+      list.innerHTML = `<div class="text-xs text-slate-500 col-span-full py-4 text-center font-bold">No hay suplentes disponibles en el banquillo. ¡Crea más cartas con Google!</div>`;
     } else {
       list.innerHTML = bench.map(p => {
         let fitText = '<i data-lucide="x" class="w-3 h-3 inline"></i> Fuera de Puesto';
-        let fitColor = 'text-rose-400';
+        let fitColor = 'text-rose-700 bg-rose-50 border border-rose-200';
         if (p.rolesHierarchy) {
           if (p.rolesHierarchy.best === role) {
             fitText = '<i data-lucide="check" class="w-3 h-3 inline"></i> Posición Principal';
-            fitColor = 'text-emerald-400';
+            fitColor = 'text-emerald-700 bg-emerald-50 border border-emerald-200';
           } else if (p.rolesHierarchy.second === role || p.rolesHierarchy.third === role) {
             fitText = '<i data-lucide="minus" class="w-3 h-3 inline"></i> Posición Secundaria';
-            fitColor = 'text-amber-400';
+            fitColor = 'text-amber-700 bg-amber-50 border border-amber-200';
           }
         }
 
         return `
           <div class="sub-bench-card" onclick="window.futApp.selectBench('${p.id}')">
             <div class="flex items-center gap-2.5">
-              <img src="${p.avatar}" alt="${p.name}" class="w-10 h-10 rounded-full object-cover border border-amber-400/50 shadow">
+              <img src="${p.avatar}" alt="${p.name}" class="w-10 h-10 rounded-full object-cover border-2 border-amber-400 shadow">
               <div>
-                <div class="text-xs font-bold text-white leading-tight">${p.name}</div>
-                <div class="text-[10px] ${fitColor} font-bold">${fitText}</div>
-                <div class="text-[9px] text-slate-400 font-semibold">Facultad: ${p.faculty.toUpperCase()} • ${p.preferredFoot}</div>
+                <div class="text-xs font-black text-slate-900 leading-tight">${p.name}</div>
+                <div class="text-[10px] ${fitColor} px-1.5 py-0.5 rounded font-bold inline-block mt-0.5">${fitText}</div>
+                <div class="text-[9px] text-slate-500 font-semibold mt-0.5">Facultad: ${p.faculty.toUpperCase()} • ${p.preferredFoot}</div>
               </div>
             </div>
             <div class="text-right">
-              <div class="font-fifa text-2xl font-bold text-amber-400 leading-none">${p.rating}</div>
-              <span class="inline-block mt-1 text-[9px] uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-extrabold border border-amber-500/30">Dar Relevo</span>
+              <div class="font-fifa text-2xl font-bold text-slate-900 leading-none">${p.rating}</div>
+              <span class="inline-block mt-1 text-[9px] uppercase px-2 py-0.5 rounded bg-amber-400 text-slate-950 font-black shadow-sm">Dar Relevo</span>
             </div>
           </div>
         `;
@@ -1150,7 +1241,7 @@ class FutApp {
       const cardClass = p.cardType === 'totw' ? 'fut-card-totw' : (p.cardType === 'special' ? 'fut-card-special' : 'fut-card-gold');
 
       return `
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-amber-400/50 transition">
+        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex flex-col justify-between hover:border-amber-400 hover:shadow-md transition">
           <div class="flex items-center justify-center mb-4">
             <div class="fut-card ${cardClass}" style="width: 140px; height: 195px; border-radius: 10px 10px 18px 18px;">
               <div class="fut-card-header" style="height: 105px; padding: 6px 8px 0 8px;">
@@ -1181,26 +1272,26 @@ class FutApp {
             </div>
           </div>
 
-          <div class="space-y-1.5 text-xs bg-slate-950 p-3 rounded-xl border border-slate-800 mb-3">
-            <div class="flex items-center justify-between text-emerald-400 font-bold">
-              <span class="flex items-center gap-1.5"><i data-lucide="award" class="w-3.5 h-3.5"></i> Principal:</span>
-              <span>${p.rolesHierarchy.best}</span>
+          <div class="space-y-1.5 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200 mb-3">
+            <div class="flex items-center justify-between text-emerald-700 font-bold">
+              <span class="flex items-center gap-1.5"><i data-lucide="award" class="w-3.5 h-3.5 text-emerald-600"></i> Principal:</span>
+              <span class="font-black text-slate-900">${p.rolesHierarchy.best}</span>
             </div>
-            <div class="flex items-center justify-between text-sky-400">
-              <span class="flex items-center gap-1.5"><i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i> Segunda:</span>
-              <span>${p.rolesHierarchy.second}</span>
+            <div class="flex items-center justify-between text-sky-700 font-bold">
+              <span class="flex items-center gap-1.5"><i data-lucide="arrow-right-circle" class="w-3.5 h-3.5 text-sky-600"></i> Segunda:</span>
+              <span class="font-black text-slate-900">${p.rolesHierarchy.second}</span>
             </div>
-            <div class="flex items-center justify-between text-amber-400">
-              <span class="flex items-center gap-1.5"><i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> Alternativa:</span>
-              <span>${p.rolesHierarchy.third}</span>
+            <div class="flex items-center justify-between text-amber-700 font-bold">
+              <span class="flex items-center gap-1.5"><i data-lucide="circle-dot" class="w-3.5 h-3.5 text-amber-600"></i> Alternativa:</span>
+              <span class="font-black text-slate-900">${p.rolesHierarchy.third}</span>
             </div>
-            <div class="flex items-center justify-between text-rose-400 font-semibold">
-              <span class="flex items-center gap-1.5"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Menos Favorable:</span>
-              <span>${p.rolesHierarchy.worst}</span>
+            <div class="flex items-center justify-between text-rose-700 font-bold">
+              <span class="flex items-center gap-1.5"><i data-lucide="x-circle" class="w-3.5 h-3.5 text-rose-600"></i> Menos Favorable:</span>
+              <span class="font-black text-slate-900">${p.rolesHierarchy.worst}</span>
             </div>
           </div>
 
-          <button onclick="window.futApp.inspectPlayer('${p.id}')" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-300 border border-slate-700 flex items-center justify-center gap-1.5">
+          <button onclick="window.futApp.inspectPlayer('${p.id}')" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-black uppercase tracking-wider text-amber-400 flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95">
             <i data-lucide="eye" class="w-3.5 h-3.5"></i>
             <span>Ver Ficha Técnica Completa</span>
           </button>
@@ -1221,44 +1312,44 @@ class FutApp {
     if (!content) return;
 
     content.innerHTML = `
-      <div class="flex items-center gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
-        <div class="w-16 h-16 rounded-xl overflow-hidden border border-amber-400/40">
+      <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+        <div class="w-16 h-16 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-sm">
           <img src="${p.avatar}" alt="${p.name}" class="w-full h-full object-cover">
         </div>
         <div class="flex-1">
           <div class="flex items-center justify-between">
-            <h4 class="font-bold text-lg text-white">${p.name}</h4>
-            <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold">${p.rating} OVR</span>
+            <h4 class="font-black text-lg text-slate-900">${p.name}</h4>
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-900 text-amber-300 font-black">${p.rating} OVR</span>
           </div>
-          <p class="text-xs text-slate-400 font-medium">"${p.nickname}" | Dorsal #${p.number} | ${p.preferredFoot}</p>
-          <p class="text-xs text-sky-400 mt-0.5">${fac.icon} ${fac.name}</p>
+          <p class="text-xs text-slate-500 font-bold">"${p.nickname}" | Dorsal #${p.number} | ${p.preferredFoot}</p>
+          <p class="text-xs text-sky-700 font-bold mt-0.5">${fac.icon} ${fac.name}</p>
         </div>
       </div>
 
-      <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-        <h5 class="text-xs font-bold uppercase text-amber-400 tracking-wider">Afinidad de Posiciones (Roles)</h5>
+      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+        <h5 class="text-xs font-black uppercase text-slate-700 tracking-wider">Afinidad de Posiciones (Roles)</h5>
         <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="p-2 rounded bg-emerald-950/40 border border-emerald-500/30">
-            <span class="block text-[10px] text-emerald-400 font-bold">1º POSICIÓN PRINCIPAL</span>
-            <span class="font-black text-white text-sm">${p.rolesHierarchy.best}</span>
+          <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-300">
+            <span class="block text-[10px] text-emerald-700 font-black uppercase">1º Posición Principal</span>
+            <span class="font-black text-emerald-950 text-sm">${p.rolesHierarchy.best}</span>
           </div>
-          <div class="p-2 rounded bg-sky-950/40 border border-sky-500/30">
-            <span class="block text-[10px] text-sky-400 font-bold">2º POSICIÓN SECUNDARIA</span>
-            <span class="font-black text-white text-sm">${p.rolesHierarchy.second}</span>
+          <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-300">
+            <span class="block text-[10px] text-sky-700 font-black uppercase">2º Posición Secundaria</span>
+            <span class="font-black text-sky-950 text-sm">${p.rolesHierarchy.second}</span>
           </div>
-          <div class="p-2 rounded bg-amber-950/40 border border-amber-500/30">
-            <span class="block text-[10px] text-amber-400 font-bold">3º POSICIÓN ALTERNATIVA</span>
-            <span class="font-black text-white text-sm">${p.rolesHierarchy.third}</span>
+          <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-300">
+            <span class="block text-[10px] text-amber-700 font-black uppercase">3º Posición Alternativa</span>
+            <span class="font-black text-amber-950 text-sm">${p.rolesHierarchy.third}</span>
           </div>
-          <div class="p-2 rounded bg-rose-950/40 border border-rose-500/30">
-            <span class="block text-[10px] text-rose-400 font-bold">4º MENOS FAVORABLE</span>
-            <span class="font-black text-white text-sm">${p.rolesHierarchy.worst}</span>
+          <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-300">
+            <span class="block text-[10px] text-rose-700 font-black uppercase">4º Menos Favorable</span>
+            <span class="font-black text-rose-950 text-sm">${p.rolesHierarchy.worst}</span>
           </div>
         </div>
       </div>
 
-      <div class="space-y-2 bg-slate-950 p-4 rounded-xl border border-slate-800">
-        <h5 class="text-xs font-bold uppercase text-slate-400 tracking-wider">Atributos FIFA</h5>
+      <div class="space-y-2 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+        <h5 class="text-xs font-black uppercase text-slate-700 tracking-wider">Atributos FIFA 18</h5>
         ${this.renderStatBar('Ritmo (PAC)', p.stats.pac)}
         ${this.renderStatBar('Tiro (SHO)', p.stats.sho)}
         ${this.renderStatBar('Pase (PAS)', p.stats.pas)}
@@ -1267,13 +1358,13 @@ class FutApp {
         ${this.renderStatBar('Físico (PHY)', p.stats.phy)}
       </div>
 
-      <div class="text-xs text-slate-400 flex items-center justify-between px-1">
-        <span>Matrícula: <strong class="text-white">${p.studentId || 'UNI-Pendiente'}</strong></span>
-        <span>Teléfono: <strong class="text-white">${p.phone || 'Privado'}</strong></span>
+      <div class="text-xs text-slate-500 flex items-center justify-between px-1 font-medium">
+        <span>Matrícula: <strong class="text-slate-900">${p.studentId || 'UNI-Pendiente'}</strong></span>
+        <span>Teléfono: <strong class="text-slate-900">${p.phone || 'Privado'}</strong></span>
       </div>
 
-      <div class="admin-only pt-3 border-t border-slate-800 flex justify-end gap-2">
-        <button onclick="window.futApp.deletePlayer('${p.id}')" class="px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900 text-rose-300 text-xs font-bold border border-rose-500/30">
+      <div class="admin-only pt-3 border-t border-slate-200 flex justify-end gap-2">
+        <button onclick="window.futApp.deletePlayer('${p.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-black border border-rose-300 transition">
           Eliminar de Plantilla
         </button>
       </div>
@@ -1296,11 +1387,11 @@ class FutApp {
     const color = value >= 80 ? 'bg-emerald-500' : (value >= 70 ? 'bg-amber-500' : 'bg-rose-500');
     return `
       <div>
-        <div class="flex justify-between text-[11px] font-bold text-slate-300 mb-0.5">
+        <div class="flex justify-between text-[11px] font-bold text-slate-700 mb-0.5">
           <span>${label}</span>
-          <span>${value}</span>
+          <span class="font-black tabular-nums">${value}</span>
         </div>
-        <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+        <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
           <div class="h-full ${color} rounded-full" style="width: ${value}%;"></div>
         </div>
       </div>
@@ -1338,33 +1429,33 @@ class FutApp {
         });
 
         breakdown.innerHTML = `
-          <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20 text-xs">
-            <div class="font-bold text-emerald-400 mb-1 flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Confirmados</span>
-              <span class="px-1.5 py-0.5 rounded bg-emerald-500/20">${confirmed.length}</span>
+          <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-xs">
+            <div class="font-black text-emerald-800 mb-1 flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Confirmados</span>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-600 text-white font-black">${confirmed.length}</span>
             </div>
-            <div class="text-[11px] text-slate-300">
-              ${confirmed.length > 0 ? confirmed.map(p => p.nickname).join(', ') : '<span class="text-slate-500">Nadie aún</span>'}
-            </div>
-          </div>
-
-          <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/20 text-xs">
-            <div class="font-bold text-amber-400 mb-1 flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><i data-lucide="help-circle" class="w-3.5 h-3.5"></i> Dudas</span>
-              <span class="px-1.5 py-0.5 rounded bg-amber-500/20">${doubts.length}</span>
-            </div>
-            <div class="text-[11px] text-slate-300">
-              ${doubts.length > 0 ? doubts.map(p => p.nickname).join(', ') : '<span class="text-slate-500">Ninguna</span>'}
+            <div class="text-[11px] text-emerald-950 font-bold">
+              ${confirmed.length > 0 ? confirmed.map(p => p.nickname).join(', ') : '<span class="text-slate-400 font-normal">Nadie aún</span>'}
             </div>
           </div>
 
-          <div class="p-3 rounded-xl bg-rose-950/30 border border-rose-500/20 text-xs">
-            <div class="font-bold text-rose-400 mb-1 flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Bajas</span>
-              <span class="px-1.5 py-0.5 rounded bg-rose-500/20">${absent.length}</span>
+          <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-xs">
+            <div class="font-black text-amber-800 mb-1 flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><i data-lucide="help-circle" class="w-4 h-4 text-amber-600"></i> Dudas</span>
+              <span class="px-2 py-0.5 rounded-full bg-amber-500 text-white font-black">${doubts.length}</span>
             </div>
-            <div class="text-[11px] text-slate-300">
-              ${absent.length > 0 ? absent.map(p => p.nickname).join(', ') : '<span class="text-slate-500">Ninguna</span>'}
+            <div class="text-[11px] text-amber-950 font-bold">
+              ${doubts.length > 0 ? doubts.map(p => p.nickname).join(', ') : '<span class="text-slate-400 font-normal">Ninguna</span>'}
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-300 text-xs">
+            <div class="font-black text-rose-800 mb-1 flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><i data-lucide="x" class="w-4 h-4 text-rose-600"></i> Bajas</span>
+              <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white font-black">${absent.length}</span>
+            </div>
+            <div class="text-[11px] text-rose-950 font-bold">
+              ${absent.length > 0 ? absent.map(p => p.nickname).join(', ') : '<span class="text-slate-400 font-normal">Ninguna</span>'}
             </div>
           </div>
         `;
@@ -1375,42 +1466,44 @@ class FutApp {
     container.innerHTML = matches.map(m => {
       const isFinished = m.status === 'finalizado';
       return `
-        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-700 transition">
+        <div class="bg-white border border-slate-200 shadow-sm p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-300 transition">
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${m.modality === 'f7' ? 'bg-amber-500/20 text-amber-400' : 'bg-sky-500/20 text-sky-400'}">
+              <span class="text-[10px] font-black px-2.5 py-0.5 rounded-md ${m.modality === 'f7' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-sky-100 text-sky-800 border border-sky-300'}">
                 ${m.modality === 'f7' ? 'Fútbol 7' : 'Fútbol Sala'}
               </span>
-              <span class="text-xs text-slate-400">${m.tournament}</span>
-              ${isFinished ? '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">FINALIZADO</span>' : ''}
+              <span class="text-xs text-slate-500 font-bold">${m.tournament}</span>
+              ${isFinished ? '<span class="text-[10px] font-black px-2 py-0.5 rounded bg-emerald-600 text-white shadow-sm">FINALIZADO</span>' : ''}
             </div>
-            <h4 class="font-bold text-base text-white mt-1">
-              ${settings.teamName} ${isFinished ? `<span class="text-amber-400 font-mono font-black">${m.goalsFor} - ${m.goalsAgainst}</span>` : 'vs'} ${m.rival}
+            <h4 class="font-black text-lg text-slate-900 mt-1.5 flex items-center gap-2">
+              <span>${settings.teamName}</span>
+              ${isFinished ? `<span class="bg-slate-900 text-amber-400 px-3 py-0.5 rounded-lg font-fifa text-xl tracking-wider">${m.goalsFor} - ${m.goalsAgainst}</span>` : '<span class="text-xs font-bold text-slate-400 uppercase">vs</span>'}
+              <span>${m.rival}</span>
             </h4>
-            <div class="text-xs text-slate-400 flex items-center gap-3 mt-0.5">
-              <span class="inline-flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3 text-slate-400"></i> ${m.date} - ${m.time}h</span>
-              <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> ${m.field}</span>
+            <div class="text-xs text-slate-500 flex items-center gap-3 mt-1 font-medium">
+              <span class="inline-flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i> ${m.date} - ${m.time}h</span>
+              <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i> ${m.field}</span>
             </div>
-            ${m.scorers ? `<div class="text-xs text-slate-300 mt-1 flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5 text-amber-400"></i> <strong>Goles:</strong> ${m.scorers}</div>` : ''}
+            ${m.scorers ? `<div class="text-xs text-slate-700 mt-1.5 flex items-center gap-1.5 font-bold"><i data-lucide="activity" class="w-3.5 h-3.5 text-amber-500"></i> <strong>Goles:</strong> <span class="font-medium">${m.scorers}</span></div>` : ''}
           </div>
 
           <div class="flex items-center gap-2">
-            ${isFinished && m.mvp ? `<span class="text-xs text-amber-400 font-bold mr-2 flex items-center gap-1"><i data-lucide="star" class="w-3.5 h-3.5"></i> MVP: ${m.mvp}</span>` : ''}
+            ${isFinished && m.mvp ? `<span class="text-xs text-amber-700 font-bold mr-2 flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200"><i data-lucide="star" class="w-3.5 h-3.5 text-amber-500"></i> MVP: ${m.mvp}</span>` : ''}
 
             ${!isFinished ? `
-              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1">
-                <span>Registrar Resultado</span>
+              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-sm transition active:scale-95">
+                <span>Registrar Acta</span>
               </button>
             ` : `
-              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs">
+              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-300 transition">
                 Editar Acta
               </button>
             `}
 
-            <button onclick="window.futApp.openMatchModal('${m.id}')" class="admin-only p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300" title="Editar">
+            <button onclick="window.futApp.openMatchModal('${m.id}')" class="admin-only p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-300 transition" title="Editar" aria-label="Editar partido">
               <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
             </button>
-            <button onclick="window.futApp.deleteMatch('${m.id}')" class="admin-only p-1.5 rounded-lg bg-slate-800 hover:bg-rose-900/40 text-slate-400 hover:text-rose-400" title="Eliminar">
+            <button onclick="window.futApp.deleteMatch('${m.id}')" class="admin-only p-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 border border-slate-300 transition" title="Eliminar" aria-label="Eliminar partido">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>
