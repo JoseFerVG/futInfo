@@ -4,6 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Teko:wght@500;600;700&display=swap');
 
 :root {
+  color-scheme: dark;
   --fut-gold-1: #fce074;
   --fut-gold-2: #dfb443;
   --fut-gold-3: #c79624;
@@ -13,6 +14,41 @@
   --chem-green: #00e676;
   --chem-orange: #ff9100;
   --chem-red: #ff1744;
+}
+
+/* ==================== WEB INTERFACE GUIDELINES & ACCESSIBILITY ==================== */
+:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+button, select, input, textarea, .tab-btn, .fut-card-slot, .fut-radial-btn, .sub-bench-card {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.font-fifa, .tabular-nums, .fut-stat-number, .fut-card-rating {
+  font-variant-numeric: tabular-nums;
+}
+
+h1, h2, h3, h4 {
+  text-wrap: balance;
+}
+
+/* Scrollbar estilizada estilo consola oscura */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
 }
 
 .font-fifa {
@@ -601,7 +637,7 @@ dialog[open] {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0.75rem;
   padding: 0.6rem 0.9rem;
-  transition: all 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease;
   cursor: pointer;
 }
 
@@ -788,9 +824,17 @@ dialog[open] {
   pointer-events: none;
 }
 
-/* ---------- Accesibilidad / rendimiento ---------- */
+/* ---------- Accesibilidad / Web Interface Guidelines (Reducción de movimiento) ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .fut-beam, .fut-led-track, .fut-stands-crowd { animation: none !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .fut-card-holo-layer, .fut-card-holo-foil, .walkout-sparks-bg, .walkout-spotlight {
+    display: none !important;
+  }
 }
 
 /* ---------- Móvil ---------- */
