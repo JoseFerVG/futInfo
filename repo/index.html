@@ -66,9 +66,42 @@
   <header class="hud-top">
     <!-- Chyron izquierdo: Escudo oficial y Nombre limpio del Club -->
     <div class="hud-club">
+      <div class="hud-crest font-fifa">FUT</div>
       <div class="hud-club-data">
-        <span id="nav-team-name" class="hud-club-name font-fifa">FURIA RECTOR FC</span>
+        <div class="hud-club-row">
+          <span id="nav-team-name" class="hud-club-name font-fifa">FURIA RECTOR FC</span>
+          <span class="hud-online"><i class="hud-online-dot"></i> LIVE</span>
+        </div>
         <span id="nav-tournament-badge" class="hud-club-tournament">TORNEO DEL RECTOR 2026</span>
+      </div>
+    </div>
+
+    <!-- Chyrons Centrales FIFA FUT: Monedas, FIFA Points, Récord y Nivel Temporada -->
+    <div class="hud-fut-status-bar hidden md:flex items-center gap-2 lg:gap-3">
+      <!-- Monedas FUT (FIFA Coins) -->
+      <div class="fifa-chyron-pill fut-coins" title="Monedas del Club FUT">
+        <span class="fut-coin-glyph font-fifa">⛃</span>
+        <span class="fifa-chyron-val font-fifa" id="hud-coins-val">15,450</span>
+      </div>
+
+      <!-- FIFA Points / Rector Points -->
+      <div class="fifa-chyron-pill fut-points" title="Puntos FIFA Rector">
+        <span class="fut-fp-glyph font-fifa">◆</span>
+        <span class="fifa-chyron-val font-fifa" id="hud-fp-val">500</span>
+      </div>
+
+      <!-- Récord del Club (V - E - D) -->
+      <div class="fifa-chyron-pill fut-record hidden lg:flex" title="Historial del Club (Victorias - Empates - Derrotas)">
+        <span class="fifa-chyron-lbl font-fifa">RECORD</span>
+        <span class="fifa-chyron-val font-fifa" id="hud-record-val">12-3-1</span>
+      </div>
+
+      <!-- Nivel de Temporada / Season XP -->
+      <div class="fifa-chyron-pill fut-level hidden xl:flex" title="Nivel de Temporada 2026">
+        <span class="fifa-chyron-lvl font-fifa">LVL 14</span>
+        <div class="fifa-lvl-bar">
+          <div class="fifa-lvl-fill" style="width: 76%"></div>
+        </div>
       </div>
     </div>
 
@@ -103,19 +136,20 @@
 
       <!-- PANEL A (44% x 100%): ACTIVE SQUAD — foco por defecto -->
       <article class="hud-panel hud-panel--squad is-focus">
+        <!-- Cabecera Oficial FIFA FUT: Banner Oro Sólido, Tipografía Condensada Negra y OVR Pill -->
         <header class="hud-squad-head cursor-pointer group" id="hud-active-squad-head" role="button" tabindex="0" title="Pulsar para abrir Gestión de Plantilla y Formaciones">
-          <div class="flex items-start justify-between w-full">
-            <h2 class="hud-title group-hover:text-amber-300 transition">ACTIVE SQUAD</h2>
-          </div>
-          <div class="hud-squad-meta">
-            <div class="flex items-center gap-2">
-              <span id="current-modality-badge" class="hud-tag">FUT 7 DRAFT</span>
-              <span id="hud-team-name-top" class="hud-squad-club">FURIA RECTOR FC</span>
+          <div class="hud-squad-head-left">
+            <h2 class="hud-squad-head-title font-fifa">ACTIVE SQUAD</h2>
+            <div class="hud-squad-head-sub">
+              <span id="hud-team-name-top" class="hud-squad-club font-fifa">FURIA RECTOR FC</span>
+              <span class="fut-stars hud-stars">★★★★★</span>
             </div>
-            <span class="fut-stars hud-stars">★★★★★</span>
-            <div class="hud-rating-bar">
-              <span class="hud-rating-fill"></span>
-              <span id="header-team-rating" class="hud-rating-num">84</span>
+          </div>
+          <div class="hud-squad-head-right">
+            <span id="current-modality-badge" class="hud-modality-pill font-fifa">FUT 7 DRAFT</span>
+            <div class="hud-rating-pill font-fifa" title="Valoración General de la Plantilla">
+              <span class="hud-rating-pill-lbl font-fifa">OVR</span>
+              <span id="header-team-rating" class="hud-rating-pill-val font-fifa">84</span>
             </div>
           </div>
         </header>
@@ -129,7 +163,7 @@
           </button>
         </div>
 
-        <div id="swap-banner" class="hidden hud-swap-banner">ARRASTRA SOBRE OTRO JUGADOR PARA INTERCAMBIAR</div>
+        <div id="swap-banner" class="hidden hud-swap-banner font-fifa">ARRASTRA SOBRE OTRO JUGADOR PARA INTERCAMBIAR</div>
 
         <div class="fut-stadium-container hud-pitch-frame">
           <div id="pitch-wrapper" class="fut-pitch hud-pitch">
@@ -137,6 +171,9 @@
             <span id="hud-team-name" hidden>Furia Rector FC</span>
             <span id="hud-team-rating" hidden>84</span>
             <span id="hud-team-starters" hidden>7</span>
+
+            <!-- Capa Dinámica SVG de Enlaces de Química FIFA FUT (Líneas entre jugadores) -->
+            <svg id="pitch-chemistry-svg" class="pitch-chemistry-svg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
 
             <div id="pitch-slots-container"></div>
 
@@ -179,8 +216,11 @@
 
       <!-- PANEL B (44% x 49.5%): BANQUILLO -->
       <article class="hud-panel hud-panel--bench" onclick="if(!event.target.closest('[data-bench-id]')) window.futApp.openSubDrawer()">
-        <h3 class="hud-title">BANQUILLO</h3>
-        <div class="hud-bignum"><span id="side-bench-count">7</span><small>SUPLENTES</small></div>
+        <div class="fifa-panel-gold-strip"></div>
+        <div class="hud-bench-head-block">
+          <h3 class="hud-title font-fifa">BANQUILLO</h3>
+          <div class="hud-bignum"><span id="side-bench-count">7</span><small>SUPLENTES</small></div>
+        </div>
         <div class="fifa-bench-dock hud-bench-dock">
           <div id="pitch-bench-container" class="fifa-bench-cards-strip"></div>
         </div>
@@ -189,8 +229,20 @@
       <!-- PANEL C (44% x 49.5%): TÁCTICA -->
       <article class="hud-panel hud-panel--tactics">
         <button type="button" id="btn-squad-actions" class="hud-panel-hit" aria-label="Abrir centro táctico"></button>
-        <h3 class="hud-title">CENTRO<br>TÁCTICO</h3>
-        <div class="hud-bignum"><span id="side-formation-tag">1-3-2-1</span><small>FORMACIÓN</small></div>
+        <div class="fifa-panel-gold-strip"></div>
+        <div class="hud-tactics-head-block">
+          <h3 class="hud-title font-fifa">CENTRO<br>TÁCTICO</h3>
+          <div class="hud-bignum"><span id="side-formation-tag">1-3-2-1</span><small>FORMACIÓN</small></div>
+        </div>
+
+        <!-- Mini Pizarra Táctica Integrada (Estilo Concept Squads FIFA Referencias) -->
+        <div class="hud-tactics-mini-pitch" id="hud-tactics-mini-pitch" title="Pizarra táctica de esquema actual">
+          <div class="mini-pitch-schematic">
+            <div class="mini-pitch-half-line"></div>
+            <div class="mini-pitch-center-circ"></div>
+            <div id="hud-tactics-dots-container" class="mini-pitch-dots-wrap"></div>
+          </div>
+        </div>
 
         <div class="hud-specs">
           <label for="spec-captain"><b>CAP</b><select id="spec-captain" name="captain"></select></label>
@@ -366,14 +418,17 @@
 
   </main>
 
-  <!-- FRANJA TÉCNICA INFERIOR DE CONSOLA EA SPORTS (ATAJOS KEYBOARD-FIRST LINEAR) -->
+  <!-- FRANJA TÉCNICA INFERIOR DE CONSOLA EA SPORTS (CONTROLLER & KEYBOARD PROMPTS) -->
   <footer class="hud-prompts" aria-label="Indicadores de consola">
-    <span class="hud-prompt"><em>Q / E</em><span>L1/R1 PESTAÑAS</span></span>
-    <span class="hud-prompt"><em>↑ ↓ ← →</em><span>CURSOR JUGADOR</span></span>
-    <span class="hud-prompt"><em>ENTER</em><span>ACCIONES / RADIAL</span></span>
-    <span class="hud-prompt"><em>S</em><span>ESQUEMA TÁCTICO</span></span>
-    <span class="hud-prompt"><em>M</em><span>TEMA CLARO/OSCURO</span></span>
-    <span class="hud-prompt"><em>DRAG &amp; DROP</em><span>INTERCAMBIAR DORSAL</span></span>
+    <span class="hud-prompt"><em class="ps-btn ps-x">✕</em><span>SELECCIONAR</span></span>
+    <span class="hud-prompt"><em class="ps-btn ps-circle">◯</em><span>VOLVER</span></span>
+    <span class="hud-prompt"><em class="ps-btn ps-triangle">▲</em><span>ACCIONES</span></span>
+    <span class="hud-prompt"><em class="ps-btn ps-square">■</em><span>SUSTITUIR</span></span>
+    <span class="hud-prompt"><em class="ps-btn ps-pill">Q / E</em><span>PESTAÑAS</span></span>
+    <span class="hud-prompt"><em class="ps-btn ps-pill">↑ ↓ ← →</em><span>CURSOR</span></span>
+    <span class="hud-prompt"><em class="ps-btn ps-pill">S</em><span>ESQUEMA</span></span>
+    <span class="hud-prompt"><em class="ps-btn ps-pill">M</em><span>MODO DÍA/NOCHE</span></span>
+    <span class="hud-prompt"><em class="ps-btn ps-pill">DRAG &amp; DROP</em><span>INTERCAMBIAR</span></span>
   </footer>
 
   <!-- ==================== MODALES NATIVOS <dialog> ACCESIBLES ==================== -->

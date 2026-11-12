@@ -394,13 +394,17 @@ class FutApp {
     const toggleBtn = document.getElementById('btn-toggle-theme');
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
-        const currentTheme = document.body.classList.contains('theme-light') ? 'light' : 'dark';
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        this.setTheme(newTheme);
-        futAudio.playSelect();
-        this.showToast(`Modo ${newTheme === 'light' ? 'Claro' : 'Oscuro'} activado`, newTheme === 'light' ? 'sun' : 'moon');
+        this.toggleTheme();
       });
     }
+  }
+
+  toggleTheme() {
+    const currentTheme = document.body.classList.contains('theme-light') ? 'light' : 'dark';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    this.setTheme(newTheme);
+    futAudio.playSelect();
+    this.showToast(`Modo ${newTheme === 'light' ? 'Claro' : 'Oscuro'} activado`, newTheme === 'light' ? 'sun' : 'moon');
   }
 
   setTheme(theme) {
@@ -1110,7 +1114,7 @@ class FutApp {
         this.toggleTheme();
       } else if (e.key === 'a' || e.key === 'A') {
         e.preventDefault();
-        document.getElementById('hud-btn-audio')?.click();
+        (document.getElementById('btn-toggle-audio') || document.getElementById('hud-btn-audio'))?.click();
       } else if (e.key === 'f' || e.key === 'F') {
         e.preventDefault();
         const settings = store.getSettings();
@@ -2376,6 +2380,54 @@ class FutApp {
 
     const projected = formationConfig.slots.map(s => this.projectSlot(s));
 
+    // Renderizar Enlaces de Química FIFA FUT en SVG (Líneas entre jugadores)
+    const chemSvg = document.getElementById('pitch-chemistry-svg');
+    if (chemSvg) {
+      const links = this.getFormationChemistryLinks(settings.modality, activeFormation, formationConfig.slots.length);
+      chemSvg.innerHTML = links.map(([i, j]) => {
+        const p1 = projected[i];
+        const p2 = projected[j];
+        if (!p1 || !p2) return '';
+
+        const pl1 = startingPlayers[i];
+        const pl2 = startingPlayers[j];
+
+        let strokeColor = '#22c55e';
+        let strokeFilter = 'drop-shadow(0 0 5px rgba(34, 197, 94, 0.85))';
+        let strokeWidth = '3';
+        let strokeDash = '';
+
+        if (!pl1 || !pl2) {
+          strokeColor = 'rgba(255, 255, 255, 0.2)';
+          strokeFilter = 'none';
+          strokeDash = 'stroke-dasharray="2,2"';
+          strokeWidth = '1.5';
+        } else if (pl1.faculty && pl2.faculty && pl1.faculty === pl2.faculty) {
+          strokeColor = '#38f89c'; // Química Perfecta (Misma facultad)
+          strokeFilter = 'drop-shadow(0 0 7px rgba(56, 248, 156, 0.95))';
+          strokeWidth = '3.5';
+        } else {
+          strokeColor = '#facc15'; // Química Media / Alta FIFA Gold
+          strokeFilter = 'drop-shadow(0 0 5px rgba(250, 204, 21, 0.85))';
+          strokeWidth = '2.8';
+        }
+
+        return `
+          <line x1="${p1.left}" y1="${p1.top}" x2="${p2.left}" y2="${p2.top}"
+                stroke="${strokeColor}" stroke-width="${strokeWidth}" stroke-linecap="round"
+                ${strokeDash} style="filter: ${strokeFilter}; vector-effect: non-scaling-stroke;" />
+        `;
+      }).join('');
+    }
+
+    // Renderizar Mini Pizarra Táctica en Panel C
+    const tacticsDots = document.getElementById('hud-tactics-dots-container');
+    if (tacticsDots) {
+      tacticsDots.innerHTML = formationConfig.slots.map(s => {
+        return `<span class="tactics-dot" style="top: ${s.top}%; left: ${s.left}%;"></span>`;
+      }).join('');
+    }
+
     // Marca de agua táctica de formación sobre el césped
     const fWatermark = document.getElementById('pitch-formation-watermark');
     if (fWatermark) {
@@ -2488,6 +2540,91 @@ class FutApp {
       scale,
       z: 12 + Math.round(t * 20)
     };
+  }
+
+  /**
+   * Enlaces tácticos de química oficial FIFA FUT entre posiciones
+   */
+  getFormationChemistryLinks(modality, formationId, slotsCount) {
+    const f7Links = {
+      '1-3-2-1': [
+        [0, 1], [0, 2], [0, 3],
+        [1, 2], [2, 3],
+        [1, 4], [2, 4], [2, 5], [3, 5],
+        [4, 5],
+        [4, 6], [5, 6]
+      ],
+      '1-2-3-1': [
+        [0, 1], [0, 2],
+        [1, 2],
+        [1, 3], [1, 4],
+        [2, 4], [2, 5],
+        [3, 4], [4, 5],
+        [3, 6], [4, 6], [5, 6]
+      ],
+      '1-3-1-2': [
+        [0, 1], [0, 2], [0, 3],
+        [1, 2], [2, 3],
+        [1, 4], [2, 4], [3, 4],
+        [4, 5], [4, 6],
+        [5, 6]
+      ],
+      '1-2-2-2': [
+        [0, 1], [0, 2],
+        [1, 2],
+        [1, 3], [2, 4],
+        [3, 4],
+        [3, 5], [4, 6],
+        [5, 6]
+      ],
+      '1-3-3-0': [
+        [0, 1], [0, 2], [0, 3],
+        [1, 2], [2, 3],
+        [1, 4], [2, 5], [3, 6],
+        [4, 5], [5, 6]
+      ],
+      '1-4-1-1': [
+        [0, 2], [0, 3],
+        [1, 2], [2, 3], [3, 4],
+        [2, 5], [3, 5],
+        [5, 6]
+      ],
+      '1-1-4-1': [
+        [0, 1],
+        [1, 2], [1, 3], [1, 4], [1, 5],
+        [2, 3], [3, 4], [4, 5],
+        [3, 6], [4, 6]
+      ]
+    };
+
+    const futsalLinks = {
+      '1-1-2-1': [
+        [0, 1],
+        [1, 2], [1, 3],
+        [2, 3],
+        [2, 4], [3, 4]
+      ],
+      '1-2-2': [
+        [0, 1], [0, 2],
+        [1, 2],
+        [1, 3], [2, 4],
+        [3, 4]
+      ],
+      '1-3-0': [
+        [0, 2],
+        [1, 2], [2, 3],
+        [1, 4], [2, 4], [3, 4]
+      ]
+    };
+
+    const catalog = modality === 'f7' ? f7Links : futsalLinks;
+    if (catalog[formationId]) return catalog[formationId];
+
+    const fallback = [];
+    for (let i = 0; i < slotsCount - 1; i++) {
+      fallback.push([i, i + 1]);
+    }
+    return fallback;
   }
 
   getActiveSlotRole(index) {

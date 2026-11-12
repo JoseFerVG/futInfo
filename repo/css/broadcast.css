@@ -204,6 +204,91 @@ body.hud-canvas {
   box-shadow: 0 0 8px #38f89c;
 }
 
+/* Chyrons Centrales FIFA FUT: Monedas, FIFA Points, Récord y Nivel Temporada */
+.hud-fut-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fifa-chyron-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 12px;
+  background: linear-gradient(135deg, rgba(16, 21, 30, 0.96) 0%, rgba(9, 12, 18, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.fifa-chyron-pill.fut-coins {
+  border-left: 3px solid #facc15;
+}
+
+.fifa-chyron-pill.fut-points {
+  border-left: 3px solid #22c55e;
+}
+
+.fifa-chyron-pill.fut-record {
+  border-left: 3px solid #38bdf8;
+}
+
+.fifa-chyron-pill.fut-level {
+  border-left: 3px solid #f59e0b;
+}
+
+.fut-coin-glyph {
+  color: #facc15;
+  font-size: 1.15rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.8));
+}
+
+.fut-fp-glyph {
+  color: #22c55e;
+  font-size: 1rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.8));
+}
+
+.fifa-chyron-val {
+  font: 800 1.05rem / 1 var(--hud-cond);
+  color: #ffffff;
+  letter-spacing: 0.05em;
+}
+
+.fifa-chyron-lbl {
+  font: 800 0.72rem / 1 var(--hud-cond);
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+}
+
+.fifa-chyron-lvl {
+  font: 900 0.85rem / 1 var(--hud-cond);
+  color: #facc15;
+  letter-spacing: 0.05em;
+}
+
+.fifa-lvl-bar {
+  width: 48px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fifa-lvl-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+  box-shadow: 0 0 6px #38bdf8;
+}
+
 /* Chyron Derecho: Modalidad, Audio y Auth */
 .hud-status {
   height: 100%;
@@ -471,56 +556,106 @@ body.hud-canvas {
   z-index: 4;
 }
 
-/* Foco de Joystick: Inundación en Oro FUT instantánea */
-.hud-panel.is-focus,
-.hud-panel:hover {
-  background:
-    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.05) 0 2px, transparent 2px 8px),
-    linear-gradient(135deg, var(--hud-gold-2) 0%, var(--hud-gold) 65%, #dfa50b 100%);
-  color: var(--hud-ink);
-  border-bottom-color: var(--hud-ink);
-  transform: scale(1.01);
-  z-index: 6;
-  box-shadow: 0 12px 35px rgba(240, 190, 42, 0.25);
-}
-
-.hud-panel.is-focus::before,
-.hud-panel:hover::before {
-  background: var(--hud-ink);
-  width: 6px;
-}
-
-.hud-panel.is-focus .hud-panel-watermark,
-.hud-panel:hover .hud-panel-watermark {
-  color: #000000;
-  opacity: 0.08;
-}
-
-.hud-panel.is-focus .hud-title,
-.hud-panel:hover .hud-title,
-.hud-panel.is-focus .hud-bignum,
-.hud-panel:hover .hud-bignum {
-  transform: translateX(4px);
-}
-
-/* Cuando el usuario pasa el ratón por la derecha, el izquierdo se apaga */
-.hud-squads:hover .hud-panel.is-focus:not(:hover) {
+/* Foco de Joystick: Resalte Oficial EA Sports */
+.hud-panel {
+  position: relative;
+  overflow: hidden;
+  color: var(--hud-text);
   background:
     repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.02) 0 2px, transparent 2px 8px),
     linear-gradient(135deg, rgba(24, 28, 38, 0.94) 0%, rgba(13, 16, 22, 0.96) 100%);
-  color: var(--hud-text);
-  border-bottom-color: rgba(255, 255, 255, 0.15);
-  transform: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 3px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  transition: all var(--hud-snap);
+  cursor: pointer;
+  isolation: isolate;
 }
 
-.hud-squads:hover .hud-panel.is-focus:not(:hover)::before {
-  background: rgba(255, 255, 255, 0.2);
+.hud-panel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 4px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 2;
+  transition: all var(--hud-snap);
 }
 
-.hud-squads:hover .hud-panel.is-focus:not(:hover) .hud-title {
-  transform: none;
+.hud-panel::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  background: var(--hud-bg);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  opacity: 0.85;
+  z-index: 3;
+}
+
+.hud-panel-watermark {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.hud-panel > *:not(.hud-panel-watermark):not(.hud-panel-hit) {
+  position: relative;
+  z-index: 4;
+}
+
+/* Panel A: ACTIVE SQUAD conserva su fondo oscuro con césped 3D y resalta en Oro */
+.hud-panel--squad.is-focus,
+.hud-panel--squad:hover {
+  border-color: var(--hud-gold) !important;
+  border-bottom: 3px solid var(--hud-gold) !important;
+  box-shadow: 0 0 25px rgba(240, 190, 42, 0.35), 0 14px 35px rgba(0, 0, 0, 0.8) !important;
+  transform: scale(1.005);
+  z-index: 6;
+}
+
+.hud-panel--squad.is-focus::before,
+.hud-panel--squad:hover::before {
+  background: var(--hud-gold);
+  width: 5px;
+}
+
+/* Paneles B y C: Resalte con atmósfera console broadcast */
+.hud-panel--bench.is-focus,
+.hud-panel--bench:hover,
+.hud-panel--tactics.is-focus,
+.hud-panel--tactics:hover {
+  background:
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 8px),
+    linear-gradient(135deg, rgba(30, 36, 48, 0.96) 0%, rgba(16, 20, 28, 0.98) 100%);
+  border-color: rgba(240, 190, 42, 0.5) !important;
+  border-bottom-color: var(--hud-gold) !important;
+  transform: scale(1.008);
+  z-index: 6;
+  box-shadow: 0 0 22px rgba(240, 190, 42, 0.25), 0 12px 30px rgba(0, 0, 0, 0.7);
+}
+
+.hud-panel--bench.is-focus::before,
+.hud-panel--bench:hover::before,
+.hud-panel--tactics.is-focus::before,
+.hud-panel--tactics:hover::before {
+  background: var(--hud-gold);
+  width: 5px;
+}
+
+.fifa-panel-gold-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--hud-gold-2) 0%, var(--hud-gold) 65%, transparent 100%);
+  z-index: 5;
 }
 
 /* Tipografía de impacto */
@@ -533,12 +668,6 @@ body.hud-canvas {
   text-transform: uppercase;
   letter-spacing: 0.01em;
   transition: transform var(--hud-snap);
-}
-
-.hud-panel--squad .hud-title {
-  font: 900 1.6rem / 1 var(--hud-cond);
-  left: 20px;
-  top: 10px;
 }
 
 .hud-bignum {
@@ -567,19 +696,103 @@ body.hud-canvas {
   transform: skewX(-12deg);
 }
 
-/* ---------- 6. ACTIVE SQUAD & CÉSPED 3D ---------- */
+/* ---------- 6. ACTIVE SQUAD & CÉSPED 3D (CALCADO DE REFERENCIAS FIFA) ---------- */
 .hud-squad-head {
   position: absolute !important;
   inset: 0 0 auto 0;
-  height: 52px;
-  padding: 10px 18px;
-  cursor: pointer;
-  transition: background 150ms ease;
+  height: 56px;
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #fbd249 0%, #f0ba28 60%, #e5a812 100%) !important;
+  color: #0b0e14 !important;
+  border-bottom: 2px solid #b8860b;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
   z-index: 10;
+  cursor: pointer;
+  transition: filter 150ms ease, box-shadow 150ms ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
 }
 
 .hud-squad-head:hover {
-  background: rgba(240, 190, 42, 0.08);
+  filter: brightness(1.05);
+  box-shadow: 0 6px 20px rgba(240, 190, 42, 0.45);
+}
+
+.hud-squad-head-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hud-squad-head-title {
+  font: 900 1.85rem / 0.9 var(--hud-cond);
+  color: #0b0e14 !important;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.hud-squad-head-sub {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.hud-squad-club {
+  font: 800 1.05rem / 1 var(--hud-cond);
+  color: #171c26 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hud-squad-head .fut-stars {
+  font-size: 0.95rem;
+  line-height: 1;
+  color: #0b0e14 !important;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.hud-squad-head-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hud-modality-pill {
+  display: inline-block;
+  padding: 3px 8px;
+  background: #0b0e14;
+  color: #fbd249;
+  font: 900 0.8rem / 1.1 var(--hud-cond);
+  letter-spacing: 0.08em;
+  transform: skewX(-12deg);
+  border: 1px solid rgba(251, 210, 73, 0.4);
+}
+
+.hud-rating-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 2px 10px;
+  background: #0b0e14;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transform: skewX(-8deg);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.hud-rating-pill-lbl {
+  font: 900 0.72rem / 1 var(--hud-cond);
+  color: #94a3b8;
+  letter-spacing: 0.06em;
+}
+
+.hud-rating-pill-val {
+  font: 900 1.65rem / 0.9 var(--hud-cond);
+  color: #fbd249;
+  text-shadow: 0 0 10px rgba(251, 210, 73, 0.7);
 }
 
 /* Barra de Acción EA Sports: Cambiar Plantilla & Formación */
@@ -587,8 +800,8 @@ body.hud-canvas {
   position: absolute !important;
   left: 16px;
   right: 16px;
-  top: 44px;
-  height: 34px;
+  top: 62px;
+  height: 32px;
   z-index: 15;
   display: flex;
   align-items: stretch;
@@ -648,58 +861,10 @@ body.hud-canvas {
   border-color: var(--hud-ink);
 }
 
-.hud-squad-meta {
-  position: absolute;
-  right: 20px;
-  top: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-}
-
-.hud-squad-club {
-  font: 800 1.25rem / 1 var(--hud-cond);
-  text-transform: uppercase;
-  color: inherit;
-}
-
-.hud-stars {
-  font-size: 1.1rem;
-  line-height: 1;
-  letter-spacing: 0.05em;
-  color: #dfa50b;
-}
-
-.hud-rating-bar {
-  position: relative;
-  width: 140px;
-  height: 18px;
-  background: #1e222b;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.hud-rating-fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 84%;
-  background: linear-gradient(90deg, #d48a00, #f5a623);
-  transition: width 300ms cubic-bezier(0.2, 1, 0.3, 1);
-}
-
-.hud-rating-num {
-  position: absolute;
-  right: 5px;
-  top: 50%;
-  transform: translateY(-50%);
-  font: 900 1.05rem / 1 var(--hud-cond) !important;
-  color: #ffffff !important;
-}
-
 .hud-swap-banner {
   position: absolute !important;
   left: 50%;
-  top: 76px;
+  top: 98px;
   transform: translateX(-50%) skewX(-12deg);
   padding: 4px 18px;
   background: var(--hud-ink);
@@ -715,7 +880,7 @@ body.hud-canvas {
   position: absolute !important;
   left: 16px;
   right: 16px;
-  top: 86px;
+  top: 100px;
   bottom: 56px;
   min-height: 0 !important;
   background: transparent !important;
@@ -766,6 +931,17 @@ body.hud-canvas {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
+}
+
+/* Capa Dinámica SVG de Enlaces de Química FUT */
+.pitch-chemistry-svg {
+  position: absolute !important;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+  overflow: visible;
 }
 
 #pitch-slots-container {
@@ -1050,11 +1226,72 @@ body.hud-canvas {
   font-size: 11rem;
 }
 
+/* Mini Pizarra Táctica Integrada (Concept Squads FIFA) */
+.hud-tactics-mini-pitch {
+  position: absolute !important;
+  left: 38%;
+  top: 14px;
+  bottom: 56px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.mini-pitch-schematic {
+  width: 100%;
+  max-width: 170px;
+  height: 100%;
+  max-height: 105px;
+  background: rgba(10, 14, 20, 0.75);
+  border: 1.5px solid rgba(240, 190, 42, 0.4);
+  position: relative;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.85);
+}
+
+.mini-pitch-half-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.mini-pitch-center-circ {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50% !important;
+  transform: translate(-50%, -50%);
+}
+
+.mini-pitch-dots-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.tactics-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--hud-gold);
+  border-radius: 50% !important;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 6px var(--hud-gold);
+  border: 1.5px solid #000;
+}
+
 .hud-specs {
   position: absolute !important;
   right: 18px;
-  bottom: 18px;
-  width: 54%;
+  bottom: 14px;
+  width: 58%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
@@ -1065,7 +1302,7 @@ body.hud-canvas {
   display: flex;
   align-items: stretch;
   background: #0a0d13;
-  height: 32px;
+  height: 30px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   cursor: pointer;
 }
@@ -1097,7 +1334,7 @@ body.hud-canvas {
   outline: 2px solid var(--hud-gold);
 }
 
-/* ---------- 9. FRANJA TÉCNICA INFERIOR (PROMPTS) ---------- */
+/* ---------- 9. FRANJA TÉCNICA INFERIOR (PROMPTS & CONTROLLER GLYPHS) ---------- */
 .hud-prompts {
   width: 100%;
   max-width: 1680px;
@@ -1106,25 +1343,72 @@ body.hud-canvas {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 20px;
   z-index: 20;
-  font: 700 0.95rem / 1 var(--hud-cond);
+  font: 700 0.92rem / 1 var(--hud-cond);
   color: #e2e8f0;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .hud-prompt {
   display: inline-flex;
   align-items: center;
+  white-space: nowrap;
 }
 
-.hud-prompt em {
+/* Botones Oficiales Estilo PlayStation / Xbox */
+.ps-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50% !important;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 0.68rem;
+  line-height: 1;
+  margin-right: 6px;
+  transform: none !important;
+  flex-shrink: 0;
+}
+
+.ps-x {
+  background: #091729;
+  color: #38bdf8;
+  border: 1.5px solid #38bdf8;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+}
+
+.ps-circle {
+  background: #260a12;
+  color: #f43f5e;
+  border: 1.5px solid #f43f5e;
+  box-shadow: 0 0 8px rgba(244, 63, 94, 0.6);
+}
+
+.ps-triangle {
+  background: #061f14;
+  color: #10b981;
+  border: 1.5px solid #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+.ps-square {
+  background: #240a20;
+  color: #ec4899;
+  border: 1.5px solid #ec4899;
+  box-shadow: 0 0 8px rgba(236, 72, 153, 0.6);
+}
+
+.ps-pill {
   display: inline-block;
-  margin-right: 8px;
-  padding: 2px 8px;
+  margin-right: 6px;
+  padding: 2px 7px;
   font-style: normal;
   font-weight: 900;
   font-size: 0.72rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   background: var(--hud-gold);
   color: var(--hud-ink);
   transform: skewX(-12deg);
@@ -1453,24 +1737,34 @@ body.hud-canvas {
 
   .hud-panel--squad {
     width: 100% !important;
+    max-width: 100% !important;
     height: clamp(430px, 72vh, 530px) !important;
     position: relative;
     flex-shrink: 0;
   }
 
   .hud-squad-head {
-    padding: 8px 12px 0 12px;
+    height: 52px !important;
+    padding: 4px 10px !important;
   }
 
-  .hud-squad-head .hud-title {
-    font-size: 1.35rem;
+  .hud-squad-head-title {
+    font-size: 1.45rem !important;
+  }
+
+  .hud-squad-club {
+    font-size: 0.90rem !important;
+  }
+
+  .hud-rating-pill-val {
+    font-size: 1.35rem !important;
   }
 
   .hud-squad-action-bar {
-    top: 34px;
-    left: 6px;
-    right: 6px;
-    height: 34px;
+    top: 56px !important;
+    left: 6px !important;
+    right: 6px !important;
+    height: 32px !important;
   }
 
   .hud-squad-bar-btn {
@@ -1487,7 +1781,7 @@ body.hud-canvas {
   }
 
   .hud-pitch-frame {
-    top: 74px !important;
+    top: 92px !important;
     bottom: 50px !important;
     left: 6px !important;
     right: 6px !important;
