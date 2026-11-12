@@ -95,15 +95,15 @@ dialog[open] {
   }
 }
 
-/* ==================== ESTADIO Y PITCH FIFA FUT BROADCAST (LIGHT ESPORTS) ==================== */
+/* ==================== ESTADIO Y PITCH FIFA FUT BROADCAST ==================== */
 .fut-stadium-container {
-  background: #ffffff;
+  background: transparent;
   position: relative;
-  border-radius: 1.5rem;
-  border: 1.5px solid #e2e8f0;
-  box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+  border-radius: 0 0 0.85rem 0.85rem;
+  border: none;
+  box-shadow: none;
   overflow: hidden;
-  min-height: 680px;
+  min-height: 600px;
 }
 
 /* Gradas de estadio y focos superiores */
@@ -621,16 +621,17 @@ dialog[open] {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(20px);
-  border-top: 3px solid #f59e0b;
-  box-shadow: 0 -15px 40px rgba(15, 23, 42, 0.15);
+  background: rgba(10, 16, 29, 0.96);
+  backdrop-filter: blur(24px);
+  border-top: 3px solid #00f0ff;
+  box-shadow: 0 -15px 45px rgba(0, 0, 0, 0.85);
   z-index: 90;
   transform: translateY(100%);
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   padding: 1rem 1.5rem 1.5rem 1.5rem;
   max-height: 48vh;
   overflow-y: auto;
+  color: #ffffff;
 }
 
 #fut-sub-drawer.drawer-open {
@@ -641,19 +642,19 @@ dialog[open] {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff;
-  border: 1.5px solid #e2e8f0;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   border-radius: 0.75rem;
   padding: 0.6rem 0.9rem;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
 }
 
 .sub-bench-card:hover {
-  background: #fffbeb;
-  border-color: #f59e0b;
-  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.15);
+  background: rgba(30, 41, 59, 0.95);
+  border-color: #00f0ff;
+  box-shadow: 0 8px 24px rgba(0, 240, 255, 0.25);
   transform: translateY(-2px);
 }
 
@@ -795,10 +796,10 @@ dialog[open] {
 /* Contenedor del estadio: viewport de consola */
 .fut-stadium-container {
   min-height: 0;
-  border-radius: 1.5rem;
-  background: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.08);
+  border-radius: 0 0 0.85rem 0.85rem;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 .fut-stadium-container::before { display: none; }
 
@@ -1199,18 +1200,21 @@ dialog[open] {
 
 /* Ribbon de Pestañas FIFA 19 */
 .fifa-tab-btn {
-  color: #64748b;
+  color: #94a3b8;
   font-weight: 800;
   letter-spacing: 0.8px;
   position: relative;
-  transition: color 0.15s ease;
+  transition: all 0.15s ease;
+  padding: 10px 14px;
 }
 .fifa-tab-btn:hover {
-  color: #0f172a;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
 }
 .fifa-tab-btn.active {
-  color: #0f172a;
+  color: #ffffff !important;
   font-weight: 900;
+  background: rgba(255, 255, 255, 0.08);
 }
 .fifa-tab-indicator {
   display: none;
@@ -1218,41 +1222,137 @@ dialog[open] {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 3.5px;
-  background: linear-gradient(90deg, #ec4899 0%, #06b6d4 50%, #f59e0b 100%);
+  height: 3px;
+  background: linear-gradient(90deg, #00f0ff 0%, #ec4899 100%);
   border-radius: 4px 4px 0 0;
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
 }
 .fifa-tab-btn.active .fifa-tab-indicator {
   display: block;
+}
+
+/* ==================== TEMA DE CONSOLA FIFA ULTIMATE TEAM ==================== */
+body.fut-console-theme {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(20, 35, 60, 0.9) 0%, rgba(7, 11, 20, 0.98) 75%),
+    radial-gradient(circle at 85% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 15% 15%, rgba(236, 72, 153, 0.08) 0%, transparent 40%),
+    #070b14;
+  background-attachment: fixed;
+  color: #f8fafc;
+  min-height: 100vh;
+}
+
+/* ==================== PANELES Y TILES CONSOLA FIFA (REFERENCIAS FIFA 16, 19 & 20) ==================== */
+.fifa-tile {
+  background: rgba(13, 20, 36, 0.88);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.85rem;
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.75);
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fifa-tile:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+}
+
+.fifa-active-squad-tile {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(10, 16, 29, 0.96);
+}
+
+.fifa-active-squad-header {
+  background: linear-gradient(90deg, rgba(13, 20, 36, 0.98) 0%, rgba(20, 32, 58, 0.96) 50%, rgba(13, 20, 36, 0.98) 100%);
+  border-bottom: 2px solid #00f0ff;
+  box-shadow: 0 4px 20px -2px rgba(0, 240, 255, 0.3);
+}
+
+.fifa-tile-accent-bar {
+  width: 4px;
+  height: 28px;
+  background: #00f0ff;
+  border-radius: 2px;
+  box-shadow: 0 0 10px #00f0ff;
+  display: inline-block;
+}
+
+.fifa-active-squad-title {
+  color: #00f0ff;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+}
+
+/* Tile de Suplentes / Reserva (Estilo MY SQUADS en Capturas 1 y 2) */
+.fifa-bench-tile {
+  background: linear-gradient(135deg, rgba(16, 26, 48, 0.94) 0%, rgba(8, 14, 26, 0.98) 100%);
+  border-left: 3.5px solid #00f0ff;
+}
+
+.fifa-bench-tile::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55%;
+  height: 100%;
+  background: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500&auto=format&fit=crop&q=80') no-repeat center right / cover;
+  opacity: 0.18;
+  mask-image: linear-gradient(to left, rgba(0,0,0,1) 30%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 30%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Tile de Roles y Especialistas (Estilo CONCEPT SQUADS en Capturas 1 y 2) */
+.fifa-tactics-tile {
+  background: linear-gradient(135deg, rgba(20, 28, 48, 0.94) 0%, rgba(10, 15, 28, 0.98) 100%);
+  border-left: 3.5px solid #f59e0b;
+}
+
+.fifa-tactics-tile::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop&q=80') no-repeat center right / cover;
+  opacity: 0.15;
+  mask-image: linear-gradient(to left, rgba(0,0,0,1) 20%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 20%, transparent 100%);
+  pointer-events: none;
 }
 
 /* Sub-header de Navegación de Plantilla (FIFA 22 Squad Menu) */
 .fifa-squad-subnav {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  padding: 6px 12px;
+  justify-content: space-between;
+  padding: 6px 14px;
   font-size: 0.75rem;
   font-weight: 900;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: #64748b;
-  border-bottom: 1.5px solid #e2e8f0;
-  margin-bottom: 8px;
+  color: #94a3b8;
+  background: rgba(13, 20, 36, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
 }
 .fifa-squad-subnav .subnav-active {
-  color: #0f172a;
+  color: #00f0ff;
   position: relative;
 }
 .fifa-squad-subnav .subnav-active::after {
   content: "";
   position: absolute;
-  bottom: -7.5px;
+  bottom: -6px;
   left: 0;
   right: 0;
-  height: 2.5px;
-  background: #ec4899;
+  height: 2px;
+  background: #00f0ff;
+  box-shadow: 0 0 8px #00f0ff;
   border-radius: 2px;
 }
 
@@ -1263,12 +1363,13 @@ dialog[open] {
   left: 14px;
   z-index: 40;
   width: 210px;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(10, 16, 29, 0.92);
   backdrop-filter: blur(16px);
-  border: 1.5px solid rgba(226, 232, 240, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 1rem;
   padding: 10px 12px;
-  box-shadow: 0 15px 35px -5px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6);
+  color: #ffffff;
 }
 
 /* HUD Superior Derecho: Ficha del Jugador Activo (Captura 1 Courtois & Captura 5 Robben) */
@@ -1278,12 +1379,13 @@ dialog[open] {
   right: 14px;
   z-index: 40;
   width: 225px;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(10, 16, 29, 0.92);
   backdrop-filter: blur(16px);
-  border: 1.5px solid rgba(226, 232, 240, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 1rem;
   padding: 10px 12px;
-  box-shadow: 0 15px 35px -5px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6);
+  color: #ffffff;
 }
 
 /* Marca de Agua de Formación Táctica en Césped (Captura 1: 4-3-3) */
@@ -1310,9 +1412,9 @@ dialog[open] {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(15, 23, 42, 0.94);
+  background: rgba(10, 16, 29, 0.94);
   backdrop-filter: blur(16px);
-  border-top: 2px solid #334155;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   padding: 6px 10px;
@@ -1322,7 +1424,7 @@ dialog[open] {
 }
 
 .fifa-bench-tag {
-  background: #334155;
+  background: #1e293b;
   color: #f8fafc;
   font-family: 'Teko', sans-serif;
   font-size: 1.15rem;
@@ -1355,14 +1457,15 @@ dialog[open] {
 
 /* Barra de Botones de Gamepad de Consola en el Pie (Captura 1 y 5) */
 .fifa-console-bar {
-  background: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 1rem;
+  background: rgba(10, 16, 29, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
   padding: 10px 18px;
-  box-shadow: 0 4px 15px -3px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 8px 25px -4px rgba(0, 0, 0, 0.6);
   font-size: 0.75rem;
   font-weight: 800;
-  color: #334155;
+  color: #e2e8f0;
   user-select: none;
 }
 
@@ -1371,10 +1474,85 @@ dialog[open] {
   box-shadow: 0 0 6px rgba(236, 72, 153, 0.8);
 }
 .gamepad-badge.l2-badge, .gamepad-badge.r3-badge {
-  background: #334155;
+  background: #1e293b;
   color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 1px 4px;
   border-radius: 4px;
   font-size: 0.65rem;
   font-weight: 900;
 }
+
+/* ==================== TEST DE ATRIBUTOS FIFA PASO A PASO ==================== */
+.fut-stat-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 9999px;
+  background: #1e293b;
+  outline: none;
+  transition: background 0.2s;
+}
+
+.fut-stat-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #f59e0b;
+  border: 3px solid #070b14;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.15s, box-shadow 0.15s;
+}
+
+.fut-stat-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: #fbbf24;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.85);
+}
+
+.fut-stat-slider::-webkit-slider-thumb:active {
+  transform: scale(1.22);
+  background: #f59e0b;
+}
+
+.fut-stat-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #f59e0b;
+  border: 3px solid #070b14;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.15s, box-shadow 0.15s;
+}
+
+.wizard-step-pill {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wizard-step-pill.active {
+  background: #f59e0b !important;
+  color: #070b14 !important;
+  font-weight: 900 !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6) !important;
+  transform: scale(1.05);
+}
+
+.wizard-preset-btn.active {
+  border-color: #f59e0b !important;
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #fbbf24 !important;
+  font-weight: 900 !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35) !important;
+}
+
+/* Modales y Paneles Consola FIFA */
+.fifa-console-modal {
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+

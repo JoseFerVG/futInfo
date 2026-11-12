@@ -11,6 +11,111 @@ import {
   getActiveConfig 
 } from './firebase-config.js';
 
+export const STATS_TEST_CONFIG = [
+  {
+    key: 'pac',
+    name: 'Ritmo (PAC)',
+    short: 'PAC',
+    icon: 'zap',
+    tagClass: 'bg-sky-100 text-sky-800 border-sky-300',
+    title: 'Ritmo y Aceleración',
+    question: '¿Cómo calificarías tu velocidad punta y aceleración al sprint?',
+    defaultValue: 82,
+    tiers: [
+      { min: 90, label: 'Élite Mundial (90+)', emoji: '⚡', desc: 'Velocidad sobrehumana. Superas a cualquier rival en carrera larga al contraataque.' },
+      { min: 80, label: 'Muy Rápido (80-89)', emoji: '🚀', desc: 'Gran zancada. Ganas la mayoría de balones divididos y repliegas al instante.' },
+      { min: 70, label: 'Competitivo (70-79)', emoji: '🏃', desc: 'Buen ritmo de carrera. Repliegas a tiempo y aguantas transiciones rápidas.' },
+      { min: 55, label: 'Nivel Medio (55-69)', emoji: '👟', desc: 'Ritmo estándar de pachanga. Cumples en carreras cortas, pero te cuesta en sprints largos.' },
+      { min: 40, label: 'Básico / Lento (~50)', emoji: '🐢', desc: 'Carrera pausada. Prefieres recibir al pie antes que desgastarte corriendo al hueco.' }
+    ]
+  },
+  {
+    key: 'sho',
+    name: 'Tiro (SHO)',
+    short: 'SHO',
+    icon: 'crosshair',
+    tagClass: 'bg-rose-100 text-rose-800 border-rose-300',
+    title: 'Tiro y Definición',
+    question: '¿Cómo es tu puntería, potencia y efectividad de cara a puerta?',
+    defaultValue: 80,
+    tiers: [
+      { min: 90, label: 'Goleador Letal (90+)', emoji: '🎯', desc: 'Francotirador clínico. Ocasión que tienes, balón que enchufas a la escuadra.' },
+      { min: 80, label: 'Gran Definidor (80-89)', emoji: '💥', desc: 'Gran pegada. Disparo potente y colocado; alto porcentaje de gol ante el portero.' },
+      { min: 70, label: 'Buen Disparo (70-79)', emoji: '⚽', desc: 'Buen golpeo a puerta. Sabes colocarla si te dejan espacio para armar la pierna.' },
+      { min: 55, label: 'Disparo Ocasional (55-69)', emoji: '🥅', desc: 'Puntería media. Intentas asegurar a puerta vacía; desde lejos suele irse desviada.' },
+      { min: 40, label: 'Básico / Sin Gol (~50)', emoji: '🛡️', desc: 'Poco disparo. Prefieres buscar el pase o asistir antes que rematar a portería.' }
+    ]
+  },
+  {
+    key: 'pas',
+    name: 'Pase (PAS)',
+    short: 'PAS',
+    icon: 'compass',
+    tagClass: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    title: 'Pase y Visión de Juego',
+    question: '¿Qué tal distribuyes el balón y conectas pases con tus compañeros?',
+    defaultValue: 80,
+    tiers: [
+      { min: 90, label: 'Visión Total (90+)', emoji: '🧠', desc: 'Director de orquesta. Pases quirúrgicos al hueco y cambios de juego teledirigidos.' },
+      { min: 80, label: 'Gran Organizador (80-89)', emoji: '📐', desc: 'Gran visión. Metes balones con peligro, marcas el ritmo y casi no fallas en corto.' },
+      { min: 70, label: 'Pase Seguro (70-79)', emoji: '👟', desc: 'Pase limpio y seguro. Buen criterio asociativo en corto y apoyos continuos.' },
+      { min: 55, label: 'Pase Elemental (55-69)', emoji: '🔄', desc: 'Aseguras en corto; pases largos o con oposición conllevan alto riesgo de pérdida.' },
+      { min: 40, label: 'Básico (~50)', emoji: '⚠️', desc: 'Dificultad distributiva. Cuesta conectar bajo presión rival o filtrar al espacio.' }
+    ]
+  },
+  {
+    key: 'dri',
+    name: 'Regate (DRI)',
+    short: 'DRI',
+    icon: 'sparkles',
+    tagClass: 'bg-purple-100 text-purple-800 border-purple-300',
+    title: 'Regate y Habilidad Técnica',
+    question: '¿Cómo manejas el balón en espacios reducidos y el uno contra uno?',
+    defaultValue: 82,
+    tiers: [
+      { min: 90, label: 'Mago del Balón (90+)', emoji: '🪄', desc: 'Balón pegado a la bota. Cambios de ritmo letales, agilidad pura y regates de fantasía.' },
+      { min: 80, label: 'Muy Técnico (80-89)', emoji: '💫', desc: 'Muy desequilibrante. Te vas con facilidad en el uno contra uno y sales de la presión.' },
+      { min: 70, label: 'Buen Control (70-79)', emoji: '✨', desc: 'Buen control orientado. Conduces cómodo con ambos pies y proteges bien la pelota.' },
+      { min: 55, label: 'Regate Justo (55-69)', emoji: '👌', desc: 'Conducción funcional. Regates básicos en línea recta sin complicarte la vida.' },
+      { min: 40, label: 'Básico (~50)', emoji: '🧱', desc: 'El balón se te escapa si intentas quiebros; prefieres soltarla rápido al primer toque.' }
+    ]
+  },
+  {
+    key: 'def',
+    name: 'Defensa (DEF)',
+    short: 'DEF',
+    icon: 'shield',
+    tagClass: 'bg-amber-100 text-amber-800 border-amber-300',
+    title: 'Defensa e Intercepción',
+    question: '¿Cómo defiendes en el 1 vs 1, cortes de balón y posicionamiento táctico?',
+    defaultValue: 60,
+    tiers: [
+      { min: 90, label: 'Muralla Infranqueable (90+)', emoji: '🛡️', desc: 'Lectura defensiva perfecta. Robas limpio sin hacer falta y ganas cualquier duelo.' },
+      { min: 80, label: 'Gran Defensor (80-89)', emoji: '🧱', desc: 'Cierre de garantías. Muy difícil de superar, anticipas cortes y despejas el peligro.' },
+      { min: 70, label: 'Defensa Sólida (70-79)', emoji: '🔒', desc: 'Posicionamiento correcto. Metes pierna con criterio y ayudas al repliegue del equipo.' },
+      { min: 55, label: 'Defensa de Empuje (55-69)', emoji: '⚔️', desc: 'Presionas por insistencia y ayudas, aunque a veces muerdes a destiempo en falso.' },
+      { min: 40, label: 'Básico (~50)', emoji: '⚠️', desc: 'Poca vocación defensiva. Cuesta temporizar o meter el cuerpo en divididos.' }
+    ]
+  },
+  {
+    key: 'phy',
+    name: 'Físico (PHY)',
+    short: 'PHY',
+    icon: 'activity',
+    tagClass: 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300',
+    title: 'Físico y Resistencia',
+    question: '¿Cómo vas de fondo físico para aguantar minutos y choque cuerpo a cuerpo?',
+    defaultValue: 78,
+    tiers: [
+      { min: 90, label: 'Portento Inagotable (90+)', emoji: '🦾', desc: 'Pulmones de acero. Presión continua sin cansancio y ganador de todo choque físico.' },
+      { min: 80, label: 'Gran Fondo Físico (80-89)', emoji: '💪', desc: 'Gran aguante físico a ritmo alto todo el partido y firmeza corporal en disputas.' },
+      { min: 70, label: 'Buena Capacidad (70-79)', emoji: '🏃‍♂️', desc: 'Aguantas el partido con soltura física y sabes regular tus esfuerzos en carrera.' },
+      { min: 55, label: 'Físico Estándar (55-69)', emoji: '⏱️', desc: 'Cumples bien el primer tiempo, pero en los minutos finales notas el bajón.' },
+      { min: 40, label: 'Fondo Justo (~50)', emoji: '🪫', desc: 'Tras varios piques necesitas aire urgentemente y pedir la rotación al banquillo.' }
+    ]
+  }
+];
+
 class FutApp {
   constructor() {
     this.currentTab = 'pitch';
@@ -419,6 +524,9 @@ class FutApp {
   }
 
   setupForms() {
+    // 0. Test Interactivo de Atributos FIFA Paso a Paso
+    this.initStatsTestEvents();
+
     // 1. Google Sign-In
     document.getElementById('btn-google-signin')?.addEventListener('click', async () => {
       const errBox = document.getElementById('google-auth-error');
@@ -612,14 +720,7 @@ class FutApp {
         document.getElementById('setup-role-third').value = existing.rolesHierarchy.third || 'DFC';
         document.getElementById('setup-role-worst').value = existing.rolesHierarchy.worst || 'POR';
       }
-      if (existing.stats) {
-        document.getElementById('setup-pac').value = existing.stats.pac || 82;
-        document.getElementById('setup-sho').value = existing.stats.sho || 80;
-        document.getElementById('setup-pas').value = existing.stats.pas || 80;
-        document.getElementById('setup-dri').value = existing.stats.dri || 82;
-        document.getElementById('setup-def').value = existing.stats.def || 60;
-        document.getElementById('setup-phy').value = existing.stats.phy || 78;
-      }
+      this.setupStatsTestForUser(existing);
       const avatarUrl = existing.avatar || user.photoURL;
       const imgEl = document.getElementById('setup-user-avatar');
       const urlInput = document.getElementById('setup-avatar-url');
@@ -629,6 +730,7 @@ class FutApp {
       if (titleEl) titleEl.textContent = 'Crea tu Carta FIFA Ultimate Team';
       if (submitBtn) submitBtn.textContent = 'Guardar y Generar mi Carta FUT';
       document.getElementById('setup-nickname').value = user.name ? user.name.split(' ')[0] : 'Crack';
+      this.setupStatsTestForUser(null);
       const avatarUrl = user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
       const imgEl = document.getElementById('setup-user-avatar');
       const urlInput = document.getElementById('setup-avatar-url');
@@ -639,6 +741,358 @@ class FutApp {
     document.getElementById('setup-user-name').textContent = user.name || 'Jugador FUT';
     document.getElementById('setup-user-email').textContent = user.email || '';
     dialog.showModal();
+    this.refreshIcons();
+  }
+
+  // ==================== TEST DE ATRIBUTOS FIFA PASO A PASO ====================
+  initStatsTestEvents() {
+    this.statsTestState = {
+      currentStep: 0,
+      stats: { pac: 82, sho: 80, pas: 80, dri: 82, def: 60, phy: 78 },
+      isCompleted: false
+    };
+
+    const slider = document.getElementById('wizard-range-slider');
+    const btnMinus = document.getElementById('wizard-btn-minus');
+    const btnPlus = document.getElementById('wizard-btn-plus');
+    const btnPrev = document.getElementById('wizard-btn-prev');
+    const btnNext = document.getElementById('wizard-btn-next');
+    const btnRestart = document.getElementById('btn-restart-stats-test');
+
+    slider?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      this.updateCurrentStatValue(val, false);
+      if (typeof futAudio !== 'undefined') futAudio.playRatingTick();
+    });
+
+    btnMinus?.addEventListener('click', () => {
+      const currentConfig = STATS_TEST_CONFIG[this.statsTestState.currentStep];
+      const currentVal = this.statsTestState.stats[currentConfig.key] || currentConfig.defaultValue;
+      if (currentVal > 40) {
+        this.updateCurrentStatValue(currentVal - 1, true);
+        if (typeof futAudio !== 'undefined') futAudio.playRatingTick();
+      }
+    });
+
+    btnPlus?.addEventListener('click', () => {
+      const currentConfig = STATS_TEST_CONFIG[this.statsTestState.currentStep];
+      const currentVal = this.statsTestState.stats[currentConfig.key] || currentConfig.defaultValue;
+      if (currentVal < 99) {
+        this.updateCurrentStatValue(currentVal + 1, true);
+        if (typeof futAudio !== 'undefined') futAudio.playRatingTick();
+      }
+    });
+
+    // Botones de presets rápidos
+    document.querySelectorAll('.wizard-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = parseInt(btn.dataset.val, 10);
+        if (!isNaN(val)) {
+          this.updateCurrentStatValue(val, true);
+          if (typeof futAudio !== 'undefined') futAudio.playCardSelect();
+        }
+      });
+    });
+
+    // Navegación anterior / siguiente
+    btnPrev?.addEventListener('click', () => {
+      if (this.statsTestState.currentStep > 0) {
+        this.statsTestState.currentStep--;
+        this.renderCurrentTestStep();
+        if (typeof futAudio !== 'undefined') futAudio.playCardSelect();
+      }
+    });
+
+    btnNext?.addEventListener('click', () => {
+      if (this.statsTestState.currentStep < 5) {
+        this.statsTestState.currentStep++;
+        this.renderCurrentTestStep();
+        if (typeof futAudio !== 'undefined') futAudio.playCardSelect();
+      } else {
+        // Finalizar evaluación
+        this.statsTestState.isCompleted = true;
+        this.showStatsTestSummary();
+        if (typeof futAudio !== 'undefined') futAudio.playSuccess();
+        this.showToast('¡Test de atributos completado con éxito!', 'award');
+      }
+    });
+
+    // Requisito expreso del usuario: hacer de nuevo el test y te sale lo mismo
+    btnRestart?.addEventListener('click', () => {
+      this.statsTestState.isCompleted = false;
+      this.statsTestState.currentStep = 0;
+      this.showStatsTestWizard();
+      if (typeof futAudio !== 'undefined') futAudio.playCardSelect();
+      this.showToast('Reiniciando test de atributos paso a paso...', 'rotate-ccw');
+    });
+  }
+
+  setupStatsTestForUser(existing) {
+    if (!this.statsTestState) {
+      this.statsTestState = {
+        currentStep: 0,
+        stats: { pac: 82, sho: 80, pas: 80, dri: 82, def: 60, phy: 78 },
+        isCompleted: false
+      };
+    }
+
+    if (existing && existing.stats) {
+      this.statsTestState.stats = {
+        pac: existing.stats.pac || 82,
+        sho: existing.stats.sho || 80,
+        pas: existing.stats.pas || 80,
+        dri: existing.stats.dri || 82,
+        def: existing.stats.def || 60,
+        phy: existing.stats.phy || 78
+      };
+      this.statsTestState.isCompleted = true;
+      this.statsTestState.currentStep = 0;
+      this.showStatsTestSummary();
+    } else {
+      this.statsTestState.stats = {
+        pac: 82,
+        sho: 80,
+        pas: 80,
+        dri: 82,
+        def: 60,
+        phy: 78
+      };
+      this.statsTestState.isCompleted = false;
+      this.statsTestState.currentStep = 0;
+      this.showStatsTestWizard();
+    }
+  }
+
+  getStatTierInfo(val) {
+    if (val >= 90) {
+      return {
+        badgeClass: 'bg-amber-400/20 text-amber-300 border border-amber-400/40',
+        textClass: 'text-amber-400',
+        label: 'Élite Mundial (90+)'
+      };
+    }
+    if (val >= 80) {
+      return {
+        badgeClass: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40',
+        textClass: 'text-emerald-400',
+        label: 'Destacado (80-89)'
+      };
+    }
+    if (val >= 70) {
+      return {
+        badgeClass: 'bg-sky-500/20 text-sky-300 border border-sky-500/40',
+        textClass: 'text-sky-400',
+        label: 'Competitivo (70-79)'
+      };
+    }
+    if (val >= 55) {
+      return {
+        badgeClass: 'bg-slate-800 text-slate-300 border border-slate-700',
+        textClass: 'text-slate-300',
+        label: 'Nivel Medio (55-69)'
+      };
+    }
+    return {
+      badgeClass: 'bg-rose-500/20 text-rose-300 border border-rose-500/40',
+      textClass: 'text-rose-400',
+      label: 'Básico / Principiante (~50)'
+    };
+  }
+
+  updateCurrentStatValue(val, updateSlider = true) {
+    val = Math.max(40, Math.min(99, val));
+    const currentConfig = STATS_TEST_CONFIG[this.statsTestState.currentStep];
+    this.statsTestState.stats[currentConfig.key] = val;
+
+    // Sincronizar input oculto para persistencia con Auth y Store
+    const hiddenInput = document.getElementById('setup-' + currentConfig.key);
+    if (hiddenInput) hiddenInput.value = val;
+
+    // Actualizar slider visual
+    const slider = document.getElementById('wizard-range-slider');
+    if (slider && updateSlider) slider.value = val;
+
+    // Actualizar display gigante
+    const valDisplay = document.getElementById('wizard-stat-value');
+    if (valDisplay) valDisplay.textContent = val;
+
+    // Actualizar badge de tier
+    const tier = this.getStatTierInfo(val);
+    const badgeEl = document.getElementById('wizard-tier-badge');
+    if (badgeEl) {
+      badgeEl.className = `mt-1 inline-block text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${tier.badgeClass}`;
+      badgeEl.textContent = tier.label;
+    }
+
+    // Actualizar caja de descripción dinámica contextual
+    const descBox = document.getElementById('wizard-stat-desc-box');
+    if (descBox) {
+      const activeTierObj = currentConfig.tiers.find(t => val >= t.min) || currentConfig.tiers[currentConfig.tiers.length - 1];
+      descBox.innerHTML = `
+        <div class="flex items-start gap-2.5">
+          <span class="text-xl flex-shrink-0">${activeTierObj.emoji}</span>
+          <div class="space-y-0.5">
+            <span class="text-[11px] font-black ${tier.textClass} uppercase tracking-wide block">
+              ${activeTierObj.label} · ${val} Puntos
+            </span>
+            <p class="text-xs text-slate-700 font-medium leading-relaxed">
+              ${activeTierObj.desc}
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Actualizar highlight de botones preset
+    document.querySelectorAll('.wizard-preset-btn').forEach(btn => {
+      const pVal = parseInt(btn.dataset.val, 10);
+      if (pVal === val) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // Actualizar número en el stepper pill
+    const pillVal = document.getElementById(`pill-val-${currentConfig.key}`);
+    if (pillVal) pillVal.textContent = val;
+  }
+
+  renderCurrentTestStep() {
+    const step = this.statsTestState.currentStep;
+    const config = STATS_TEST_CONFIG[step];
+    const val = this.statsTestState.stats[config.key] || config.defaultValue;
+
+    // Badge de paso actual
+    const stepBadge = document.getElementById('wizard-step-badge');
+    if (stepBadge) stepBadge.textContent = `Paso ${step + 1} de 6`;
+
+    // Barra de progreso
+    const progressBar = document.getElementById('wizard-progress-bar');
+    if (progressBar) progressBar.style.width = `${((step + 1) / 6) * 100}%`;
+
+    // Stepper pills interactivos
+    const pillsContainer = document.getElementById('wizard-stepper-pills');
+    if (pillsContainer) {
+      pillsContainer.innerHTML = STATS_TEST_CONFIG.map((c, idx) => {
+        const cVal = this.statsTestState.stats[c.key] || c.defaultValue;
+        const isActive = idx === step;
+        return `
+          <button type="button" class="wizard-step-pill p-1 rounded-xl border text-center transition cursor-pointer ${
+            isActive 
+              ? 'active border-amber-400 bg-amber-400 text-slate-950 font-black shadow-sm' 
+              : 'border-slate-800 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold'
+          }" data-step="${idx}">
+            <span class="text-[9px] block uppercase font-fifa leading-tight">${c.short}</span>
+            <span id="pill-val-${c.key}" class="text-[11px] block font-black leading-tight font-fifa">${cVal}</span>
+          </button>
+        `;
+      }).join('');
+
+      pillsContainer.querySelectorAll('.wizard-step-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetStep = parseInt(btn.dataset.step, 10);
+          if (!isNaN(targetStep)) {
+            this.statsTestState.currentStep = targetStep;
+            this.renderCurrentTestStep();
+            if (typeof futAudio !== 'undefined') futAudio.playCardSelect();
+          }
+        });
+      });
+    }
+
+    // Cabecera del atributo
+    const tagEl = document.getElementById('wizard-stat-tag');
+    if (tagEl) {
+      tagEl.textContent = config.short;
+      tagEl.className = `text-xs font-black px-2 py-0.5 rounded-md font-fifa tracking-wider border ${config.tagClass}`;
+    }
+
+    const titleEl = document.getElementById('wizard-stat-title');
+    if (titleEl) titleEl.textContent = config.title;
+
+    const questEl = document.getElementById('wizard-stat-question');
+    if (questEl) questEl.textContent = config.question;
+
+    // Actualizar valor, descripción y presets
+    this.updateCurrentStatValue(val, true);
+
+    // Botones de navegación
+    const btnPrev = document.getElementById('wizard-btn-prev');
+    if (btnPrev) {
+      btnPrev.disabled = (step === 0);
+    }
+
+    const nextText = document.getElementById('wizard-btn-next-text');
+    const nextBtn = document.getElementById('wizard-btn-next');
+    if (nextText && nextBtn) {
+      if (step < 5) {
+        const nextCfg = STATS_TEST_CONFIG[step + 1];
+        nextText.textContent = `Siguiente: ${nextCfg.short}`;
+        nextBtn.className = 'px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition active:scale-95 cursor-pointer';
+        const icon = document.getElementById('wizard-btn-next-icon');
+        if (icon) icon.setAttribute('data-lucide', 'chevron-right');
+      } else {
+        nextText.textContent = 'Finalizar Test y Ver Resultado ✓';
+        nextBtn.className = 'px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer';
+        const icon = document.getElementById('wizard-btn-next-icon');
+        if (icon) icon.setAttribute('data-lucide', 'check-check');
+      }
+    }
+
+    this.refreshIcons();
+  }
+
+  showStatsTestSummary() {
+    const wizardView = document.getElementById('stats-wizard-view');
+    const summaryView = document.getElementById('stats-summary-view');
+    if (wizardView) wizardView.classList.add('hidden');
+    if (summaryView) summaryView.classList.remove('hidden');
+
+    const s = this.statsTestState?.stats || { pac: 82, sho: 80, pas: 80, dri: 82, def: 60, phy: 78 };
+    const ovr = Math.round(
+      (s.pac * 0.15) +
+      (s.sho * 0.20) +
+      (s.pas * 0.20) +
+      (s.dri * 0.20) +
+      (s.def * 0.15) +
+      (s.phy * 0.10)
+    );
+
+    const ovrBadge = document.getElementById('summary-ovr-badge');
+    if (ovrBadge) ovrBadge.textContent = `${ovr} OVR`;
+
+    const grid = document.getElementById('summary-stats-grid');
+    if (grid) {
+      grid.innerHTML = STATS_TEST_CONFIG.map(c => {
+        const val = s[c.key] || c.defaultValue;
+        const tier = this.getStatTierInfo(val);
+        return `
+          <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 shadow-sm text-center">
+            <span class="text-[9px] font-black text-slate-400 block font-sans">${c.short}</span>
+            <span class="text-xl sm:text-2xl font-black font-fifa ${tier.textClass} block leading-tight">${val}</span>
+            <span class="text-[8px] font-bold text-slate-400 block truncate">${c.short}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Sincronizar campos ocultos del formulario
+    STATS_TEST_CONFIG.forEach(c => {
+      const input = document.getElementById('setup-' + c.key);
+      if (input) input.value = s[c.key] || c.defaultValue;
+    });
+
+    this.refreshIcons();
+  }
+
+  showStatsTestWizard() {
+    const wizardView = document.getElementById('stats-wizard-view');
+    const summaryView = document.getElementById('stats-summary-view');
+    if (summaryView) summaryView.classList.add('hidden');
+    if (wizardView) wizardView.classList.remove('hidden');
+
+    this.renderCurrentTestStep();
     this.refreshIcons();
   }
 
@@ -796,6 +1250,9 @@ class FutApp {
     const navName = document.getElementById('nav-team-name');
     if (navName) navName.textContent = settings.teamName;
 
+    const hudTop = document.getElementById('hud-team-name-top');
+    if (hudTop) hudTop.textContent = settings.teamName;
+
     const navBadge = document.getElementById('nav-tournament-badge');
     if (navBadge) navBadge.textContent = settings.tournament;
 
@@ -934,6 +1391,18 @@ class FutApp {
     const rEl = document.getElementById('hud-team-rating');
     if (rEl) rEl.textContent = chemRatingData.rating;
 
+    const headerRating = document.getElementById('header-team-rating');
+    if (headerRating) headerRating.textContent = chemRatingData.rating;
+
+    const headerChem = document.getElementById('header-team-chem');
+    if (headerChem) headerChem.textContent = chemRatingData.chemistry || 100;
+
+    const headerChemBar = document.getElementById('header-chem-bar');
+    if (headerChemBar) headerChemBar.style.width = `${chemRatingData.chemistry || 100}%`;
+
+    const sideFormation = document.getElementById('side-formation-tag');
+    if (sideFormation) sideFormation.textContent = activeFormation;
+
     const startersEl = document.getElementById('hud-team-starters');
     if (startersEl) startersEl.textContent = startingPlayers.length;
     
@@ -1045,6 +1514,9 @@ class FutApp {
       if (name) seenBenchNames.add(name);
       bench.push(p);
     }
+
+    const sideBenchCount = document.getElementById('side-bench-count');
+    if (sideBenchCount) sideBenchCount.textContent = bench.length;
 
     if (bench.length === 0) {
       benchContainer.innerHTML = `
@@ -1181,18 +1653,21 @@ class FutApp {
     }
   }
 
-  openSubDrawer(starterIndex) {
+  openSubDrawer(starterIndex = null) {
     const drawer = document.getElementById('fut-sub-drawer');
     const list = document.getElementById('sub-drawer-bench-list');
     const targetTag = document.getElementById('sub-drawer-target-player');
     if (!drawer || !list) return;
 
     const starting = store.getStartingLineup();
-    const starter = starting[starterIndex];
-    const role = this.getActiveSlotRole(starterIndex);
+    const effectiveIndex = starterIndex !== null ? starterIndex : (this.selectedStarterIndex !== null ? this.selectedStarterIndex : 0);
+    const starter = starting[effectiveIndex];
+    const role = this.getActiveSlotRole(effectiveIndex);
 
     if (targetTag && starter) {
-      targetTag.textContent = `Cambiar a ${starter.nickname} (${role})`;
+      targetTag.textContent = `Cambiar a ${starter.nickname || starter.name} (${role})`;
+    } else if (targetTag) {
+      targetTag.textContent = 'Banquillo de Suplentes';
     }
 
     const allPlayers = store.getPlayers();
@@ -1212,35 +1687,38 @@ class FutApp {
       bench.push(p);
     }
 
+    const sideBenchCount = document.getElementById('side-bench-count');
+    if (sideBenchCount) sideBenchCount.textContent = bench.length;
+
     if (bench.length === 0) {
-      list.innerHTML = `<div class="text-xs text-slate-500 col-span-full py-4 text-center font-bold">No hay suplentes disponibles en el banquillo. ¡Crea más cartas con Google!</div>`;
+      list.innerHTML = `<div class="text-xs text-slate-400 col-span-full py-4 text-center font-bold">No hay suplentes disponibles en el banquillo. ¡Añade más fichajes al club!</div>`;
     } else {
       list.innerHTML = bench.map(p => {
         let fitText = '<i data-lucide="x" class="w-3 h-3 inline"></i> Fuera de Puesto';
-        let fitColor = 'text-rose-700 bg-rose-50 border border-rose-200';
+        let fitColor = 'text-rose-300 bg-rose-950/60 border border-rose-500/40';
         if (p.rolesHierarchy) {
           if (p.rolesHierarchy.best === role) {
             fitText = '<i data-lucide="check" class="w-3 h-3 inline"></i> Posición Principal';
-            fitColor = 'text-emerald-700 bg-emerald-50 border border-emerald-200';
+            fitColor = 'text-emerald-300 bg-emerald-950/60 border border-emerald-500/40';
           } else if (p.rolesHierarchy.second === role || p.rolesHierarchy.third === role) {
             fitText = '<i data-lucide="minus" class="w-3 h-3 inline"></i> Posición Secundaria';
-            fitColor = 'text-amber-700 bg-amber-50 border border-amber-200';
+            fitColor = 'text-amber-300 bg-amber-950/60 border border-amber-500/40';
           }
         }
 
         return `
           <div class="sub-bench-card" onclick="window.futApp.selectBench('${p.id}')">
             <div class="flex items-center gap-2.5">
-              <img src="${p.avatar}" alt="${p.name}" class="w-10 h-10 rounded-full object-cover border-2 border-amber-400 shadow">
+              <img src="${p.avatar}" alt="${p.name}" class="w-10 h-10 rounded-full object-cover border-2 border-cyan-400 shadow">
               <div>
-                <div class="text-xs font-black text-slate-900 leading-tight">${p.name}</div>
+                <div class="text-xs font-black text-white leading-tight font-fifa text-base tracking-wide">${p.name}</div>
                 <div class="text-[10px] ${fitColor} px-1.5 py-0.5 rounded font-bold inline-block mt-0.5">${fitText}</div>
-                <div class="text-[9px] text-slate-500 font-semibold mt-0.5">Facultad: ${p.faculty.toUpperCase()} • ${p.preferredFoot}</div>
+                <div class="text-[9px] text-slate-400 font-semibold mt-0.5">Facultad: ${p.faculty.toUpperCase()} • ${p.preferredFoot}</div>
               </div>
             </div>
             <div class="text-right">
-              <div class="font-fifa text-2xl font-bold text-slate-900 leading-none">${p.rating}</div>
-              <span class="inline-block mt-1 text-[9px] uppercase px-2 py-0.5 rounded bg-amber-400 text-slate-950 font-black shadow-sm">Dar Relevo</span>
+              <div class="font-fifa text-2xl font-bold text-amber-400 leading-none">${p.rating}</div>
+              <span class="inline-block mt-1 text-[9px] uppercase px-2 py-0.5 rounded bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black shadow-sm">Dar Relevo</span>
             </div>
           </div>
         `;
@@ -1412,7 +1890,8 @@ class FutApp {
       const cardClass = p.cardType === 'totw' ? 'fut-card-totw' : (p.cardType === 'special' ? 'fut-card-special' : 'fut-card-gold');
 
       return `
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex flex-col justify-between hover:border-amber-400 hover:shadow-md transition">
+        <div class="fifa-tile p-5 flex flex-col justify-between hover:border-amber-400 hover:shadow-xl transition group relative overflow-hidden">
+          <div class="fifa-tile-accent-bar mb-2"></div>
           <div class="flex items-center justify-center mb-4">
             <div class="fut-card ${cardClass}" style="width: 140px; height: 195px; border-radius: 10px 10px 18px 18px;">
               <div class="fut-card-header" style="height: 105px; padding: 6px 8px 0 8px;">
@@ -1443,26 +1922,26 @@ class FutApp {
             </div>
           </div>
 
-          <div class="space-y-1.5 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200 mb-3">
-            <div class="flex items-center justify-between text-emerald-700 font-bold">
-              <span class="flex items-center gap-1.5"><i data-lucide="award" class="w-3.5 h-3.5 text-emerald-600"></i> Principal:</span>
-              <span class="font-black text-slate-900">${p.rolesHierarchy.best}</span>
+          <div class="space-y-1.5 text-xs bg-slate-950/70 p-3 rounded-xl border border-white/10 mb-3">
+            <div class="flex items-center justify-between text-emerald-400 font-bold">
+              <span class="flex items-center gap-1.5 text-[11px]"><i data-lucide="award" class="w-3.5 h-3.5 text-emerald-400"></i> Principal:</span>
+              <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.best}</span>
             </div>
-            <div class="flex items-center justify-between text-sky-700 font-bold">
-              <span class="flex items-center gap-1.5"><i data-lucide="arrow-right-circle" class="w-3.5 h-3.5 text-sky-600"></i> Segunda:</span>
-              <span class="font-black text-slate-900">${p.rolesHierarchy.second}</span>
+            <div class="flex items-center justify-between text-sky-400 font-bold">
+              <span class="flex items-center gap-1.5 text-[11px]"><i data-lucide="arrow-right-circle" class="w-3.5 h-3.5 text-sky-400"></i> Segunda:</span>
+              <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.second}</span>
             </div>
-            <div class="flex items-center justify-between text-amber-700 font-bold">
-              <span class="flex items-center gap-1.5"><i data-lucide="circle-dot" class="w-3.5 h-3.5 text-amber-600"></i> Alternativa:</span>
-              <span class="font-black text-slate-900">${p.rolesHierarchy.third}</span>
+            <div class="flex items-center justify-between text-amber-400 font-bold">
+              <span class="flex items-center gap-1.5 text-[11px]"><i data-lucide="circle-dot" class="w-3.5 h-3.5 text-amber-400"></i> Alternativa:</span>
+              <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.third}</span>
             </div>
-            <div class="flex items-center justify-between text-rose-700 font-bold">
-              <span class="flex items-center gap-1.5"><i data-lucide="x-circle" class="w-3.5 h-3.5 text-rose-600"></i> Menos Favorable:</span>
-              <span class="font-black text-slate-900">${p.rolesHierarchy.worst}</span>
+            <div class="flex items-center justify-between text-rose-400 font-bold">
+              <span class="flex items-center gap-1.5 text-[11px]"><i data-lucide="x-circle" class="w-3.5 h-3.5 text-rose-400"></i> Menos Favorable:</span>
+              <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.worst}</span>
             </div>
           </div>
 
-          <button onclick="window.futApp.inspectPlayer('${p.id}')" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-black uppercase tracking-wider text-amber-400 flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95">
+          <button onclick="window.futApp.inspectPlayer('${p.id}')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-amber-400 text-xs font-black uppercase tracking-wider text-amber-400 flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95 cursor-pointer">
             <i data-lucide="eye" class="w-3.5 h-3.5"></i>
             <span>Ver Ficha Técnica Completa</span>
           </button>
@@ -1483,44 +1962,44 @@ class FutApp {
     if (!content) return;
 
     content.innerHTML = `
-      <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-        <div class="w-16 h-16 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-sm">
+      <div class="flex items-center gap-4 bg-slate-900/90 p-4 rounded-xl border border-slate-700/80">
+        <div class="w-16 h-16 rounded-xl overflow-hidden border-2 border-amber-400 shadow-md flex-shrink-0">
           <img src="${p.avatar}" alt="${p.name}" class="w-full h-full object-cover">
         </div>
         <div class="flex-1">
           <div class="flex items-center justify-between">
-            <h4 class="font-black text-lg text-slate-900">${p.name}</h4>
-            <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-900 text-amber-300 font-black">${p.rating} OVR</span>
+            <h4 class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">${p.name}</h4>
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-fifa text-base font-black shadow-sm">${p.rating} OVR</span>
           </div>
-          <p class="text-xs text-slate-500 font-bold">"${p.nickname}" | Dorsal #${p.number} | ${p.preferredFoot}</p>
-          <p class="text-xs text-sky-700 font-bold mt-0.5">${fac.icon} ${fac.name}</p>
+          <p class="text-xs text-slate-400 font-bold">"${p.nickname}" | Dorsal #${p.number} | ${p.preferredFoot}</p>
+          <p class="text-xs text-cyan-400 font-bold mt-0.5">${fac.icon} ${fac.name}</p>
         </div>
       </div>
 
-      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-        <h5 class="text-xs font-black uppercase text-slate-700 tracking-wider">Afinidad de Posiciones (Roles)</h5>
+      <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-700/80 space-y-2">
+        <h5 class="text-[10px] font-black uppercase text-amber-400 font-fifa tracking-wider">AFINIDAD DE POSICIONES (ROLES TÁCTICOS)</h5>
         <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-300">
-            <span class="block text-[10px] text-emerald-700 font-black uppercase">1º Posición Principal</span>
-            <span class="font-black text-emerald-950 text-sm">${p.rolesHierarchy.best}</span>
+          <div class="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/50">
+            <span class="block text-[10px] text-emerald-400 font-black uppercase">1º Principal</span>
+            <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.best}</span>
           </div>
-          <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-300">
-            <span class="block text-[10px] text-sky-700 font-black uppercase">2º Posición Secundaria</span>
-            <span class="font-black text-sky-950 text-sm">${p.rolesHierarchy.second}</span>
+          <div class="p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/50">
+            <span class="block text-[10px] text-sky-400 font-black uppercase">2º Secundaria</span>
+            <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.second}</span>
           </div>
-          <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-300">
-            <span class="block text-[10px] text-amber-700 font-black uppercase">3º Posición Alternativa</span>
-            <span class="font-black text-amber-950 text-sm">${p.rolesHierarchy.third}</span>
+          <div class="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/50">
+            <span class="block text-[10px] text-amber-400 font-black uppercase">3º Alternativa</span>
+            <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.third}</span>
           </div>
-          <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-300">
-            <span class="block text-[10px] text-rose-700 font-black uppercase">4º Menos Favorable</span>
-            <span class="font-black text-rose-950 text-sm">${p.rolesHierarchy.worst}</span>
+          <div class="p-2.5 rounded-xl bg-rose-950/40 border border-rose-500/50">
+            <span class="block text-[10px] text-rose-400 font-black uppercase">4º Menos Favorable</span>
+            <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.worst}</span>
           </div>
         </div>
       </div>
 
-      <div class="space-y-2 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-        <h5 class="text-xs font-black uppercase text-slate-700 tracking-wider">Atributos FIFA 18</h5>
+      <div class="space-y-2 bg-slate-900/90 p-4 rounded-xl border border-slate-700/80">
+        <h5 class="text-[10px] font-black uppercase text-amber-400 font-fifa tracking-wider">ATRIBUTOS OFICIALES FIFA</h5>
         ${this.renderStatBar('Ritmo (PAC)', p.stats.pac)}
         ${this.renderStatBar('Tiro (SHO)', p.stats.sho)}
         ${this.renderStatBar('Pase (PAS)', p.stats.pas)}
@@ -1529,13 +2008,13 @@ class FutApp {
         ${this.renderStatBar('Físico (PHY)', p.stats.phy)}
       </div>
 
-      <div class="text-xs text-slate-500 flex items-center justify-between px-1 font-medium">
-        <span>Matrícula: <strong class="text-slate-900">${p.studentId || 'UNI-Pendiente'}</strong></span>
-        <span>Teléfono: <strong class="text-slate-900">${p.phone || 'Privado'}</strong></span>
+      <div class="text-xs text-slate-400 flex items-center justify-between px-1 font-medium">
+        <span>Matrícula: <strong class="text-white">${p.studentId || 'UNI-Pendiente'}</strong></span>
+        <span>Teléfono: <strong class="text-white">${p.phone || 'Privado'}</strong></span>
       </div>
 
-      <div class="admin-only pt-3 border-t border-slate-200 flex justify-end gap-2">
-        <button onclick="window.futApp.deletePlayer('${p.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-black border border-rose-300 transition">
+      <div class="admin-only pt-3 border-t border-white/10 flex justify-end gap-2">
+        <button onclick="window.futApp.deletePlayer('${p.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-black border border-rose-500/40 transition cursor-pointer">
           Eliminar de Plantilla
         </button>
       </div>
@@ -1555,15 +2034,15 @@ class FutApp {
   }
 
   renderStatBar(label, value) {
-    const color = value >= 80 ? 'bg-emerald-500' : (value >= 70 ? 'bg-amber-500' : 'bg-rose-500');
+    const color = value >= 80 ? 'bg-emerald-400' : (value >= 70 ? 'bg-amber-400' : 'bg-rose-400');
     return `
       <div>
-        <div class="flex justify-between text-[11px] font-bold text-slate-700 mb-0.5">
+        <div class="flex justify-between text-[11px] font-bold text-slate-300 mb-0.5">
           <span>${label}</span>
-          <span class="font-black tabular-nums">${value}</span>
+          <span class="font-black tabular-nums text-white font-fifa text-sm">${value}</span>
         </div>
-        <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-          <div class="h-full ${color} rounded-full" style="width: ${value}%;"></div>
+        <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+          <div class="h-full ${color} rounded-full shadow-sm" style="width: ${value}%;"></div>
         </div>
       </div>
     `;
@@ -1600,33 +2079,33 @@ class FutApp {
         });
 
         breakdown.innerHTML = `
-          <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-xs">
-            <div class="font-black text-emerald-800 mb-1 flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Confirmados</span>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-600 text-white font-black">${confirmed.length}</span>
+          <div class="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 text-xs">
+            <div class="font-black text-emerald-400 mb-1 flex items-center justify-between font-fifa text-base">
+              <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Confirmados</span>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-black font-fifa text-sm">${confirmed.length}</span>
             </div>
-            <div class="text-[11px] text-emerald-950 font-bold">
-              ${confirmed.length > 0 ? confirmed.map(p => p.nickname).join(', ') : '<span class="text-slate-400 font-normal">Nadie aún</span>'}
-            </div>
-          </div>
-
-          <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-xs">
-            <div class="font-black text-amber-800 mb-1 flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><i data-lucide="help-circle" class="w-4 h-4 text-amber-600"></i> Dudas</span>
-              <span class="px-2 py-0.5 rounded-full bg-amber-500 text-white font-black">${doubts.length}</span>
-            </div>
-            <div class="text-[11px] text-amber-950 font-bold">
-              ${doubts.length > 0 ? doubts.map(p => p.nickname).join(', ') : '<span class="text-slate-400 font-normal">Ninguna</span>'}
+            <div class="text-[11px] text-slate-200 font-bold">
+              ${confirmed.length > 0 ? confirmed.map(p => p.nickname).join(', ') : '<span class="text-slate-500 font-normal">Nadie aún</span>'}
             </div>
           </div>
 
-          <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-300 text-xs">
-            <div class="font-black text-rose-800 mb-1 flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><i data-lucide="x" class="w-4 h-4 text-rose-600"></i> Bajas</span>
-              <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white font-black">${absent.length}</span>
+          <div class="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-xs">
+            <div class="font-black text-amber-400 mb-1 flex items-center justify-between font-fifa text-base">
+              <span class="flex items-center gap-1.5"><i data-lucide="help-circle" class="w-4 h-4 text-amber-400"></i> Dudas</span>
+              <span class="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black font-fifa text-sm">${doubts.length}</span>
             </div>
-            <div class="text-[11px] text-rose-950 font-bold">
-              ${absent.length > 0 ? absent.map(p => p.nickname).join(', ') : '<span class="text-slate-400 font-normal">Ninguna</span>'}
+            <div class="text-[11px] text-slate-200 font-bold">
+              ${doubts.length > 0 ? doubts.map(p => p.nickname).join(', ') : '<span class="text-slate-500 font-normal">Ninguna</span>'}
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-xs">
+            <div class="font-black text-rose-400 mb-1 flex items-center justify-between font-fifa text-base">
+              <span class="flex items-center gap-1.5"><i data-lucide="x" class="w-4 h-4 text-rose-400"></i> Bajas</span>
+              <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white font-black font-fifa text-sm">${absent.length}</span>
+            </div>
+            <div class="text-[11px] text-slate-200 font-bold">
+              ${absent.length > 0 ? absent.map(p => p.nickname).join(', ') : '<span class="text-slate-500 font-normal">Ninguna</span>'}
             </div>
           </div>
         `;
@@ -1637,44 +2116,44 @@ class FutApp {
     container.innerHTML = matches.map(m => {
       const isFinished = m.status === 'finalizado';
       return `
-        <div class="bg-white border border-slate-200 shadow-sm p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-300 transition">
+        <div class="fifa-tile p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-amber-400/50 transition">
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-[10px] font-black px-2.5 py-0.5 rounded-md ${m.modality === 'f7' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-sky-100 text-sky-800 border border-sky-300'}">
+              <span class="text-[10px] font-black px-2.5 py-0.5 rounded-md ${m.modality === 'f7' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'}">
                 ${m.modality === 'f7' ? 'Fútbol 7' : 'Fútbol Sala'}
               </span>
-              <span class="text-xs text-slate-500 font-bold">${m.tournament}</span>
-              ${isFinished ? '<span class="text-[10px] font-black px-2 py-0.5 rounded bg-emerald-600 text-white shadow-sm">FINALIZADO</span>' : ''}
+              <span class="text-xs text-slate-400 font-bold">${m.tournament}</span>
+              ${isFinished ? '<span class="text-[10px] font-black px-2 py-0.5 rounded bg-emerald-500 text-slate-950 shadow-sm font-fifa tracking-wider">FINALIZADO</span>' : ''}
             </div>
-            <h4 class="font-black text-lg text-slate-900 mt-1.5 flex items-center gap-2">
+            <h4 class="font-fifa text-2xl sm:text-3xl font-bold text-white mt-1.5 flex items-center gap-2.5">
               <span>${settings.teamName}</span>
-              ${isFinished ? `<span class="bg-slate-900 text-amber-400 px-3 py-0.5 rounded-lg font-fifa text-xl tracking-wider">${m.goalsFor} - ${m.goalsAgainst}</span>` : '<span class="text-xs font-bold text-slate-400 uppercase">vs</span>'}
+              ${isFinished ? `<span class="bg-amber-400 text-slate-950 px-3 py-0.5 rounded-lg font-fifa text-2xl font-black tracking-wider shadow-md">${m.goalsFor} - ${m.goalsAgainst}</span>` : '<span class="text-xs font-bold text-slate-500 uppercase tracking-widest font-sans">vs</span>'}
               <span>${m.rival}</span>
             </h4>
-            <div class="text-xs text-slate-500 flex items-center gap-3 mt-1 font-medium">
-              <span class="inline-flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i> ${m.date} - ${m.time}h</span>
-              <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i> ${m.field}</span>
+            <div class="text-xs text-slate-400 flex items-center gap-3 mt-1 font-medium">
+              <span class="inline-flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-400"></i> ${m.date} - ${m.time}h</span>
+              <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-cyan-400"></i> ${m.field}</span>
             </div>
-            ${m.scorers ? `<div class="text-xs text-slate-700 mt-1.5 flex items-center gap-1.5 font-bold"><i data-lucide="activity" class="w-3.5 h-3.5 text-amber-500"></i> <strong>Goles:</strong> <span class="font-medium">${m.scorers}</span></div>` : ''}
+            ${m.scorers ? `<div class="text-xs text-slate-300 mt-1.5 flex items-center gap-1.5 font-bold"><i data-lucide="activity" class="w-3.5 h-3.5 text-amber-400"></i> <strong>Goles:</strong> <span class="font-medium text-slate-200">${m.scorers}</span></div>` : ''}
           </div>
 
           <div class="flex items-center gap-2">
-            ${isFinished && m.mvp ? `<span class="text-xs text-amber-700 font-bold mr-2 flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200"><i data-lucide="star" class="w-3.5 h-3.5 text-amber-500"></i> MVP: ${m.mvp}</span>` : ''}
+            ${isFinished && m.mvp ? `<span class="text-xs text-amber-300 font-bold mr-2 flex items-center gap-1 bg-amber-500/20 px-2.5 py-1 rounded-lg border border-amber-500/40"><i data-lucide="star" class="w-3.5 h-3.5 text-amber-400"></i> MVP: ${m.mvp}</span>` : ''}
 
             ${!isFinished ? `
-              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-sm transition active:scale-95">
+              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-md transition active:scale-95 cursor-pointer">
                 <span>Registrar Acta</span>
               </button>
             ` : `
-              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-300 transition">
+              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition cursor-pointer">
                 Editar Acta
               </button>
             `}
 
-            <button onclick="window.futApp.openMatchModal('${m.id}')" class="admin-only p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-300 transition" title="Editar" aria-label="Editar partido">
+            <button onclick="window.futApp.openMatchModal('${m.id}')" class="admin-only p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer" title="Editar" aria-label="Editar partido">
               <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
             </button>
-            <button onclick="window.futApp.deleteMatch('${m.id}')" class="admin-only p-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 border border-slate-300 transition" title="Eliminar" aria-label="Eliminar partido">
+            <button onclick="window.futApp.deleteMatch('${m.id}')" class="admin-only p-2 rounded-xl bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-400 border border-slate-700 transition cursor-pointer" title="Eliminar" aria-label="Eliminar partido">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>
