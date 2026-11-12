@@ -1007,37 +1007,179 @@ class FutApp {
       this.closeSubDrawer();
     });
 
-    // Control de Teclado estilo consola para el Menú Radial
+    // Control de Teclado Consola / Keyboard-First (Patrón Linear & EA Sports FC)
     window.addEventListener('keydown', (e) => {
+      const targetEl = e.target instanceof Element ? e.target : document.activeElement;
+      const isInput = targetEl && typeof targetEl.matches === 'function' && targetEl.matches('input, textarea, select, [contenteditable="true"]');
+      if (isInput) {
+        if (e.key === 'Escape') {
+          targetEl.blur();
+        }
+        return;
+      }
+
+      // 1. Tecla '/' para búsqueda rápida en el Álbum (Atajo Linear)
+      if (e.key === '/') {
+        e.preventDefault();
+        this.switchTab('album');
+        setTimeout(() => {
+          document.getElementById('album-search-input')?.focus();
+        }, 50);
+        return;
+      }
+
+      // 2. Control L1 / R1 de pestañas de consola (Teclas Q y E)
+      const tabs = ['pitch', 'album', 'partidos', 'ajustes'];
+      const currentIdx = tabs.indexOf(this.currentTab || 'pitch');
+
+      if (e.key === 'q' || e.key === 'Q' || e.key === 'PageUp') {
+        e.preventDefault();
+        const prevIdx = (currentIdx - 1 + tabs.length) % tabs.length;
+        this.switchTab(tabs[prevIdx]);
+        return;
+      }
+      if (e.key === 'e' || e.key === 'E' || e.key === 'PageDown') {
+        e.preventDefault();
+        const nextIdx = (currentIdx + 1) % tabs.length;
+        this.switchTab(tabs[nextIdx]);
+        return;
+      }
+
+      // 3. Menú Radial activo
       if (this.activeRadialIndex !== null) {
         const key = e.key.toLowerCase();
         if (key === 'x') {
           e.preventDefault();
           document.getElementById('btn-radial-sub')?.click();
+          return;
         } else if (key === 'y') {
           e.preventDefault();
           document.getElementById('btn-radial-inspect')?.click();
+          return;
         } else if (key === 'a') {
           e.preventDefault();
           document.getElementById('btn-radial-captain')?.click();
+          return;
         } else if (key === 'b' || key === 'escape') {
           e.preventDefault();
           this.closeRadialMenu(true);
+          return;
         }
-      } else if (e.key === 'Escape') {
+      }
+
+      // 4. Tecla Escape: Cerrar modales, radiales y cajones
+      if (e.key === 'Escape') {
         this.closeSubDrawer();
+        this.closeRadialMenu(true);
+        document.querySelectorAll('dialog[open]').forEach(d => d.close());
+        return;
+      }
+
+      // 5. Navegación Espacial en el Césped (Flechas de dirección estilo Joystick)
+      if (!this.currentTab || this.currentTab === 'pitch') {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          this.navigatePitchDirection('up');
+          return;
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          this.navigatePitchDirection('down');
+          return;
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          this.navigatePitchDirection('left');
+          return;
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          this.navigatePitchDirection('right');
+          return;
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const targetIndex = this.selectedStarterIndex !== null ? this.selectedStarterIndex : 0;
+          this.selectStarter(targetIndex);
+          return;
+        }
+      }
+
+      // 6. Atajos Rápidos de Sistema
+      if (e.key === 's' || e.key === 'S') {
+        e.preventDefault();
+        this.openSquadActionsModal('tab-formations');
+      } else if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        this.toggleTheme();
+      } else if (e.key === 'a' || e.key === 'A') {
+        e.preventDefault();
+        document.getElementById('hud-btn-audio')?.click();
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        const settings = store.getSettings();
+        const nextMod = settings.modality === 'f7' ? 'futsal' : 'f7';
+        setModality(nextMod);
       }
     });
 
-    // Shader Holográfico Dinámico reactivo al cursor / puntero
+    // Filtros del Álbum (Patrón Linear)
+    const searchInput = document.getElementById('album-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        this.albumSearchQuery = e.target.value;
+        this.renderAlbumCards();
+      });
+    }
+
+    document.querySelectorAll('#album-role-filters .hud-filter-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#album-role-filters .hud-filter-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.albumRoleFilter = btn.dataset.role;
+        futAudio.playNav();
+        this.renderAlbumCards();
+      });
+    });
+
+    const sortSelect = document.getElementById('album-sort-select');
+    if (sortSelect) {
+      sortSelect.addEventListener('change', (e) => {
+        this.albumSortBy = e.target.value;
+        futAudio.playNav();
+        this.renderAlbumCards();
+      });
+    }
+
+    document.getElementById('btn-reset-album-filters')?.addEventListener('click', () => {
+      this.albumSearchQuery = '';
+      this.albumRoleFilter = 'all';
+      if (searchInput) searchInput.value = '';
+      document.querySelectorAll('#album-role-filters .hud-filter-pill').forEach((b, i) => {
+        b.classList.toggle('active', i === 0);
+      });
+      futAudio.playNav();
+      this.renderAlbumCards();
+    });
+
+    // Shader Holográfico & Tilt 3D Apple/Linear dinámico reactivo al cursor
     document.addEventListener('pointermove', (e) => {
       const card = e.target.closest('.fut-card');
       if (!card) return;
       const rect = card.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100;
       const y = ((e.clientY - rect.top) / rect.height) * 100;
+      const dx = (e.clientX - rect.left) / rect.width - 0.5;
+      const dy = (e.clientY - rect.top) / rect.height - 0.5;
+
       card.style.setProperty('--glare-x', `${x.toFixed(1)}%`);
       card.style.setProperty('--glare-y', `${y.toFixed(1)}%`);
+      card.style.setProperty('--tilt-x', `${(-dy * 10).toFixed(1)}deg`);
+      card.style.setProperty('--tilt-y', `${(dx * 10).toFixed(1)}deg`);
+    });
+
+    document.addEventListener('pointerout', (e) => {
+      const card = e.target.closest('.fut-card');
+      if (card && !card.contains(e.relatedTarget)) {
+        card.style.setProperty('--tilt-x', '0deg');
+        card.style.setProperty('--tilt-y', '0deg');
+      }
     });
 
     // Modales setup
@@ -2264,13 +2406,14 @@ class FutApp {
       }
 
       return `
-        <div class="fut-card-slot ${isSelected ? 'swap-active' : ''}" 
+        <div class="fut-card-slot ${isSelected ? 'swap-active is-selected-cursor' : ''}" 
              style="${slotStyle}"
              data-slot-index="${index}"
              draggable="true"
              onclick="window.futApp.selectStarter(${index})"
              onmouseenter="window.futApp.updatePlayerInspector(window.futApp.store.getStartingLineup()[${index}])">
           
+          ${isSelected ? `<div class="fifa-player-cursor font-fifa" title="Jugador Activo">▼</div>` : ''}
           ${this.renderFutCard(player, { size: 'pitch', role: slot.role })}
 
           <div class="fut-pos-pedestal">
@@ -2502,10 +2645,76 @@ class FutApp {
     this.closeRadialMenu(true);
   }
 
+  // Navegación espacial con flechas de dirección (D-Pad / Joystick EA Sports)
+  navigatePitchDirection(dir) {
+    const settings = store.getSettings();
+    const activeFormation = store.getActiveFormation();
+    const conf = getFormationConfig(settings.modality, activeFormation);
+    if (!conf || !conf.slots || conf.slots.length === 0) return;
+
+    let currentIdx = this.selectedStarterIndex;
+    if (currentIdx === null || currentIdx === undefined || currentIdx < 0 || currentIdx >= conf.slots.length) {
+      currentIdx = 0;
+    }
+
+    const currentSlot = conf.slots[currentIdx];
+    const currentTop = currentSlot.top;
+    const currentLeft = currentSlot.left;
+
+    let bestIdx = null;
+    let bestScore = Infinity;
+
+    conf.slots.forEach((slot, idx) => {
+      if (idx === currentIdx) return;
+      const dTop = slot.top - currentTop;
+      const dLeft = slot.left - currentLeft;
+
+      let inDirection = false;
+      let primaryDist = 0;
+      let perpDist = 0;
+
+      if (dir === 'up') {
+        inDirection = dTop < -3;
+        primaryDist = -dTop;
+        perpDist = Math.abs(dLeft);
+      } else if (dir === 'down') {
+        inDirection = dTop > 3;
+        primaryDist = dTop;
+        perpDist = Math.abs(dLeft);
+      } else if (dir === 'left') {
+        inDirection = dLeft < -3;
+        primaryDist = -dLeft;
+        perpDist = Math.abs(dTop);
+      } else if (dir === 'right') {
+        inDirection = dLeft > 3;
+        primaryDist = dLeft;
+        perpDist = Math.abs(dTop);
+      }
+
+      if (inDirection) {
+        const score = primaryDist + 1.8 * perpDist;
+        if (score < bestScore) {
+          bestScore = score;
+          bestIdx = idx;
+        }
+      }
+    });
+
+    if (bestIdx !== null) {
+      this.selectedStarterIndex = bestIdx;
+      const starting = store.getStartingLineup();
+      if (starting[bestIdx]) {
+        this.updatePlayerInspector(starting[bestIdx]);
+      }
+      this.renderPitch();
+      futAudio.playNav();
+    }
+  }
+
   selectStarter(index) {
     futAudio.playCardSelect();
 
-    if (this.selectedStarterIndex === null) {
+    if (this.selectedStarterIndex === null || this.selectedStarterIndex === index) {
       this.selectedStarterIndex = index;
       const starting = store.getStartingLineup();
       if (starting[index]) {
@@ -2518,10 +2727,12 @@ class FutApp {
       const slot = conf?.slots[index] || { top: 50, left: 50 };
       const pr = this.projectSlot(slot);
 
-      this.openRadialMenu(index, pr);
-      this.showToast('Arrastra a otra posición o usa las acciones', 'sliders-horizontal');
-    } else if (this.selectedStarterIndex === index) {
-      this.closeSubDrawer();
+      if (this.activeRadialIndex === index) {
+        this.closeRadialMenu(true);
+      } else {
+        this.openRadialMenu(index, pr);
+        this.showToast('Acciones tácticas de jugador activas', 'sliders-horizontal');
+      }
     } else {
       const starting = store.getStartingLineup();
       const p1 = starting[this.selectedStarterIndex];
@@ -2615,12 +2826,62 @@ class FutApp {
     };
   }
 
-  // ==================== ÁLBUM DE CARTAS ====================
+  // ==================== ÁLBUM DE CARTAS (PATRÓN LINEAR / EA SPORTS) ====================
   renderAlbumCards() {
     const grid = document.getElementById('album-cards-grid');
+    const emptyState = document.getElementById('album-empty-state');
+    const countBadge = document.getElementById('album-count-badge');
     if (!grid) return;
 
-    const players = store.getPlayers();
+    let players = store.getPlayers();
+
+    // 1. Filtrado por texto de búsqueda (Linear instant search)
+    const query = (this.albumSearchQuery || '').toLowerCase().trim();
+    if (query) {
+      players = players.filter(p => {
+        const name = (p.name || '').toLowerCase();
+        const nick = (p.nickname || '').toLowerCase();
+        const num = String(p.number || '');
+        const role = (p.rolesHierarchy?.best || p.position || '').toLowerCase();
+        return name.includes(query) || nick.includes(query) || num.includes(query) || role.includes(query);
+      });
+    }
+
+    // 2. Filtrado por Línea / Posición
+    const roleFilter = this.albumRoleFilter || 'all';
+    if (roleFilter !== 'all') {
+      players = players.filter(p => {
+        const bestRole = p.rolesHierarchy?.best || p.position || '';
+        if (roleFilter === 'DC') return ['DC', 'SD', 'EI', 'ED', 'PIV'].includes(bestRole);
+        if (roleFilter === 'MC') return ['MC', 'MCO', 'MCD', 'MI', 'MD', 'ALA', 'ALI', 'ALD'].includes(bestRole);
+        if (roleFilter === 'DFC') return ['DFC', 'LI', 'LD', 'CIE'].includes(bestRole);
+        if (roleFilter === 'POR') return bestRole === 'POR';
+        return true;
+      });
+    }
+
+    // 3. Ordenación
+    const sortBy = this.albumSortBy || 'ovr-desc';
+    players.sort((a, b) => {
+      if (sortBy === 'ovr-desc') return (b.rating || 75) - (a.rating || 75);
+      if (sortBy === 'ovr-asc') return (a.rating || 75) - (b.rating || 75);
+      if (sortBy === 'dorsal-asc') return (a.number || 99) - (b.number || 99);
+      if (sortBy === 'name-asc') return (a.nickname || a.name || '').localeCompare(b.nickname || b.name || '');
+      return 0;
+    });
+
+    if (countBadge) {
+      countBadge.textContent = `${players.length} CROMO${players.length === 1 ? '' : 'S'}`;
+    }
+
+    if (players.length === 0) {
+      grid.innerHTML = '';
+      if (emptyState) emptyState.classList.remove('hidden');
+      return;
+    }
+
+    if (emptyState) emptyState.classList.add('hidden');
+
     grid.innerHTML = players.map(p => {
       const fac = FACULTIES.find(f => f.id === p.faculty) || FACULTIES[0];
 

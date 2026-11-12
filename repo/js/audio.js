@@ -55,11 +55,83 @@ class FUTAudioEngine {
   }
 
   playFocus() {
-    this.playCardSelect();
+    this.playNav();
   }
 
   playSelect() {
     this.playCardSelect();
+  }
+
+  // Tick ultra-limpio de consola al mover joystick o flechas (estilo EA Sports FC)
+  playNav() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1250, t);
+      osc.frequency.exponentialRampToValueAtTime(700, t + 0.035);
+
+      gain.gain.setValueAtTime(0.07, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.04);
+    } catch (_) {}
+  }
+
+  // Swoosh de navegación entre pestañas L1 / R1
+  playTabSwoosh() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(420, t);
+      osc.frequency.exponentialRampToValueAtTime(880, t + 0.07);
+
+      gain.gain.setValueAtTime(0.08, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.08);
+    } catch (_) {}
+  }
+
+  // Error o acción inválida
+  playError() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, t);
+      osc.frequency.setValueAtTime(130, t + 0.06);
+
+      gain.gain.setValueAtTime(0.10, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.14);
+    } catch (_) {}
   }
 
   // Sonido de swap o intercambio de carta (whoosh + thud táctil)

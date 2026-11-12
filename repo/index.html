@@ -167,12 +167,12 @@
             <span id="inspector-player-stars" class="hud-insp-stars-badge" title="Filigranas y Pierna Mala">4★ / 4★</span>
           </div>
           <div id="inspector-stats-grid" class="hud-insp-stats">
-            <span><b>PAC</b><em id="stat-pac">84</em></span>
-            <span><b>SHO</b><em id="stat-sho">82</em></span>
-            <span><b>PAS</b><em id="stat-pas">80</em></span>
-            <span><b>DRI</b><em id="stat-dri">85</em></span>
-            <span><b>DEF</b><em id="stat-def">60</em></span>
-            <span><b>PHY</b><em id="stat-phy">78</em></span>
+            <span data-tooltip="Ritmo y Aceleración"><b>PAC</b><em id="stat-pac">84</em></span>
+            <span data-tooltip="Tiro y Definición"><b>SHO</b><em id="stat-sho">82</em></span>
+            <span data-tooltip="Pase y Visión"><b>PAS</b><em id="stat-pas">80</em></span>
+            <span data-tooltip="Regate y Agilidad"><b>DRI</b><em id="stat-dri">85</em></span>
+            <span data-tooltip="Defensa e Intercepción"><b>DEF</b><em id="stat-def">60</em></span>
+            <span data-tooltip="Físico y Resistencia"><b>PHY</b><em id="stat-phy">78</em></span>
           </div>
         </footer>
       </article>
@@ -218,6 +218,40 @@
           <i data-lucide="plus" class="w-4 h-4"></i>
           <span>Mi Carta / Nuevo Fichaje</span>
         </button>
+      </div>
+
+      <!-- BARRA DE BÚSQUEDA Y FILTRADO INSTANTÁNEO (PATRÓN LINEAR / EA SPORTS FC) -->
+      <div class="hud-filter-bar flex flex-col md:flex-row gap-2.5 items-stretch md:items-center justify-between bg-slate-900/90 border border-slate-700/80 p-2.5 shadow-md">
+        <div class="relative flex-1 min-w-[200px]">
+          <i data-lucide="search" class="w-4 h-4 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input type="text" id="album-search-input" placeholder="Buscar jugador por nombre o dorsal... (Presiona /)" autocomplete="off" class="w-full bg-slate-950/90 border border-slate-700/70 pl-9 pr-8 py-2 text-xs text-white placeholder-slate-500 font-bold focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition">
+          <kbd class="hidden sm:inline-block absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 border border-slate-700 font-mono">/</kbd>
+        </div>
+
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0" id="album-role-filters">
+          <button type="button" class="hud-filter-pill active" data-role="all">TODOS</button>
+          <button type="button" class="hud-filter-pill" data-role="DC">DELANTEROS</button>
+          <button type="button" class="hud-filter-pill" data-role="MC">MEDIOS</button>
+          <button type="button" class="hud-filter-pill" data-role="DFC">DEFENSAS</button>
+          <button type="button" class="hud-filter-pill" data-role="POR">PORTEROS</button>
+        </div>
+
+        <div class="flex items-center justify-between md:justify-end gap-3">
+          <select id="album-sort-select" class="bg-slate-950/90 border border-slate-700/70 text-[11px] font-bold text-slate-300 py-1.5 px-2.5 uppercase tracking-wider focus:border-amber-400">
+            <option value="ovr-desc">VALORACIÓN (MÁS ALTA)</option>
+            <option value="ovr-asc">VALORACIÓN (MÁS BAJA)</option>
+            <option value="dorsal-asc">DORSAL (#1 - #99)</option>
+            <option value="name-asc">NOMBRE (A - Z)</option>
+          </select>
+          <span id="album-count-badge" class="text-[11px] font-bold text-amber-400 font-fifa tracking-wider uppercase whitespace-nowrap bg-amber-500/10 border border-amber-500/30 px-2 py-1">8 CROMOS</span>
+        </div>
+      </div>
+
+      <div id="album-empty-state" class="hidden fifa-tile p-8 text-center space-y-2 border border-slate-800">
+        <i data-lucide="filter-x" class="w-10 h-10 text-amber-400 mx-auto opacity-70"></i>
+        <h4 class="font-fifa text-xl font-bold text-white uppercase tracking-wider">NO SE HAN ENCONTRADO CROMOS</h4>
+        <p class="text-xs text-slate-400">Ningún jugador de la plantilla coincide con los criterios de búsqueda.</p>
+        <button type="button" id="btn-reset-album-filters" class="mt-2 px-3 py-1.5 bg-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider">Restablecer Filtros</button>
       </div>
 
       <div id="album-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -332,11 +366,14 @@
 
   </main>
 
-  <!-- FRANJA TÉCNICA INFERIOR DE CONSOLA (86.5% - 90.1% ALTO) -->
+  <!-- FRANJA TÉCNICA INFERIOR DE CONSOLA EA SPORTS (ATAJOS KEYBOARD-FIRST LINEAR) -->
   <footer class="hud-prompts" aria-label="Indicadores de consola">
-    <span class="hud-prompt"><em>DRAG &amp; DROP</em><span>INTERCAMBIAR TITULAR / SUPLENTE</span></span>
-    <span class="hud-prompt"><em>CLIC CARTA</em><span>MENÚ RADIAL / FICHA TÉCNICA</span></span>
-    <span class="hud-prompt"><em>PANEL DERECHO</em><span>BANQUILLO Y CENTRO TÁCTICO PRO</span></span>
+    <span class="hud-prompt"><em>Q / E</em><span>L1/R1 PESTAÑAS</span></span>
+    <span class="hud-prompt"><em>↑ ↓ ← →</em><span>CURSOR JUGADOR</span></span>
+    <span class="hud-prompt"><em>ENTER</em><span>ACCIONES / RADIAL</span></span>
+    <span class="hud-prompt"><em>S</em><span>ESQUEMA TÁCTICO</span></span>
+    <span class="hud-prompt"><em>M</em><span>TEMA CLARO/OSCURO</span></span>
+    <span class="hud-prompt"><em>DRAG &amp; DROP</em><span>INTERCAMBIAR DORSAL</span></span>
   </footer>
 
   <!-- ==================== MODALES NATIVOS <dialog> ACCESIBLES ==================== -->
