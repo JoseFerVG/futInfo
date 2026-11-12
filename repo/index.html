@@ -64,45 +64,9 @@
   <div class="hud-bg" aria-hidden="true"></div>
 
   <header class="hud-top">
-    <!-- Chyron izquierdo: Escudo oficial y Nombre limpio del Club -->
+    <!-- Chyron izquierdo: Nombre oficial del Club sin divisas ni logos ajenos -->
     <div class="hud-club">
-      <div class="hud-crest font-fifa">FUT</div>
-      <div class="hud-club-data">
-        <div class="hud-club-row">
-          <span id="nav-team-name" class="hud-club-name font-fifa">FURIA RECTOR FC</span>
-          <span class="hud-online"><i class="hud-online-dot"></i> LIVE</span>
-        </div>
-        <span id="nav-tournament-badge" class="hud-club-tournament">TORNEO DEL RECTOR 2026</span>
-      </div>
-    </div>
-
-    <!-- Chyrons Centrales FIFA FUT: Monedas, FIFA Points, Récord y Nivel Temporada -->
-    <div class="hud-fut-status-bar hidden md:flex items-center gap-2 lg:gap-3">
-      <!-- Monedas FUT (FIFA Coins) -->
-      <div class="fifa-chyron-pill fut-coins" title="Monedas del Club FUT">
-        <span class="fut-coin-glyph font-fifa">⛃</span>
-        <span class="fifa-chyron-val font-fifa" id="hud-coins-val">15,450</span>
-      </div>
-
-      <!-- FIFA Points / Rector Points -->
-      <div class="fifa-chyron-pill fut-points" title="Puntos FIFA Rector">
-        <span class="fut-fp-glyph font-fifa">◆</span>
-        <span class="fifa-chyron-val font-fifa" id="hud-fp-val">500</span>
-      </div>
-
-      <!-- Récord del Club (V - E - D) -->
-      <div class="fifa-chyron-pill fut-record hidden lg:flex" title="Historial del Club (Victorias - Empates - Derrotas)">
-        <span class="fifa-chyron-lbl font-fifa">RECORD</span>
-        <span class="fifa-chyron-val font-fifa" id="hud-record-val">12-3-1</span>
-      </div>
-
-      <!-- Nivel de Temporada / Season XP -->
-      <div class="fifa-chyron-pill fut-level hidden xl:flex" title="Nivel de Temporada 2026">
-        <span class="fifa-chyron-lvl font-fifa">LVL 14</span>
-        <div class="fifa-lvl-bar">
-          <div class="fifa-lvl-fill" style="width: 76%"></div>
-        </div>
-      </div>
+      <span id="nav-team-name" class="hud-club-name font-fifa">FURIA RECTOR FC</span>
     </div>
 
     <!-- Chyron derecho: modalidad + tema claro/oscuro + audio + sesión -->
@@ -154,14 +118,21 @@
           </div>
         </header>
 
-        <!-- Barra de Acción EA Sports: Cambiar Plantilla / Formación con máxima visibilidad -->
+        <!-- Barra de Acción EA Sports: Cambiar Plantilla / Formación con máxima visibilidad e interactividad -->
         <div class="hud-squad-action-bar">
-          <button type="button" id="btn-open-squad-modal" class="hud-squad-bar-btn" title="Abrir Centro Táctico y Formaciones (Tecla S)">
-            <span class="hud-squad-bar-title font-fifa">
-              <em class="ps-btn ps-square">■</em>
-              <span>CAMBIAR PLANTILLA &amp; FORMACIÓN</span>
-            </span>
-            <span class="hud-squad-bar-badge font-fifa">ESQUEMAS FC 26</span>
+          <button type="button" id="btn-open-squad-modal" class="hud-squad-action-tile" title="Abrir Centro Táctico y Formaciones (Tecla S)">
+            <div class="hud-action-left">
+              <span class="hud-action-icon-pill">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+              </span>
+              <div class="hud-action-text-group">
+                <span class="hud-action-title font-fifa">CAMBIAR PLANTILLA &amp; FORMACIÓN</span>
+                <span class="hud-action-sub">GESTIONAR ESQUEMA TÁCTICO, ROLES Y JUGADORES</span>
+              </div>
+            </div>
+            <div class="hud-action-right">
+              <span class="hud-action-prompt font-fifa"><kbd class="fifa-btn-chip">S</kbd> GESTIONAR <span class="fifa-arrow">►</span></span>
+            </div>
           </button>
         </div>
 
@@ -351,89 +322,354 @@
       </div>
     </section>
 
-    <!-- ==================== 3. VISTA PARTIDOS & ASISTENCIA ==================== -->
-    <section id="view-partidos" class="tab-view hidden space-y-5">
+    <!-- ==================== 3. VISTA JORNADAS (EA SPORTS FC BROADCAST MATCHDAY) ==================== -->
+    <section id="view-partidos" class="tab-view hidden space-y-6">
       
-      <!-- Banner Próximo Partido (Estilo Matchday FUT) -->
-      <div class="fifa-tile p-6 relative overflow-hidden border border-amber-500/30">
-        <div class="fifa-tile-accent-bar bg-amber-400"></div>
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <span class="text-[10px] font-black uppercase tracking-widest text-amber-400 block font-fifa">CONVOCATORIA PRÓXIMO ENCUENTRO</span>
-            <h3 id="next-match-headline" class="font-fifa text-3xl sm:text-4xl font-bold text-white uppercase tracking-wider mt-0.5">Cargando partido...</h3>
-            <p id="next-match-details" class="text-xs text-slate-400 mt-1"></p>
+      <!-- ENCABEZADO DE RETRANSMISIÓN MATCHDAY -->
+      <header class="fifa-broadcast-head">
+        <div class="fifa-broadcast-title-group">
+          <div class="fifa-broadcast-live-chyron font-fifa">
+            <span class="fifa-live-dot"></span> MATCHDAY BROADCAST • EN DIRECTO
+          </div>
+          <h2 class="fifa-broadcast-main-title font-fifa">CENTRO DE JORNADAS Y CONVOCATORIA</h2>
+        </div>
+        <div class="fifa-broadcast-head-actions">
+          <button type="button" id="btn-create-match" class="admin-only fifa-broadcast-action-btn" title="Programar Nueva Jornada">
+            <i data-lucide="calendar-plus" class="w-4 h-4 text-amber-400"></i>
+            <span class="font-fifa">PROGRAMAR JORNADA</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- TARJETA OFICIAL DEL PARTIDO DE LA JORNADA (EA SPORTS FC BATTLE ARENA) -->
+      <article class="fifa-matchday-arena-card">
+        <!-- Barra de Metadatos del Encuentro -->
+        <div class="fifa-arena-top-banner">
+          <span class="fifa-arena-badge font-fifa">PRÓXIMO ENCUENTRO OFICIAL</span>
+          <div id="next-match-details" class="fifa-arena-venue font-fifa">
+            <!-- Fecha y Cancha dinámicos -->
+          </div>
+          <span class="fifa-arena-stream font-fifa">STREAM EA FC 26</span>
+        </div>
+
+        <!-- Escenario de Choque Local vs Visitante -->
+        <div class="fifa-arena-vs-stage">
+          <!-- Club Local -->
+          <div class="fifa-arena-club fifa-arena-club--home">
+            <div class="fifa-arena-crest-box">
+              <span class="fifa-arena-crest-glyph font-fifa" id="featured-home-crest">🛡️</span>
+            </div>
+            <div class="fifa-arena-club-info">
+              <span class="fifa-arena-tag font-fifa">LOCAL</span>
+              <h3 class="fifa-arena-club-title font-fifa" id="featured-home-name">FURIA RECTOR FC</h3>
+              <div class="fifa-arena-ovr-pill font-fifa">VAL <span class="fifa-ovr-num">84</span></div>
+            </div>
           </div>
 
-          <div class="flex items-center gap-2 flex-wrap">
-            <button onclick="window.futApp.voteAttendance('asistira')" class="px-4 py-2  bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition active:scale-95 cursor-pointer">
-              <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>
-              <span>Asistiré</span>
+          <!-- Centro VS y Marcador / Hora -->
+          <div class="fifa-arena-vs-center">
+            <div class="fifa-arena-vs-diamond font-fifa">VS</div>
+            <div class="fifa-arena-kickoff-time font-fifa" id="next-match-time-chip">20:00 H</div>
+            <span class="fifa-arena-status-pill font-fifa" id="featured-match-status-badge">CONVOCATORIA ABIERTA</span>
+          </div>
+
+          <!-- Club Visitante -->
+          <div class="fifa-arena-club fifa-arena-club--away">
+            <div class="fifa-arena-club-info text-right">
+              <span class="fifa-arena-tag font-fifa">VISITANTE</span>
+              <h3 class="fifa-arena-club-title font-fifa" id="featured-away-name">INGENIEROS UNITED</h3>
+              <div class="fifa-arena-ovr-pill font-fifa">VAL <span class="fifa-ovr-num">81</span></div>
+            </div>
+            <div class="fifa-arena-crest-box">
+              <span class="fifa-arena-crest-glyph font-fifa" id="featured-away-crest">🦁</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de Botones de Consola: Confirmación de Asistencia -->
+        <div class="fifa-arena-vote-bar">
+          <div class="fifa-vote-heading font-fifa">
+            <i data-lucide="gamepad-2" class="w-4 h-4 text-amber-400"></i>
+            <span>VOTA TU DISPONIBILIDAD:</span>
+          </div>
+          <div class="fifa-vote-buttons">
+            <button type="button" onclick="window.futApp.voteAttendance('asistira')" class="fifa-console-vote-btn fifa-vote-yes" title="Confirmar asistencia">
+              <em class="ps-btn ps-x">✕</em>
+              <span class="font-fifa">CONFIRMAR ASISTENCIA</span>
             </button>
-            <button onclick="window.futApp.voteAttendance('duda')" class="px-4 py-2  bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition active:scale-95 cursor-pointer">
-              <i data-lucide="help-circle" class="w-4 h-4 text-amber-400"></i>
-              <span>Duda</span>
+            <button type="button" onclick="window.futApp.voteAttendance('duda')" class="fifa-console-vote-btn fifa-vote-maybe" title="Duda de asistencia">
+              <em class="ps-btn ps-square">■</em>
+              <span class="font-fifa">EN DUDA</span>
             </button>
-            <button onclick="window.futApp.voteAttendance('no_puede')" class="px-4 py-2  bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition active:scale-95 cursor-pointer">
-              <i data-lucide="x" class="w-4 h-4 text-rose-400"></i>
-              <span>Baja</span>
+            <button type="button" onclick="window.futApp.voteAttendance('no_puede')" class="fifa-console-vote-btn fifa-vote-no" title="Baja para este encuentro">
+              <em class="ps-btn ps-circle">◯</em>
+              <span class="font-fifa">DECLINAR / BAJA</span>
             </button>
           </div>
         </div>
 
-        <!-- Desglose de Asistencia en Tiempo Real -->
-        <div class="mt-4 pt-4 border-t border-white/10 relative z-10">
-          <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest font-fifa mb-2.5">ESTADO OFICIAL DE LA CONVOCATORIA:</div>
-          <div id="attendance-breakdown" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <!-- Renderizado dinámico -->
+        <!-- Desglose de Convocatoria en 3 Columnas Broadcast -->
+        <div class="fifa-arena-convocatoria-panel">
+          <div class="fifa-convocatoria-title font-fifa">
+            <span>DESGLOSE TÁCTICO DE CONVOCADOS</span>
+            <span class="fifa-convocatoria-sub font-fifa">SISTEMA OFICIAL EA SPORTS FC</span>
+          </div>
+          <div id="attendance-breakdown" class="fifa-convocatoria-columns">
+            <!-- Render dinámico desde JS -->
           </div>
         </div>
-      </div>
+      </article>
 
-      <!-- Encabezado con Botón de Programar Partido -->
-      <div class="flex items-center justify-between">
-        <h3 class="font-fifa text-2xl sm:text-3xl font-bold text-white uppercase tracking-wider">CALENDARIO DE JORNADAS</h3>
-        <button id="btn-create-match" class="admin-only px-4 py-2  bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition active:scale-95 cursor-pointer">
-          <i data-lucide="plus" class="w-4 h-4"></i>
-          <span>Programar Partido</span>
-        </button>
-      </div>
+      <!-- SECCIÓN DEL CALENDARIO DE FIXTURES DE LIGA -->
+      <section class="fifa-fixtures-board">
+        <header class="fifa-fixtures-header">
+          <div class="fifa-fixtures-title-wrap">
+            <h3 class="fifa-fixtures-heading font-fifa">CALENDARIO OFICIAL DE JORNADAS</h3>
+            <span class="fifa-fixtures-sub">TORNEO DEL RECTOR 2026 • FASE REGULAR</span>
+          </div>
+          <div class="fifa-fixtures-count-pill font-fifa">
+            <span>FIXTURES ACTIVOS</span>
+          </div>
+        </header>
 
-      <div id="matches-container" class="space-y-3">
-        <!-- Render de partidos -->
-      </div>
+        <div id="matches-container" class="fifa-fixtures-list">
+          <!-- Render dinámico de jornadas estilo torneo FIFA -->
+        </div>
+      </section>
+
     </section>
 
-    <!-- ==================== 4. VISTA AJUSTES & FIREBASE ==================== -->
-    <section id="view-ajustes" class="tab-view hidden space-y-5">
+    <!-- ==================== 4. VISTA MI CLUB (EA SPORTS FC CLUB HUB COMPLETO) ==================== -->
+    <section id="view-ajustes" class="tab-view hidden space-y-6">
       
-      <!-- Configuración del Equipo -->
-      <div class="fifa-tile p-6 relative overflow-hidden space-y-4">
-        <div class="fifa-tile-accent-bar"></div>
-        <div class="relative z-10">
-          <div class="flex items-center gap-2">
-            <i data-lucide="sliders-horizontal" class="w-5 h-5 text-amber-400"></i>
-            <h3 class="font-fifa text-3xl font-bold text-white uppercase tracking-wider">CONFIGURACIÓN DEL CLUB</h3>
+      <!-- CABECERA MI CLUB -->
+      <header class="fifa-broadcast-head">
+        <div class="fifa-broadcast-title-group">
+          <div class="fifa-broadcast-live-chyron font-fifa">
+            <span class="fifa-live-dot"></span> EA SPORTS FC • GESTIÓN DE CLUB
           </div>
-          <p class="text-xs text-slate-400 mt-0.5">Edita el nombre del club y la competición actual.</p>
+          <h2 class="fifa-broadcast-main-title font-fifa">CENTRO DE PERSONALIZACIÓN DEL CLUB</h2>
+        </div>
+      </header>
+
+      <form id="form-team-settings" class="space-y-6">
+
+        <!-- 1. IDENTIDAD DEL CLUB -->
+        <div class="fifa-club-tile">
+          <div class="fifa-club-tile-accent"></div>
+          <div class="fifa-club-tile-header">
+            <i data-lucide="shield" class="w-5 h-5 text-amber-400"></i>
+            <div>
+              <h3 class="font-fifa text-2xl text-white font-bold">1. IDENTIDAD Y MARCADOR</h3>
+              <p class="text-xs text-slate-400">Configura el nombre oficial, abreviatura de 3 letras y lema del club.</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+            <div>
+              <label for="set-team-name" class="fifa-field-lbl font-fifa">Nombre del Club</label>
+              <input type="text" id="set-team-name" name="teamName" autocomplete="off" class="fifa-input font-fifa" placeholder="Furia Rector FC">
+            </div>
+            <div>
+              <label for="set-short-name" class="fifa-field-lbl font-fifa">Abreviatura Marcador (3 letras)</label>
+              <input type="text" id="set-short-name" name="shortName" maxlength="3" autocomplete="off" class="fifa-input font-fifa" placeholder="FUR">
+            </div>
+            <div>
+              <label for="set-tournament-name" class="fifa-field-lbl font-fifa">Competición Oficial</label>
+              <input type="text" id="set-tournament-name" name="tournamentName" autocomplete="off" class="fifa-input font-fifa" placeholder="Torneo del Rector 2026">
+            </div>
+            <div>
+              <label for="set-club-slogan" class="fifa-field-lbl font-fifa">Lema del Club</label>
+              <input type="text" id="set-club-slogan" name="slogan" autocomplete="off" class="fifa-input font-fifa" placeholder="¡Hasta el último minuto!">
+            </div>
+          </div>
         </div>
 
-        <form id="form-team-settings" class="space-y-4 relative z-10">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- 2. SELECTOR DE ESCUDO OFICIAL -->
+        <div class="fifa-club-tile">
+          <div class="fifa-club-tile-accent"></div>
+          <div class="fifa-club-tile-header">
+            <i data-lucide="award" class="w-5 h-5 text-amber-400"></i>
             <div>
-              <label for="set-team-name" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Nombre del Equipo</label>
-              <input type="text" id="set-team-name" name="teamName" autocomplete="off" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+              <h3 class="font-fifa text-2xl text-white font-bold">2. ESCUDO OFICIAL DEL CLUB</h3>
+              <p class="text-xs text-slate-400">Selecciona el blasón heráldico que representará al equipo en las retransmisiones.</p>
             </div>
+          </div>
+          <input type="hidden" id="set-club-crest" name="crest" value="shield_gold">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-4" id="club-crests-grid">
+            <!-- Renderizado dinámico de escudos interactivos -->
+          </div>
+        </div>
+
+        <!-- 3. EQUIPACIÓN OFICIAL Y PREVISUALIZACIÓN -->
+        <div class="fifa-club-tile">
+          <div class="fifa-club-tile-accent"></div>
+          <div class="fifa-club-tile-header">
+            <i data-lucide="shirt" class="w-5 h-5 text-amber-400"></i>
             <div>
-              <label for="set-tournament-name" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Nombre del Torneo</label>
-              <input type="text" id="set-tournament-name" name="tournamentName" autocomplete="off" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+              <h3 class="font-fifa text-2xl text-white font-bold">3. EQUIPACIÓN OFICIAL DE PARTIDO</h3>
+              <p class="text-xs text-slate-400">Personaliza los colores de la primera camiseta y los ribetes técnicos.</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 items-center">
+            <div class="space-y-4">
+              <div>
+                <label for="set-kit-primary" class="fifa-field-lbl font-fifa">Color Principal de Camiseta</label>
+                <div class="flex items-center gap-3">
+                  <input type="color" id="set-kit-primary" name="kitColor" value="#f8fafc" class="fifa-color-picker cursor-pointer">
+                  <span class="text-xs text-slate-300 font-bold" id="kit-primary-hex">#f8fafc</span>
+                </div>
+              </div>
+              <div>
+                <label for="set-kit-secondary" class="fifa-field-lbl font-fifa">Color Secundario (Ribetes / Dorsal)</label>
+                <div class="flex items-center gap-3">
+                  <input type="color" id="set-kit-secondary" name="kitSecondary" value="#f0be2a" class="fifa-color-picker cursor-pointer">
+                  <span class="text-xs text-slate-300 font-bold" id="kit-secondary-hex">#f0be2a</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mini Preview en vivo de la equipación -->
+            <div class="fifa-kit-preview-box">
+              <span class="fifa-kit-preview-title font-fifa">VISTA PREVIA EQUIPACIÓN</span>
+              <div class="fifa-kit-preview-silhouette" id="club-kit-preview-silhouette">
+                <!-- SVG dinámico de la camiseta -->
+              </div>
+              <span class="fifa-kit-preview-dorsal font-fifa">DORSAL #10</span>
+            </div>
+
+            <!-- Información técnica -->
+            <div class="fifa-kit-info-card">
+              <span class="font-fifa text-amber-400 text-sm font-bold block mb-1">ESPECIFICACIÓN FIFA QUALITY</span>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                El diseño elegido se reflejará automáticamente en todas las cartas FUT de la plantilla, el álbum de cromos y la pizarra del campo de juego.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. ESTADIO Y BALÓN OFICIAL -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Estadio Oficial -->
+          <div class="fifa-club-tile">
+            <div class="fifa-club-tile-accent"></div>
+            <div class="fifa-club-tile-header">
+              <i data-lucide="map-pin" class="w-5 h-5 text-amber-400"></i>
+              <div>
+                <h3 class="font-fifa text-2xl text-white font-bold">4. ESTADIO OFICIAL LOCAL</h3>
+                <p class="text-xs text-slate-400">Sede donde disputa sus encuentros el club.</p>
+              </div>
+            </div>
+            <input type="hidden" id="set-club-stadium" name="stadium" value="campus_sur">
+            <div class="space-y-2 mt-4" id="club-stadiums-list">
+              <!-- Renderizado de estadios con capacidad y césped -->
             </div>
           </div>
 
-          <button type="submit" class="admin-only px-6 py-2.5  bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer">
-            Guardar Información del Club
+          <!-- Balón Oficial -->
+          <div class="fifa-club-tile">
+            <div class="fifa-club-tile-accent"></div>
+            <div class="fifa-club-tile-header">
+              <i data-lucide="circle-dot" class="w-5 h-5 text-amber-400"></i>
+              <div>
+                <h3 class="font-fifa text-2xl text-white font-bold">5. BALÓN OFICIAL DE PARTIDO</h3>
+                <p class="text-xs text-slate-400">Balón de competición oficial homologado.</p>
+              </div>
+            </div>
+            <input type="hidden" id="set-club-ball" name="ball" value="nike_flight">
+            <div class="space-y-2 mt-4" id="club-balls-list">
+              <!-- Renderizado de balones oficiales -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. ESPECIALISTAS A BALÓN PARADO -->
+        <div class="fifa-club-tile">
+          <div class="fifa-club-tile-accent"></div>
+          <div class="fifa-club-tile-header">
+            <i data-lucide="crosshair" class="w-5 h-5 text-amber-400"></i>
+            <div>
+              <h3 class="font-fifa text-2xl text-white font-bold">6. ESPECIALISTAS A BALÓN PARADO</h3>
+              <p class="text-xs text-slate-400">Asigna los roles clave para capitanía, lanzamientos de penalti, faltas y córners.</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+            <div>
+              <label for="spec-captain" class="fifa-field-lbl font-fifa">👑 Capitán del Equipo</label>
+              <select id="spec-captain" name="captain" class="fifa-select font-fifa"></select>
+            </div>
+            <div>
+              <label for="spec-penalties" class="fifa-field-lbl font-fifa">🎯 Penaltis</label>
+              <select id="spec-penalties" name="penalties" class="fifa-select font-fifa"></select>
+            </div>
+            <div>
+              <label for="spec-freekicks" class="fifa-field-lbl font-fifa">🚀 Faltas Directas</label>
+              <select id="spec-freekicks" name="freekicks" class="fifa-select font-fifa"></select>
+            </div>
+            <div>
+              <label for="spec-corners" class="fifa-field-lbl font-fifa">🚩 Córners</label>
+              <select id="spec-corners" name="corners" class="fifa-select font-fifa"></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. RÉCORD HISTÓRICO Y VITRINA DE TROFEOS -->
+        <div class="fifa-club-tile">
+          <div class="fifa-club-tile-accent"></div>
+          <div class="fifa-club-tile-header">
+            <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i>
+            <div>
+              <h3 class="font-fifa text-2xl text-white font-bold">7. PALMARÉS Y ESTADÍSTICAS HISTÓRICAS</h3>
+              <p class="text-xs text-slate-400">Récord competitivo oficial de Furia Rector FC en todas las ediciones.</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-4">
+            <div class="fifa-stat-badge">
+              <span class="fifa-stat-badge-num font-fifa">16</span>
+              <span class="fifa-stat-badge-lbl font-fifa">PARTIDOS JUGADOS</span>
+            </div>
+            <div class="fifa-stat-badge">
+              <span class="fifa-stat-badge-num font-fifa text-emerald-400">12</span>
+              <span class="fifa-stat-badge-lbl font-fifa">VICTORIAS</span>
+            </div>
+            <div class="fifa-stat-badge">
+              <span class="fifa-stat-badge-num font-fifa text-amber-400">3</span>
+              <span class="fifa-stat-badge-lbl font-fifa">EMPATES</span>
+            </div>
+            <div class="fifa-stat-badge">
+              <span class="fifa-stat-badge-num font-fifa text-rose-400">1</span>
+              <span class="fifa-stat-badge-lbl font-fifa">DERROTAS</span>
+            </div>
+            <div class="fifa-stat-badge">
+              <span class="fifa-stat-badge-num font-fifa text-cyan-400">48</span>
+              <span class="fifa-stat-badge-lbl font-fifa">GOLES A FAVOR</span>
+            </div>
+            <div class="fifa-stat-badge">
+              <span class="fifa-stat-badge-num font-fifa text-purple-400">+29</span>
+              <span class="fifa-stat-badge-lbl font-fifa">DIFERENCIA GOLES</span>
+            </div>
+          </div>
+
+          <!-- Vitrina de Trofeos -->
+          <div class="mt-4 pt-4 border-t border-white/10 flex flex-wrap items-center gap-3">
+            <span class="text-xs font-fifa text-amber-400 uppercase tracking-wider font-bold">SALA DE TROFEOS:</span>
+            <div class="fifa-trophy-pill font-fifa">🏆 CAMPEÓN OTOÑO 2025</div>
+            <div class="fifa-trophy-pill font-fifa">🥈 SUBCAMPEÓN COPA RECTOR</div>
+            <div class="fifa-trophy-pill font-fifa">🎖️ MEJOR ATAQUE F7</div>
+          </div>
+        </div>
+
+        <!-- 8. BOTÓN DE ACCIÓN Y GUARDADO EA SPORTS -->
+        <div class="flex items-center justify-between pt-2">
+          <p class="text-xs text-slate-400">
+            Los cambios se guardan localmente y se sincronizan en tiempo real en la nube.
+          </p>
+          <button type="submit" class="admin-only fifa-save-club-btn font-fifa">
+            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            <span>GUARDAR PERSONALIZACIÓN DEL CLUB</span>
           </button>
-        </form>
-      </div>
+        </div>
+
+      </form>
     </section>
 
     <!-- CAJÓN DE SUSTITUCIÓN RÁPIDA (SUBSTITUTION DRAWER) -->

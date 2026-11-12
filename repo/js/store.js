@@ -291,9 +291,16 @@ const DEFAULT_PLAYERS = [
 
 const DEFAULT_SETTINGS = {
   teamName: 'Furia Rector FC',
-  shortName: 'FRF',
+  shortName: 'FUR',
   tournament: 'Torneo del Rector 2026',
   modality: 'f7', // 'f7' o 'futsal'
+  crest: 'shield_gold',
+  kitColor: '#f8fafc',
+  kitSecondary: '#f0be2a',
+  stadium: 'campus_sur',
+  ball: 'nike_flight',
+  slogan: '¡Hasta el último minuto!',
+  foundedYear: '2024',
   specialists: {
     captain: 'p4',
     penalties: 'p6',
