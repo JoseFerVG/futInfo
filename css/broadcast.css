@@ -519,14 +519,45 @@ body.hud-canvas {
 .hud-squad-head {
   position: absolute !important;
   inset: 0 0 auto 0;
-  height: 64px;
-  padding: 16px 20px;
+  height: 74px;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: background 150ms ease;
+  z-index: 10;
+}
+
+.hud-squad-head:hover {
+  background: rgba(240, 190, 42, 0.08);
+}
+
+.hud-squad-action-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--hud-ink);
+  color: var(--hud-gold);
+  border: 1px solid var(--hud-gold);
+  font: 900 0.8rem / 1 var(--hud-cond);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 120ms ease;
+  transform: skewX(-8deg);
+  margin-top: 2px;
+}
+
+.hud-squad-head:hover .hud-squad-action-badge,
+.hud-squad-action-badge:hover {
+  background: var(--hud-gold);
+  color: var(--hud-ink);
+  box-shadow: 0 0 14px rgba(240, 190, 42, 0.6);
 }
 
 .hud-squad-meta {
   position: absolute;
   right: 20px;
-  top: 16px;
+  top: 14px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -694,6 +725,37 @@ body.hud-canvas {
   border-left: 5px solid var(--hud-gold);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 20;
+}
+
+.hud-insp-kit {
+  height: 100%;
+  width: 52px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #141720;
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 0 100%);
+  flex-shrink: 0;
+}
+
+.hud-insp-kit-svg {
+  width: 30px;
+  height: 38px;
+  color: #262e3d;
+}
+
+.hud-insp-dorsal {
+  position: absolute;
+  top: 58%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  font-family: var(--hud-cond);
+  font-weight: 900;
+  font-size: 1.25rem;
+  color: var(--hud-gold);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+  line-height: 1;
 }
 
 .hud-inspector img {
@@ -1102,4 +1164,296 @@ body.hud-canvas {
   .hud-prompts {
     display: none;
   }
+}
+
+/* ---------- 14. FIFA SQUAD HUB & VISUAL FORMATIONS ---------- */
+.fifa-modal-nav {
+  gap: 8px;
+}
+
+.fifa-modal-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  font-family: var(--hud-cond);
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--hud-snap);
+  white-space: nowrap;
+}
+
+.fifa-modal-tab:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.fifa-modal-tab.active {
+  color: var(--hud-gold) !important;
+  background: rgba(240, 190, 42, 0.12) !important;
+  border-bottom-color: var(--hud-gold) !important;
+}
+
+/* Grilla de formaciones visuales FIFA */
+.fifa-formations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.fifa-formation-card {
+  position: relative;
+  background: #0e1219;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: 4px solid rgba(255, 255, 255, 0.25);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all var(--hud-snap);
+}
+
+.fifa-formation-card:hover {
+  border-color: var(--hud-gold);
+  border-left-color: var(--hud-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+}
+
+.fifa-formation-card.is-active {
+  background: rgba(240, 190, 42, 0.08);
+  border-color: var(--hud-gold);
+  border-left: 4px solid var(--hud-gold);
+  box-shadow: 0 0 16px rgba(240, 190, 42, 0.35);
+}
+
+.fifa-form-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.fifa-form-code {
+  font-size: 1.6rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.fifa-formation-card.is-active .fifa-form-code {
+  color: var(--hud-gold);
+}
+
+.fifa-form-badge {
+  font-family: var(--hud-cond);
+  font-weight: 800;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+.fifa-formation-card.is-active .fifa-form-badge {
+  background: var(--hud-gold);
+  color: var(--hud-ink);
+}
+
+.fifa-form-name {
+  font-family: var(--hud-cond);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 8px;
+}
+
+/* Mini campo de fútbol táctico con puntos */
+.fifa-form-mini-pitch {
+  width: 100%;
+  height: 90px;
+  background: linear-gradient(180deg, #1f3310, #14220b);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.mini-pitch-box {
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.mini-pitch-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.mini-pitch-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+}
+
+.mini-pitch-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: #ffffff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 4px #000;
+}
+
+.fifa-formation-card.is-active .mini-pitch-dot {
+  background: var(--hud-gold);
+  box-shadow: 0 0 6px var(--hud-gold);
+}
+
+.fifa-form-btn {
+  width: 100%;
+  padding: 4px 6px;
+  font-family: var(--hud-cond);
+  font-weight: 800;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #181d26;
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  transition: all var(--hud-snap);
+}
+
+.fifa-form-btn.is-active-btn {
+  background: var(--hud-gold) !important;
+  color: var(--hud-ink) !important;
+  border-color: var(--hud-gold) !important;
+}
+
+/* Grilla de plantillas guardadas */
+.fifa-squads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  padding: 4px;
+}
+
+.fifa-squad-card {
+  background: #0e1219;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: 5px solid rgba(255, 255, 255, 0.25);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  transition: all var(--hud-snap);
+}
+
+.fifa-squad-card:hover {
+  border-color: var(--hud-gold);
+  border-left-color: var(--hud-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+}
+
+.fifa-squad-card.is-active {
+  background: rgba(240, 190, 42, 0.08);
+  border-color: var(--hud-gold);
+  border-left: 5px solid var(--hud-gold);
+  box-shadow: 0 0 20px rgba(240, 190, 42, 0.35);
+}
+
+.fifa-squad-modality {
+  font-family: var(--hud-cond);
+  font-weight: 900;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--hud-gold);
+  text-transform: uppercase;
+}
+
+.fifa-squad-name {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.fifa-squad-ovr {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--hud-gold);
+  line-height: 0.9;
+  text-align: right;
+}
+
+.fifa-squad-ovr small {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+}
+
+.fifa-squad-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--hud-cond);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #94a3b8;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
+}
+
+.fifa-squad-btn {
+  width: 100%;
+  padding: 6px 10px;
+  font-family: var(--hud-cond);
+  font-weight: 900;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #181d26;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  text-align: center;
+  transition: all var(--hud-snap);
+}
+
+.fifa-squad-btn.is-active-btn {
+  background: var(--hud-gold) !important;
+  color: var(--hud-ink) !important;
+  border-color: var(--hud-gold) !important;
 }

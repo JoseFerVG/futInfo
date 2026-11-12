@@ -456,8 +456,16 @@ class FutApp {
             <span class="fut-card-flag" title="${fac.name}">${fac.icon}</span>
             <span class="fut-card-club" title="Universidad">🛡️</span>
           </div>
-          <div class="fut-card-avatar-wrap">
-            <img src="${player.avatar}" alt="${player.name}" class="fut-card-avatar" loading="lazy">
+          <div class="fut-card-kit-wrap">
+            <div class="fut-card-kit-silhouette">
+              <svg viewBox="0 0 80 95" fill="none" xmlns="http://www.w3.org/2000/svg" class="fut-card-kit-svg">
+                <path d="M40 7 C33 7 28 12.5 28 19.5 C28 25.5 33 30.5 40 30.5 C47 30.5 52 25.5 52 19.5 C52 12.5 47 7 40 7 Z" fill="currentColor" opacity="0.88"/>
+                <path d="M36 29 L44 29 L45 35 L35 35 Z" fill="currentColor" opacity="0.75"/>
+                <path d="M14 42 L25 35 C29 38 34 39.5 40 39.5 C46 39.5 51 38 55 35 L66 42 L74 61 L62 65 L60 95 L20 95 L18 65 L6 61 Z" fill="currentColor" opacity="0.96"/>
+                <path d="M33 36 L40 44 L47 36" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+              </svg>
+              <span class="fut-card-dorsal font-fifa">#${player.number || 10}</span>
+            </div>
           </div>
         </div>
 
@@ -533,11 +541,13 @@ class FutApp {
     if (!player) return;
 
     const imgEl = document.getElementById('inspector-player-avatar');
+    const dorsalEl = document.getElementById('inspector-player-dorsal');
     const posEl = document.getElementById('inspector-player-pos');
     const nameEl = document.getElementById('inspector-player-name');
     const ratingEl = document.getElementById('inspector-player-rating');
     
     if (imgEl) imgEl.src = player.avatar;
+    if (dorsalEl) dorsalEl.textContent = `#${player.number || 10}`;
     if (posEl) posEl.textContent = player.rolesHierarchy?.best || player.roleBest || 'DC';
     if (nameEl) nameEl.textContent = player.nickname || player.name;
     if (ratingEl) ratingEl.textContent = player.rating;
@@ -559,11 +569,178 @@ class FutApp {
   }
 
   toggleSquadActions() {
+    this.openSquadActionsModal('tab-formations');
+  }
+
+  openSquadActionsModal(tab = 'tab-formations') {
     const dialog = document.getElementById('squad-actions-dialog');
-    if (dialog) {
-      if (dialog.open) dialog.close();
-      else dialog.showModal();
+    if (!dialog) return;
+
+    const modBadge = document.getElementById('modal-active-modality-badge');
+    const settings = store.getSettings();
+    if (modBadge) {
+      modBadge.textContent = settings.modality === 'f7' ? 'FUT 7 DRAFT' : 'FUTSAL 5v5';
     }
+
+    this.renderFormationsVisualGrid();
+    this.renderSquadsVisualGrid();
+    this.populateFormationsSelect();
+
+    if (tab) {
+      const tabBtn = dialog.querySelector(`.fifa-modal-tab[data-tab="${tab}"]`);
+      if (tabBtn) tabBtn.click();
+    }
+
+    if (!dialog.open) {
+      dialog.showModal();
+      futAudio.playFocus();
+    }
+  }
+
+  initModalTabs() {
+    const tabs = document.querySelectorAll('#squad-actions-dialog .fifa-modal-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetViewId = tab.dataset.tab;
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('#squad-actions-dialog .fifa-modal-view').forEach(view => {
+          if (view.id === targetViewId) {
+            view.classList.remove('hidden');
+          } else {
+            view.classList.add('hidden');
+          }
+        });
+        futAudio.playFocus();
+      });
+    });
+  }
+
+  renderFormationsVisualGrid() {
+    const grid = document.getElementById('fifa-formations-grid');
+    if (!grid) return;
+
+    const settings = store.getSettings();
+    const isF7 = settings.modality === 'f7';
+    const list = Object.values(isF7 ? TACTICAL_FORMATIONS.f7 : TACTICAL_FORMATIONS.futsal);
+    const current = store.getActiveFormation();
+
+    grid.innerHTML = list.map(f => {
+      const isActive = f.id === current;
+      const dots = f.slots.map(s => `
+        <span class="mini-pitch-dot" style="top: ${s.top}%; left: ${s.left}%;"></span>
+      `).join('');
+
+      const cleanName = f.name.includes('(') ? f.name.split('(')[1].replace(')', '') : f.name;
+
+      return `
+        <div class="fifa-formation-card ${isActive ? 'is-active' : ''}" data-formation-id="${f.id}">
+          <div class="fifa-form-card-header">
+            <span class="fifa-form-code font-fifa">${f.short}</span>
+            <span class="fifa-form-badge">${f.styleTag.split('/')[0].trim()}</span>
+          </div>
+          <div class="fifa-form-name font-fifa">${cleanName}</div>
+          <div class="fifa-form-mini-pitch">
+            <div class="mini-pitch-box">
+              <div class="mini-pitch-line"></div>
+              <div class="mini-pitch-circle"></div>
+              ${dots}
+            </div>
+          </div>
+          <button type="button" class="fifa-form-btn ${isActive ? 'is-active-btn' : ''}">
+            ${isActive ? '★ ACTIVA' : 'SELECCIONAR'}
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    grid.querySelectorAll('.fifa-formation-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const formId = card.dataset.formationId;
+        this.selectFormation(formId);
+      });
+    });
+  }
+
+  selectFormation(formId) {
+    store.setFormation(formId);
+    const sel = document.getElementById('select-active-formation');
+    if (sel) sel.value = formId;
+
+    this.renderPitch();
+    this.updateTacticsAdviceCard(formId);
+    this.renderFormationsVisualGrid();
+    futAudio.playSuccess();
+    this.showToast(`Formación cambiada a ${formId}`, 'shield');
+  }
+
+  renderSquadsVisualGrid() {
+    const grid = document.getElementById('fifa-squads-grid');
+    if (!grid) return;
+
+    const squads = store.getSquads();
+    const activeId = store.getActiveSquadId();
+
+    grid.innerHTML = squads.map(s => {
+      const isActive = s.id === activeId;
+      const modLabel = s.modality === 'f7' ? 'FÚTBOL 7' : 'FÚTBOL SALA';
+      const startersCount = s.startingLineup?.length || (s.modality === 'f7' ? 7 : 5);
+      const benchCount = s.benchPlayers?.length || 0;
+
+      return `
+        <div class="fifa-squad-card ${isActive ? 'is-active' : ''}" data-squad-id="${s.id}">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="fifa-squad-modality font-fifa">${modLabel}</span>
+              <h3 class="fifa-squad-name font-fifa">${s.name}</h3>
+            </div>
+            <div class="fifa-squad-ovr font-fifa">${s.rating || 84} <small>OVR</small></div>
+          </div>
+          <div class="fifa-squad-meta-row">
+            <span><i data-lucide="shield" class="w-3 h-3 inline text-amber-400"></i> Esquema: <b>${s.formation}</b></span>
+            <span><i data-lucide="users" class="w-3 h-3 inline text-cyan-400"></i> ${startersCount} Titulares · ${benchCount} Suplentes</span>
+          </div>
+          <button type="button" class="fifa-squad-btn ${isActive ? 'is-active-btn' : ''}">
+            ${isActive ? '★ PLANTILLA ACTIVA' : 'ACTIVAR PLANTILLA'}
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    grid.querySelectorAll('.fifa-squad-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const squadId = card.dataset.squadId;
+        this.selectSquad(squadId);
+      });
+    });
+
+    this.refreshIcons();
+  }
+
+  selectSquad(squadId) {
+    const success = store.loadSquadPreset(squadId);
+    if (!success) return;
+
+    const currentSquad = store.getActiveSquad();
+    this.updateModalityButtons(currentSquad.modality);
+    this.populateFormationsSelect();
+    this.renderPitch();
+    this.renderSquadsVisualGrid();
+    this.renderFormationsVisualGrid();
+    futAudio.playSuccess();
+    this.showToast(`¡Plantilla activa: ${currentSquad.name}!`, 'sparkles');
+  }
+
+  saveCurrentSquadPrompt() {
+    const name = prompt('Nombre para la nueva plantilla guardada:', `Plantilla Furia ${Date.now().toString().slice(-4)}`);
+    if (!name || !name.trim()) return;
+
+    const squad = store.saveCurrentAsSquad(name.trim());
+    this.renderSquadsVisualGrid();
+    futAudio.playSuccess();
+    this.showToast(`¡Nueva plantilla "${squad.name}" guardada y activada!`, 'sparkles');
   }
 
   cancelSelection() {
@@ -629,9 +806,21 @@ class FutApp {
   }
 
   bindEvents() {
-    document.getElementById('btn-squad-actions')?.addEventListener('click', () => {
-      this.toggleSquadActions();
+    this.initModalTabs();
+
+    document.getElementById('hud-active-squad-head')?.addEventListener('click', () => {
+      this.openSquadActionsModal('tab-formations');
     });
+
+    document.getElementById('btn-open-squad-modal')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.openSquadActionsModal('tab-formations');
+    });
+
+    document.getElementById('btn-squad-actions')?.addEventListener('click', () => {
+      this.openSquadActionsModal('tab-formations');
+    });
+
     // Pestañas
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -655,11 +844,7 @@ class FutApp {
     const selectFormation = document.getElementById('select-active-formation');
     if (selectFormation) {
       selectFormation.addEventListener('change', (e) => {
-        store.setFormation(e.target.value);
-        this.updateTacticsAdviceCard(e.target.value);
-        this.renderPitch();
-        futAudio.playSuccess();
-        this.showToast(`Formación cambiada a ${e.target.value}`, 'sliders-horizontal');
+        this.selectFormation(e.target.value);
       });
     }
 
@@ -2177,7 +2362,10 @@ class FutApp {
         return `
           <div class="sub-bench-card" onclick="window.futApp.selectBench('${p.id}')">
             <div class="flex items-center gap-2.5">
-              <img src="${p.avatar}" alt="${p.name}" class="w-10 h-10 rounded-full object-cover border-2 border-cyan-400 shadow">
+              <div class="w-10 h-10 bg-slate-900 border-2 border-amber-400/80 flex flex-col items-center justify-center font-fifa text-amber-300 font-bold shadow-md flex-shrink-0" style="clip-path: polygon(0 0, 100% 0, 100% 80%, 80% 100%, 0 100%);">
+                <span class="text-[8px] text-slate-400 leading-none">DOR</span>
+                <span class="text-base leading-none text-white font-black">#${p.number || 10}</span>
+              </div>
               <div>
                 <div class="text-xs font-black text-white leading-tight font-fifa text-base tracking-wide">${p.name}</div>
                 <div class="text-[10px] ${fitColor} px-1.5 py-0.5 rounded font-bold inline-block mt-0.5">${fitText}</div>

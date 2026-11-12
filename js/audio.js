@@ -54,6 +54,14 @@ class FUTAudioEngine {
     } catch (_) {}
   }
 
+  playFocus() {
+    this.playCardSelect();
+  }
+
+  playSelect() {
+    this.playCardSelect();
+  }
+
   // Sonido de swap o intercambio de carta (whoosh + thud táctil)
   playCardSwap() {
     if (this.muted) return;

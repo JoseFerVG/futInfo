@@ -312,7 +312,37 @@ const DEFAULT_SETTINGS = {
   activeFormationFutsal: '1-1-2-1',
   startingLineupF7: ['p1', 'p3', 'p2', 'p8', 'p4', 'p5', 'p6'],
   startingLineupFutsal: ['p1', 'p2', 'p4', 'p5', 'p6'],
-  benchPlayers: ['p7']
+  benchPlayers: ['p7'],
+  activeSquadId: 'sq_furia_f7',
+  squads: [
+    {
+      id: 'sq_furia_f7',
+      name: 'Furia Rector Titular',
+      modality: 'f7',
+      formation: '1-3-2-1',
+      startingLineup: ['p1', 'p3', 'p2', 'p8', 'p4', 'p5', 'p6'],
+      benchPlayers: ['p7'],
+      rating: 84
+    },
+    {
+      id: 'sq_rotaciones_f7',
+      name: 'Furia Rotaciones B',
+      modality: 'f7',
+      formation: '1-2-3-1',
+      startingLineup: ['p1', 'p2', 'p7', 'p8', 'p3', 'p4', 'p5'],
+      benchPlayers: ['p6'],
+      rating: 81
+    },
+    {
+      id: 'sq_sala_elite',
+      name: 'Furia Futsal Sala',
+      modality: 'futsal',
+      formation: '1-1-2-1',
+      startingLineup: ['p1', 'p2', 'p4', 'p5', 'p6'],
+      benchPlayers: ['p3', 'p7', 'p8'],
+      rating: 85
+    }
+  ]
 };
 
 const DEFAULT_MATCHES = [
@@ -386,6 +416,14 @@ export class TeamStore {
 
     const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
     this.settings = savedSettings ? JSON.parse(savedSettings) : DEFAULT_SETTINGS;
+
+    if (!this.settings.squads || !Array.isArray(this.settings.squads) || this.settings.squads.length === 0) {
+      this.settings.squads = JSON.parse(JSON.stringify(DEFAULT_SETTINGS.squads));
+      this.settings.activeSquadId = DEFAULT_SETTINGS.activeSquadId;
+    }
+    if (!this.settings.activeSquadId) {
+      this.settings.activeSquadId = this.settings.squads[0]?.id || 'sq_furia_f7';
+    }
 
     this.saveLocal();
   }
@@ -645,6 +683,68 @@ export class TeamStore {
       this.settings.specialists[role] = playerId;
       this.notify();
     }
+  }
+
+  // ==================== GESTIÓN DE PLANTILLAS Y PRESETS FIFA ====================
+  getSquads() {
+    if (!this.settings.squads || !Array.isArray(this.settings.squads) || this.settings.squads.length === 0) {
+      this.settings.squads = JSON.parse(JSON.stringify(DEFAULT_SETTINGS.squads));
+      this.settings.activeSquadId = DEFAULT_SETTINGS.activeSquadId;
+      this.saveLocal();
+    }
+    return this.settings.squads;
+  }
+
+  getActiveSquadId() {
+    return this.settings.activeSquadId || (this.settings.squads && this.settings.squads[0]?.id) || 'sq_furia_f7';
+  }
+
+  getActiveSquad() {
+    const squads = this.getSquads();
+    const currentId = this.getActiveSquadId();
+    return squads.find(s => s.id === currentId) || squads[0];
+  }
+
+  loadSquadPreset(squadId) {
+    const squads = this.getSquads();
+    const target = squads.find(s => s.id === squadId);
+    if (!target) return false;
+
+    this.settings.activeSquadId = target.id;
+    this.settings.modality = target.modality;
+    if (target.modality === 'f7') {
+      this.settings.activeFormationF7 = target.formation;
+      this.settings.startingLineupF7 = [...target.startingLineup];
+    } else {
+      this.settings.activeFormationFutsal = target.formation;
+      this.settings.startingLineupFutsal = [...target.startingLineup];
+    }
+    if (Array.isArray(target.benchPlayers)) {
+      this.settings.benchPlayers = [...target.benchPlayers];
+    }
+    this.saveLocal();
+    this.notify();
+    return true;
+  }
+
+  saveCurrentAsSquad(name) {
+    const isF7 = this.settings.modality === 'f7';
+    const squads = this.getSquads();
+    const newId = 'sq_' + Date.now();
+    const newSquad = {
+      id: newId,
+      name: name || `Plantilla ${squads.length + 1}`,
+      modality: this.settings.modality,
+      formation: isF7 ? this.settings.activeFormationF7 : this.settings.activeFormationFutsal,
+      startingLineup: isF7 ? [...this.settings.startingLineupF7] : [...this.settings.startingLineupFutsal],
+      benchPlayers: [...(this.settings.benchPlayers || ['p7'])],
+      rating: 84
+    };
+    squads.push(newSquad);
+    this.settings.activeSquadId = newId;
+    this.saveLocal();
+    this.notify();
+    return newSquad;
   }
 
   calculateTeamChemistryAndRating(slotRoles) {

@@ -612,13 +612,17 @@ dialog[open] {
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
 
-.fut-card-avatar-wrap {
+.fut-card-avatar-wrap,
+.fut-card-kit-wrap {
   position: absolute;
   top: 0;
-  right: 7%;
+  right: 6%;
   width: 62%;
   height: 100%;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
   z-index: 2;
   pointer-events: none;
 }
@@ -630,6 +634,54 @@ dialog[open] {
   object-position: top center;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
 }
+
+.fut-card-kit-silhouette {
+  position: relative;
+  width: 86%;
+  height: 98%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.65));
+}
+
+.fut-card-kit-svg {
+  width: 100%;
+  height: 100%;
+  color: #12161f;
+  transition: transform 0.2s ease;
+}
+
+.fut-card-dorsal {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Barlow Condensed', 'Teko', sans-serif;
+  font-weight: 900;
+  font-size: 1.55em;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+
+/* Colores de silueta y dorsal según tipo de carta */
+.fut-card-toty .fut-card-kit-svg { color: #081a38; }
+.fut-card-toty .fut-card-dorsal { color: #e0f2fe; text-shadow: 0 0 10px rgba(56, 189, 248, 0.8), 0 2px 4px #000; }
+
+.fut-card-tots .fut-card-kit-svg { color: #072235; }
+.fut-card-tots .fut-card-dorsal { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.9), 0 2px 4px #000; }
+
+.fut-card-totw .fut-card-kit-svg { color: #15161b; }
+.fut-card-totw .fut-card-dorsal { color: #f0be2a; text-shadow: 0 0 8px rgba(240, 190, 42, 0.8), 0 2px 4px #000; }
+
+.fut-card-icon .fut-card-kit-svg { color: #221c10; }
+.fut-card-icon .fut-card-dorsal { color: #f59e0b; text-shadow: 0 0 8px rgba(245, 158, 11, 0.8), 0 2px 4px #000; }
+
+.fut-card-gold .fut-card-kit-svg { color: #1d1810; }
+.fut-card-gold .fut-card-dorsal { color: #f0be2a; text-shadow: 0 0 6px rgba(240, 190, 42, 0.7), 0 2px 4px #000; }
 
 /* 2. PLACA DE NOMBRE */
 .fut-card-name-plate {
