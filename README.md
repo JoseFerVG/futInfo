@@ -1,68 +1,51 @@
-# futInfo - FIFA Ultimate Team Edition | Torneo del Rector ⚽🎮
+# futInfo - Torneo del Rector 2026 (FIFA FUT Hub)
 
-Plataforma interactiva para la gestión integral de tu equipo en el **Torneo del Rector**, diseñada con la estética de **FIFA Ultimate Team (FUT)**, inspirada en la pantalla táctica de plantillas y FUT Draft.
-
-🌐 **Web en Vivo (GitHub Pages):** [https://josefervg.github.io/futInfo/](https://josefervg.github.io/futInfo/)  
-📦 **Repositorio GitHub:** [https://github.com/JoseFerVG/futInfo](https://github.com/JoseFerVG/futInfo)
+> **Ecosistema de competición universitaria con interfaz interactiva EA Sports FIFA Ultimate Team y división estratégica de captación masiva.**
 
 ---
 
-## 🎮 Características Principales
+## 🗂️ ESTRUCTURA DEL PROYECTO
 
-### 1. Pizarra Táctica y Estadio 3D (Estética FIFA FUT)
-- **Perspectiva de Césped FIFA:** Campo con líneas oficiales, focos de estadio y portería en primer plano.
-- **Cartas FUT Personalizadas:**
-  - Cartas Oro Brillante, TOTW (Negras) y Especiales (Azules).
-  - Valoración media (OVR), posición, foto/avatar recortado, escudo de facultad universitaria y bandera.
-  - Atributos FIFA: Ritmo (PAC), Tiro (SHO), Pase (PAS), Regate (DRI), Defensa (DEF) y Físico (PHY).
-- **Líneas de Química Interactivas (Chemistry Links):**
-  - 🟢 **Verde:** Máxima afinidad y compañeros de la misma facultad/carrera (Informática, Medicina, Derecho, CAFD, etc.).
-  - 🟠 **Naranja:** Conexión estándar / compatibilidad normal.
-  - 🔴 **Rojo:** Mala conexión o jugador fuera de posición.
-- **Pedestales Hexagonales con Semáforo de Rol:**
-  - 🟢 Verde: Juega en su posición favorita (100% afinidad).
-  - 🟡 Amarillo: Juega en su rol secundario (75% afinidad).
-  - 🔴 Rojo: Juega en su peor rol (riesgo para el equipo).
-- **HUD Superior:** Media del equipo (Team Rating) y Química global (Team Chemistry 0-100) con barra dinámica, junto a la tarjeta del Míster.
-- **Banquillo de Suplentes e Intercambio Rápido:** Toca un titular y luego un suplente para intercambiarlos en tiempo real.
+El proyecto está organizado en dos divisiones principales para separar el desarrollo de la aplicación web y la estrategia de marketing y captación:
 
-### 2. Dos Modalidades Oficiales
-- **Fútbol 7 (7 vs 7):** Formaciones como `1-3-2-1` (Árbol de Navidad), `1-2-3-1` (Bandas y Control) y `1-3-1-2` (Doble Punta).
-- **Fútbol Sala (5 vs 5):** Formaciones como `1-1-2-1` (Rombo Clásico Futsal), `1-2-2` (Cuadrado) y `1-3-0` (Falso 9).
-- Selector rápido en la cabecera para alternar entre ambas modalidades al instante.
-
-### 3. Ficha de Personaje con Roles de Mejor a Peor
-Al registrarse o editar su ficha, cada jugador define sus preferencias tácticas:
-1. 🥇 **1º Mejor Posición (Favorita):** Rinde al 100% y aporta química verde.
-2. 🥈 **2º Segunda Posición (Aceptable):** Rinde al 75% con química naranja.
-3. 🥉 **3º Tercera Posición (Emergencia):** Rinde al 50%.
-4. ❌ **4º Peor Rol (Peligro):** La posición donde nunca debe jugar (ej. Portero o Central). Si el entrenador lo alinea ahí, se muestra en rojo y penaliza la química.
-
-### 4. Sistema de Autenticación & Firebase
-- Soporte para **Firebase Authentication** y sincronización en la nube.
-- **Modo Local / Demo Offline:** Funciona inmediatamente desde el navegador sin necesidad de configuración previa.
-- Cuentas de prueba listas para usar:
-  - 👔 **Míster (Admin):** `mister@rector.es` / `rector2026`
-  - 🏃 **Jugador:** `charly@rector.es` / `rector2026`
-
-### 5. Suite del Entrenador (Míster)
-- Asignación de especialistas a balón parado:
-  - 👑 Capitán del equipo
-  - 🎯 Lanzador de Penaltis
-  - 📐 Faltas Directas
-  - 🚩 Saques de Esquina
-- Calendario de jornadas con confirmación de asistencia en 1 clic (Asistiré / Duda / Baja).
-- Control de tesorería y cuota de inscripción al torneo (35 €).
+```
+futInfo/
+├── index.html                    # Redirección automática a /repo/index.html
+├── README.md                     # Documentación principal del espacio de trabajo
+│
+├── repo/                         # CÓDIGO FUENTE DE LA APLICACIÓN WEB
+│   ├── index.html                # HUD Consola Broadcast 16:9 interactivo
+│   ├── assets/                   # Fondos de estadio nocturno, texturas y assets FIFA
+│   ├── css/                      # broadcast.css (HUD TV) y styles.css (cartas FUT)
+│   ├── js/                       # app.js, store.js, audio.js, auth.js, firebase-config.js
+│   ├── ReferenciasFifa/          # Capturas de referencia de interfaz FIFA de consola
+│   └── README.md                 # Documentación técnica de la plataforma
+│
+└── marketing/                    # CAMPAÑAS DE CAPTACIÓN POR WHATSAPP (PLAZO: 72H)
+    ├── campañas/                 # Los 5 copys definitivos optimizados tras 10 iteraciones
+    │   ├── 01_DRAFT_CALLOUT_PERSONAL.md
+    │   ├── 02_GUERRA_FACULTADES.md
+    │   ├── 03_CARTA_FUT_GAMIFICACION.md
+    │   ├── 04_ULTIMATUM_72H_CAPITANES.md
+    │   └── 05_AUDIO_GUERRILLA_MEME.md
+    ├── scripts/                  # evaluador_campanas.py (Motor de simulación multi-agente)
+    ├── simulaciones/             # metricas_evolucion.md y resultados_optimizacion_10_iteraciones.json
+    └── informes/                 # INFORME_ESTRATEGIA_WHATSAPP_72H.md (Manual operativo)
+```
 
 ---
 
-## 🛠️ Tecnologías
-- **HTML5 Semántico + `<dialog>` nativo accesible**.
-- **Tailwind CSS + CSS3 custom** con efectos glassmorphism, gradientes FIFA y tipografía deportiva *Teko* & *Outfit*.
-- **Vanilla JavaScript Modular (ES Modules)**.
-- **Firebase SDK v10 (CDN modular)** con persistencia LocalStorage inteligente.
-- **Iconografía Lucide**.
+## 🚀 CÓMO EJECUTAR LA APLICACIÓN
+
+1. Iniciar un servidor HTTP local en el puerto deseado:
+   ```bash
+   npx http-server -p 8085 -c-1
+   ```
+2. Abrir en el navegador:
+   `http://127.0.0.1:8085/repo/index.html` (o `http://127.0.0.1:8085/` para redirección automática).
 
 ---
 
-Desarrollado para el Torneo del Rector.
+## 📢 CAMPAÑAS DE MARKETING WHATSAPP (72 HORAS PARA CIERRE)
+Las 5 campañas de marketing disruptivo han sido evaluadas por un panel de 5 agentes simulados a lo largo de 10 rondas de optimización, logrando un score promedio de **98.3 / 100**.
+Consulta las campañas listas para enviar en [marketing/campañas](file:///C:/Users/josef/Desktop/futInfo/marketing/campa%C3%B1as/) y el calendario de difusión en [marketing/informes/INFORME_ESTRATEGIA_WHATSAPP_72H.md](file:///C:/Users/josef/Desktop/futInfo/marketing/informes/INFORME_ESTRATEGIA_WHATSAPP_72H.md).

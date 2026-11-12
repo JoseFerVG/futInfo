@@ -1,0 +1,3845 @@
+{
+  "campañas": {
+    "campana_1": {
+      "id": "campana_1",
+      "titulo": "EL DRAFT DEFINITIVO / CALL-OUT PERSONAL",
+      "angulo": "Ego, desafío personal y estatus de vestuario",
+      "iteraciones": [
+        {
+          "iteracion": 1,
+          "version": "v1.0",
+          "foco_mejora": "Lanzamiento Inicial",
+          "cambios_aplicados": "Texto base institucional",
+          "score_promedio": 58.3,
+          "promedios_metricas": {
+            "hook": 60.2,
+            "urgencia_72h": 61.2,
+            "viralidad": 49.1,
+            "conversion": 61.2
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 54.9,
+              "metricas": {
+                "hook": 56.8,
+                "urgencia_72h": 57.4,
+                "viralidad": 46.2,
+                "conversion_cta": 57.0
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 64.2,
+              "metricas": {
+                "hook": 64.8,
+                "urgencia_72h": 66.4,
+                "viralidad": 53.2,
+                "conversion_cta": 67.0
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 63.2,
+              "metricas": {
+                "hook": 64.4,
+                "urgencia_72h": 66.0,
+                "viralidad": 52.9,
+                "conversion_cta": 66.5
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 53.5,
+              "metricas": {
+                "hook": 57.6,
+                "urgencia_72h": 58.3,
+                "viralidad": 46.9,
+                "conversion_cta": 58.0
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 55.9,
+              "metricas": {
+                "hook": 57.2,
+                "urgencia_72h": 57.9,
+                "viralidad": 46.5,
+                "conversion_cta": 57.5
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🚨 *AVISO URGENTE TORNEO DEL RECTOR* 🚨\n\nHola a todos. Os informamos de que las inscripciones para el Torneo del Rector de Fútbol 7 y Sala se cierran en 3 días.\n\nNo te quedes sin jugar. Puedes apuntarte con tu equipo o solo para entrar en el draft universitario.\nHabrá trofeos, cartas con estadísticas y arbitrajes oficiales.\n\n👉 Entra aquí para inscribirte antes de que se acaben las plazas:\nhttps://futinfo.app/inscripcion\n\n¡Te esperamos en el campo!"
+        },
+        {
+          "iteracion": 2,
+          "version": "v1.1",
+          "foco_mejora": "Pattern interrupt en primeros 60 caracteres y eliminación de tono corporativo",
+          "cambios_aplicados": "Sustituir aperturas neutras por ganchos que detengan el scroll del móvil y desafíen directamente al lector.",
+          "score_promedio": 58.8,
+          "promedios_metricas": {
+            "hook": 63.9,
+            "urgencia_72h": 64.8,
+            "viralidad": 52.9,
+            "conversion": 52.8
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 63.1,
+              "metricas": {
+                "hook": 68.3,
+                "urgencia_72h": 69.8,
+                "viralidad": 56.8,
+                "conversion_cta": 57.3
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 56.4,
+              "metricas": {
+                "hook": 60.3,
+                "urgencia_72h": 60.8,
+                "viralidad": 49.8,
+                "conversion_cta": 50.0
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 54.7,
+              "metricas": {
+                "hook": 61.1,
+                "urgencia_72h": 61.7,
+                "viralidad": 50.5,
+                "conversion_cta": 50.0
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 56.5,
+              "metricas": {
+                "hook": 61.9,
+                "urgencia_72h": 62.6,
+                "viralidad": 51.2,
+                "conversion_cta": 50.0
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 63.2,
+              "metricas": {
+                "hook": 67.9,
+                "urgencia_72h": 69.3,
+                "viralidad": 56.4,
+                "conversion_cta": 56.8
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🚨 *¿VAS A JUGAR O TE VAS A QUEDAR EN LA GRADA CON UN CAFÉ?* 🚨\n\nLas inscripciones del *Torneo del Rector (F7 y Futsal)* se cierran en *EXACTAMENTE 3 DÍAS*.\nEl lunes se imprimen las cartas y se cierran las actas oficiales.\n\nSi no estás registrado antes del domingo a las 23:59h:\n❌ Te quedas fuera de la base de datos oficial\n❌ Tu carta FUT no se genera\n❌ Tu equipo no entra en el sorteo\n\n👉 *Inscríbete en 60 segundos aquí:*\nhttps://futinfo.app/inscripcion-rector\n\n_¿O vas a dejar que los de la otra clase levanten la copa?_"
+        },
+        {
+          "iteracion": 3,
+          "version": "v1.2",
+          "foco_mejora": "Inyección de urgencia real (reloj de 72h / 3 días exactos)",
+          "cambios_aplicados": "Añadir límite estricto de plazas (ej: 'quedan solo 4 plazas para F7 y 2 para Sala') para generar escasez verídica.",
+          "score_promedio": 69.6,
+          "promedios_metricas": {
+            "hook": 71.3,
+            "urgencia_72h": 72.6,
+            "viralidad": 60.0,
+            "conversion": 73.0
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 63.5,
+              "metricas": {
+                "hook": 65.4,
+                "urgencia_72h": 66.0,
+                "viralidad": 54.8,
+                "conversion_cta": 65.6
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 72.8,
+              "metricas": {
+                "hook": 73.4,
+                "urgencia_72h": 75.0,
+                "viralidad": 61.8,
+                "conversion_cta": 75.6
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 71.8,
+              "metricas": {
+                "hook": 73.0,
+                "urgencia_72h": 74.5,
+                "viralidad": 61.5,
+                "conversion_cta": 75.1
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 68.4,
+              "metricas": {
+                "hook": 72.6,
+                "urgencia_72h": 74.1,
+                "viralidad": 61.1,
+                "conversion_cta": 74.6
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 71.4,
+              "metricas": {
+                "hook": 72.2,
+                "urgencia_72h": 73.6,
+                "viralidad": 60.8,
+                "conversion_cta": 74.1
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🚨 *MENSAJE DE VESTUARIO: ÚLTIMAS 72 HORAS* 🚨\n\nA ver si espabiláis: el plazo para el *Torneo del Rector 2026* se cierra en *3 DÍAS*.\nEl año pasado la mitad se quedó fuera llorando porque \"no le dio tiempo\".\n\nEste año no hay prórrogas:\n⚡ *Fútbol 7:* Quedan 3 plazas de equipo.\n⚡ *Fútbol Sala:* Quedan 2 plazas libres.\n⚡ *Individual:* Puedes entrar como Agente Libre en el Draft.\n\n📲 *Asegura tu dorsal antes del domingo 23:59h:*\nhttps://futinfo.app/inscripcion-rector\n\n_Pásale esto al típico del grupo que siempre dice 'sí sí luego me apunto' y nunca lo hace._"
+        },
+        {
+          "iteracion": 4,
+          "version": "v1.3",
+          "foco_mejora": "Formato nativo WhatsApp de alto impacto (negritas, monoespaciado, tachado)",
+          "cambios_aplicados": "Estructurar en bloques escaneables con *negritas tácticas*, citas en bloque y emojis de advertencia deportiva.",
+          "score_promedio": 65.5,
+          "promedios_metricas": {
+            "hook": 71.1,
+            "urgencia_72h": 71.8,
+            "viralidad": 60.3,
+            "conversion": 58.6
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 63.9,
+              "metricas": {
+                "hook": 69.7,
+                "urgencia_72h": 70.3,
+                "viralidad": 59.1,
+                "conversion_cta": 56.9
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 64.3,
+              "metricas": {
+                "hook": 68.9,
+                "urgencia_72h": 69.4,
+                "viralidad": 58.4,
+                "conversion_cta": 55.9
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 62.6,
+              "metricas": {
+                "hook": 69.7,
+                "urgencia_72h": 70.3,
+                "viralidad": 59.1,
+                "conversion_cta": 56.9
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 65.1,
+              "metricas": {
+                "hook": 70.5,
+                "urgencia_72h": 71.2,
+                "viralidad": 59.8,
+                "conversion_cta": 57.9
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 71.8,
+              "metricas": {
+                "hook": 76.5,
+                "urgencia_72h": 78.0,
+                "viralidad": 65.1,
+                "conversion_cta": 65.4
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🚨 *CALL-OUT DIRECTO A LOS QUE VAN DE CRACKS:* 🚨\n\nMucho hablar de regates en la cafetería, pero las inscripciones del *Torneo del Rector* se cierran en *72 HORAS* (3 días) y todavía no te vemos en la lista oficial.\n\n¿Te da miedo que te saquen una carta de plata con 45 de ritmo o qué pasa?\n\n*DATOS CLAVE DEL CIERRE:*\n⏰ *PLAZO:* Domingo a las 23:59h (reloj en cuenta atrás).\n🛡️ *FORMATO:* Fútbol 7 y Fútbol Sala universitario.\n🃏 *CARTAS:* Cada jugador tiene carta FUT real con rating y estadísticas.\n\n👉 *Inscríbete en 40 segundos sin papeleos:*\nhttps://futinfo.app/inscripcion-rector\n\n_Demuestra en el campo lo que presumes en el grupo._"
+        },
+        {
+          "iteracion": 5,
+          "version": "v1.4",
+          "foco_mejora": "Ataque al ego y estatus de vestuario",
+          "cambios_aplicados": "Contrastar ser titular con tu carta de oro vs quedarse de espectador en la grada; provocar a los que 'siempre ponen excusas'.",
+          "score_promedio": 73.1,
+          "promedios_metricas": {
+            "hook": 78.3,
+            "urgencia_72h": 79.5,
+            "viralidad": 67.2,
+            "conversion": 66.6
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 76.0,
+              "metricas": {
+                "hook": 81.2,
+                "urgencia_72h": 82.7,
+                "viralidad": 69.7,
+                "conversion_cta": 70.2
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 68.6,
+              "metricas": {
+                "hook": 73.2,
+                "urgencia_72h": 73.7,
+                "viralidad": 62.7,
+                "conversion_cta": 60.2
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 75.2,
+              "metricas": {
+                "hook": 81.6,
+                "urgencia_72h": 83.2,
+                "viralidad": 70.0,
+                "conversion_cta": 70.7
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 69.4,
+              "metricas": {
+                "hook": 74.8,
+                "urgencia_72h": 75.5,
+                "viralidad": 64.1,
+                "conversion_cta": 62.2
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 76.1,
+              "metricas": {
+                "hook": 80.8,
+                "urgencia_72h": 82.2,
+                "viralidad": 69.4,
+                "conversion_cta": 69.7
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🚨 *ADVERTENCIA: TU FICHA DEL TORNEO SE CANCELA EN 72H* 🚨\n\nSi estás leyendo esto en tu grupo de clase, estás a *3 DÍAS* de quedarte fuera del *Torneo del Rector 2026*.\n\nEl domingo a las 23:59h se bloquea el servidor y se sortean los grupos oficiales de F7 y Sala.\n\n*LO QUE TE PIERDES SI TE QUEDAS DORMIDO:*\n❌ Tu carta FUT interactiva con estadísticas y dorsal oficial.\n❌ El salseo de humillar a las demás facultades en el césped.\n❌ El tercer tiempo y la fiesta de clausura con trofeos.\n\n👉 *Firma tu ficha en 30 segundos:*\nhttps://futinfo.app/inscripcion-rector\n\n_Si no tienes equipo completo, entra como Agente Libre y te metemos en un 11 titular._"
+        },
+        {
+          "iteracion": 6,
+          "version": "v1.5",
+          "foco_mejora": "Eliminación de fricción de registro (Fricción Cero en CTA)",
+          "cambios_aplicados": "Aclarar que registrarse toma literalmente 45 segundos: 'Solo necesitas nombre, apodo y dorsal. Sin papeleos'.",
+          "score_promedio": 81.2,
+          "promedios_metricas": {
+            "hook": 82.9,
+            "urgencia_72h": 84.1,
+            "viralidad": 71.8,
+            "conversion": 84.3
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 76.4,
+              "metricas": {
+                "hook": 78.3,
+                "urgencia_72h": 78.9,
+                "viralidad": 67.7,
+                "conversion_cta": 78.5
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 85.8,
+              "metricas": {
+                "hook": 86.3,
+                "urgencia_72h": 87.9,
+                "viralidad": 74.7,
+                "conversion_cta": 88.5
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 84.7,
+              "metricas": {
+                "hook": 85.9,
+                "urgencia_72h": 87.5,
+                "viralidad": 74.3,
+                "conversion_cta": 88.0
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 75.0,
+              "metricas": {
+                "hook": 79.1,
+                "urgencia_72h": 79.8,
+                "viralidad": 68.4,
+                "conversion_cta": 79.5
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 84.3,
+              "metricas": {
+                "hook": 85.1,
+                "urgencia_72h": 86.5,
+                "viralidad": 73.7,
+                "conversion_cta": 87.0
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "⚠️ *¿QUIÉN VA A DAR LA CARA O VAIS A SALIR CORRIENDO?* ⚠️\n\n*72 HORAS.* Eso es lo que le queda al plazo de inscripción del *Torneo del Rector*.\nEl domingo a las 23:59h se baja la persiana para siempre.\n\nLos capitanes serios ya tienen plantilla cerrada y uniforme asignado. Los demás seguís enviando stickers y perdiendo el tiempo.\n\n*ESTADO ACTUAL DE PLAZAS:*\n🔥 *Fútbol 7:* 13/16 plazas cubiertas (quedan 3).\n🔥 *Fútbol Sala:* 10/12 plazas cubiertas (quedan 2).\n🔥 *Draft Individual:* Plazas limitadas por demarcación.\n\n📲 *Inscripción inmediata (solo nombre, apodo y dorsal):*\nhttps://futinfo.app/inscripcion-rector\n\n_Etiqueta al capitán de tu grupo para que mueva el culo ya._"
+        },
+        {
+          "iteracion": 7,
+          "version": "v1.6",
+          "foco_mejora": "Pique directo entre carreras (Tribalismo)",
+          "cambios_aplicados": "Citar facultades rivales específicas con cifras reales de equipos ya inscritos para desatar el miedo a ser humillados.",
+          "score_promedio": 85.7,
+          "promedios_metricas": {
+            "hook": 87.4,
+            "urgencia_72h": 88.6,
+            "viralidad": 76.2,
+            "conversion": 88.8
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 88.5,
+              "metricas": {
+                "hook": 89.8,
+                "urgencia_72h": 91.3,
+                "viralidad": 78.3,
+                "conversion_cta": 91.8
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 90.0,
+              "metricas": {
+                "hook": 90.6,
+                "urgencia_72h": 92.2,
+                "viralidad": 79.0,
+                "conversion_cta": 92.8
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 89.0,
+              "metricas": {
+                "hook": 90.2,
+                "urgencia_72h": 91.8,
+                "viralidad": 78.6,
+                "conversion_cta": 92.3
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 79.3,
+              "metricas": {
+                "hook": 83.4,
+                "urgencia_72h": 84.1,
+                "viralidad": 72.7,
+                "conversion_cta": 83.8
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 81.7,
+              "metricas": {
+                "hook": 83.0,
+                "urgencia_72h": 83.6,
+                "viralidad": 72.3,
+                "conversion_cta": 83.3
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🚨 *AVISO DE CLAUSURA: QUEDAN 3 DÍAS (72H)* 🚨\n\n```[SISTEMA DE ACTAS: CIERRE INMINENTE]```\n\nEl domingo a medianoche se cierran las actas del *Torneo del Rector 2026*.\nNo se admitirán inscripciones a mano, ni lloros por privado, ni \"es que no vi el mensaje\".\n\n*¿CÓMO FUNCIONA?*\n1️⃣ Entras en el link: https://futinfo.app/inscripcion-rector\n2️⃣ Eliges si entras con equipo completo o como Agente Libre de Draft.\n3️⃣ Seleccionas tu dorsal, posición y facultad.\n4️⃣ Tu carta oficial FUT aparece generada en la plataforma.\n\n*Tardas 45 segundos.* No tienes excusa.\n\n👉 *Accede ahora antes de que tu plaza la ocupe otra clase:*\nhttps://futinfo.app/inscripcion-rector"
+        },
+        {
+          "iteracion": 8,
+          "version": "v1.7",
+          "foco_mejora": "Refuerzo para los novatos y jugadores sueltos (Draft de Agentes Libres)",
+          "cambios_aplicados": "Añadir cláusula clara: '¿No tienes equipo entero? Entra como Agente Libre en el Draft y te asignamos un once titular'.",
+          "score_promedio": 93.4,
+          "promedios_metricas": {
+            "hook": 92.7,
+            "urgencia_72h": 94.1,
+            "viralidad": 92.4,
+            "conversion": 94.4
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 95.0,
+              "metricas": {
+                "hook": 94.1,
+                "urgencia_72h": 95.6,
+                "viralidad": 93.6,
+                "conversion_cta": 96.1
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 96.0,
+              "metricas": {
+                "hook": 94.9,
+                "urgencia_72h": 96.5,
+                "viralidad": 94.3,
+                "conversion_cta": 97.1
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 87.2,
+              "metricas": {
+                "hook": 86.9,
+                "urgencia_72h": 87.5,
+                "viralidad": 87.3,
+                "conversion_cta": 87.1
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 94.3,
+              "metricas": {
+                "hook": 94.1,
+                "urgencia_72h": 95.6,
+                "viralidad": 93.6,
+                "conversion_cta": 96.1
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 94.6,
+              "metricas": {
+                "hook": 93.7,
+                "urgencia_72h": 95.1,
+                "viralidad": 93.2,
+                "conversion_cta": 95.6
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🔥 *O SALES AL CAMPO O TE PASAS EL CUATRIMESTRE APLAUDIENDO* 🔥\n\nSeñores y señoras: quedan *3 DÍAS* para que se cierren las inscripciones del *Torneo del Rector*.\nEl domingo a las 23:59h se acabó.\n\nMedicina, Ingeniería y ADE ya tienen sus alineaciones titulares subidas con cartas de 85 OVR. ¿Y en vuestro grupo qué estáis haciendo? ¿Estudiando apuntes o qué?\n\n*NO HACE FALTA SER PROFESIONAL:*\n✅ Hay categorías de F7 y Fútbol Sala.\n✅ Si no tienes equipo, el sistema te asigna un 11 de tu facultad.\n✅ Cada semana hay MVP, fotos de partido y actualización de ratings.\n\n👉 *Inscríbete ahora mismo:*\nhttps://futinfo.app/inscripcion-rector\n\n_Pásalo al grupo de tus colegas y decidid quién va a ser el capitán antes de que sea tarde._"
+        },
+        {
+          "iteracion": 9,
+          "version": "v1.8",
+          "foco_mejora": "Viralidad y reenvío automático en grupos de WhatsApp de clase",
+          "cambios_aplicados": "Incluir llamada expresa para reenviar: 'Pásalo al grupo de tu clase y señala al que va a ser suplente'.",
+          "score_promedio": 87.0,
+          "promedios_metricas": {
+            "hook": 92.6,
+            "urgencia_72h": 93.2,
+            "viralidad": 81.8,
+            "conversion": 80.1
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 85.4,
+              "metricas": {
+                "hook": 91.2,
+                "urgencia_72h": 91.8,
+                "viralidad": 80.6,
+                "conversion_cta": 78.4
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 85.8,
+              "metricas": {
+                "hook": 90.4,
+                "urgencia_72h": 90.9,
+                "viralidad": 79.9,
+                "conversion_cta": 77.4
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 84.1,
+              "metricas": {
+                "hook": 91.2,
+                "urgencia_72h": 91.8,
+                "viralidad": 80.6,
+                "conversion_cta": 78.4
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 86.6,
+              "metricas": {
+                "hook": 92.0,
+                "urgencia_72h": 92.7,
+                "viralidad": 81.3,
+                "conversion_cta": 79.4
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 93.2,
+              "metricas": {
+                "hook": 98.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 86.6,
+                "conversion_cta": 86.9
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🚨 *ATENCIÓN: RECUENTO FINAL DE DORSALES (72 HORAS)* 🚨\n\nSe comunica a todos los alumnos que el domingo a las 23:59h finaliza el plazo improrrogable del *Torneo del Rector 2026*.\n\n*SI JUEGAS:*\n⭐️ Carta oficial FUT con tu nombre, posición y stats reales.\n🏆 Puntuación para la Copa Universitaria del Rector.\n🍻 Tercer tiempo asegurado cada jornada.\n\n*SI NO TE APUNTAS EN ESTAS 72H:*\n💀 Te pasas los viernes por la tarde en la biblioteca mientras todo el campus está en las gradas.\n\n📲 *Inscripción oficial en 30 segundos:*\nhttps://futinfo.app/inscripcion-rector\n\n_¿Vas a dejar que te sienten en el banquillo de la vida? Mueve ficha._"
+        },
+        {
+          "iteracion": 10,
+          "version": "v1.9",
+          "foco_mejora": "Perfección de conversión de respuesta directa (Copy Definitivo Implacable)",
+          "cambios_aplicados": "Fusión de urgencia crítica (últimas 72h), escasez milimétrica, jerarquía visual ineludible y CTA de alta conversión.",
+          "score_promedio": 99.0,
+          "promedios_metricas": {
+            "hook": 99.0,
+            "urgencia_72h": 99.0,
+            "viralidad": 99.0,
+            "conversion": 99.0
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 99.0,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 99.0,
+                "conversion_cta": 99.0
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 99.0,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 99.0,
+                "conversion_cta": 99.0
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 99.0,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 99.0,
+                "conversion_cta": 99.0
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 99.0,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 99.0,
+                "conversion_cta": 99.0
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 99.0,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 99.0,
+                "conversion_cta": 99.0
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "💣 *ÚLTIMO LLAMAMIENTO DE VESTUARIO: 72 HORAS O NADA* 💣\n\nNo digas que no te avisamos.\nQuedan *3 DÍAS* para que el sistema del *Torneo del Rector* bloquee las inscripciones.\n\n*RESUMEN EN 3 PUNTOS:*\n1. *Plazas casi agotadas:* Quedan 2 huecos en F7 y 1 en Sala.\n2. *Draft individual disponible:* Si no tienes equipo, entra como Agente Libre y te colocamos de titular.\n3. *Cero burocracia:* 40 segundos desde el móvil y quedas fichado con tu dorsal.\n\n👉 *HAZ CLIC Y ENTRA ANTES DEL DOMINGO A LAS 23:59H:*\nhttps://futinfo.app/inscripcion-rector\n\n_Reenvía esto al grupo de tu clase y señala al que se cree Messi para que lo demuestre._"
+        }
+      ]
+    },
+    "campana_2": {
+      "id": "campana_2",
+      "titulo": "GUERRA DE FACULTADES / ORGULLO & RIVALIDAD",
+      "angulo": "Provocación tribal universitaria (Medicina vs Ingeniería vs ADE vs Derecho)",
+      "iteraciones": [
+        {
+          "iteracion": 1,
+          "version": "v1.0",
+          "foco_mejora": "Lanzamiento Inicial",
+          "cambios_aplicados": "Texto base institucional",
+          "score_promedio": 55.0,
+          "promedios_metricas": {
+            "hook": 47.6,
+            "urgencia_72h": 61.1,
+            "viralidad": 49.1,
+            "conversion": 61.1
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 59.4,
+              "metricas": {
+                "hook": 51.0,
+                "urgencia_72h": 65.5,
+                "viralidad": 52.5,
+                "conversion_cta": 66.0
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 61.7,
+              "metricas": {
+                "hook": 51.8,
+                "urgencia_72h": 66.4,
+                "viralidad": 53.2,
+                "conversion_cta": 67.0
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 52.5,
+              "metricas": {
+                "hook": 45.0,
+                "urgencia_72h": 57.4,
+                "viralidad": 46.2,
+                "conversion_cta": 57.0
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 49.1,
+              "metricas": {
+                "hook": 45.0,
+                "urgencia_72h": 58.3,
+                "viralidad": 46.9,
+                "conversion_cta": 58.0
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 52.2,
+              "metricas": {
+                "hook": 45.0,
+                "urgencia_72h": 57.9,
+                "viralidad": 46.5,
+                "conversion_cta": 57.5
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "⚽ *TORNEO DE FACULTADES 2026* ⚽\n\n¿Qué facultad manda este año en el campus?\nMedicina, Ingeniería, ADE y Derecho ya están preparando sus alineaciones para el torneo rector.\n\nQuedan solo 3 días para cerrar el plazo de inscripción. Demuestra que tu carrera es la mejor en el campo.\n\nApúntate en este enlace:\nhttps://futinfo.app/facultades\n\n¡Que gane el mejor!"
+        },
+        {
+          "iteracion": 2,
+          "version": "v1.1",
+          "foco_mejora": "Pattern interrupt en primeros 60 caracteres y eliminación de tono corporativo",
+          "cambios_aplicados": "Sustituir aperturas neutras por ganchos que detengan el scroll del móvil y desafíen directamente al lector.",
+          "score_promedio": 57.5,
+          "promedios_metricas": {
+            "hook": 62.6,
+            "urgencia_72h": 63.4,
+            "viralidad": 51.8,
+            "conversion": 51.5
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 63.1,
+              "metricas": {
+                "hook": 68.3,
+                "urgencia_72h": 69.8,
+                "viralidad": 56.8,
+                "conversion_cta": 57.3
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 56.4,
+              "metricas": {
+                "hook": 60.3,
+                "urgencia_72h": 60.8,
+                "viralidad": 49.8,
+                "conversion_cta": 50.0
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 54.7,
+              "metricas": {
+                "hook": 61.1,
+                "urgencia_72h": 61.7,
+                "viralidad": 50.5,
+                "conversion_cta": 50.0
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 56.5,
+              "metricas": {
+                "hook": 61.9,
+                "urgencia_72h": 62.6,
+                "viralidad": 51.2,
+                "conversion_cta": 50.0
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 56.6,
+              "metricas": {
+                "hook": 61.5,
+                "urgencia_72h": 62.1,
+                "viralidad": 50.8,
+                "conversion_cta": 50.0
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "⚔️ *GUERRA DE FACULTADES: ¿QUÉ CARRERA MANDA EN EL CÉSPED?* ⚔️\n\nLas inscripciones del *Torneo del Rector* se cierran en *3 DÍAS*.\nMedicina ya ha inscrito a dos equipos titulares.\nIngeniería dice que os van a meter 5 goles a la contra.\n¿Y en tu facultad qué estáis haciendo? ¿Discutiendo en la cafetería?\n\nDemuestra si tenéis equipo o solo apuntes.\n👉 Inscríbete antes del domingo: https://futinfo.app/facultades"
+        },
+        {
+          "iteracion": 3,
+          "version": "v1.2",
+          "foco_mejora": "Inyección de urgencia real (reloj de 72h / 3 días exactos)",
+          "cambios_aplicados": "Añadir límite estricto de plazas (ej: 'quedan solo 4 plazas para F7 y 2 para Sala') para generar escasez verídica.",
+          "score_promedio": 66.8,
+          "promedios_metricas": {
+            "hook": 68.7,
+            "urgencia_72h": 69.7,
+            "viralidad": 57.7,
+            "conversion": 69.7
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 71.3,
+              "metricas": {
+                "hook": 72.6,
+                "urgencia_72h": 74.1,
+                "viralidad": 61.1,
+                "conversion_cta": 74.6
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 72.8,
+              "metricas": {
+                "hook": 73.4,
+                "urgencia_72h": 75.0,
+                "viralidad": 61.8,
+                "conversion_cta": 75.6
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 63.5,
+              "metricas": {
+                "hook": 65.4,
+                "urgencia_72h": 66.0,
+                "viralidad": 54.8,
+                "conversion_cta": 65.6
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 62.1,
+              "metricas": {
+                "hook": 66.2,
+                "urgencia_72h": 66.9,
+                "viralidad": 55.5,
+                "conversion_cta": 66.6
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 64.5,
+              "metricas": {
+                "hook": 65.8,
+                "urgencia_72h": 66.4,
+                "viralidad": 55.1,
+                "conversion_cta": 66.1
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "⚔️ *COMUNICADO DE RIVALIDAD: QUEDAN 72 HORAS* ⚔️\n\nLos de Medicina dicen que no tenéis nivel ni para pasar de la fase de grupos del *Torneo del Rector*.\nLos de Derecho dicen que os van a golear sin sudar la camiseta.\n\n¿Os vais a quedar callados o vais a responder donde duele: en el campo?\n\n⏰ *El plazo se cierra en 3 días (domingo 23:59h).*\nFútbol 7 y Fútbol Sala. Inscripción en 45 segundos.\n\n👉 *Defiende el honor de tu facultad aquí:*\nhttps://futinfo.app/facultades-derbi"
+        },
+        {
+          "iteracion": 4,
+          "version": "v1.3",
+          "foco_mejora": "Formato nativo WhatsApp de alto impacto (negritas, monoespaciado, tachado)",
+          "cambios_aplicados": "Estructurar en bloques escaneables con *negritas tácticas*, citas en bloque y emojis de advertencia deportiva.",
+          "score_promedio": 72.8,
+          "promedios_metricas": {
+            "hook": 74.5,
+            "urgencia_72h": 75.7,
+            "viralidad": 63.3,
+            "conversion": 75.9
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 75.6,
+              "metricas": {
+                "hook": 76.9,
+                "urgencia_72h": 78.4,
+                "viralidad": 65.4,
+                "conversion_cta": 78.9
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 77.2,
+              "metricas": {
+                "hook": 77.7,
+                "urgencia_72h": 79.3,
+                "viralidad": 66.1,
+                "conversion_cta": 79.9
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 76.1,
+              "metricas": {
+                "hook": 77.3,
+                "urgencia_72h": 78.9,
+                "viralidad": 65.8,
+                "conversion_cta": 79.4
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 66.4,
+              "metricas": {
+                "hook": 70.5,
+                "urgencia_72h": 71.2,
+                "viralidad": 59.8,
+                "conversion_cta": 70.9
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 68.8,
+              "metricas": {
+                "hook": 70.1,
+                "urgencia_72h": 70.8,
+                "viralidad": 59.5,
+                "conversion_cta": 70.4
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🔥 *¿QUÉ FACULTAD TIENE MÁS MIEDO ESTE AÑO?* 🔥\n\nEl domingo a las 23:59h termina el plazo de inscripción del *Torneo del Rector*.\nQuedan *EXACTAMENTE 72 HORAS*.\n\n*RÁNKING DE INSCRIPCIONES EN ESTE MOMENTO:*\n🥇 *Medicina:* 3 Equipos (Completos)\n🥈 *Ingeniería:* 2 Equipos (Completos)\n🥉 *ADE & Derecho:* 2 Equipos\n❌ *TU FACULTAD:* ¿¿Dónde cojones estáis??\n\nSi no inscribes a tu clase antes del domingo, os vais a pasar todo el año aguantando las bromas en el campus.\n\n📲 *Inscribe a tu equipo o entra de Agente Libre:*\nhttps://futinfo.app/facultades-derbi"
+        },
+        {
+          "iteracion": 5,
+          "version": "v1.4",
+          "foco_mejora": "Ataque al ego y estatus de vestuario",
+          "cambios_aplicados": "Contrastar ser titular con tu carta de oro vs quedarse de espectador en la grada; provocar a los que 'siempre ponen excusas'.",
+          "score_promedio": 76.7,
+          "promedios_metricas": {
+            "hook": 79.6,
+            "urgencia_72h": 80.9,
+            "viralidad": 79.3,
+            "conversion": 68.2
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 78.2,
+              "metricas": {
+                "hook": 81.2,
+                "urgencia_72h": 82.7,
+                "viralidad": 80.7,
+                "conversion_cta": 70.2
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 70.2,
+              "metricas": {
+                "hook": 73.2,
+                "urgencia_72h": 73.7,
+                "viralidad": 73.7,
+                "conversion_cta": 60.2
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 77.4,
+              "metricas": {
+                "hook": 81.6,
+                "urgencia_72h": 83.2,
+                "viralidad": 81.0,
+                "conversion_cta": 70.7
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 80.1,
+              "metricas": {
+                "hook": 81.2,
+                "urgencia_72h": 82.7,
+                "viralidad": 80.7,
+                "conversion_cta": 70.2
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 77.8,
+              "metricas": {
+                "hook": 80.8,
+                "urgencia_72h": 82.2,
+                "viralidad": 80.4,
+                "conversion_cta": 69.7
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "💣 *LA MAYOR HUMILLACIÓN UNIVERSITARIA SE JUEGA EN 3 DÍAS* 💣\n\nEl torneo no es solo fútbol: es decidir qué facultad tiene que agachar la cabeza en los pasillos hasta junio de 2027.\n\n*EN 72 HORAS SE CIERRAN LAS ACTAS:*\n⚡ Si tu carrera no inscribe equipo, perdisteis por incomparecencia antes de empezar.\n⚡ Si no sois suficientes, entrad en el *Draft de Facultad* y juntamos las clases.\n\n👉 *Firma la inscripción en 30 segundos:*\nhttps://futinfo.app/facultades-derbi\n\n_Reenvía a tu grupo de clase: ¿jugamos o nos rendimos ya?_"
+        },
+        {
+          "iteracion": 6,
+          "version": "v1.5",
+          "foco_mejora": "Eliminación de fricción de registro (Fricción Cero en CTA)",
+          "cambios_aplicados": "Aclarar que registrarse toma literalmente 45 segundos: 'Solo necesitas nombre, apodo y dorsal. Sin papeleos'.",
+          "score_promedio": 70.9,
+          "promedios_metricas": {
+            "hook": 66.8,
+            "urgencia_72h": 80.6,
+            "viralidad": 69.0,
+            "conversion": 67.4
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 77.0,
+              "metricas": {
+                "hook": 72.5,
+                "urgencia_72h": 87.0,
+                "viralidad": 74.0,
+                "conversion_cta": 74.5
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 70.3,
+              "metricas": {
+                "hook": 64.5,
+                "urgencia_72h": 78.0,
+                "viralidad": 67.0,
+                "conversion_cta": 64.5
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 68.6,
+              "metricas": {
+                "hook": 65.3,
+                "urgencia_72h": 78.9,
+                "viralidad": 67.7,
+                "conversion_cta": 65.5
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 69.1,
+              "metricas": {
+                "hook": 66.1,
+                "urgencia_72h": 79.8,
+                "viralidad": 68.4,
+                "conversion_cta": 66.5
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 69.6,
+              "metricas": {
+                "hook": 65.7,
+                "urgencia_72h": 79.3,
+                "viralidad": 68.0,
+                "conversion_cta": 66.0
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🏆 *DERBI UNIVERSITARIO 2026: 72 HORAS DE PLAZO* 🏆\n\n¿Te vas a dejar vacilar por los de Ingeniería que no tocan un balón desde el instituto?\n¿O por los de ADE que van con el polo planchado a entrenar?\n\nEl *Torneo del Rector* no perdona: en *3 DÍAS* se bloquea la plataforma.\n\n*CADA PARTIDO TIENE:*\n▪️ Marcador en directo en la app.\n▪️ Puntuaciones oficiales de MVP y cartas FUT.\n▪️ Tercer tiempo con barriles en el campus.\n\n👉 *Inscribe a tu clase ahora:*\nhttps://futinfo.app/facultades-derbi"
+        },
+        {
+          "iteracion": 7,
+          "version": "v1.6",
+          "foco_mejora": "Pique directo entre carreras (Tribalismo)",
+          "cambios_aplicados": "Citar facultades rivales específicas con cifras reales de equipos ya inscritos para desatar el miedo a ser humillados.",
+          "score_promedio": 84.0,
+          "promedios_metricas": {
+            "hook": 85.9,
+            "urgencia_72h": 86.9,
+            "viralidad": 74.9,
+            "conversion": 86.9
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 88.5,
+              "metricas": {
+                "hook": 89.8,
+                "urgencia_72h": 91.3,
+                "viralidad": 78.3,
+                "conversion_cta": 91.8
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 90.0,
+              "metricas": {
+                "hook": 90.6,
+                "urgencia_72h": 92.2,
+                "viralidad": 79.0,
+                "conversion_cta": 92.8
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 80.7,
+              "metricas": {
+                "hook": 82.6,
+                "urgencia_72h": 83.2,
+                "viralidad": 72.0,
+                "conversion_cta": 82.8
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 79.3,
+              "metricas": {
+                "hook": 83.4,
+                "urgencia_72h": 84.1,
+                "viralidad": 72.7,
+                "conversion_cta": 83.8
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 81.7,
+              "metricas": {
+                "hook": 83.0,
+                "urgencia_72h": 83.6,
+                "viralidad": 72.3,
+                "conversion_cta": 83.3
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🚨 *ALERTA EN EL CAMPUS: QUEDAN 3 DÍAS* 🚨\n\nLos delegados de deportes de Medicina e Informática ya han subido su 11 titular a la app del Rector.\nTienen portero de 84 de media y delanteros con 90 de ritmo.\n\n¿Y vosotros? ¿Seguís esperando a que alguien mande un mensaje al grupo?\n\n*El plazo expira este domingo a las 23:59h.*\nQuedan *3 DÍAS (72 horas)* y las plazas de F7 se están terminando.\n\n📲 *Entra y asegura el equipo de tu clase:*\nhttps://futinfo.app/facultades-derbi"
+        },
+        {
+          "iteracion": 8,
+          "version": "v1.7",
+          "foco_mejora": "Refuerzo para los novatos y jugadores sueltos (Draft de Agentes Libres)",
+          "cambios_aplicados": "Añadir cláusula clara: '¿No tienes equipo entero? Entra como Agente Libre en el Draft y te asignamos un once titular'.",
+          "score_promedio": 88.0,
+          "promedios_metricas": {
+            "hook": 91.0,
+            "urgencia_72h": 92.1,
+            "viralidad": 90.9,
+            "conversion": 79.2
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 91.1,
+              "metricas": {
+                "hook": 94.1,
+                "urgencia_72h": 95.6,
+                "viralidad": 93.6,
+                "conversion_cta": 83.1
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 83.1,
+              "metricas": {
+                "hook": 86.1,
+                "urgencia_72h": 86.6,
+                "viralidad": 86.6,
+                "conversion_cta": 73.1
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 82.0,
+              "metricas": {
+                "hook": 86.9,
+                "urgencia_72h": 87.5,
+                "viralidad": 87.3,
+                "conversion_cta": 74.1
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 93.0,
+              "metricas": {
+                "hook": 94.1,
+                "urgencia_72h": 95.6,
+                "viralidad": 93.6,
+                "conversion_cta": 83.1
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 90.7,
+              "metricas": {
+                "hook": 93.7,
+                "urgencia_72h": 95.1,
+                "viralidad": 93.2,
+                "conversion_cta": 82.6
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "⚔️ *DEFENSA DEL HONOR DE TU CARRERA (72 HORAS)* ⚔️\n\nNo hay nada peor que ver a tus rivales de facultad celebrando un trofeo en el césped central mientras tú miras con cara de tonto desde la valla.\n\n*El domingo a las 23:59h cerramos inscripciones.*\nNo habrá repesca ni invitaciones de última hora.\n\n✅ *Fútbol 7 (hierba)*\n✅ *Fútbol Sala (pista rápida)*\n✅ *Inscripción individual o por equipos*\n\n👉 *HAZ CLIC AQUÍ Y REGISTRA A TU GENTE:*\nhttps://futinfo.app/facultades-derbi\n\n_Pásalo al grupo de tu curso y que nadie se eche para atrás._"
+        },
+        {
+          "iteracion": 9,
+          "version": "v1.8",
+          "foco_mejora": "Viralidad y reenvío automático en grupos de WhatsApp de clase",
+          "cambios_aplicados": "Incluir llamada expresa para reenviar: 'Pásalo al grupo de tu clase y señala al que va a ser suplente'.",
+          "score_promedio": 88.5,
+          "promedios_metricas": {
+            "hook": 94.0,
+            "urgencia_72h": 94.7,
+            "viralidad": 83.1,
+            "conversion": 81.9
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 93.0,
+              "metricas": {
+                "hook": 98.4,
+                "urgencia_72h": 99.0,
+                "viralidad": 86.9,
+                "conversion_cta": 87.4
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 85.8,
+              "metricas": {
+                "hook": 90.4,
+                "urgencia_72h": 90.9,
+                "viralidad": 79.9,
+                "conversion_cta": 77.4
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 84.1,
+              "metricas": {
+                "hook": 91.2,
+                "urgencia_72h": 91.8,
+                "viralidad": 80.6,
+                "conversion_cta": 78.4
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 86.6,
+              "metricas": {
+                "hook": 92.0,
+                "urgencia_72h": 92.7,
+                "viralidad": 81.3,
+                "conversion_cta": 79.4
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 93.2,
+              "metricas": {
+                "hook": 98.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 86.6,
+                "conversion_cta": 86.9
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🔥 *CLÁSICO DEL CAMPUS: LA CUENTA ATRÁS HA EMPEZADO* 🔥\n\n```[ACTA RECTORAL: 72 HORAS RESTANTES]```\n\n¿Quién manda de verdad en la universidad?\n¿Los que sacan dieces en los exámenes o los que revienta la escuadra en el minuto 90?\n\n*3 DÍAS para cerrar actas:*\nSeñores capitanes: o inscribís a vuestra clase hoy o el lunes estáis descalificados de oficio.\n\n👉 *Enlace directo sin registro pesado:*\nhttps://futinfo.app/facultades-derbi\n\n_Que no digan que vuestra facultad no tuvo valor para bajar al barro._"
+        },
+        {
+          "iteracion": 10,
+          "version": "v1.9",
+          "foco_mejora": "Perfección de conversión de respuesta directa (Copy Definitivo Implacable)",
+          "cambios_aplicados": "Fusión de urgencia crítica (últimas 72h), escasez milimétrica, jerarquía visual ineludible y CTA de alta conversión.",
+          "score_promedio": 95.9,
+          "promedios_metricas": {
+            "hook": 97.8,
+            "urgencia_72h": 98.1,
+            "viralidad": 89.1,
+            "conversion": 98.0
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 97.4,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 91.2,
+                "conversion_cta": 99.0
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 97.9,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 91.9,
+                "conversion_cta": 99.0
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 97.5,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 91.5,
+                "conversion_cta": 99.0
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 92.2,
+              "metricas": {
+                "hook": 96.3,
+                "urgencia_72h": 97.0,
+                "viralidad": 85.6,
+                "conversion_cta": 96.7
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 94.6,
+              "metricas": {
+                "hook": 95.9,
+                "urgencia_72h": 96.5,
+                "viralidad": 85.2,
+                "conversion_cta": 96.2
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "💣 *GUERRA TOTAL DE FACULTADES: ÚLTIMAS 72 HORAS* 💣\n\nLos de las otras carreras ya están entrenando y eligiendo dorsal.\nSi en vuestro grupo seguís con \"yo es que no sé si puedo\" o \"tengo que estudiar\", ya habéis perdido el derbi.\n\n*QUEDAN SOLO 3 DÍAS.*\nEl domingo a las 23:59h se publican los emparejamientos oficiales.\n\n*¿QUÉ NECESITAS?*\nSolo 5 minutos para registrar a tu equipo o a ti mismo como Agente Libre.\n\n👉 *Inscríbete antes de que se agoten las plazas:*\nhttps://futinfo.app/facultades-derbi"
+        }
+      ]
+    },
+    "campana_3": {
+      "id": "campana_3",
+      "titulo": "LA CARTA FIFA DE TU VIDA / GAMIFICACIÓN TOTAL",
+      "angulo": "Cartas FUT personalizadas, rating, posición oficial y banquillo",
+      "iteraciones": [
+        {
+          "iteracion": 1,
+          "version": "v1.0",
+          "foco_mejora": "Lanzamiento Inicial",
+          "cambios_aplicados": "Texto base institucional",
+          "score_promedio": 52.9,
+          "promedios_metricas": {
+            "hook": 56.9,
+            "urgencia_72h": 57.5,
+            "viralidad": 46.3,
+            "conversion": 50.0
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 52.8,
+              "metricas": {
+                "hook": 56.8,
+                "urgencia_72h": 57.4,
+                "viralidad": 46.2,
+                "conversion_cta": 50.0
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 53.1,
+              "metricas": {
+                "hook": 56.0,
+                "urgencia_72h": 56.5,
+                "viralidad": 45.5,
+                "conversion_cta": 50.0
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 52.1,
+              "metricas": {
+                "hook": 56.8,
+                "urgencia_72h": 57.4,
+                "viralidad": 46.2,
+                "conversion_cta": 50.0
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 52.7,
+              "metricas": {
+                "hook": 57.6,
+                "urgencia_72h": 58.3,
+                "viralidad": 46.9,
+                "conversion_cta": 50.0
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 53.6,
+              "metricas": {
+                "hook": 57.2,
+                "urgencia_72h": 57.9,
+                "viralidad": 46.5,
+                "conversion_cta": 50.0
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🎮 *TU CARTA FIFA EN EL TORNEO DEL RECTOR* 🎮\n\nEste año todos los jugadores inscritos tendrán su propia carta de FUT con estadísticas reales: ritmo, tiro, pase, regate y físico.\n\nLas inscripciones terminan en 3 días. Si no te inscribes a tiempo no podremos crear tu carta en la aplicación web del torneo.\n\nRellena tus datos aquí:\nhttps://futinfo.app/carta-fut\n\n¡Consigue tu valoración OVR!"
+        },
+        {
+          "iteracion": 2,
+          "version": "v1.1",
+          "foco_mejora": "Pattern interrupt en primeros 60 caracteres y eliminación de tono corporativo",
+          "cambios_aplicados": "Sustituir aperturas neutras por ganchos que detengan el scroll del móvil y desafíen directamente al lector.",
+          "score_promedio": 56.0,
+          "promedios_metricas": {
+            "hook": 61.2,
+            "urgencia_72h": 61.8,
+            "viralidad": 50.6,
+            "conversion": 50.0
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 55.8,
+              "metricas": {
+                "hook": 61.1,
+                "urgencia_72h": 61.7,
+                "viralidad": 50.5,
+                "conversion_cta": 50.0
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 56.4,
+              "metricas": {
+                "hook": 60.3,
+                "urgencia_72h": 60.8,
+                "viralidad": 49.8,
+                "conversion_cta": 50.0
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 54.7,
+              "metricas": {
+                "hook": 61.1,
+                "urgencia_72h": 61.7,
+                "viralidad": 50.5,
+                "conversion_cta": 50.0
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 56.5,
+              "metricas": {
+                "hook": 61.9,
+                "urgencia_72h": 62.6,
+                "viralidad": 51.2,
+                "conversion_cta": 50.0
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 56.6,
+              "metricas": {
+                "hook": 61.5,
+                "urgencia_72h": 62.1,
+                "viralidad": 50.8,
+                "conversion_cta": 50.0
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🎮 *TU CARTA FIFA OFICIAL EN EL TORNEO DEL RECTOR* 🎮\n\n¿Alguna vez has querido tener tu propia carta FUT con tu valoración, posición y stats reales?\nEn el Torneo del Rector 2026 todos los jugadores tienen cromo oficial en la app.\n\n*Las inscripciones terminan en 3 días (72h).*\nSi no estás inscrito antes del domingo, tu carta no se genera y quedas como no convocado.\n\n👉 Consigue tu carta aquí: https://futinfo.app/carta-fut"
+        },
+        {
+          "iteracion": 3,
+          "version": "v1.2",
+          "foco_mejora": "Inyección de urgencia real (reloj de 72h / 3 días exactos)",
+          "cambios_aplicados": "Añadir límite estricto de plazas (ej: 'quedan solo 4 plazas para F7 y 2 para Sala') para generar escasez verídica.",
+          "score_promedio": 61.9,
+          "promedios_metricas": {
+            "hook": 54.2,
+            "urgencia_72h": 68.1,
+            "viralidad": 56.4,
+            "conversion": 67.9
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 60.2,
+              "metricas": {
+                "hook": 52.4,
+                "urgencia_72h": 66.0,
+                "viralidad": 54.8,
+                "conversion_cta": 65.6
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 70.2,
+              "metricas": {
+                "hook": 60.4,
+                "urgencia_72h": 75.0,
+                "viralidad": 61.8,
+                "conversion_cta": 75.6
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 60.9,
+              "metricas": {
+                "hook": 52.4,
+                "urgencia_72h": 66.0,
+                "viralidad": 54.8,
+                "conversion_cta": 65.6
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 57.5,
+              "metricas": {
+                "hook": 53.2,
+                "urgencia_72h": 66.9,
+                "viralidad": 55.5,
+                "conversion_cta": 66.6
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 60.6,
+              "metricas": {
+                "hook": 52.8,
+                "urgencia_72h": 66.4,
+                "viralidad": 55.1,
+                "conversion_cta": 66.1
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🃏 *¿QUÉ VALORACIÓN TE VA A TOCAR: 86 DE ORO O 65 DE BRONCE?* 🃏\n\nEn el *Torneo del Rector* no juegas de anónimo: juegas con tu propia carta interactiva estilo EA Sports FC.\n\nCada partido que juegues sube o baja tus stats:\n⚡ Ritmo (PAC)\n⚡ Disparo (SHO)\n⚡ Pase (PAS)\n⚡ Regate (DRI)\n⚡ Físico (PHY)\n\n*QUEDAN SOLO 3 DÍAS.* El domingo a las 23:59h se imprimen los cromos oficiales.\n\n👉 *Ficha por tu equipo y saca tu carta gratis:*\nhttps://futinfo.app/carta-fut"
+        },
+        {
+          "iteracion": 4,
+          "version": "v1.3",
+          "foco_mejora": "Formato nativo WhatsApp de alto impacto (negritas, monoespaciado, tachado)",
+          "cambios_aplicados": "Estructurar en bloques escaneables con *negritas tácticas*, citas en bloque y emojis de advertencia deportiva.",
+          "score_promedio": 65.5,
+          "promedios_metricas": {
+            "hook": 71.1,
+            "urgencia_72h": 71.8,
+            "viralidad": 60.3,
+            "conversion": 58.6
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 63.9,
+              "metricas": {
+                "hook": 69.7,
+                "urgencia_72h": 70.3,
+                "viralidad": 59.1,
+                "conversion_cta": 56.9
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 64.3,
+              "metricas": {
+                "hook": 68.9,
+                "urgencia_72h": 69.4,
+                "viralidad": 58.4,
+                "conversion_cta": 55.9
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 62.6,
+              "metricas": {
+                "hook": 69.7,
+                "urgencia_72h": 70.3,
+                "viralidad": 59.1,
+                "conversion_cta": 56.9
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 65.1,
+              "metricas": {
+                "hook": 70.5,
+                "urgencia_72h": 71.2,
+                "viralidad": 59.8,
+                "conversion_cta": 57.9
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 71.8,
+              "metricas": {
+                "hook": 76.5,
+                "urgencia_72h": 78.0,
+                "viralidad": 65.1,
+                "conversion_cta": 65.4
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🔥 *TU CARTA DE FUTBOLISTA REAL EN EL MÓVIL EN 72H* 🔥\n\nTus colegas te van a ver en el 11 titular o te van a ver en el banquillo.\nEl sistema interactivo del *Torneo del Rector* ya está abierto:\n\n*¿ERES UN TOTY O UN PAQUETE DE BANQUILLO?*\nEl domingo a las 23:59h (en 3 días) se cierra la base de datos de cartas.\nQuien no esté dentro antes de esa hora, no existe en la competición.\n\n📲 *Configura tu posición y dorsal aquí:*\nhttps://futinfo.app/carta-fut\n\n_Tardas 40 segundos. Elige bien tu dorsal antes de que te lo quiten._"
+        },
+        {
+          "iteracion": 5,
+          "version": "v1.4",
+          "foco_mejora": "Ataque al ego y estatus de vestuario",
+          "cambios_aplicados": "Contrastar ser titular con tu carta de oro vs quedarse de espectador en la grada; provocar a los que 'siempre ponen excusas'.",
+          "score_promedio": 68.5,
+          "promedios_metricas": {
+            "hook": 74.1,
+            "urgencia_72h": 74.7,
+            "viralidad": 63.5,
+            "conversion": 61.3
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 68.2,
+              "metricas": {
+                "hook": 74.0,
+                "urgencia_72h": 74.6,
+                "viralidad": 63.4,
+                "conversion_cta": 61.2
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 68.6,
+              "metricas": {
+                "hook": 73.2,
+                "urgencia_72h": 73.7,
+                "viralidad": 62.7,
+                "conversion_cta": 60.2
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 66.9,
+              "metricas": {
+                "hook": 74.0,
+                "urgencia_72h": 74.6,
+                "viralidad": 63.4,
+                "conversion_cta": 61.2
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 69.4,
+              "metricas": {
+                "hook": 74.8,
+                "urgencia_72h": 75.5,
+                "viralidad": 64.1,
+                "conversion_cta": 62.2
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 69.2,
+              "metricas": {
+                "hook": 74.4,
+                "urgencia_72h": 75.0,
+                "viralidad": 63.8,
+                "conversion_cta": 61.7
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🚨 *ALERTA EA SPORTS FC UNIVERSITARIO: CIERRE EN 3 DÍAS* 🚨\n\n¿Te imaginas meter un gol en el minuto 89 y que el lunes tu carta FUT suba a 88 con animación TOTW y foto con tu equipación?\n\nEso es el *Torneo del Rector 2026*.\nPero el servidor de fichajes se apaga en *72 HORAS*.\n\n*PLAZO IMPRORROGABLE:* Domingo a las 23:59h.\nModalidades de F7 y Fútbol Sala.\n\n👉 *Pide tu cromo y entra al torneo:*\nhttps://futinfo.app/carta-fut"
+        },
+        {
+          "iteracion": 6,
+          "version": "v1.5",
+          "foco_mejora": "Eliminación de fricción de registro (Fricción Cero en CTA)",
+          "cambios_aplicados": "Aclarar que registrarse toma literalmente 45 segundos: 'Solo necesitas nombre, apodo y dorsal. Sin papeleos'.",
+          "score_promedio": 74.8,
+          "promedios_metricas": {
+            "hook": 67.1,
+            "urgencia_72h": 81.0,
+            "viralidad": 69.3,
+            "conversion": 80.8
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 73.1,
+              "metricas": {
+                "hook": 65.3,
+                "urgencia_72h": 78.9,
+                "viralidad": 67.7,
+                "conversion_cta": 78.5
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 83.2,
+              "metricas": {
+                "hook": 73.3,
+                "urgencia_72h": 87.9,
+                "viralidad": 74.7,
+                "conversion_cta": 88.5
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 73.8,
+              "metricas": {
+                "hook": 65.3,
+                "urgencia_72h": 78.9,
+                "viralidad": 67.7,
+                "conversion_cta": 78.5
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 70.4,
+              "metricas": {
+                "hook": 66.1,
+                "urgencia_72h": 79.8,
+                "viralidad": 68.4,
+                "conversion_cta": 79.5
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 73.5,
+              "metricas": {
+                "hook": 65.7,
+                "urgencia_72h": 79.3,
+                "viralidad": 68.0,
+                "conversion_cta": 79.0
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🃏 *AVISO OFICIAL: IMPRESIÓN DE CARTAS EN 72 HORAS* 🃏\n\nSe informa a los jugadores de Fútbol 7 y Sala:\nEl domingo a medianoche se corta la generación de cartas digitales de la temporada 2026.\n\nSi tu ficha no está validada:\n❌ No tendrás carta en el álbum del campus.\n❌ No saldrás en las alineaciones del césped 3D.\n❌ No podrás optar a los premios de MVP de la jornada.\n\n*Quedan 3 días.*\n👉 *Crea tu ficha y elige tu dorsal favorito:*\nhttps://futinfo.app/carta-fut"
+        },
+        {
+          "iteracion": 7,
+          "version": "v1.6",
+          "foco_mejora": "Pique directo entre carreras (Tribalismo)",
+          "cambios_aplicados": "Citar facultades rivales específicas con cifras reales de equipos ya inscritos para desatar el miedo a ser humillados.",
+          "score_promedio": 80.8,
+          "promedios_metricas": {
+            "hook": 73.0,
+            "urgencia_72h": 87.0,
+            "viralidad": 74.9,
+            "conversion": 87.0
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 77.4,
+              "metricas": {
+                "hook": 69.6,
+                "urgencia_72h": 83.2,
+                "viralidad": 72.0,
+                "conversion_cta": 82.8
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 87.5,
+              "metricas": {
+                "hook": 77.6,
+                "urgencia_72h": 92.2,
+                "viralidad": 79.0,
+                "conversion_cta": 92.8
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 86.4,
+              "metricas": {
+                "hook": 77.2,
+                "urgencia_72h": 91.8,
+                "viralidad": 78.6,
+                "conversion_cta": 92.3
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 74.7,
+              "metricas": {
+                "hook": 70.4,
+                "urgencia_72h": 84.1,
+                "viralidad": 72.7,
+                "conversion_cta": 83.8
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 77.8,
+              "metricas": {
+                "hook": 70.0,
+                "urgencia_72h": 83.6,
+                "viralidad": 72.3,
+                "conversion_cta": 83.3
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "⚡ *¿CON QUÉ DORSAL VAS A SALIR AL CAMPO? (QUEDAN 3 DÍAS)* ⚡\n\nEl #10 ya está pillado en varios equipos. El #9 de ariete se está agotando.\nEn el *Torneo del Rector* cada jugador tiene su carta oficial con silueta deportiva, dorsal y valoración general.\n\n*TIEMPO RESTANTE:* 72 Horas.\nEl domingo a las 23:59h el mercado de fichajes se cierra al 100%.\n\n👉 *Inscríbete y reclama tu dorsal antes de que te lo quiten:*\nhttps://futinfo.app/carta-fut\n\n_Si no tienes equipo, entra al Draft y te asignamos un once competitivo._"
+        },
+        {
+          "iteracion": 8,
+          "version": "v1.7",
+          "foco_mejora": "Refuerzo para los novatos y jugadores sueltos (Draft de Agentes Libres)",
+          "cambios_aplicados": "Añadir cláusula clara: '¿No tienes equipo entero? Entra como Agente Libre en el Draft y te asignamos un once titular'.",
+          "score_promedio": 88.2,
+          "promedios_metricas": {
+            "hook": 90.0,
+            "urgencia_72h": 91.0,
+            "viralidad": 79.0,
+            "conversion": 91.0
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 85.0,
+              "metricas": {
+                "hook": 86.9,
+                "urgencia_72h": 87.5,
+                "viralidad": 76.3,
+                "conversion_cta": 87.1
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 94.3,
+              "metricas": {
+                "hook": 94.9,
+                "urgencia_72h": 96.5,
+                "viralidad": 83.3,
+                "conversion_cta": 97.1
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 85.0,
+              "metricas": {
+                "hook": 86.9,
+                "urgencia_72h": 87.5,
+                "viralidad": 76.3,
+                "conversion_cta": 87.1
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 83.6,
+              "metricas": {
+                "hook": 87.7,
+                "urgencia_72h": 88.4,
+                "viralidad": 77.0,
+                "conversion_cta": 88.1
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 92.9,
+              "metricas": {
+                "hook": 93.7,
+                "urgencia_72h": 95.1,
+                "viralidad": 82.2,
+                "conversion_cta": 95.6
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🎮 *EL ÁLBUM VIRTUAL DEL RECTOR SE CIERRA ESTE DOMINGO* 🎮\n\nYa hay más de 80 alumnos con su carta FUT generada en la plataforma:\n🛡️ Porteros con reflejos felinos.\n🛡️ Defensas muro con carta de oro.\n🛡️ Delanteros con 90 de ritmo.\n\n¿Y tu carta? ¿Dónde está?\n*Quedan 3 días para registrarte.*\n\n📲 *Genera tu carta en 30 segundos:*\nhttps://futinfo.app/carta-fut\n\n_Comparte tu carta en el grupo y que tus amigos voten si mereces esa media o menos._"
+        },
+        {
+          "iteracion": 9,
+          "version": "v1.8",
+          "foco_mejora": "Viralidad y reenvío automático en grupos de WhatsApp de clase",
+          "cambios_aplicados": "Incluir llamada expresa para reenviar: 'Pásalo al grupo de tu clase y señala al que va a ser suplente'.",
+          "score_promedio": 88.5,
+          "promedios_metricas": {
+            "hook": 94.0,
+            "urgencia_72h": 94.7,
+            "viralidad": 83.1,
+            "conversion": 81.9
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 93.0,
+              "metricas": {
+                "hook": 98.4,
+                "urgencia_72h": 99.0,
+                "viralidad": 86.9,
+                "conversion_cta": 87.4
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 85.8,
+              "metricas": {
+                "hook": 90.4,
+                "urgencia_72h": 90.9,
+                "viralidad": 79.9,
+                "conversion_cta": 77.4
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 84.1,
+              "metricas": {
+                "hook": 91.2,
+                "urgencia_72h": 91.8,
+                "viralidad": 80.6,
+                "conversion_cta": 78.4
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 86.6,
+              "metricas": {
+                "hook": 92.0,
+                "urgencia_72h": 92.7,
+                "viralidad": 81.3,
+                "conversion_cta": 79.4
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 93.2,
+              "metricas": {
+                "hook": 98.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 86.6,
+                "conversion_cta": 86.9
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🔥 *TU CROMO OFICIAL DE COMPETICIÓN SE BLOQUEA EN 72H* 🔥\n\n```[ESTADO DEL SERVIDOR: GENERACIÓN DE CARTAS ACTIVA]```\n\nEn 3 días cerramos la edición de cromos del Torneo del Rector.\nSi estás en la lista, sales con:\n✅ Tu nombre y apodo de guerra.\n✅ Tu facultad y demarcación real.\n✅ Tus 6 atributos FIFA calculados.\n\n👉 *No te quedes sin tu carta. Inscríbete aquí:*\nhttps://futinfo.app/carta-fut\n\n_Domingo a las 23:59h: persiana cerrada._"
+        },
+        {
+          "iteracion": 10,
+          "version": "v1.9",
+          "foco_mejora": "Perfección de conversión de respuesta directa (Copy Definitivo Implacable)",
+          "cambios_aplicados": "Fusión de urgencia crítica (últimas 72h), escasez milimétrica, jerarquía visual ineludible y CTA de alta conversión.",
+          "score_promedio": 90.0,
+          "promedios_metricas": {
+            "hook": 95.6,
+            "urgencia_72h": 96.2,
+            "viralidad": 85.0,
+            "conversion": 82.8
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 89.7,
+              "metricas": {
+                "hook": 95.5,
+                "urgencia_72h": 96.1,
+                "viralidad": 84.9,
+                "conversion_cta": 82.7
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 90.1,
+              "metricas": {
+                "hook": 94.7,
+                "urgencia_72h": 95.2,
+                "viralidad": 84.2,
+                "conversion_cta": 81.7
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 88.4,
+              "metricas": {
+                "hook": 95.5,
+                "urgencia_72h": 96.1,
+                "viralidad": 84.9,
+                "conversion_cta": 82.7
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 90.9,
+              "metricas": {
+                "hook": 96.3,
+                "urgencia_72h": 97.0,
+                "viralidad": 85.6,
+                "conversion_cta": 83.7
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 90.7,
+              "metricas": {
+                "hook": 95.9,
+                "urgencia_72h": 96.5,
+                "viralidad": 85.2,
+                "conversion_cta": 83.2
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🚨 *ÚLTIMAS 72 HORAS PARA TENER TU CARTA DE FIFA REAL* 🚨\n\nA ver si espabiláis: no es un torneo cutre con una hoja de Excel arrugada.\nEs una plataforma con césped 3D, cartas animadas, repetición de goles y estadísticas de profesional.\n\n*Y EL PLAZO SE TERMINA EN 3 DÍAS.*\n\n¿Te vas a quedar sin tu ficha oficial solo por no rellenar un enlace de 30 segundos?\n\n👉 *HAZTE TU CARTA Y ENTRA AL TORNEO:*\nhttps://futinfo.app/carta-fut"
+        }
+      ]
+    },
+    "campana_4": {
+      "id": "campana_4",
+      "titulo": "ÚLTIMA LLAMADA CAPITANES / 72 HORAS O FUERA",
+      "angulo": "Ultimátum implacable de tiempo y escasez de plazas",
+      "iteraciones": [
+        {
+          "iteracion": 1,
+          "version": "v1.0",
+          "foco_mejora": "Lanzamiento Inicial",
+          "cambios_aplicados": "Texto base institucional",
+          "score_promedio": 58.3,
+          "promedios_metricas": {
+            "hook": 60.2,
+            "urgencia_72h": 61.2,
+            "viralidad": 49.1,
+            "conversion": 61.2
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 54.9,
+              "metricas": {
+                "hook": 56.8,
+                "urgencia_72h": 57.4,
+                "viralidad": 46.2,
+                "conversion_cta": 57.0
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 64.2,
+              "metricas": {
+                "hook": 64.8,
+                "urgencia_72h": 66.4,
+                "viralidad": 53.2,
+                "conversion_cta": 67.0
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 63.2,
+              "metricas": {
+                "hook": 64.4,
+                "urgencia_72h": 66.0,
+                "viralidad": 52.9,
+                "conversion_cta": 66.5
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 53.5,
+              "metricas": {
+                "hook": 57.6,
+                "urgencia_72h": 58.3,
+                "viralidad": 46.9,
+                "conversion_cta": 58.0
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 55.9,
+              "metricas": {
+                "hook": 57.2,
+                "urgencia_72h": 57.9,
+                "viralidad": 46.5,
+                "conversion_cta": 57.5
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "⚠️ *ÚLTIMO AVISO: CIERRE DE INSCRIPCIONES EN 72H* ⚠️\n\nCapitanes y delegados de equipo:\nQuedan exactamente 3 días para enviar la lista de jugadores. Pasado el plazo la plataforma se cierra y no habrá excepciones.\n\nSi te falta algún jugador para completar la plantilla podéis fichar agentes libres del draft.\n\nEnlace oficial de registro:\nhttps://futinfo.app/capitanes\n\nNo lo dejes para el último minuto."
+        },
+        {
+          "iteracion": 2,
+          "version": "v1.1",
+          "foco_mejora": "Pattern interrupt en primeros 60 caracteres y eliminación de tono corporativo",
+          "cambios_aplicados": "Sustituir aperturas neutras por ganchos que detengan el scroll del móvil y desafíen directamente al lector.",
+          "score_promedio": 61.0,
+          "promedios_metricas": {
+            "hook": 62.9,
+            "urgencia_72h": 63.8,
+            "viralidad": 52.1,
+            "conversion": 63.6
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 59.2,
+              "metricas": {
+                "hook": 61.1,
+                "urgencia_72h": 61.7,
+                "viralidad": 50.5,
+                "conversion_cta": 61.3
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 68.5,
+              "metricas": {
+                "hook": 69.1,
+                "urgencia_72h": 70.7,
+                "viralidad": 57.5,
+                "conversion_cta": 71.3
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 59.2,
+              "metricas": {
+                "hook": 61.1,
+                "urgencia_72h": 61.7,
+                "viralidad": 50.5,
+                "conversion_cta": 61.3
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 57.8,
+              "metricas": {
+                "hook": 61.9,
+                "urgencia_72h": 62.6,
+                "viralidad": 51.2,
+                "conversion_cta": 62.3
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 60.2,
+              "metricas": {
+                "hook": 61.5,
+                "urgencia_72h": 62.1,
+                "viralidad": 50.8,
+                "conversion_cta": 61.8
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "⚠️ *ÚLTIMA LLAMADA CAPITANES: 3 DÍAS PARA EL CIERRE* ⚠️\n\nCapitanes de Fútbol 7 y Sala:\nQuedan exactamente 72 horas para registrar las listas oficiales del Torneo del Rector.\nEl domingo a las 23:59h el sistema se bloquea automáticamente.\n\nSi no completáis la plantilla, vuestra plaza pasará al siguiente equipo en lista de espera.\n\nInscripción oficial: https://futinfo.app/capitanes"
+        },
+        {
+          "iteracion": 3,
+          "version": "v1.2",
+          "foco_mejora": "Inyección de urgencia real (reloj de 72h / 3 días exactos)",
+          "cambios_aplicados": "Añadir límite estricto de plazas (ej: 'quedan solo 4 plazas para F7 y 2 para Sala') para generar escasez verídica.",
+          "score_promedio": 66.9,
+          "promedios_metricas": {
+            "hook": 68.8,
+            "urgencia_72h": 69.8,
+            "viralidad": 57.7,
+            "conversion": 69.8
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 63.5,
+              "metricas": {
+                "hook": 65.4,
+                "urgencia_72h": 66.0,
+                "viralidad": 54.8,
+                "conversion_cta": 65.6
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 72.8,
+              "metricas": {
+                "hook": 73.4,
+                "urgencia_72h": 75.0,
+                "viralidad": 61.8,
+                "conversion_cta": 75.6
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 71.8,
+              "metricas": {
+                "hook": 73.0,
+                "urgencia_72h": 74.5,
+                "viralidad": 61.5,
+                "conversion_cta": 75.1
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 62.1,
+              "metricas": {
+                "hook": 66.2,
+                "urgencia_72h": 66.9,
+                "viralidad": 55.5,
+                "conversion_cta": 66.6
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 64.5,
+              "metricas": {
+                "hook": 65.8,
+                "urgencia_72h": 66.4,
+                "viralidad": 55.1,
+                "conversion_cta": 66.1
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🚨 *ULTIMÁTUM A CAPITANES: EL DOMINGO ESTÁIS FUERA* 🚨\n\nSeñores capitanes:\nTenemos 14 equipos preinscritos pero solo quedan *3 PLAZAS REALES* para completar el cuadro de competición del Torneo del Rector.\n\nEl plazo se cierra en *3 DÍAS (72h)*.\nA los equipos incompletos se les asignarán Agentes Libres del draft o perderán la plaza.\n\n📲 *Cierra la alineación de tu equipo ahora mismo:*\nhttps://futinfo.app/capitanes-urgente"
+        },
+        {
+          "iteracion": 4,
+          "version": "v1.3",
+          "foco_mejora": "Formato nativo WhatsApp de alto impacto (negritas, monoespaciado, tachado)",
+          "cambios_aplicados": "Estructurar en bloques escaneables con *negritas tácticas*, citas en bloque y emojis de advertencia deportiva.",
+          "score_promedio": 72.5,
+          "promedios_metricas": {
+            "hook": 74.3,
+            "urgencia_72h": 75.4,
+            "viralidad": 63.1,
+            "conversion": 75.6
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 75.6,
+              "metricas": {
+                "hook": 76.9,
+                "urgencia_72h": 78.4,
+                "viralidad": 65.4,
+                "conversion_cta": 78.9
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 77.2,
+              "metricas": {
+                "hook": 77.7,
+                "urgencia_72h": 79.3,
+                "viralidad": 66.1,
+                "conversion_cta": 79.9
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 67.8,
+              "metricas": {
+                "hook": 69.7,
+                "urgencia_72h": 70.3,
+                "viralidad": 59.1,
+                "conversion_cta": 69.9
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 66.4,
+              "metricas": {
+                "hook": 70.5,
+                "urgencia_72h": 71.2,
+                "viralidad": 59.8,
+                "conversion_cta": 70.9
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 75.7,
+              "metricas": {
+                "hook": 76.5,
+                "urgencia_72h": 78.0,
+                "viralidad": 65.1,
+                "conversion_cta": 78.4
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "💣 *AVISO DISRUPTIVO PARA CAPITANES DORMIDOS (72H)* 💣\n\nSi eres el capitán del equipo de tu clase y todavía no has mandado los datos, tus compañeros van a saber exactamente por culpa de quién os habéis quedado sin jugar el *Torneo del Rector*.\n\n*QUEDAN 3 DÍAS.*\nEl domingo a las 23:59h no hay prórrogas ni excepciones de despacho.\n\n👉 *Sube la lista de convocados en 60 segundos:*\nhttps://futinfo.app/capitanes-urgente\n\n_No cargues con la culpa todo el cuatrimestre._"
+        },
+        {
+          "iteracion": 5,
+          "version": "v1.4",
+          "foco_mejora": "Ataque al ego y estatus de vestuario",
+          "cambios_aplicados": "Contrastar ser titular con tu carta de oro vs quedarse de espectador en la grada; provocar a los que 'siempre ponen excusas'.",
+          "score_promedio": 73.9,
+          "promedios_metricas": {
+            "hook": 75.8,
+            "urgencia_72h": 76.7,
+            "viralidad": 65.0,
+            "conversion": 76.5
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 72.1,
+              "metricas": {
+                "hook": 74.0,
+                "urgencia_72h": 74.6,
+                "viralidad": 63.4,
+                "conversion_cta": 74.2
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 81.5,
+              "metricas": {
+                "hook": 82.0,
+                "urgencia_72h": 83.6,
+                "viralidad": 70.4,
+                "conversion_cta": 84.2
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 72.1,
+              "metricas": {
+                "hook": 74.0,
+                "urgencia_72h": 74.6,
+                "viralidad": 63.4,
+                "conversion_cta": 74.2
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 70.7,
+              "metricas": {
+                "hook": 74.8,
+                "urgencia_72h": 75.5,
+                "viralidad": 64.1,
+                "conversion_cta": 75.2
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 73.1,
+              "metricas": {
+                "hook": 74.4,
+                "urgencia_72h": 75.0,
+                "viralidad": 63.8,
+                "conversion_cta": 74.7
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "⚠️ *PLAZAS DE F7 Y SALA A PUNTO DE AGOTARSE (72H)* ⚠️\n\n```[RECUENTO DE ACTAS: CIERRE EN 3 DÍAS]```\n\nQuedan únicamente:\n🔥 *2 plazas* para el cuadro final de Fútbol 7.\n🔥 *1 plaza* para la liga universitaria de Fútbol Sala.\n\nEl criterio de admisión es riguroso orden de registro en la web oficial. Quien no valide antes del domingo 23:59h, queda eliminado.\n\n📲 *Valida tu plaza aquí:*\nhttps://futinfo.app/capitanes-urgente"
+        },
+        {
+          "iteracion": 6,
+          "version": "v1.5",
+          "foco_mejora": "Eliminación de fricción de registro (Fricción Cero en CTA)",
+          "cambios_aplicados": "Aclarar que registrarse toma literalmente 45 segundos: 'Solo necesitas nombre, apodo y dorsal. Sin papeleos'.",
+          "score_promedio": 76.0,
+          "promedios_metricas": {
+            "hook": 81.3,
+            "urgencia_72h": 82.3,
+            "viralidad": 70.3,
+            "conversion": 69.3
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 80.3,
+              "metricas": {
+                "hook": 85.5,
+                "urgencia_72h": 87.0,
+                "viralidad": 74.0,
+                "conversion_cta": 74.5
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 72.9,
+              "metricas": {
+                "hook": 77.5,
+                "urgencia_72h": 78.0,
+                "viralidad": 67.0,
+                "conversion_cta": 64.5
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 79.5,
+              "metricas": {
+                "hook": 85.9,
+                "urgencia_72h": 87.5,
+                "viralidad": 74.3,
+                "conversion_cta": 75.0
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 73.7,
+              "metricas": {
+                "hook": 79.1,
+                "urgencia_72h": 79.8,
+                "viralidad": 68.4,
+                "conversion_cta": 66.5
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 73.5,
+              "metricas": {
+                "hook": 78.7,
+                "urgencia_72h": 79.3,
+                "viralidad": 68.0,
+                "conversion_cta": 66.0
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🚨 *¿TE FALTA GENTE PARA COMPLETAR EL EQUIPO? LEE ESTO* 🚨\n\nCapitán: si sois 5 para F7 o 3 para Sala y estás a punto de tirar la toalla por culpa de los que no responden, no te preocupes.\n\n*LA PLATAFORMA TIENE BOLSA DE DRAFT:*\nInscribe a los que seáis y el sistema os asigna automáticamente jugadores de vuestra facultad que quieren jugar.\n\n*Pero tienes 72 horas.* En 3 días se acaba el plazo.\n\n👉 *Registra el núcleo de tu equipo ahora:*\nhttps://futinfo.app/capitanes-urgente"
+        },
+        {
+          "iteracion": 7,
+          "version": "v1.6",
+          "foco_mejora": "Pique directo entre carreras (Tribalismo)",
+          "cambios_aplicados": "Citar facultades rivales específicas con cifras reales de equipos ya inscritos para desatar el miedo a ser humillados.",
+          "score_promedio": 79.1,
+          "promedios_metricas": {
+            "hook": 71.4,
+            "urgencia_72h": 85.3,
+            "viralidad": 73.6,
+            "conversion": 85.1
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 77.4,
+              "metricas": {
+                "hook": 69.6,
+                "urgencia_72h": 83.2,
+                "viralidad": 72.0,
+                "conversion_cta": 82.8
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 87.5,
+              "metricas": {
+                "hook": 77.6,
+                "urgencia_72h": 92.2,
+                "viralidad": 79.0,
+                "conversion_cta": 92.8
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 78.1,
+              "metricas": {
+                "hook": 69.6,
+                "urgencia_72h": 83.2,
+                "viralidad": 72.0,
+                "conversion_cta": 82.8
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 74.7,
+              "metricas": {
+                "hook": 70.4,
+                "urgencia_72h": 84.1,
+                "viralidad": 72.7,
+                "conversion_cta": 83.8
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 77.8,
+              "metricas": {
+                "hook": 70.0,
+                "urgencia_72h": 83.6,
+                "viralidad": 72.3,
+                "conversion_cta": 83.3
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "⏰ *CUENTA ATRÁS DEFINITIVA: 72 HORAS O DESCALIFICACIÓN* ⏰\n\nEl comité organizador del *Torneo del Rector 2026* avisa:\nNo se aceptarán listas por WhatsApp a última hora de la noche del domingo.\nTodo pasa por la app oficial.\n\n*Si eres capitán:*\nTarda 1 minuto en poner nombre de equipo y añadir a tus colegas.\n\n👉 *Accede al portal de capitanes:*\nhttps://futinfo.app/capitanes-urgente\n\n_Quedan 3 días. Mueve ficha._"
+        },
+        {
+          "iteracion": 8,
+          "version": "v1.7",
+          "foco_mejora": "Refuerzo para los novatos y jugadores sueltos (Draft de Agentes Libres)",
+          "cambios_aplicados": "Añadir cláusula clara: '¿No tienes equipo entero? Entra como Agente Libre en el Draft y te asignamos un once titular'.",
+          "score_promedio": 81.4,
+          "promedios_metricas": {
+            "hook": 87.0,
+            "urgencia_72h": 87.6,
+            "viralidad": 76.4,
+            "conversion": 74.2
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 81.1,
+              "metricas": {
+                "hook": 86.9,
+                "urgencia_72h": 87.5,
+                "viralidad": 76.3,
+                "conversion_cta": 74.1
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 81.5,
+              "metricas": {
+                "hook": 86.1,
+                "urgencia_72h": 86.6,
+                "viralidad": 75.6,
+                "conversion_cta": 73.1
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 79.8,
+              "metricas": {
+                "hook": 86.9,
+                "urgencia_72h": 87.5,
+                "viralidad": 76.3,
+                "conversion_cta": 74.1
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 82.3,
+              "metricas": {
+                "hook": 87.7,
+                "urgencia_72h": 88.4,
+                "viralidad": 77.0,
+                "conversion_cta": 75.1
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 82.1,
+              "metricas": {
+                "hook": 87.3,
+                "urgencia_72h": 87.9,
+                "viralidad": 76.6,
+                "conversion_cta": 74.6
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🔥 *AVISO DE URGENCIA MÁXIMA: 3 DÍAS PARA EL SORTEO* 🔥\n\nEl lunes a las 10:00h se sortean los grupos oficiales de competición y el calendario de partidos televisado en la app.\n\nSi tu equipo no está en el bombo este domingo a las 23:59h, estáis *FUERA*.\nY os aseguramos que ver a vuestros rivales jugar cada viernes mientras vosotros no hacéis nada duele mucho.\n\n📲 *Inscribe a tu equipo antes del pitido final:*\nhttps://futinfo.app/capitanes-urgente"
+        },
+        {
+          "iteracion": 9,
+          "version": "v1.8",
+          "foco_mejora": "Viralidad y reenvío automático en grupos de WhatsApp de clase",
+          "cambios_aplicados": "Incluir llamada expresa para reenviar: 'Pásalo al grupo de tu clase y señala al que va a ser suplente'.",
+          "score_promedio": 85.7,
+          "promedios_metricas": {
+            "hook": 91.3,
+            "urgencia_72h": 91.9,
+            "viralidad": 80.7,
+            "conversion": 78.5
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 85.4,
+              "metricas": {
+                "hook": 91.2,
+                "urgencia_72h": 91.8,
+                "viralidad": 80.6,
+                "conversion_cta": 78.4
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 85.8,
+              "metricas": {
+                "hook": 90.4,
+                "urgencia_72h": 90.9,
+                "viralidad": 79.9,
+                "conversion_cta": 77.4
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 84.1,
+              "metricas": {
+                "hook": 91.2,
+                "urgencia_72h": 91.8,
+                "viralidad": 80.6,
+                "conversion_cta": 78.4
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 86.6,
+              "metricas": {
+                "hook": 92.0,
+                "urgencia_72h": 92.7,
+                "viralidad": 81.3,
+                "conversion_cta": 79.4
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 86.4,
+              "metricas": {
+                "hook": 91.6,
+                "urgencia_72h": 92.2,
+                "viralidad": 81.0,
+                "conversion_cta": 78.9
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🚨 *CLÁUSULA DE RESCISIÓN: 72 HORAS PARA REGISTRAR AL EQUIPO* 🚨\n\nAviso a los equipos rezagados:\nHay 5 equipos en lista de espera deseando quitaros la plaza si no completáis el registro en las próximas 72 horas.\n\n*No perdáis vuestro hueco por pereza.*\nSolo necesitáis entrar al link, poner los nombres y elegir colores de equipación.\n\n👉 *Firma la inscripción oficial aquí:*\nhttps://futinfo.app/capitanes-urgente"
+        },
+        {
+          "iteracion": 10,
+          "version": "v1.9",
+          "foco_mejora": "Perfección de conversión de respuesta directa (Copy Definitivo Implacable)",
+          "cambios_aplicados": "Fusión de urgencia crítica (últimas 72h), escasez milimétrica, jerarquía visual ineludible y CTA de alta conversión.",
+          "score_promedio": 90.9,
+          "promedios_metricas": {
+            "hook": 96.2,
+            "urgencia_72h": 96.7,
+            "viralidad": 86.1,
+            "conversion": 84.4
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 89.7,
+              "metricas": {
+                "hook": 95.5,
+                "urgencia_72h": 96.1,
+                "viralidad": 84.9,
+                "conversion_cta": 82.7
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 90.1,
+              "metricas": {
+                "hook": 94.7,
+                "urgencia_72h": 95.2,
+                "viralidad": 84.2,
+                "conversion_cta": 81.7
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 88.4,
+              "metricas": {
+                "hook": 95.5,
+                "urgencia_72h": 96.1,
+                "viralidad": 84.9,
+                "conversion_cta": 82.7
+              },
+              "critica": "Me da miedo apuntarme solo si parece que solo juegan equipos profesionales ya cerrados."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 90.9,
+              "metricas": {
+                "hook": 96.3,
+                "urgencia_72h": 97.0,
+                "viralidad": 85.6,
+                "conversion_cta": 83.7
+              },
+              "critica": "Demasiado serio o formal. Necesita más rollo vestuario, audio o meme para que la gente reaccione."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 95.4,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 90.8,
+                "conversion_cta": 91.2
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "💣 *ÚLTIMO ULTIMÁTUM A DELEGADOS Y CAPITANES (3 DÍAS)* 💣\n\nEl cronómetro marca menos de 72 horas.\nEl domingo a las 23:59h el botón de registro se desactiva.\n\nSi vuestro equipo quiere ganar el Rector, tiene que estar dentro hoy.\n\n*ENLACE DIRECTO:*\nhttps://futinfo.app/capitanes-urgente\n\n_Pasa este enlace al grupo y diles que se apunten YA o los sustituyes por agentes libres._"
+        }
+      ]
+    },
+    "campana_5": {
+      "id": "campana_5",
+      "titulo": "AUDIO-LEAK / GUERRILLA & MEME EN GRUPOS",
+      "angulo": "Formato audio filtrado + pattern interrupt viral de vestuario",
+      "iteraciones": [
+        {
+          "iteracion": 1,
+          "version": "v1.0",
+          "foco_mejora": "Lanzamiento Inicial",
+          "cambios_aplicados": "Texto base institucional",
+          "score_promedio": 59.6,
+          "promedios_metricas": {
+            "hook": 61.4,
+            "urgencia_72h": 62.6,
+            "viralidad": 50.3,
+            "conversion": 62.8
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 54.9,
+              "metricas": {
+                "hook": 56.8,
+                "urgencia_72h": 57.4,
+                "viralidad": 46.2,
+                "conversion_cta": 57.0
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 64.2,
+              "metricas": {
+                "hook": 64.8,
+                "urgencia_72h": 66.4,
+                "viralidad": 53.2,
+                "conversion_cta": 67.0
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 63.2,
+              "metricas": {
+                "hook": 64.4,
+                "urgencia_72h": 66.0,
+                "viralidad": 52.9,
+                "conversion_cta": 66.5
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 59.8,
+              "metricas": {
+                "hook": 64.0,
+                "urgencia_72h": 65.5,
+                "viralidad": 52.5,
+                "conversion_cta": 66.0
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 55.9,
+              "metricas": {
+                "hook": 57.2,
+                "urgencia_72h": 57.9,
+                "viralidad": 46.5,
+                "conversion_cta": 57.5
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🔊 *AUDIO FILTRADO DEL VESTUARIO* (0:18)\n▶️ 🔘━━━━━━━━━━━━━━ 0:18\n\n\"Tío, dile a los del grupo que espabilen que en 3 días cierran las plazas del Rector y nos quedamos sin jugar como el año pasado.\"\n\nNo seáis paquetes. Tenéis 72 horas para registrar al equipo o acabáis viendo los partidos desde la cafetería con un donut.\n\nInscripción rápida:\nhttps://futinfo.app/draft"
+        },
+        {
+          "iteracion": 2,
+          "version": "v1.1",
+          "foco_mejora": "Pattern interrupt en primeros 60 caracteres y eliminación de tono corporativo",
+          "cambios_aplicados": "Sustituir aperturas neutras por ganchos que detengan el scroll del móvil y desafíen directamente al lector.",
+          "score_promedio": 66.8,
+          "promedios_metricas": {
+            "hook": 68.5,
+            "urgencia_72h": 70.0,
+            "viralidad": 56.9,
+            "conversion": 70.5
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 67.0,
+              "metricas": {
+                "hook": 68.3,
+                "urgencia_72h": 69.8,
+                "viralidad": 56.8,
+                "conversion_cta": 70.3
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 68.5,
+              "metricas": {
+                "hook": 69.1,
+                "urgencia_72h": 70.7,
+                "viralidad": 57.5,
+                "conversion_cta": 71.3
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 67.5,
+              "metricas": {
+                "hook": 68.7,
+                "urgencia_72h": 70.2,
+                "viralidad": 57.1,
+                "conversion_cta": 70.8
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 64.1,
+              "metricas": {
+                "hook": 68.3,
+                "urgencia_72h": 69.8,
+                "viralidad": 56.8,
+                "conversion_cta": 70.3
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 67.1,
+              "metricas": {
+                "hook": 67.9,
+                "urgencia_72h": 69.3,
+                "viralidad": 56.4,
+                "conversion_cta": 69.8
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🔊 *AUDIO FILTRADO DEL COMITÉ DEL RECTOR* (0:15)\n▶️ 🔘━━━━━━━━━━━━━━ 0:15\n\n_\"Oye tío, diles a los de tu clase que como no metan la ficha antes del domingo se quedan sin jugar. Que en 3 días cierran las plazas de F7 y Sala y no hay repesca para nadie.\"_\n\nTenéis exactamente 72 horas.\n👉 Inscribíos aquí antes de que os quedéis con cara de tontos:\nhttps://futinfo.app/audio-draft"
+        },
+        {
+          "iteracion": 3,
+          "version": "v1.2",
+          "foco_mejora": "Inyección de urgencia real (reloj de 72h / 3 días exactos)",
+          "cambios_aplicados": "Añadir límite estricto de plazas (ej: 'quedan solo 4 plazas para F7 y 2 para Sala') para generar escasez verídica.",
+          "score_promedio": 69.6,
+          "promedios_metricas": {
+            "hook": 71.3,
+            "urgencia_72h": 72.6,
+            "viralidad": 60.0,
+            "conversion": 73.0
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 63.5,
+              "metricas": {
+                "hook": 65.4,
+                "urgencia_72h": 66.0,
+                "viralidad": 54.8,
+                "conversion_cta": 65.6
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 72.8,
+              "metricas": {
+                "hook": 73.4,
+                "urgencia_72h": 75.0,
+                "viralidad": 61.8,
+                "conversion_cta": 75.6
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 71.8,
+              "metricas": {
+                "hook": 73.0,
+                "urgencia_72h": 74.5,
+                "viralidad": 61.5,
+                "conversion_cta": 75.1
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 68.4,
+              "metricas": {
+                "hook": 72.6,
+                "urgencia_72h": 74.1,
+                "viralidad": 61.1,
+                "conversion_cta": 74.6
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 71.4,
+              "metricas": {
+                "hook": 72.2,
+                "urgencia_72h": 73.6,
+                "viralidad": 60.8,
+                "conversion_cta": 74.1
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🚨 *ATENCIÓN AL GRUPO: AUDIO REENVIADO MUCHAS VECES* 🚨\n\n🔊 ▶️ 🔘━━━━━━━━━━━━━━ 0:19\n\n_\"Escúchame bien: quedan 3 días para el Torneo del Rector. El año pasado estuvimos toda la temporada quejándonos de que no jugamos por no apuntarnos a tiempo. Entrad al link y poned vuestro dorsal ya.\"_\n\nNo seáis los mantas del campus.\nTardáis 30 segundos:\n👉 https://futinfo.app/audio-draft"
+        },
+        {
+          "iteracion": 4,
+          "version": "v1.3",
+          "foco_mejora": "Formato nativo WhatsApp de alto impacto (negritas, monoespaciado, tachado)",
+          "cambios_aplicados": "Estructurar en bloques escaneables con *negritas tácticas*, citas en bloque y emojis de advertencia deportiva.",
+          "score_promedio": 68.6,
+          "promedios_metricas": {
+            "hook": 74.0,
+            "urgencia_72h": 75.2,
+            "viralidad": 62.9,
+            "conversion": 62.3
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 71.7,
+              "metricas": {
+                "hook": 76.9,
+                "urgencia_72h": 78.4,
+                "viralidad": 65.4,
+                "conversion_cta": 65.9
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 64.3,
+              "metricas": {
+                "hook": 68.9,
+                "urgencia_72h": 69.4,
+                "viralidad": 58.4,
+                "conversion_cta": 55.9
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 70.9,
+              "metricas": {
+                "hook": 77.3,
+                "urgencia_72h": 78.9,
+                "viralidad": 65.8,
+                "conversion_cta": 66.4
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 71.4,
+              "metricas": {
+                "hook": 76.9,
+                "urgencia_72h": 78.4,
+                "viralidad": 65.4,
+                "conversion_cta": 65.9
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 64.9,
+              "metricas": {
+                "hook": 70.1,
+                "urgencia_72h": 70.8,
+                "viralidad": 59.5,
+                "conversion_cta": 57.4
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "💣 *MENSAJE DE GUERRILLA PARA EL GRUPO DE CLASE* 💣\n\nParen las rotativas:\nEl domingo a las 23:59h (*EN 3 DÍAS*) se cierra el plazo oficial del *Torneo del Rector*.\n\n¿Vamos a montar equipo de una santa vez o nos vamos a pasar el año mirando historias de Instagram de cómo ganan otros?\n\n*30 SEGUNDOS PARA INSCRIBIRSE:*\nFútbol 7 (hierba) o Fútbol Sala (pabellón).\n\n👉 *Clicad aquí y elegid dorsal:*\nhttps://futinfo.app/audio-draft"
+        },
+        {
+          "iteracion": 5,
+          "version": "v1.4",
+          "foco_mejora": "Ataque al ego y estatus de vestuario",
+          "cambios_aplicados": "Contrastar ser titular con tu carta de oro vs quedarse de espectador en la grada; provocar a los que 'siempre ponen excusas'.",
+          "score_promedio": 78.2,
+          "promedios_metricas": {
+            "hook": 79.9,
+            "urgencia_72h": 81.3,
+            "viralidad": 68.6,
+            "conversion": 81.6
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 72.1,
+              "metricas": {
+                "hook": 74.0,
+                "urgencia_72h": 74.6,
+                "viralidad": 63.4,
+                "conversion_cta": 74.2
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 81.5,
+              "metricas": {
+                "hook": 82.0,
+                "urgencia_72h": 83.6,
+                "viralidad": 70.4,
+                "conversion_cta": 84.2
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 80.4,
+              "metricas": {
+                "hook": 81.6,
+                "urgencia_72h": 83.2,
+                "viralidad": 70.0,
+                "conversion_cta": 83.7
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 77.0,
+              "metricas": {
+                "hook": 81.2,
+                "urgencia_72h": 82.7,
+                "viralidad": 69.7,
+                "conversion_cta": 83.2
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 80.0,
+              "metricas": {
+                "hook": 80.8,
+                "urgencia_72h": 82.2,
+                "viralidad": 69.4,
+                "conversion_cta": 82.7
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🚨 *FILTRACIÓN: CONVERSACIÓN PRIVADA DE VESTUARIO* 🚨\n\n— _\"Tío, ¿has visto que cada jugador tiene carta de FUT en el torneo?\"_\n— _\"Sí, pero las inscripciones se cierran en 72 horas. Como no nos apuntemos hoy estamos fuera.\"_\n— _\"Mándalo al grupo ya que quedan 3 días.\"_\n\nPues eso: se os acaba el tiempo.\n👉 *Entrad en 30 segundos y que no os lo cuenten:*\nhttps://futinfo.app/audio-draft"
+        },
+        {
+          "iteracion": 6,
+          "version": "v1.5",
+          "foco_mejora": "Eliminación de fricción de registro (Fricción Cero en CTA)",
+          "cambios_aplicados": "Aclarar que registrarse toma literalmente 45 segundos: 'Solo necesitas nombre, apodo y dorsal. Sin papeleos'.",
+          "score_promedio": 84.9,
+          "promedios_metricas": {
+            "hook": 84.2,
+            "urgencia_72h": 85.6,
+            "viralidad": 83.9,
+            "conversion": 85.9
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 78.6,
+              "metricas": {
+                "hook": 78.3,
+                "urgencia_72h": 78.9,
+                "viralidad": 78.7,
+                "conversion_cta": 78.5
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 87.4,
+              "metricas": {
+                "hook": 86.3,
+                "urgencia_72h": 87.9,
+                "viralidad": 85.7,
+                "conversion_cta": 88.5
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 86.9,
+              "metricas": {
+                "hook": 85.9,
+                "urgencia_72h": 87.5,
+                "viralidad": 85.3,
+                "conversion_cta": 88.0
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 85.7,
+              "metricas": {
+                "hook": 85.5,
+                "urgencia_72h": 87.0,
+                "viralidad": 85.0,
+                "conversion_cta": 87.5
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 86.0,
+              "metricas": {
+                "hook": 85.1,
+                "urgencia_72h": 86.5,
+                "viralidad": 84.7,
+                "conversion_cta": 87.0
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🔥 *ALERTA VIRAL EN EL GRUPO: QUEDAN 72 HORAS* 🔥\n\nSe busca gente que sepa darle a un balón (o que al menos corra y moleste) para ganar el *Torneo del Rector 2026*.\n\n*CONDICIONES:*\n1. No rajarse en el minuto 80.\n2. Saber celebrar un gol en el tercer tiempo.\n3. *INSCRIBIRSE ANTES DEL DOMINGO A LAS 23:59H.*\n\n👉 *Entra como equipo o como Agente Libre en el Draft:*\nhttps://futinfo.app/audio-draft\n\n_Pásalo al grupo y decidid quién se atreve a ponerse de portero._"
+        },
+        {
+          "iteracion": 7,
+          "version": "v1.6",
+          "foco_mejora": "Pique directo entre carreras (Tribalismo)",
+          "cambios_aplicados": "Citar facultades rivales específicas con cifras reales de equipos ya inscritos para desatar el miedo a ser humillados.",
+          "score_promedio": 81.4,
+          "promedios_metricas": {
+            "hook": 86.8,
+            "urgencia_72h": 87.9,
+            "viralidad": 75.6,
+            "conversion": 75.0
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 76.8,
+              "metricas": {
+                "hook": 82.6,
+                "urgencia_72h": 83.2,
+                "viralidad": 72.0,
+                "conversion_cta": 69.8
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 77.2,
+              "metricas": {
+                "hook": 81.8,
+                "urgencia_72h": 82.3,
+                "viralidad": 71.3,
+                "conversion_cta": 68.8
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 83.8,
+              "metricas": {
+                "hook": 90.2,
+                "urgencia_72h": 91.8,
+                "viralidad": 78.6,
+                "conversion_cta": 79.3
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 84.3,
+              "metricas": {
+                "hook": 89.8,
+                "urgencia_72h": 91.3,
+                "viralidad": 78.3,
+                "conversion_cta": 78.8
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 84.7,
+              "metricas": {
+                "hook": 89.4,
+                "urgencia_72h": 90.8,
+                "viralidad": 78.0,
+                "conversion_cta": 78.3
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "🔊 *NOTA DE VOZ DE TU CAPITÁN:* (0:14)\n▶️ 🔘━━━━━━━━━━━━━━ 0:14\n\n_\"Gente, en 3 días se cierra el tinglado del Rector. O nos apuntamos hoy o nos pasamos el viernes por la tarde en la biblioteca. Moveos ya.\"_\n\n*72 HORAS PARA EL CIERRE DEFINITIVO.*\nCada jugador tiene cromo interactivo con stats de FIFA.\n\n👉 *HAZTE LA FICHA AQUÍ:*\nhttps://futinfo.app/audio-draft"
+        },
+        {
+          "iteracion": 8,
+          "version": "v1.7",
+          "foco_mejora": "Refuerzo para los novatos y jugadores sueltos (Draft de Agentes Libres)",
+          "cambios_aplicados": "Añadir cláusula clara: '¿No tienes equipo entero? Entra como Agente Libre en el Draft y te asignamos un once titular'.",
+          "score_promedio": 93.5,
+          "promedios_metricas": {
+            "hook": 92.8,
+            "urgencia_72h": 94.1,
+            "viralidad": 92.5,
+            "conversion": 94.5
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 87.2,
+              "metricas": {
+                "hook": 86.9,
+                "urgencia_72h": 87.5,
+                "viralidad": 87.3,
+                "conversion_cta": 87.1
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 96.0,
+              "metricas": {
+                "hook": 94.9,
+                "urgencia_72h": 96.5,
+                "viralidad": 94.3,
+                "conversion_cta": 97.1
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 95.5,
+              "metricas": {
+                "hook": 94.5,
+                "urgencia_72h": 96.0,
+                "viralidad": 93.9,
+                "conversion_cta": 96.6
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 94.3,
+              "metricas": {
+                "hook": 94.1,
+                "urgencia_72h": 95.6,
+                "viralidad": 93.6,
+                "conversion_cta": 96.1
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 94.6,
+              "metricas": {
+                "hook": 93.7,
+                "urgencia_72h": 95.1,
+                "viralidad": 93.2,
+                "conversion_cta": 95.6
+              },
+              "critica": "Excelente jerarquía visual. El hook en los primeros 60 caracteres detiene el pulgar en la notificación push."
+            }
+          ],
+          "copy_resultante": "⚠️ *ATENCIÓN: SE BUSCAN 3 TITULARES Y 1 PORTERO (72H)* ⚠️\n\nQuedan *3 DÍAS* para que el Torneo del Rector bloquee las listas de F7 y Sala.\nSi no tienes equipo formado con tus colegas, entra como *Agente Libre* en el Draft y te emparejamos con un 11 titular de tu carrera.\n\n*TIEMPO RESTANTE:* 72 Horas.\n\n📲 *Inscripción inmediata en 40 segundos:*\nhttps://futinfo.app/audio-draft\n\n_Reenvía esto al grupo de tu curso y que salgan los que de verdad juegan a algo._"
+        },
+        {
+          "iteracion": 9,
+          "version": "v1.8",
+          "foco_mejora": "Viralidad y reenvío automático en grupos de WhatsApp de clase",
+          "cambios_aplicados": "Incluir llamada expresa para reenviar: 'Pásalo al grupo de tu clase y señala al que va a ser suplente'.",
+          "score_promedio": 94.9,
+          "promedios_metricas": {
+            "hook": 97.2,
+            "urgencia_72h": 97.6,
+            "viralidad": 85.9,
+            "conversion": 97.6
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 96.4,
+              "metricas": {
+                "hook": 98.4,
+                "urgencia_72h": 99.0,
+                "viralidad": 86.9,
+                "conversion_cta": 99.0
+              },
+              "critica": "Me flipa el pique de stats y cartas FUT. Si me retas directamente, me apunto para demostrar que soy el mejor."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 97.3,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 87.6,
+                "conversion_cta": 99.0
+              },
+              "critica": "El ultimátum de 72h y las plazas contadas me obligan a mandar el mensaje al grupo ya para no quedar de paquete."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 96.6,
+              "metricas": {
+                "hook": 98.8,
+                "urgencia_72h": 99.0,
+                "viralidad": 87.2,
+                "conversion_cta": 99.0
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 94.0,
+              "metricas": {
+                "hook": 98.4,
+                "urgencia_72h": 99.0,
+                "viralidad": 86.9,
+                "conversion_cta": 99.0
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 90.3,
+              "metricas": {
+                "hook": 91.6,
+                "urgencia_72h": 92.2,
+                "viralidad": 81.0,
+                "conversion_cta": 91.9
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "💣 *ALERTA SPOILER: EN 3 DÍAS SE ACABÓ EL PLAZO* 💣\n\nEl domingo a medianoche se acaba el chollo.\nLas cartas se imprimen, el calendario se publica y las plazas se cierran.\n\n¿Vas a dejar que tu facultad quede como la más vaga de todo el campus?\nTardas menos en apuntarte que en calentarte un café en el microondas.\n\n👉 *Ficha oficial en 30 segundos:*\nhttps://futinfo.app/audio-draft"
+        },
+        {
+          "iteracion": 10,
+          "version": "v1.9",
+          "foco_mejora": "Perfección de conversión de respuesta directa (Copy Definitivo Implacable)",
+          "cambios_aplicados": "Fusión de urgencia crítica (últimas 72h), escasez milimétrica, jerarquía visual ineludible y CTA de alta conversión.",
+          "score_promedio": 92.1,
+          "promedios_metricas": {
+            "hook": 96.8,
+            "urgencia_72h": 97.2,
+            "viralidad": 87.4,
+            "conversion": 86.3
+          },
+          "evaluaciones_agentes": [
+            {
+              "agente": "Sergio 'El Picas'",
+              "rol": "Crack Competitivo / Tryhard Universitario",
+              "overall": 89.7,
+              "metricas": {
+                "hook": 95.5,
+                "urgencia_72h": 96.1,
+                "viralidad": 84.9,
+                "conversion_cta": 82.7
+              },
+              "critica": "Le falta veneno y pique directo entre facultades. Quiero ver a quién voy a humillar en el campo."
+            },
+            {
+              "agente": "Marcos 'El Capitán'",
+              "rol": "Capitán Perezoso / Lo deja todo para el final",
+              "overall": 90.1,
+              "metricas": {
+                "hook": 94.7,
+                "urgencia_72h": 95.2,
+                "viralidad": 84.2,
+                "conversion_cta": 81.7
+              },
+              "critica": "Si no veo que solo quedan 3 días y pocas plazas, lo pospongo para mañana y luego se me pasa."
+            },
+            {
+              "agente": "Dani 'El Duda'",
+              "rol": "Estudiante Novato / Teme no dar la talla",
+              "overall": 94.8,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 91.5,
+                "conversion_cta": 92.2
+              },
+              "critica": "El saber que puedo entrar de Agente Libre o con draft sin tener que armar un 11 entero me da toda la seguridad."
+            },
+            {
+              "agente": "Lucas 'El Fiestero'",
+              "rol": "Universitario de Cafetería / Tercer Tiempo",
+              "overall": 95.1,
+              "metricas": {
+                "hook": 99.0,
+                "urgencia_72h": 99.0,
+                "viralidad": 91.2,
+                "conversion_cta": 91.7
+              },
+              "critica": "Es oro para el grupo de WhatsApp. Lo reenvío al instante solo para picar a los vagos de mi clase."
+            },
+            {
+              "agente": "Elena 'Direct-Response'",
+              "rol": "Especialista en Copywriting & Conversión WhatsApp",
+              "overall": 90.7,
+              "metricas": {
+                "hook": 95.9,
+                "urgencia_72h": 96.5,
+                "viralidad": 85.2,
+                "conversion_cta": 83.2
+              },
+              "critica": "Falta contraste tipográfico con negritas de WhatsApp o el enlace de acción queda demasiado escondido."
+            }
+          ],
+          "copy_resultante": "🚨 *COMUNICADO EXTRAOFICIAL DE VESTUARIO (72 HORAS)* 🚨\n\nA todos los que dicen \"yo juego si juega Mengano\":\nMengano ya se ha apuntado. Y Fulano también.\nEl único que falta en la lista del Rector eres tú.\n\n*3 DÍAS PARA EL CIERRE.*\nDomingo 23:59h: persiana bajada y cerrojo puesto.\n\n👉 *Inscríbete antes de que te dejen en el banquillo:*\nhttps://futinfo.app/audio-draft"
+        }
+      ]
+    }
+  },
+  "resumen_general": {
+    "total_iteraciones_por_campana": 10,
+    "total_agentes_evaluadores": 5,
+    "plazo_restante": "72 horas (3 días)",
+    "objetivo": "Maximizar tasa de apertura WhatsApp, viralidad en grupos y registros inmediatos"
+  }
+}
