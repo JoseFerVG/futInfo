@@ -376,7 +376,8 @@ export class TeamStore {
 
   init() {
     const savedPlayers = localStorage.getItem(STORAGE_KEYS.PLAYERS);
-    this.players = savedPlayers ? JSON.parse(savedPlayers) : DEFAULT_PLAYERS;
+    const rawPlayers = savedPlayers ? JSON.parse(savedPlayers) : DEFAULT_PLAYERS;
+    this.players = this.deduplicatePlayers(rawPlayers);
 
     const savedMatches = localStorage.getItem(STORAGE_KEYS.MATCHES);
     this.matches = savedMatches ? JSON.parse(savedMatches) : DEFAULT_MATCHES;
@@ -385,6 +386,39 @@ export class TeamStore {
     this.settings = savedSettings ? JSON.parse(savedSettings) : DEFAULT_SETTINGS;
 
     this.saveLocal();
+  }
+
+  deduplicatePlayers(list) {
+    if (!Array.isArray(list) || list.length === 0) return [...DEFAULT_PLAYERS];
+    const seenEmails = new Set();
+    const seenNames = new Set();
+    const seenIds = new Set();
+    const cleanList = [];
+
+    for (const p of list) {
+      if (!p) continue;
+      // 1. Check ID
+      if (p.id && seenIds.has(p.id)) continue;
+
+      // 2. Check Email
+      const email = (p.email || '').toLowerCase().trim();
+      if (email && email.includes('@')) {
+        if (seenEmails.has(email)) continue;
+        seenEmails.add(email);
+      }
+
+      // 3. Check exact Name
+      const name = (p.name || '').toLowerCase().trim();
+      const nickname = (p.nickname || '').toLowerCase().trim();
+      const nameKey = `${name}_${nickname}`;
+      if (name && seenNames.has(nameKey)) continue;
+
+      if (p.id) seenIds.add(p.id);
+      if (name) seenNames.add(nameKey);
+      cleanList.push(p);
+    }
+
+    return cleanList.length > 0 ? cleanList : [...DEFAULT_PLAYERS];
   }
 
   subscribe(listener) {
@@ -418,6 +452,19 @@ export class TeamStore {
   }
 
   addPlayer(data) {
+    const cleanEmail = (data.email || '').toLowerCase().trim();
+    const cleanName = (data.name || '').toLowerCase().trim();
+
+    // Comprobar si ya existe un jugador con este email o nombre exacto
+    const existing = this.players.find(p => 
+      (cleanEmail && p.email && p.email.toLowerCase().trim() === cleanEmail) ||
+      (cleanName && p.name && p.name.toLowerCase().trim() === cleanName)
+    );
+
+    if (existing) {
+      return this.updatePlayer(existing.id, data);
+    }
+
     const defaultStats = {
       pac: parseInt(data.pac, 10) || 80,
       sho: parseInt(data.sho, 10) || 75,
@@ -520,6 +567,20 @@ export class TeamStore {
       ? this.settings.startingLineupF7 
       : this.settings.startingLineupFutsal;
     return list.map(id => this.getPlayerById(id)).filter(Boolean);
+  }
+
+  setStartingLineup(players) {
+    const isF7 = this.settings.modality === 'f7';
+    const ids = players.map(p => (typeof p === 'string' ? p : p.id)).filter(Boolean);
+    if (isF7) this.settings.startingLineupF7 = ids;
+    else this.settings.startingLineupFutsal = ids;
+    this.notify();
+  }
+
+  resetStartingLineup() {
+    this.settings.startingLineupF7 = ['p1', 'p3', 'p2', 'p8', 'p4', 'p5', 'p6'];
+    this.settings.startingLineupFutsal = ['p1', 'p2', 'p4', 'p5', 'p6'];
+    this.notify();
   }
 
   swapStartingPlayer(slotIndex, newPlayerId) {

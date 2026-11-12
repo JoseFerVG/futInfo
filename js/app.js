@@ -98,7 +98,122 @@ class FutApp {
     }
   }
 
+
+  // ==================== INSPECTOR DE JUGADOR ACTIVO (CAPTURA 1 COURTOIS & CAPTURA 5 ROBBEN) ====================
+  updatePlayerInspector(player) {
+    if (!player) {
+      const starting = store.getStartingLineup();
+      player = starting[0] || store.getPlayers()[0];
+    }
+    if (!player) return;
+
+    const imgEl = document.getElementById('inspector-player-avatar');
+    const posEl = document.getElementById('inspector-player-pos');
+    const nameEl = document.getElementById('inspector-player-name');
+    const ratingEl = document.getElementById('inspector-player-rating');
+    
+    if (imgEl) imgEl.src = player.avatar;
+    if (posEl) posEl.textContent = player.rolesHierarchy?.best || player.roleBest || 'DC';
+    if (nameEl) nameEl.textContent = player.nickname || player.name;
+    if (ratingEl) ratingEl.textContent = player.rating;
+
+    const stats = player.stats || { pac: 80, sho: 80, pas: 80, dri: 80, def: 65, phy: 75 };
+    const pacEl = document.getElementById('stat-pac');
+    const shoEl = document.getElementById('stat-sho');
+    const pasEl = document.getElementById('stat-pas');
+    const driEl = document.getElementById('stat-dri');
+    const defEl = document.getElementById('stat-def');
+    const phyEl = document.getElementById('stat-phy');
+
+    if (pacEl) pacEl.textContent = stats.pac;
+    if (shoEl) shoEl.textContent = stats.sho;
+    if (pasEl) pasEl.textContent = stats.pas;
+    if (driEl) driEl.textContent = stats.dri;
+    if (defEl) defEl.textContent = stats.def;
+    if (phyEl) phyEl.textContent = stats.phy;
+  }
+
+  toggleSquadActions() {
+    const dialog = document.getElementById('squad-actions-dialog');
+    if (dialog) {
+      if (dialog.open) dialog.close();
+      else dialog.showModal();
+    }
+  }
+
+  cancelSelection() {
+    this.selectedStarterIndex = null;
+    this.closeRadialMenu(true);
+    this.renderPitch();
+    this.showToast('Selección cancelada', 'x');
+  }
+
+  triggerSwapActive() {
+    if (this.selectedStarterIndex !== null) {
+      this.openSubDrawer(this.selectedStarterIndex);
+    } else {
+      this.selectStarter(0);
+    }
+  }
+
+  inspectSelectedOrCaptain() {
+    const starting = store.getStartingLineup();
+    const target = this.selectedStarterIndex !== null ? starting[this.selectedStarterIndex] : starting[0];
+    if (target) {
+      this.inspectPlayer(target.id);
+    }
+  }
+
+  autoOptimizeSquad() {
+    const settings = store.getSettings();
+    const isF7 = settings.modality === 'f7';
+    const activeFormation = store.getActiveFormation();
+    const tacticalFormations = {
+      '1-3-2-1': ['POR', 'LI', 'DFC', 'LD', 'MC', 'MC', 'DC'],
+      '1-2-3-1': ['POR', 'DFC', 'DFC', 'EI', 'MC', 'ED', 'DC'],
+      '1-3-1-2': ['POR', 'LI', 'DFC', 'LD', 'MCO', 'DC', 'DC'],
+      '1-1-2-1': ['POR', 'CIE', 'ALI', 'ALD', 'PIV'],
+      '1-2-2': ['POR', 'CIE', 'CIE', 'PIV', 'PIV'],
+      '1-3-0': ['POR', 'ALI', 'CIE', 'ALD', 'MC']
+    };
+    const targetRoles = tacticalFormations[activeFormation] || tacticalFormations[isF7 ? '1-3-2-1' : '1-1-2-1'];
+    const all = store.getPlayers();
+    const pool = [...all];
+    const newStarting = [];
+
+    targetRoles.forEach(role => {
+      // 1. Exact best match
+      let idx = pool.findIndex(p => p.rolesHierarchy?.best === role || p.roleBest === role);
+      // 2. Second best match
+      if (idx === -1) {
+        idx = pool.findIndex(p => p.rolesHierarchy?.second === role || p.roleSecond === role);
+      }
+      // 3. Fallback to highest rated available
+      if (idx === -1) {
+        idx = 0;
+      }
+      if (idx !== -1 && pool.length > 0) {
+        newStarting.push(pool.splice(idx, 1)[0]);
+      }
+    });
+
+    store.setStartingLineup(newStarting);
+    document.getElementById('squad-actions-dialog')?.close();
+    this.renderPitch();
+    this.showToast('¡Plantilla auto-alineada por posiciones oficiales!', 'sparkles');
+  }
+
+  resetSquadPositions() {
+    store.resetStartingLineup();
+    document.getElementById('squad-actions-dialog')?.close();
+    this.renderPitch();
+    this.showToast('Posiciones de plantilla restablecidas', 'rotate-ccw');
+  }
+
   bindEvents() {
+    document.getElementById('btn-squad-actions')?.addEventListener('click', () => {
+      this.toggleSquadActions();
+    });
     // Pestañas
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -582,11 +697,15 @@ class FutApp {
   switchTab(tabId) {
     this.currentTab = tabId;
 
-    document.querySelectorAll('.tab-btn').forEach(btn => {
+    document.querySelectorAll('.fifa-tab-btn, .tab-btn').forEach(btn => {
       if (btn.dataset.tab === tabId) {
-        btn.className = 'tab-btn active px-4 py-2 rounded-xl flex items-center gap-2 transition text-white bg-slate-900 border border-slate-800 shadow-sm';
+        btn.classList.add('active');
+        btn.classList.remove('text-slate-500');
+        btn.classList.add('text-slate-900');
       } else {
-        btn.className = 'tab-btn px-4 py-2 rounded-xl flex items-center gap-2 transition text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 border border-transparent';
+        btn.classList.remove('active');
+        btn.classList.remove('text-slate-900');
+        btn.classList.add('text-slate-500');
       }
     });
 
@@ -829,9 +948,27 @@ class FutApp {
       modBadge.textContent = isF7 ? 'FUT 7 DRAFT' : 'FUTSAL DRAFT';
     }
 
-    // Sin líneas de química
-    if (svgLines) svgLines.innerHTML = '';
     const projected = formationConfig.slots.map(s => this.projectSlot(s));
+
+    // LÍNEAS TÁCTICAS DE QUÍMICA SVG (CAPTURA 1: ENLACES VERDES DE JUEGO)
+    if (svgLines && formationConfig.links) {
+      svgLines.innerHTML = formationConfig.links.map(([i1, i2]) => {
+        const p1 = projected[i1];
+        const p2 = projected[i2];
+        if (!p1 || !p2) return '';
+        return `<line x1="${p1.left}%" y1="${p1.top}%" x2="${p2.left}%" y2="${p2.top}%" stroke="rgba(0, 230, 118, 0.75)" stroke-width="3" stroke-linecap="round" style="filter: drop-shadow(0 0 5px rgba(0, 230, 118, 0.7));" />`;
+      }).join('');
+    }
+
+    // Marca de agua táctica de formación sobre el césped (Captura 1)
+    const fWatermark = document.getElementById('pitch-formation-watermark');
+    if (fWatermark) {
+      fWatermark.textContent = activeFormation;
+    }
+
+    // Actualizar inspector superior derecho (Captura 1 y 5)
+    const activePlayer = this.selectedStarterIndex !== null ? startingPlayers[this.selectedStarterIndex] : (startingPlayers[0] || allPlayers[0]);
+    this.updatePlayerInspector(activePlayer);
 
     // Renderizar Cartas sobre el Césped
     slotsContainer.innerHTML = formationConfig.slots.map((slot, index) => {
@@ -858,7 +995,8 @@ class FutApp {
         <div class="fut-card-slot ${isSelected ? 'swap-active' : ''}" 
              style="${slotStyle}"
              data-slot-index="${index}"
-             onclick="window.futApp.selectStarter(${index})">
+             onclick="window.futApp.selectStarter(${index})"
+             onmouseenter="window.futApp.updatePlayerInspector(window.futApp.store.getStartingLineup()[${index}])">
           
           <div class="fut-card ${cardTypeClass}">
             <!-- Capa Holográfica Reactiva -->
@@ -890,14 +1028,27 @@ class FutApp {
       `;
     }).join('');
 
-    // Banquillo
+    // Banquillo (Deduplicación estricta para garantizar 0 duplicados)
     const allPlayers = store.getPlayers();
     const startingIds = new Set(startingPlayers.map(p => p.id));
-    const bench = allPlayers.filter(p => !startingIds.has(p.id));
+    const seenBenchNames = new Set(startingPlayers.map(p => (p.nickname || p.name || '').toLowerCase().trim()));
+    const seenBenchEmails = new Set(startingPlayers.map(p => (p.email || '').toLowerCase().trim()).filter(Boolean));
+    const bench = [];
+
+    for (const p of allPlayers) {
+      if (startingIds.has(p.id)) continue;
+      const email = (p.email || '').toLowerCase().trim();
+      const name = (p.nickname || p.name || '').toLowerCase().trim();
+      if (email && seenBenchEmails.has(email)) continue;
+      if (name && seenBenchNames.has(name)) continue;
+      if (email) seenBenchEmails.add(email);
+      if (name) seenBenchNames.add(name);
+      bench.push(p);
+    }
 
     if (bench.length === 0) {
       benchContainer.innerHTML = `
-        <div class="text-xs text-slate-500 py-2">No hay suplentes en la recámara. ¡Crea más cartas con Google para el banquillo!</div>
+        <div class="text-xs text-slate-400 py-2 px-3 italic whitespace-nowrap">Banquillo libre. Añade fichajes desde el Álbum.</div>
       `;
     } else {
       benchContainer.innerHTML = bench.map(p => {
@@ -905,22 +1056,25 @@ class FutApp {
         const cardClass = p.cardType === 'totw' ? 'fut-card-totw' : (p.cardType === 'special' ? 'fut-card-special' : 'fut-card-gold');
 
         return `
-          <div class="cursor-pointer hover:scale-105 transition flex-shrink-0" onclick="window.futApp.selectBench('${p.id}')">
-            <div class="fut-card ${cardClass}" style="width: 76px; height: 105px;">
-              <div class="fut-card-header" style="height: 56px;">
+          <div class="cursor-pointer hover:scale-105 transition flex-shrink-0" 
+               onclick="window.futApp.selectBench('${p.id}')"
+               onmouseenter="window.futApp.updatePlayerInspector(window.futApp.store.getPlayerById('${p.id}'))"
+               title="${p.name} (${p.rolesHierarchy ? p.rolesHierarchy.best : p.roleBest || 'DC'})">
+            <div class="fut-card ${cardClass}" style="width: 60px; height: 86px;">
+              <div class="fut-card-header" style="height: 44px; padding: 2px 3px 0 3px;">
                 <div class="fut-card-badge-col">
-                  <span class="fut-card-rating" style="font-size: 1.3rem;">${p.rating}</span>
-                  <span class="fut-card-pos" style="font-size: 0.58rem;">${p.rolesHierarchy.best}</span>
-                  <span class="fut-card-emblem">${fac.icon}</span>
+                  <span class="fut-card-rating" style="font-size: 1.15rem; line-height: 1;">${p.rating}</span>
+                  <span class="fut-card-pos" style="font-size: 0.5rem;">${p.rolesHierarchy ? p.rolesHierarchy.best : (p.roleBest || 'DC')}</span>
+                  <span class="fut-card-emblem" style="font-size: 0.55rem;">${fac.icon}</span>
                 </div>
-                <div class="fut-card-avatar-wrap" style="width: 48px; height: 55px;">
+                <div class="fut-card-avatar-wrap" style="width: 38px; height: 44px; right: 1px; top: 2px;">
                   <img src="${p.avatar}" alt="${p.name}" class="fut-card-avatar">
                 </div>
               </div>
-              <div class="fut-card-name-plate" style="font-size: 0.6rem; padding: 1px 2px;">
-                ${p.nickname}
+              <div class="fut-card-name-plate" style="font-size: 0.52rem; padding: 1px 2px; margin: 0 1px;">
+                ${p.nickname || p.name.split(' ')[0]}
               </div>
-              <div class="fut-card-footer"></div>
+              <div class="fut-card-footer" style="padding: 1px;"></div>
             </div>
           </div>
         `;
@@ -1043,7 +1197,20 @@ class FutApp {
 
     const allPlayers = store.getPlayers();
     const startingIds = new Set(starting.map(p => p.id));
-    const bench = allPlayers.filter(p => !startingIds.has(p.id));
+    const seenBenchNames = new Set(starting.map(p => (p.nickname || p.name || '').toLowerCase().trim()));
+    const seenBenchEmails = new Set(starting.map(p => (p.email || '').toLowerCase().trim()).filter(Boolean));
+    const bench = [];
+
+    for (const p of allPlayers) {
+      if (startingIds.has(p.id)) continue;
+      const email = (p.email || '').toLowerCase().trim();
+      const name = (p.nickname || p.name || '').toLowerCase().trim();
+      if (email && seenBenchEmails.has(email)) continue;
+      if (name && seenBenchNames.has(name)) continue;
+      if (email) seenBenchEmails.add(email);
+      if (name) seenBenchNames.add(name);
+      bench.push(p);
+    }
 
     if (bench.length === 0) {
       list.innerHTML = `<div class="text-xs text-slate-500 col-span-full py-4 text-center font-bold">No hay suplentes disponibles en el banquillo. ¡Crea más cartas con Google!</div>`;
@@ -1095,6 +1262,10 @@ class FutApp {
 
     if (this.selectedStarterIndex === null) {
       this.selectedStarterIndex = index;
+      const starting = store.getStartingLineup();
+      if (starting[index]) {
+        this.updatePlayerInspector(starting[index]);
+      }
       this.renderPitch();
       const settings = store.getSettings();
       const isF7 = settings.modality === 'f7';

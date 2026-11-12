@@ -1185,3 +1185,196 @@ dialog[open] {
   font-size: 1.1rem !important;
   padding: 4px 6px !important;
 }
+
+/* =====================================================================
+   ESTÉTICA 1:1 FIFA 19 & FIFA 22 ULTIMATE TEAM (MENÚS & SQUAD MANAGEMENT)
+   Basado exactamente en las capturas del usuario:
+   - Ribbon de pestañas FIFA 19 con subrayado neón dual-tone (Magenta / Cian / Ámbar)
+   - HUD de Valoración & Química con barra de progreso cian estilo FC 24
+   - HUD derecho con Ficha Rápida del Jugador seleccionado (estilo Courtois / Robben)
+   - Marca de agua táctica de Formación sobre el césped en perspectiva
+   - Muelle inferior integrado de Suplentes (SUP.) con tarjeta de Míster (MÁN.)
+   - Barra de acción de mando de consola en el pie
+   ===================================================================== */
+
+/* Ribbon de Pestañas FIFA 19 */
+.fifa-tab-btn {
+  color: #64748b;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  position: relative;
+  transition: color 0.15s ease;
+}
+.fifa-tab-btn:hover {
+  color: #0f172a;
+}
+.fifa-tab-btn.active {
+  color: #0f172a;
+  font-weight: 900;
+}
+.fifa-tab-indicator {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  background: linear-gradient(90deg, #ec4899 0%, #06b6d4 50%, #f59e0b 100%);
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+}
+.fifa-tab-btn.active .fifa-tab-indicator {
+  display: block;
+}
+
+/* Sub-header de Navegación de Plantilla (FIFA 22 Squad Menu) */
+.fifa-squad-subnav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #64748b;
+  border-bottom: 1.5px solid #e2e8f0;
+  margin-bottom: 8px;
+}
+.fifa-squad-subnav .subnav-active {
+  color: #0f172a;
+  position: relative;
+}
+.fifa-squad-subnav .subnav-active::after {
+  content: "";
+  position: absolute;
+  bottom: -7.5px;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: #ec4899;
+  border-radius: 2px;
+}
+
+/* HUD Superior Izquierdo: Valoración, Química & Acciones (Captura 1) */
+.fifa-squad-left-hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 40;
+  width: 210px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(226, 232, 240, 0.95);
+  border-radius: 1rem;
+  padding: 10px 12px;
+  box-shadow: 0 15px 35px -5px rgba(15, 23, 42, 0.12);
+}
+
+/* HUD Superior Derecho: Ficha del Jugador Activo (Captura 1 Courtois & Captura 5 Robben) */
+.fifa-squad-right-hud {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 40;
+  width: 225px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(226, 232, 240, 0.95);
+  border-radius: 1rem;
+  padding: 10px 12px;
+  box-shadow: 0 15px 35px -5px rgba(15, 23, 42, 0.12);
+}
+
+/* Marca de Agua de Formación Táctica en Césped (Captura 1: 4-3-3) */
+.pitch-formation-watermark {
+  position: absolute;
+  bottom: 125px;
+  left: 32px;
+  font-family: 'Teko', sans-serif;
+  font-size: 5.5rem;
+  font-weight: 700;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.32);
+  letter-spacing: 2px;
+  pointer-events: none;
+  user-select: none;
+  z-index: 8;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  line-height: 1;
+}
+
+/* Muelle de Suplentes Integrado en la Base del Estadio (Captura 1 SUP. & MÁN.) */
+.fifa-bench-dock {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(16px);
+  border-top: 2px solid #334155;
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  gap: 8px;
+  z-index: 25;
+  overflow: hidden;
+}
+
+.fifa-bench-tag {
+  background: #334155;
+  color: #f8fafc;
+  font-family: 'Teko', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 8px 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  line-height: 1;
+}
+.fifa-bench-tag.manager-tag {
+  background: #b45309;
+  color: #fef3c7;
+}
+
+.fifa-bench-cards-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 4px;
+  flex: 1;
+  scrollbar-width: thin;
+}
+
+/* Barra de Botones de Gamepad de Consola en el Pie (Captura 1 y 5) */
+.fifa-console-bar {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 10px 18px;
+  box-shadow: 0 4px 15px -3px rgba(15, 23, 42, 0.06);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #334155;
+  user-select: none;
+}
+
+.gamepad-badge.square-btn {
+  background: #ec4899;
+  box-shadow: 0 0 6px rgba(236, 72, 153, 0.8);
+}
+.gamepad-badge.l2-badge, .gamepad-badge.r3-badge {
+  background: #334155;
+  color: #f8fafc;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 900;
+}
