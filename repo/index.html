@@ -64,27 +64,23 @@
   <div class="hud-bg" aria-hidden="true"></div>
 
   <header class="hud-top">
-    <!-- Chyron izquierdo: escudo + club -->
+    <!-- Chyron izquierdo: Escudo oficial y Nombre limpio del Club -->
     <div class="hud-club">
-      <div class="hud-crest">FUT</div>
       <div class="hud-club-data">
-        <div class="hud-club-row">
-          <span class="hud-est">EST. OCT 2026</span>
-          <span id="nav-team-name" class="hud-club-name">Furia Rector FC</span>
-        </div>
-        <div class="hud-club-row hud-club-meta">
-          <span id="nav-tournament-badge">Torneo del Rector</span>
-          <span id="firebase-status-badge" class="hud-online"><i></i><span>En Línea</span></span>
-        </div>
+        <span id="nav-team-name" class="hud-club-name font-fifa">FURIA RECTOR FC</span>
+        <span id="nav-tournament-badge" class="hud-club-tournament">TORNEO DEL RECTOR 2026</span>
       </div>
     </div>
 
-    <!-- Chyron derecho: modalidad + audio + sesión -->
+    <!-- Chyron derecho: modalidad + tema claro/oscuro + audio + sesión -->
     <div class="hud-status">
       <div class="hud-mode" role="group" aria-label="Modalidad">
         <button id="btn-mode-f7" class="hud-mode-btn active">FÚTBOL 7</button>
         <button id="btn-mode-futsal" class="hud-mode-btn">FÚTBOL SALA</button>
       </div>
+      <button id="btn-toggle-theme" aria-label="Alternar modo claro / oscuro" title="Modo Claro / Oscuro" class="hud-icon-btn">
+        <i data-lucide="sun" id="theme-toggle-icon" class="w-4 h-4"></i>
+      </button>
       <button id="btn-toggle-audio" aria-label="Alternar efectos de sonido" title="Sonido" class="hud-icon-btn">
         <i data-lucide="volume-2" class="w-4 h-4"></i>
       </button>
@@ -107,14 +103,9 @@
 
       <!-- PANEL A (44% x 100%): ACTIVE SQUAD — foco por defecto -->
       <article class="hud-panel hud-panel--squad is-focus">
-        <div class="hud-panel-watermark">XI</div>
         <header class="hud-squad-head cursor-pointer group" id="hud-active-squad-head" role="button" tabindex="0" title="Pulsar para abrir Gestión de Plantilla y Formaciones">
           <div class="flex items-start justify-between w-full">
-            <h2 class="hud-title group-hover:text-amber-300 transition">ACTIVE<br>SQUAD</h2>
-            <button type="button" id="btn-open-squad-modal" class="hud-squad-action-badge font-fifa" title="Abrir Gestión de Plantilla y Formaciones">
-              <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
-              <span>CAMBIAR PLANTILLA / FORMACIÓN</span>
-            </button>
+            <h2 class="hud-title group-hover:text-amber-300 transition">ACTIVE SQUAD</h2>
           </div>
           <div class="hud-squad-meta">
             <div class="flex items-center gap-2">
@@ -129,12 +120,19 @@
           </div>
         </header>
 
+        <!-- Barra de Acción EA Sports: Cambiar Plantilla / Formación con máxima visibilidad -->
+        <div class="hud-squad-action-bar">
+          <button type="button" id="btn-open-squad-modal" class="hud-squad-bar-btn" title="Abrir Gestión de Plantilla y Formaciones">
+            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-amber-400"></i>
+            <span class="hud-squad-bar-title font-fifa">CAMBIAR PLANTILLA &amp; FORMACIÓN</span>
+            <span class="hud-squad-bar-badge font-fifa">ESQUEMAS EA SPORTS FC</span>
+          </button>
+        </div>
+
         <div id="swap-banner" class="hidden hud-swap-banner">ARRASTRA SOBRE OTRO JUGADOR PARA INTERCAMBIAR</div>
 
         <div class="fut-stadium-container hud-pitch-frame">
           <div id="pitch-wrapper" class="fut-pitch hud-pitch">
-            <div id="pitch-formation-watermark" class="pitch-formation-watermark">1-3-2-1</div>
-
             <!-- Datos ocultos usados por el renderer -->
             <span id="hud-team-name" hidden>Furia Rector FC</span>
             <span id="hud-team-rating" hidden>84</span>
@@ -163,6 +161,11 @@
           <span id="inspector-player-pos" class="hud-insp-pos">POR</span>
           <span id="inspector-player-name" class="hud-insp-name">Pablo García</span>
           <span id="inspector-player-rating" class="hud-insp-ovr">84</span>
+          <div class="hud-insp-traits hidden md:flex items-center gap-1.5 ml-1">
+            <span id="inspector-player-playstyle" class="hud-insp-trait-badge" title="PlayStyle Oficial">🎯 TIRO CALIDAD</span>
+            <span id="inspector-player-chem" class="hud-insp-trait-badge" title="Estilo de Química">HUN</span>
+            <span id="inspector-player-stars" class="hud-insp-stars-badge" title="Filigranas y Pierna Mala">4★ / 4★</span>
+          </div>
           <div id="inspector-stats-grid" class="hud-insp-stats">
             <span><b>PAC</b><em id="stat-pac">84</em></span>
             <span><b>SHO</b><em id="stat-sho">82</em></span>
@@ -176,7 +179,6 @@
 
       <!-- PANEL B (44% x 49.5%): BANQUILLO -->
       <article class="hud-panel hud-panel--bench" onclick="if(!event.target.closest('[data-bench-id]')) window.futApp.openSubDrawer()">
-        <div class="hud-panel-watermark">SUB</div>
         <h3 class="hud-title">BANQUILLO</h3>
         <div class="hud-bignum"><span id="side-bench-count">7</span><small>SUPLENTES</small></div>
         <div class="fifa-bench-dock hud-bench-dock">
@@ -186,7 +188,6 @@
 
       <!-- PANEL C (44% x 49.5%): TÁCTICA -->
       <article class="hud-panel hud-panel--tactics">
-        <div class="hud-panel-watermark" id="tile-formation-badge">1-3-2-1</div>
         <button type="button" id="btn-squad-actions" class="hud-panel-hit" aria-label="Abrir centro táctico"></button>
         <h3 class="hud-title">CENTRO<br>TÁCTICO</h3>
         <div class="hud-bignum"><span id="side-formation-tag">1-3-2-1</span><small>FORMACIÓN</small></div>
@@ -213,7 +214,7 @@
           </h2>
           <p class="text-xs text-slate-400 mt-1 font-medium">Cartas activas de la plantilla con estadísticas oficiales y jerarquía táctica de posiciones.</p>
         </div>
-        <button id="btn-open-create-card" class="relative z-10 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-500/25 transition active:scale-95 cursor-pointer">
+        <button id="btn-open-create-card" class="relative z-10 px-5 py-2.5  bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-500/25 transition active:scale-95 cursor-pointer">
           <i data-lucide="plus" class="w-4 h-4"></i>
           <span>Mi Carta / Nuevo Fichaje</span>
         </button>
@@ -238,15 +239,15 @@
           </div>
 
           <div class="flex items-center gap-2 flex-wrap">
-            <button onclick="window.futApp.voteAttendance('asistira')" class="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition active:scale-95 cursor-pointer">
+            <button onclick="window.futApp.voteAttendance('asistira')" class="px-4 py-2  bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition active:scale-95 cursor-pointer">
               <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>
               <span>Asistiré</span>
             </button>
-            <button onclick="window.futApp.voteAttendance('duda')" class="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition active:scale-95 cursor-pointer">
+            <button onclick="window.futApp.voteAttendance('duda')" class="px-4 py-2  bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition active:scale-95 cursor-pointer">
               <i data-lucide="help-circle" class="w-4 h-4 text-amber-400"></i>
               <span>Duda</span>
             </button>
-            <button onclick="window.futApp.voteAttendance('no_puede')" class="px-4 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition active:scale-95 cursor-pointer">
+            <button onclick="window.futApp.voteAttendance('no_puede')" class="px-4 py-2  bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition active:scale-95 cursor-pointer">
               <i data-lucide="x" class="w-4 h-4 text-rose-400"></i>
               <span>Baja</span>
             </button>
@@ -265,7 +266,7 @@
       <!-- Encabezado con Botón de Programar Partido -->
       <div class="flex items-center justify-between">
         <h3 class="font-fifa text-2xl sm:text-3xl font-bold text-white uppercase tracking-wider">CALENDARIO DE JORNADAS</h3>
-        <button id="btn-create-match" class="admin-only px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition active:scale-95 cursor-pointer">
+        <button id="btn-create-match" class="admin-only px-4 py-2  bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition active:scale-95 cursor-pointer">
           <i data-lucide="plus" class="w-4 h-4"></i>
           <span>Programar Partido</span>
         </button>
@@ -294,15 +295,15 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label for="set-team-name" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Nombre del Equipo</label>
-              <input type="text" id="set-team-name" name="teamName" autocomplete="off" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+              <input type="text" id="set-team-name" name="teamName" autocomplete="off" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
             </div>
             <div>
               <label for="set-tournament-name" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Nombre del Torneo</label>
-              <input type="text" id="set-tournament-name" name="tournamentName" autocomplete="off" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+              <input type="text" id="set-tournament-name" name="tournamentName" autocomplete="off" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
             </div>
           </div>
 
-          <button type="submit" class="admin-only px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer">
+          <button type="submit" class="admin-only px-6 py-2.5  bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer">
             Guardar Información del Club
           </button>
         </form>
@@ -316,9 +317,9 @@
           <div class="flex items-center gap-2">
             <i data-lucide="repeat" class="w-5 h-5 text-cyan-400"></i>
             <span class="text-white font-fifa text-2xl font-black tracking-wider uppercase">Sustitución Rápida</span>
-            <span id="sub-drawer-target-player" class="text-xs bg-cyan-950/60 text-cyan-300 border border-cyan-500/40 px-2.5 py-1 rounded-lg font-bold">Cambiar Jugador</span>
+            <span id="sub-drawer-target-player" class="text-xs bg-cyan-950/60 text-cyan-300 border border-cyan-500/40 px-2.5 py-1  font-bold">Cambiar Jugador</span>
           </div>
-          <button type="button" id="btn-close-sub-drawer" class="text-slate-400 hover:text-white text-xs font-black px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+          <button type="button" id="btn-close-sub-drawer" class="text-slate-400 hover:text-white text-xs font-black px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700  transition flex items-center gap-1.5 shadow-sm cursor-pointer">
             <i data-lucide="x" class="w-4 h-4"></i>
             <span>Cerrar</span>
           </button>
@@ -341,14 +342,14 @@
   <!-- ==================== MODALES NATIVOS <dialog> ACCESIBLES ==================== -->
 
   <!-- 1. MODAL LOGIN PRINCIPAL (CON GOOGLE SIGN-IN LIGHT ESPORTS) -->
-  <dialog id="login-dialog" aria-labelledby="login-title" class="fifa-console-modal max-w-md w-full rounded-2xl bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
+  <dialog id="login-dialog" aria-labelledby="login-title" class="fifa-console-modal max-w-md w-full  bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
     <div class="p-6">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-2.5">
-          <span class="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 font-fifa text-xl font-bold flex items-center justify-center shadow">FUT</span>
+          <span class="w-9 h-9  bg-amber-400 text-slate-950 font-fifa text-xl font-bold flex items-center justify-center shadow">FUT</span>
           <h2 id="login-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">Acceso al Club</h2>
         </div>
-        <button type="button" id="btn-close-login" aria-label="Cerrar ventana de inicio de sesión" class="text-slate-400 hover:text-white p-1.5 focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg cursor-pointer">
+        <button type="button" id="btn-close-login" aria-label="Cerrar ventana de inicio de sesión" class="text-slate-400 hover:text-white p-1.5 focus-visible:ring-2 focus-visible:ring-amber-500  cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -357,7 +358,7 @@
         Accede con tu <strong>Cuenta de Google</strong> para unirte a la plantilla oficial y gestionar tu carta FUT.
       </p>
 
-      <button type="button" id="btn-google-signin" class="w-full py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-3 shadow-md transition group active:scale-[0.98] cursor-pointer">
+      <button type="button" id="btn-google-signin" class="w-full py-3.5 px-4  bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-3 shadow-md transition group active:scale-[0.98] cursor-pointer">
         <svg class="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -367,7 +368,7 @@
         <span>Continuar con Google</span>
       </button>
 
-      <div id="google-auth-error" class="hidden mt-3 text-xs text-rose-400 p-2.5 rounded-lg bg-rose-950/50 border border-rose-500/40"></div>
+      <div id="google-auth-error" class="hidden mt-3 text-xs text-rose-400 p-2.5  bg-rose-950/50 border border-rose-500/40"></div>
 
       <div class="relative my-6">
         <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-800"></div></div>
@@ -377,11 +378,11 @@
       </div>
 
       <div class="space-y-2">
-        <button type="button" onclick="window.futApp.quickLogin('mister@rector.es', 'rector2026')" class="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-amber-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer">
+        <button type="button" onclick="window.futApp.quickLogin('mister@rector.es', 'rector2026')" class="w-full py-2.5 px-3  bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-amber-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer">
           <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
           <span>Entrar como Míster (Admin)</span>
         </button>
-        <button type="button" onclick="window.futApp.quickLogin('charly@rector.es', 'rector2026')" class="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-emerald-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer">
+        <button type="button" onclick="window.futApp.quickLogin('charly@rector.es', 'rector2026')" class="w-full py-2.5 px-3  bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-emerald-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer">
           <i data-lucide="user" class="w-4 h-4 text-emerald-400"></i>
           <span>Entrar como Jugador (Carlos Ruiz)</span>
         </button>
@@ -391,89 +392,181 @@
   </dialog>
 
   <!-- 2. MODAL RELLENAR FICHA DE PERSONAJE FIFA (ROLES DE MEJOR A PEOR) -->
-  <dialog id="player-card-setup-dialog" aria-labelledby="setup-title" class="fifa-console-modal max-w-xl w-full rounded-2xl bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
+  <dialog id="player-card-setup-dialog" aria-labelledby="setup-title" class="fifa-console-modal max-w-xl w-full  bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
     <div class="p-6">
       
       <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
         <div class="flex items-center gap-2.5">
-          <span class="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 font-fifa text-xl font-bold flex items-center justify-center shadow">FUT</span>
+          <span class="w-9 h-9  bg-amber-400 text-slate-950 font-fifa text-xl font-bold flex items-center justify-center shadow">FUT</span>
           <div>
             <h3 id="setup-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider leading-none">Ficha Técnica de Jugador</h3>
             <p class="text-xs text-slate-400 font-medium mt-0.5">1 carta por usuario • Personaliza tu foto, atributos y roles.</p>
           </div>
         </div>
-        <button type="button" id="btn-close-setup" aria-label="Cerrar formulario de carta FUT" class="text-slate-400 hover:text-white p-1.5 focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg cursor-pointer">
+        <button type="button" id="btn-close-setup" aria-label="Cerrar formulario de carta FUT" class="text-slate-400 hover:text-white p-1.5 focus-visible:ring-2 focus-visible:ring-amber-500  cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <form id="form-setup-card" class="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
         
-        <!-- Editor de Foto de Perfil FUT -->
-        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row items-center gap-4">
-          <div class="relative group cursor-pointer flex-shrink-0">
-            <img id="setup-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Avatar" class="w-16 h-16 rounded-2xl object-cover border-2 border-amber-400 shadow-md">
-            <label for="setup-avatar-file" class="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 transition rounded-2xl flex flex-col items-center justify-center text-[10px] font-bold text-white cursor-pointer" title="Subir foto desde tu dispositivo">
-              <i data-lucide="camera" class="w-4 h-4 text-amber-400 mb-0.5"></i>
-              <span>Cambiar</span>
-            </label>
-          </div>
-          <div class="flex-1 text-center sm:text-left space-y-1">
-            <div id="setup-user-name" class="font-fifa text-xl font-bold text-white leading-none">Nombre de Usuario</div>
+        <!-- Identificación del Jugador -->
+        <div class="p-3 bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+          <div>
+            <div id="setup-user-name" class="font-fifa text-xl font-bold text-white uppercase">Usuario</div>
             <div id="setup-user-email" class="text-xs text-slate-400 font-mono">correo@gmail.com</div>
-            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
-              <label for="setup-avatar-file" class="cursor-pointer text-xs font-black uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 px-3 py-1 rounded-xl shadow-sm transition flex items-center gap-1.5 active:scale-95">
-                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                <span>Subir Foto Personal</span>
-              </label>
-              <input type="file" id="setup-avatar-file" aria-label="Subir archivo de foto" accept="image/*" class="hidden">
-              <input type="hidden" id="setup-avatar-url" aria-label="URL del avatar" name="avatar" value="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80">
+          </div>
+          <span class="text-[10px] font-fifa text-amber-400 uppercase tracking-wider bg-amber-400/10 px-2 py-1 border border-amber-400/30">CARTA ACTIVA EA SPORTS</span>
+        </div>
+
+        <!-- PERSONALIZADOR DE EQUIPACIÓN OFICIAL Y DORSAL -->
+        <div class="p-4 bg-slate-900/90 border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <span class="text-xs font-black text-amber-400 uppercase tracking-wide font-fifa text-base flex items-center gap-1.5">
+              <i data-lucide="shirt" class="w-4 h-4 text-amber-400"></i>
+              <span>KIT STUDIO — PERSONALIZACIÓN DE EQUIPACIÓN</span>
+            </span>
+            <span class="text-[10px] uppercase font-fifa text-slate-400">EA SPORTS KIT CREATOR</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div>
+              <label for="setup-kit-primary" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Color Camiseta *</label>
+              <select id="setup-kit-primary" name="kitColor" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
+                <option value="#f0be2a" selected>Oro FUT (#f0be2a)</option>
+                <option value="#0ea5e9">Azul Eléctrico (#0ea5e9)</option>
+                <option value="#dc2626">Rojo Furia (#dc2626)</option>
+                <option value="#f8fafc">Blanco Real (#f8fafc)</option>
+                <option value="#059669">Verde Esmeralda (#059669)</option>
+                <option value="#111827">Negro Carbón (#111827)</option>
+                <option value="#7c3aed">Púrpura Real (#7c3aed)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="setup-kit-secondary" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Detalles / Cuello</label>
+              <select id="setup-kit-secondary" name="kitSecondary" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
+                <option value="#111827" selected>Negro Carbón</option>
+                <option value="#f0be2a">Oro FUT</option>
+                <option value="#ffffff">Blanco Puro</option>
+                <option value="#00f0ff">Cian Neón</option>
+                <option value="#dc2626">Rojo Intenso</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="setup-kit-collar" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Estilo Cuello</label>
+              <select id="setup-kit-collar" name="kitCollar" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
+                <option value="round" selected>Redondo Clásico</option>
+                <option value="vneck">Pico (V-Neck Pro)</option>
+                <option value="polo">Cuello Polo Vintage</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="setup-kit-sleeves" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Mangas</label>
+              <select id="setup-kit-sleeves" name="kitSleeves" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
+                <option value="short" selected>Manga Corta Pro</option>
+                <option value="long">Manga Larga + Térmica</option>
+              </select>
             </div>
           </div>
         </div>
 
-        <!-- Galería de Presets de Jugadores Pro -->
-        <div class="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl space-y-1.5">
-          <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1 font-fifa">
-            <i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i> O elige un headshot pro en 1 click:
-          </span>
-          <div class="flex items-center gap-2 overflow-x-auto py-1" id="setup-avatar-presets">
-            <button type="button" class="avatar-preset-btn flex-shrink-0 p-0.5 rounded-xl border-2 border-transparent hover:border-amber-400 transition" data-avatar="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Preset 1" class="w-9 h-9 rounded-lg object-cover">
-            </button>
-            <button type="button" class="avatar-preset-btn flex-shrink-0 p-0.5 rounded-xl border-2 border-transparent hover:border-amber-400 transition" data-avatar="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" alt="Preset 2" class="w-9 h-9 rounded-lg object-cover">
-            </button>
-            <button type="button" class="avatar-preset-btn flex-shrink-0 p-0.5 rounded-xl border-2 border-transparent hover:border-amber-400 transition" data-avatar="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80">
-              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80" alt="Preset 3" class="w-9 h-9 rounded-lg object-cover">
-            </button>
-            <button type="button" class="avatar-preset-btn flex-shrink-0 p-0.5 rounded-xl border-2 border-transparent hover:border-amber-400 transition" data-avatar="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80">
-              <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80" alt="Preset 4" class="w-9 h-9 rounded-lg object-cover">
-            </button>
-            <button type="button" class="avatar-preset-btn flex-shrink-0 p-0.5 rounded-xl border-2 border-transparent hover:border-amber-400 transition" data-avatar="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80">
-              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80" alt="Preset 5" class="w-9 h-9 rounded-lg object-cover">
-            </button>
-            <button type="button" class="avatar-preset-btn flex-shrink-0 p-0.5 rounded-xl border-2 border-transparent hover:border-amber-400 transition" data-avatar="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80">
-              <img src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80" alt="Preset 6" class="w-9 h-9 rounded-lg object-cover">
-            </button>
+        <!-- PLAYSTYLES, HABILIDADES & CELEBRACIÓN -->
+        <div class="p-4 bg-slate-900/90 border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <span class="text-xs font-black text-amber-400 uppercase tracking-wide font-fifa text-base flex items-center gap-1.5">
+              <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+              <span>PLAYSTYLES OFICIALES &amp; HABILIDADES</span>
+            </span>
+            <span class="text-[10px] uppercase font-fifa text-slate-400">EA FC 25 ENGINE</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="setup-playstyle" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">PlayStyle Característico *</label>
+              <select id="setup-playstyle" name="playStyle" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
+                <option value="finesse" selected>🎯 Tiro con Calidad (Finesse Shot)</option>
+                <option value="power_shot">💥 Zapatazo / Cañonero (Power Shot)</option>
+                <option value="rapid">⚡ Paso Rápido / Sprint (Rapid)</option>
+                <option value="incisive">🪄 Pase Incisivo al Hueco (Incisive Pass)</option>
+                <option value="anticipate">🛡️ Anticipación / Muralla (Anticipate)</option>
+                <option value="acrobatic">🧤 Reflejos Felinos (Acrobatic GK)</option>
+                <option value="leader">👑 Don de Mando / Capitán (Leader)</option>
+                <option value="trivela">🌀 Trivela / Empeine Exterior</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="setup-celebration" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Celebración de Gol Favorita</label>
+              <select id="setup-celebration" name="celebration" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
+                <option value="siuuu" selected>SIUUU (Salto y giro en el aire)</option>
+                <option value="calma">Calma (Palmas hacia el suelo)</option>
+                <option value="samba">Samba Brasileña</option>
+                <option value="corazon">Corazón con los dedos</option>
+                <option value="robot">El Robot Mecánico</option>
+                <option value="desliz">Deslizamiento sobre rodillas</option>
+                <option value="cielo">Doble dedo señalando al cielo</option>
+                <option value="dormido">Night Night (Dormido)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <div>
+              <label for="setup-skill-moves" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Filigranas / Regate</label>
+              <select id="setup-skill-moves" name="skillMoves" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
+                <option value="5">★★★★★ 5 Estrellas (Mago)</option>
+                <option value="4" selected>★★★★☆ 4 Estrellas (Regateador)</option>
+                <option value="3">★★★☆☆ 3 Estrellas (Competente)</option>
+                <option value="2">★★☆☆☆ 2 Estrellas (Básico)</option>
+                <option value="1">★☆☆☆☆ 1 Estrella (Sobrio)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="setup-weak-foot" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Pierna Mala</label>
+              <select id="setup-weak-foot" name="weakFoot" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
+                <option value="5">★★★★★ 5 Estrellas (Ambidiestro)</option>
+                <option value="4" selected>★★★★☆ 4 Estrellas (Solvente)</option>
+                <option value="3">★★★☆☆ 3 Estrellas (Aceptable)</option>
+                <option value="2">★★☆☆☆ 2 Estrellas (Solo apoyo)</option>
+                <option value="1">★☆☆☆☆ 1 Estrella (De palo)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="setup-chem-style" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Estilo de Química (FUT)</label>
+              <select id="setup-chem-style" name="chemStyle" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
+                <option value="HUN" selected>Cazador / Hunter (PAC + SHO)</option>
+                <option value="SHA">Sombra / Shadow (PAC + DEF)</option>
+                <option value="HAW">Halcón / Hawk (PAC + SHO + PHY)</option>
+                <option value="ANC">Ancla / Anchor (DEF + PHY + PAC)</option>
+                <option value="ENG">Motor / Engine (DRI + PAS + PAC)</option>
+                <option value="CAT">Catalizador (PAS + PAC)</option>
+                <option value="BAS">Básico / Balance General</option>
+                <option value="WAL">Muro / Wall (Especial POR)</option>
+              </select>
+            </div>
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label for="setup-nickname" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Apodo en Camiseta *</label>
-            <input type="text" id="setup-nickname" name="nickname" autocomplete="off" required placeholder="Ej: Charly / Mago…" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+            <input type="text" id="setup-nickname" name="nickname" autocomplete="off" required placeholder="Ej: Charly / Mago…" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
           </div>
           <div>
             <label for="setup-number" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Dorsal Favorito *</label>
-            <input type="number" id="setup-number" name="number" min="1" max="99" value="10" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+            <input type="number" id="setup-number" name="number" min="1" max="99" value="10" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label for="setup-faculty" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Facultad / Grado *</label>
-            <select id="setup-faculty" name="faculty" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+            <select id="setup-faculty" name="faculty" class="w-full bg-slate-900 border border-slate-700  px-2 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
               <option value="inf">Informática (INF)</option>
               <option value="med">Medicina (MED)</option>
               <option value="der">Derecho / ADE (DER)</option>
@@ -484,7 +577,7 @@
           </div>
           <div>
             <label for="setup-foot" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Pie Hábil</label>
-            <select id="setup-foot" name="foot" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+            <select id="setup-foot" name="foot" class="w-full bg-slate-900 border border-slate-700  px-2 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
               <option value="Diestro">Diestro</option>
               <option value="Zurdo">Zurdo</option>
               <option value="Ambidiestro">Ambidiestro</option>
@@ -492,7 +585,7 @@
           </div>
           <div>
             <label for="setup-card-type" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Edición de Carta FUT *</label>
-            <select id="setup-card-type" name="cardType" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+            <select id="setup-card-type" name="cardType" class="w-full bg-slate-900 border border-slate-700  px-2 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
               <option value="gold">Oro Brillante (Rare Gold)</option>
               <option value="totw">En Forma / TOTW</option>
               <option value="toty">TOTY (Team of the Year)</option>
@@ -503,7 +596,7 @@
         </div>
 
         <!-- ROLES DE MEJOR A PEOR -->
-        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-3">
+        <div class="p-4  bg-slate-900/80 border border-slate-800 space-y-3">
           <div class="flex items-center gap-1.5 text-xs font-black text-amber-400 uppercase tracking-wide font-fifa text-base">
             <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
             <span>JERARQUÍA DE POSICIONES (DE MEJOR A PEOR)</span>
@@ -515,7 +608,7 @@
                 <i data-lucide="award" class="w-3.5 h-3.5 text-emerald-400"></i>
                 <span>1º Mejor Posición (Favorita)</span>
               </label>
-              <select id="setup-role-best" name="roleBest" class="w-full bg-emerald-950/40 border border-emerald-500/50 rounded-lg px-2 py-1.5 text-xs text-emerald-300 font-bold">
+              <select id="setup-role-best" name="roleBest" class="w-full bg-emerald-950/40 border border-emerald-500/50  px-2 py-1.5 text-xs text-emerald-300 font-bold">
                 <option value="DC">Delantero Centro (ST / DC)</option>
                 <option value="PIV">Pívot Futsal (PIV)</option>
                 <option value="MC">Mediocentro (CM / MC)</option>
@@ -535,7 +628,7 @@
                 <i data-lucide="check-circle" class="w-3.5 h-3.5 text-sky-400"></i>
                 <span>2º Segunda Posición (Aceptable)</span>
               </label>
-              <select id="setup-role-second" name="roleSecond" class="w-full bg-sky-950/40 border border-sky-500/50 rounded-lg px-2 py-1.5 text-xs text-sky-300 font-bold">
+              <select id="setup-role-second" name="roleSecond" class="w-full bg-sky-950/40 border border-sky-500/50  px-2 py-1.5 text-xs text-sky-300 font-bold">
                 <option value="MC">Mediocentro (CM / MC)</option>
                 <option value="ALD">Ala Derecho Futsal</option>
                 <option value="ALI">Ala Izquierdo Futsal</option>
@@ -553,7 +646,7 @@
                 <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-400"></i>
                 <span>3º Tercera Posición (Emergencia)</span>
               </label>
-              <select id="setup-role-third" name="roleThird" class="w-full bg-amber-950/40 border border-amber-500/50 rounded-lg px-2 py-1.5 text-xs text-amber-300 font-bold">
+              <select id="setup-role-third" name="roleThird" class="w-full bg-amber-950/40 border border-amber-500/50  px-2 py-1.5 text-xs text-amber-300 font-bold">
                 <option value="DFC">Defensa Central (CB)</option>
                 <option value="MC">Mediocentro</option>
                 <option value="LI">Lateral Izquierdo</option>
@@ -567,7 +660,7 @@
                 <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-400"></i>
                 <span>4º Peor Rol (NO ponerlo aquí)</span>
               </label>
-              <select id="setup-role-worst" name="roleWorst" class="w-full bg-rose-950/40 border border-rose-500/50 rounded-lg px-2 py-1.5 text-xs text-rose-300 font-bold">
+              <select id="setup-role-worst" name="roleWorst" class="w-full bg-rose-950/40 border border-rose-500/50  px-2 py-1.5 text-xs text-rose-300 font-bold">
                 <option value="POR">Portero (Riesgo cantada)</option>
                 <option value="DFC">Defensa Central</option>
                 <option value="CIE">Cierre Futsal</option>
@@ -588,12 +681,12 @@
           <input type="hidden" id="setup-phy" name="phy" value="78">
 
           <!-- 1. VISTA: TEST ACTIVO (PASO A PASO) -->
-          <div id="stats-wizard-view" class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-4">
+          <div id="stats-wizard-view" class="p-4  bg-slate-900/90 border border-slate-800 space-y-4">
             
             <!-- Cabecera del Test y Contador de Pasos -->
             <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
               <div class="flex items-center gap-2">
-                <span class="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-400 flex items-center justify-center font-bold">
+                <span class="w-7 h-7  bg-amber-400/20 text-amber-400 flex items-center justify-center font-bold">
                   <i data-lucide="sparkles" class="w-4 h-4"></i>
                 </span>
                 <div>
@@ -601,15 +694,15 @@
                   <p class="text-[10px] text-slate-400 font-medium">Configura tus estadísticas una a una con orientación de nivel</p>
                 </div>
               </div>
-              <span id="wizard-step-badge" class="px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-black uppercase tracking-wider border border-amber-400/40 font-fifa text-sm">
+              <span id="wizard-step-badge" class="px-2.5 py-0.5  bg-amber-400/20 text-amber-300 text-[10px] font-black uppercase tracking-wider border border-amber-400/40 font-fifa text-sm">
                 Paso 1 de 6
               </span>
             </div>
 
             <!-- Stepper interactivo de 6 Atributos y Barra de Progreso -->
             <div class="space-y-1.5">
-              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                <div id="wizard-progress-bar" class="bg-gradient-to-r from-amber-500 to-amber-400 h-full transition-all duration-300 rounded-full" style="width: 16.66%;"></div>
+              <div class="w-full bg-slate-800 h-1.5  overflow-hidden">
+                <div id="wizard-progress-bar" class="bg-gradient-to-r from-amber-500 to-amber-400 h-full transition-all duration-300 " style="width: 16.66%;"></div>
               </div>
               <div class="grid grid-cols-6 gap-1 text-center" id="wizard-stepper-pills">
                 <!-- Generado dinámicamente: PAC, SHO, PAS, DRI, DEF, PHY -->
@@ -617,13 +710,13 @@
             </div>
 
             <!-- Tarjeta Principal del Atributo Activo -->
-            <div class="bg-slate-950/90 rounded-xl p-4 border border-slate-800 space-y-3.5">
+            <div class="bg-slate-950/90  p-4 border border-slate-800 space-y-3.5">
               
               <!-- Cabecera de la Estadística Actual -->
               <div class="flex items-start justify-between gap-3">
                 <div class="space-y-1">
                   <div class="flex items-center gap-2">
-                    <span id="wizard-stat-tag" class="text-xs font-black px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 font-fifa tracking-wider border border-sky-500/40">
+                    <span id="wizard-stat-tag" class="text-xs font-black px-2 py-0.5  bg-sky-500/20 text-sky-300 font-fifa tracking-wider border border-sky-500/40">
                       PAC
                     </span>
                     <h5 id="wizard-stat-title" class="font-fifa text-xl font-bold text-white uppercase tracking-wider">
@@ -640,14 +733,14 @@
                   <div id="wizard-stat-value" class="text-4xl font-black font-fifa leading-none text-amber-400">
                     82
                   </div>
-                  <div id="wizard-tier-badge" class="mt-1 inline-block text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                  <div id="wizard-tier-badge" class="mt-1 inline-block text-[9px] font-black uppercase tracking-wider px-2 py-0.5  bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                     Destacado (80-89)
                   </div>
                 </div>
               </div>
 
               <!-- Caja de Descripción Contextual Dinámica -->
-              <div id="wizard-stat-desc-box" class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 leading-relaxed font-medium transition-all">
+              <div id="wizard-stat-desc-box" class="p-3  bg-slate-900/90 border border-slate-800 text-xs text-slate-300 leading-relaxed font-medium transition-all">
                 <!-- Se actualiza dinámicamente según el valor -->
               </div>
 
@@ -659,11 +752,11 @@
                   <span>Máximo Élite (99)</span>
                 </div>
                 <div class="flex items-center gap-2.5">
-                  <button type="button" id="wizard-btn-minus" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-black flex items-center justify-center transition active:scale-95 text-base border border-slate-700 cursor-pointer" aria-label="Disminuir 1 punto">
+                  <button type="button" id="wizard-btn-minus" class="w-8 h-8  bg-slate-800 hover:bg-slate-700 text-white font-black flex items-center justify-center transition active:scale-95 text-base border border-slate-700 cursor-pointer" aria-label="Disminuir 1 punto">
                     -
                   </button>
                   <input type="range" id="wizard-range-slider" min="40" max="99" value="82" class="fut-stat-slider w-full cursor-pointer accent-amber-500" aria-label="Selector de nivel de atributo">
-                  <button type="button" id="wizard-btn-plus" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-black flex items-center justify-center transition active:scale-95 text-base border border-slate-700 cursor-pointer" aria-label="Aumentar 1 punto">
+                  <button type="button" id="wizard-btn-plus" class="w-8 h-8  bg-slate-800 hover:bg-slate-700 text-white font-black flex items-center justify-center transition active:scale-95 text-base border border-slate-700 cursor-pointer" aria-label="Aumentar 1 punto">
                     +
                   </button>
                 </div>
@@ -675,23 +768,23 @@
                   🎯 NIVELES DE REFERENCIA RÁPIDOS (CLICK PARA APLICAR):
                 </span>
                 <div class="grid grid-cols-5 gap-1.5 text-center" id="wizard-preset-buttons">
-                  <button type="button" data-val="45" class="wizard-preset-btn p-1.5 rounded-xl border border-slate-800 bg-slate-900/80 text-[10px] font-bold text-slate-300 hover:border-amber-400 transition cursor-pointer">
+                  <button type="button" data-val="45" class="wizard-preset-btn p-1.5  border border-slate-800 bg-slate-900/80 text-[10px] font-bold text-slate-300 hover:border-amber-400 transition cursor-pointer">
                     <span class="block font-black text-xs text-white font-fifa text-base">45</span>
                     <span class="text-[8px] text-slate-400 block">Principiante</span>
                   </button>
-                  <button type="button" data-val="55" class="wizard-preset-btn p-1.5 rounded-xl border border-slate-800 bg-slate-900/80 text-[10px] font-bold text-slate-300 hover:border-amber-400 transition cursor-pointer">
+                  <button type="button" data-val="55" class="wizard-preset-btn p-1.5  border border-slate-800 bg-slate-900/80 text-[10px] font-bold text-slate-300 hover:border-amber-400 transition cursor-pointer">
                     <span class="block font-black text-xs text-white font-fifa text-base">55</span>
                     <span class="text-[8px] text-slate-400 block">Medio (~50)</span>
                   </button>
-                  <button type="button" data-val="72" class="wizard-preset-btn p-1.5 rounded-xl border border-slate-800 bg-slate-900/80 text-[10px] font-bold text-slate-300 hover:border-amber-400 transition cursor-pointer">
+                  <button type="button" data-val="72" class="wizard-preset-btn p-1.5  border border-slate-800 bg-slate-900/80 text-[10px] font-bold text-slate-300 hover:border-amber-400 transition cursor-pointer">
                     <span class="block font-black text-xs text-white font-fifa text-base">72</span>
                     <span class="text-[8px] text-slate-400 block">Competitivo</span>
                   </button>
-                  <button type="button" data-val="84" class="wizard-preset-btn p-1.5 rounded-xl border border-slate-800 bg-slate-900/80 text-[10px] font-bold text-slate-300 hover:border-amber-400 transition cursor-pointer">
+                  <button type="button" data-val="84" class="wizard-preset-btn p-1.5  border border-slate-800 bg-slate-900/80 text-[10px] font-bold text-slate-300 hover:border-amber-400 transition cursor-pointer">
                     <span class="block font-black text-xs text-white font-fifa text-base">84</span>
                     <span class="text-[8px] text-slate-400 block">Destacado</span>
                   </button>
-                  <button type="button" data-val="93" class="wizard-preset-btn p-1.5 rounded-xl border border-slate-800 bg-slate-900/80 text-[10px] font-bold text-slate-300 hover:border-amber-400 transition cursor-pointer">
+                  <button type="button" data-val="93" class="wizard-preset-btn p-1.5  border border-slate-800 bg-slate-900/80 text-[10px] font-bold text-slate-300 hover:border-amber-400 transition cursor-pointer">
                     <span class="block font-black text-xs text-white font-fifa text-base">93</span>
                     <span class="text-[8px] text-slate-400 block">Élite</span>
                   </button>
@@ -699,7 +792,7 @@
               </div>
 
               <!-- Guía Permanente de Escala FIFA (Orientación clara de qué es 100, 50, etc.) -->
-              <div class="mt-2 p-2.5 rounded-xl bg-amber-950/30 border border-amber-500/30 text-[11px] text-amber-200 space-y-1">
+              <div class="mt-2 p-2.5  bg-amber-950/30 border border-amber-500/30 text-[11px] text-amber-200 space-y-1">
                 <div class="font-black flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-amber-400 font-fifa">
                   <i data-lucide="info" class="w-3.5 h-3.5 text-amber-400"></i>
                   <span>GUÍA OFICIAL DE ESCALA FIFA (¿QUÉ REPRESENTA CADA PUNTUACIÓN?)</span>
@@ -717,12 +810,12 @@
 
             <!-- Navegación del Test: Anterior / Siguiente -->
             <div class="flex items-center justify-between gap-3 pt-1">
-              <button type="button" id="wizard-btn-prev" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs flex items-center gap-1.5 transition disabled:opacity-30 disabled:pointer-events-none cursor-pointer">
+              <button type="button" id="wizard-btn-prev" class="px-4 py-2  bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs flex items-center gap-1.5 transition disabled:opacity-30 disabled:pointer-events-none cursor-pointer">
                 <i data-lucide="chevron-left" class="w-4 h-4"></i>
                 <span>Anterior</span>
               </button>
 
-              <button type="button" id="wizard-btn-next" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition active:scale-95 cursor-pointer">
+              <button type="button" id="wizard-btn-next" class="px-5 py-2.5  bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition active:scale-95 cursor-pointer">
                 <span id="wizard-btn-next-text">Siguiente atributo</span>
                 <i id="wizard-btn-next-icon" data-lucide="chevron-right" class="w-4 h-4"></i>
               </button>
@@ -730,10 +823,10 @@
           </div>
 
           <!-- 2. VISTA: RESUMEN DE TEST COMPLETADO -->
-          <div id="stats-summary-view" class="hidden p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3.5">
+          <div id="stats-summary-view" class="hidden p-4  bg-slate-900/90 border border-slate-800 space-y-3.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                <span class="w-7 h-7  bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
                   <i data-lucide="check-check" class="w-4 h-4"></i>
                 </span>
                 <div>
@@ -741,7 +834,7 @@
                   <p class="text-[10px] text-slate-400 font-medium">Tus estadísticas oficiales han sido calculadas</p>
                 </div>
               </div>
-              <span id="summary-ovr-badge" class="px-3 py-1 rounded-xl bg-amber-400 text-slate-950 font-fifa text-xl font-bold shadow-sm">
+              <span id="summary-ovr-badge" class="px-3 py-1  bg-amber-400 text-slate-950 font-fifa text-xl font-bold shadow-sm">
                 81 OVR
               </span>
             </div>
@@ -753,7 +846,7 @@
 
             <!-- Botón para Repetir el Test (Pedido expresamente por el usuario) -->
             <div class="pt-2 text-center space-y-2">
-              <button type="button" id="btn-restart-stats-test" class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-700 hover:border-amber-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition active:scale-98 cursor-pointer">
+              <button type="button" id="btn-restart-stats-test" class="w-full py-2.5 px-4  bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-700 hover:border-amber-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition active:scale-98 cursor-pointer">
                 <i data-lucide="rotate-ccw" class="w-4 h-4 text-amber-400"></i>
                 <span>Hacer de nuevo el test</span>
               </button>
@@ -765,7 +858,7 @@
 
         </div>
 
-        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider shadow-xl shadow-amber-500/20 transition active:scale-95 cursor-pointer">
+        <button type="submit" class="w-full py-3  bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider shadow-xl shadow-amber-500/20 transition active:scale-95 cursor-pointer">
           Guardar y Generar mi Carta FUT
         </button>
 
@@ -774,14 +867,14 @@
   </dialog>
 
   <!-- 3. MODAL INSPECCIONAR CARTA DE JUGADOR -->
-  <dialog id="player-inspect-dialog" aria-labelledby="inspect-dialog-title" class="fifa-console-modal max-w-md w-full rounded-2xl bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
+  <dialog id="player-inspect-dialog" aria-labelledby="inspect-dialog-title" class="fifa-console-modal max-w-md w-full  bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
     <div class="p-6">
       <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
         <h3 id="inspect-dialog-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider flex items-center gap-2">
           <i data-lucide="shield" class="w-5 h-5 text-amber-400"></i>
           <span>Ficha Técnica Oficial FUT</span>
         </h3>
-        <button type="button" id="btn-close-inspect" aria-label="Cerrar ficha técnica" class="text-slate-400 hover:text-white p-1.5 focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg cursor-pointer">
+        <button type="button" id="btn-close-inspect" aria-label="Cerrar ficha técnica" class="text-slate-400 hover:text-white p-1.5 focus-visible:ring-2 focus-visible:ring-amber-500  cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -792,11 +885,11 @@
   </dialog>
 
   <!-- 4. MODAL PROGRAMAR / EDITAR PARTIDO -->
-  <dialog id="match-dialog" aria-labelledby="match-dialog-title" class="fifa-console-modal max-w-lg w-full rounded-2xl bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
+  <dialog id="match-dialog" aria-labelledby="match-dialog-title" class="fifa-console-modal max-w-lg w-full  bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
     <div class="p-6">
       <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
         <h2 id="match-dialog-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">Programar Partido</h2>
-        <button type="button" id="btn-close-match" aria-label="Cerrar ventana de partido" class="text-slate-400 hover:text-white p-1.5 rounded-lg focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer">
+        <button type="button" id="btn-close-match" aria-label="Cerrar ventana de partido" class="text-slate-400 hover:text-white p-1.5  focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -806,58 +899,58 @@
         
         <div>
           <label for="match-rival" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Equipo Rival *</label>
-          <input type="text" id="match-rival" name="rival" autocomplete="off" required placeholder="Ej: Medicina FC…" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+          <input type="text" id="match-rival" name="rival" autocomplete="off" required placeholder="Ej: Medicina FC…" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label for="match-modality" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Modalidad</label>
-            <select id="match-modality" name="modality" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+            <select id="match-modality" name="modality" class="w-full bg-slate-900 border border-slate-700  px-2 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
               <option value="f7">Fútbol 7</option>
               <option value="futsal">Fútbol Sala</option>
             </select>
           </div>
           <div>
             <label for="match-tournament" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Jornada / Competición</label>
-            <input type="text" id="match-tournament" name="tournament" placeholder="Torneo del Rector - J3…" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+            <input type="text" id="match-tournament" name="tournament" placeholder="Torneo del Rector - J3…" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label for="match-date" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Fecha *</label>
-            <input type="date" id="match-date" name="date" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+            <input type="date" id="match-date" name="date" required class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
           </div>
           <div>
             <label for="match-time" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Hora *</label>
-            <input type="time" id="match-time" name="time" required value="20:00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+            <input type="time" id="match-time" name="time" required value="20:00" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
           </div>
         </div>
 
         <div>
           <label for="match-field" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Instalación / Pista Deportiva</label>
-          <input type="text" id="match-field" name="field" placeholder="Ej: Campo Césped 2 / Pabellón Central…" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+          <input type="text" id="match-field" name="field" placeholder="Ej: Campo Césped 2 / Pabellón Central…" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
         </div>
 
         <div>
           <label for="match-notes" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Notas de la Convocatoria</label>
-          <textarea id="match-notes" name="notes" rows="2" placeholder="Camiseta de juego, puntualidad…" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500"></textarea>
+          <textarea id="match-notes" name="notes" rows="2" placeholder="Camiseta de juego, puntualidad…" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500"></textarea>
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
           <button type="button" id="btn-cancel-match" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition cursor-pointer">Cancelar</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition active:scale-95 cursor-pointer">Guardar Partido</button>
+          <button type="submit" class="px-5 py-2  bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition active:scale-95 cursor-pointer">Guardar Partido</button>
         </div>
       </form>
     </div>
   </dialog>
 
   <!-- 5. MODAL REGISTRAR RESULTADO DE PARTIDO (ACTA) -->
-  <dialog id="match-result-dialog" aria-labelledby="result-dialog-title" class="fifa-console-modal max-w-md w-full rounded-2xl bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
+  <dialog id="match-result-dialog" aria-labelledby="result-dialog-title" class="fifa-console-modal max-w-md w-full  bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
     <div class="p-6">
       <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
         <h2 id="result-dialog-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">Acta del Partido</h2>
-        <button type="button" id="btn-close-result" aria-label="Cerrar acta del partido" class="text-slate-400 hover:text-white p-1.5 rounded-lg focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer">
+        <button type="button" id="btn-close-result" aria-label="Cerrar acta del partido" class="text-slate-400 hover:text-white p-1.5  focus-visible:ring-2 focus-visible:ring-amber-500 cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -865,21 +958,21 @@
       <form id="form-match-result" class="space-y-4">
         <input type="hidden" id="result-match-id" name="resultMatchId" aria-label="ID de Acta de Partido">
         
-        <div class="flex items-center justify-center gap-4 py-4 bg-slate-900 rounded-xl border border-slate-800">
+        <div class="flex items-center justify-center gap-4 py-4 bg-slate-900  border border-slate-800">
           <div class="text-center">
             <label for="result-goals-for" id="result-team-name" class="block text-xs font-bold text-amber-400 mb-1 truncate max-w-[110px] cursor-pointer font-fifa text-base">Furia Rector</label>
-            <input type="number" id="result-goals-for" name="goalsFor" aria-label="Goles Furia Rector" min="0" value="0" class="w-16 text-center text-3xl font-fifa font-bold bg-slate-950 border border-slate-700 rounded-lg py-1 text-white">
+            <input type="number" id="result-goals-for" name="goalsFor" aria-label="Goles Furia Rector" min="0" value="0" class="w-16 text-center text-3xl font-fifa font-bold bg-slate-950 border border-slate-700  py-1 text-white">
           </div>
           <span class="text-2xl font-bold text-slate-500">-</span>
           <div class="text-center">
             <label for="result-goals-against" id="result-rival-name" class="block text-xs font-bold text-slate-300 mb-1 truncate max-w-[110px] cursor-pointer font-fifa text-base">Rival</label>
-            <input type="number" id="result-goals-against" name="goalsAgainst" aria-label="Goles Equipo Rival" min="0" value="0" class="w-16 text-center text-3xl font-fifa font-bold bg-slate-950 border border-slate-700 rounded-lg py-1 text-white">
+            <input type="number" id="result-goals-against" name="goalsAgainst" aria-label="Goles Equipo Rival" min="0" value="0" class="w-16 text-center text-3xl font-fifa font-bold bg-slate-950 border border-slate-700  py-1 text-white">
           </div>
         </div>
 
         <div>
           <label for="result-scorers" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Goleadores del Equipo</label>
-          <input type="text" id="result-scorers" name="scorers" placeholder="Ej: Pablo (2), Hugo (1)…" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+          <input type="text" id="result-scorers" name="scorers" placeholder="Ej: Pablo (2), Hugo (1)…" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
         </div>
 
         <div>
@@ -887,12 +980,12 @@
             <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400"></i>
             <span>MVP del Partido</span>
           </label>
-          <input type="text" id="result-mvp" name="mvp" placeholder="Ej: Marcos Soto…" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+          <input type="text" id="result-mvp" name="mvp" placeholder="Ej: Marcos Soto…" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
           <button type="button" id="btn-cancel-result" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition cursor-pointer">Cancelar</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider transition active:scale-95 cursor-pointer">Finalizar Partido</button>
+          <button type="submit" class="px-5 py-2  bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider transition active:scale-95 cursor-pointer">Finalizar Partido</button>
         </div>
       </form>
     </div>
@@ -915,7 +1008,7 @@
 
       <!-- Paso 2: Posición Principal -->
       <div id="walkout-pos-step" class="walkout-step hidden">
-        <div id="walkout-pos-pill" class="font-fifa text-5xl text-slate-950 font-black px-6 py-1 bg-amber-400 rounded-xl shadow-2xl">DC</div>
+        <div id="walkout-pos-pill" class="font-fifa text-5xl text-slate-950 font-black px-6 py-1 bg-amber-400  shadow-2xl">DC</div>
       </div>
 
       <!-- Paso 3: Carta Gigante y Revelación -->
@@ -925,7 +1018,7 @@
           <div id="walkout-rating-ticker" class="font-fifa text-8xl font-black text-amber-400 leading-none drop-shadow-[0_0_25px_rgba(251,191,36,0.8)]">00</div>
           <div id="walkout-player-nickname" class="font-fifa text-4xl font-black text-white uppercase tracking-widest mt-1">FICHAJE ESTRELLA</div>
           <p id="walkout-status-text" class="text-xs text-amber-300/80 font-bold mt-1">¡Nuevo Jugador Fichado para el Torneo del Rector!</p>
-          <button type="button" id="btn-close-walkout" class="mt-4 px-8 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-2xl hover:scale-105 active:scale-95 transition flex items-center justify-center gap-2 mx-auto cursor-pointer">
+          <button type="button" id="btn-close-walkout" class="mt-4 px-8 py-2.5  bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-2xl hover:scale-105 active:scale-95 transition flex items-center justify-center gap-2 mx-auto cursor-pointer">
             <i data-lucide="check-circle-2" class="w-4 h-4"></i>
             <span>Confirmar Fichaje y Entrar a la Plantilla</span>
           </button>

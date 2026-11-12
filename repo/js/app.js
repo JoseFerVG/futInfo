@@ -352,6 +352,9 @@ class FutApp {
   }
 
   async init() {
+    // 0. Tema Claro / Oscuro
+    this.initTheme();
+
     // 1. Inicializar Firebase
     const fb = await initFirebaseServices();
     this.updateFirebaseBadge(fb.isConnected);
@@ -382,6 +385,39 @@ class FutApp {
     // 5. Render inicial
     this.renderAll();
     this.refreshIcons();
+  }
+
+  initTheme() {
+    const savedTheme = localStorage.getItem('fut_theme') || 'dark';
+    this.setTheme(savedTheme);
+
+    const toggleBtn = document.getElementById('btn-toggle-theme');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        const currentTheme = document.body.classList.contains('theme-light') ? 'light' : 'dark';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        this.setTheme(newTheme);
+        futAudio.playSelect();
+        this.showToast(`Modo ${newTheme === 'light' ? 'Claro' : 'Oscuro'} activado`, newTheme === 'light' ? 'sun' : 'moon');
+      });
+    }
+  }
+
+  setTheme(theme) {
+    const isLight = theme === 'light';
+    if (isLight) {
+      document.body.classList.add('theme-light');
+      document.documentElement.classList.add('theme-light');
+    } else {
+      document.body.classList.remove('theme-light');
+      document.documentElement.classList.remove('theme-light');
+    }
+    localStorage.setItem('fut_theme', theme);
+    const icon = document.getElementById('theme-toggle-icon');
+    if (icon) {
+      icon.setAttribute('data-lucide', isLight ? 'moon' : 'sun');
+      if (window.lucide) window.lucide.createIcons();
+    }
   }
 
   showToast(message, icon = 'shield') {
@@ -422,6 +458,34 @@ class FutApp {
     }
   }
 
+  getPlayStyleIcon(ps) {
+    const map = {
+      finesse: '🎯',
+      power_shot: '💥',
+      rapid: '⚡',
+      incisive: '🪄',
+      anticipate: '🛡️',
+      acrobatic: '🧤',
+      leader: '👑',
+      trivela: '🌀'
+    };
+    return map[ps] || '⭐';
+  }
+
+  getPlayStyleLabel(ps) {
+    const map = {
+      finesse: 'Tiro Calidad',
+      power_shot: 'Power Shot',
+      rapid: 'Paso Rápido',
+      incisive: 'Pase Incisivo',
+      anticipate: 'Muralla DEF',
+      acrobatic: 'Acrobático GK',
+      leader: 'Capitán / Líder',
+      trivela: 'Trivela'
+    };
+    return map[ps] || 'Estándar';
+  }
+
   renderFutCard(player, options = {}) {
     if (!player) return '';
     const {
@@ -436,7 +500,10 @@ class FutApp {
     const displayRole = role || (player.rolesHierarchy ? player.rolesHierarchy.best : (player.roleBest || 'DC'));
     const displayName = (player.nickname || player.name.split(' ')[0] || 'CRACK').toUpperCase();
     const stats = player.stats || { pac: 80, sho: 80, pas: 80, dri: 80, def: 65, phy: 75 };
-    const chemStyle = player.chemStyle || 'BAS';
+    const chemStyle = player.chemStyle || 'HUN';
+    const playStyle = player.playStyle || 'finesse';
+    const kitColor = player.kitColor || '#1d1810';
+    const kitSecondary = player.kitSecondary || '#f0be2a';
 
     let sizeClass = 'fut-card-size-pitch';
     if (size === 'album') sizeClass = 'fut-card-size-album';
@@ -459,12 +526,12 @@ class FutApp {
           <div class="fut-card-kit-wrap">
             <div class="fut-card-kit-silhouette">
               <svg viewBox="0 0 80 95" fill="none" xmlns="http://www.w3.org/2000/svg" class="fut-card-kit-svg">
-                <path d="M40 7 C33 7 28 12.5 28 19.5 C28 25.5 33 30.5 40 30.5 C47 30.5 52 25.5 52 19.5 C52 12.5 47 7 40 7 Z" fill="currentColor" opacity="0.88"/>
-                <path d="M36 29 L44 29 L45 35 L35 35 Z" fill="currentColor" opacity="0.75"/>
-                <path d="M14 42 L25 35 C29 38 34 39.5 40 39.5 C46 39.5 51 38 55 35 L66 42 L74 61 L62 65 L60 95 L20 95 L18 65 L6 61 Z" fill="currentColor" opacity="0.96"/>
-                <path d="M33 36 L40 44 L47 36" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+                <path d="M40 7 C33 7 28 12.5 28 19.5 C28 25.5 33 30.5 40 30.5 C47 30.5 52 25.5 52 19.5 C52 12.5 47 7 40 7 Z" fill="${kitSecondary}" opacity="0.88"/>
+                <path d="M36 29 L44 29 L45 35 L35 35 Z" fill="${kitSecondary}" opacity="0.85"/>
+                <path d="M14 42 L25 35 C29 38 34 39.5 40 39.5 C46 39.5 51 38 55 35 L66 42 L74 61 L62 65 L60 95 L20 95 L18 65 L6 61 Z" fill="${kitColor}" opacity="0.96"/>
+                <path d="M33 36 L40 44 L47 36" stroke="${kitSecondary}" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
               </svg>
-              <span class="fut-card-dorsal font-fifa">#${player.number || 10}</span>
+              <span class="fut-card-dorsal font-fifa" style="color: ${kitColor === '#f8fafc' || kitColor === '#ffffff' ? '#111827' : '#ffffff'};">#${player.number || 10}</span>
             </div>
           </div>
         </div>
@@ -505,32 +572,17 @@ class FutApp {
           </div>
         </div>
 
-        <div class="fut-card-bottom-badge">
+        <div class="fut-card-bottom-badge flex items-center gap-1">
           <span class="fut-chem-pill">${chemStyle}</span>
+          <span class="text-[0.62em]" title="${this.getPlayStyleLabel(playStyle)}">${this.getPlayStyleIcon(playStyle)}</span>
         </div>
       </div>
     `;
   }
 
   updateFirebaseBadge(isConnected) {
-    const badge = document.getElementById('firebase-status-badge');
-    if (!badge) return;
-
-    if (isConnected) {
-      badge.className = 'flex items-center gap-1.5 text-emerald-400 font-semibold';
-      badge.innerHTML = `
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>Firebase & Google Auth (Nube)</span>
-      `;
-    } else {
-      badge.className = 'flex items-center gap-1.5 text-amber-400 font-medium';
-      badge.innerHTML = `
-        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-        <span>Modo Local / Demo</span>
-      `;
-    }
+    // Top-left header mantiene exclusivamente el nombre oficial del club FURIA RECTOR FC
   }
-
 
   // ==================== INSPECTOR DE JUGADOR ACTIVO (CAPTURA 1 COURTOIS & CAPTURA 5 ROBBEN) ====================
   updatePlayerInspector(player) {
@@ -545,12 +597,24 @@ class FutApp {
     const posEl = document.getElementById('inspector-player-pos');
     const nameEl = document.getElementById('inspector-player-name');
     const ratingEl = document.getElementById('inspector-player-rating');
+    const psEl = document.getElementById('inspector-player-playstyle');
+    const chemEl = document.getElementById('inspector-player-chem');
+    const starsEl = document.getElementById('inspector-player-stars');
     
     if (imgEl) imgEl.src = player.avatar;
     if (dorsalEl) dorsalEl.textContent = `#${player.number || 10}`;
     if (posEl) posEl.textContent = player.rolesHierarchy?.best || player.roleBest || 'DC';
     if (nameEl) nameEl.textContent = player.nickname || player.name;
     if (ratingEl) ratingEl.textContent = player.rating;
+
+    const ps = player.playStyle || 'finesse';
+    const chem = player.chemStyle || 'HUN';
+    const sm = player.skillMoves || 4;
+    const wf = player.weakFoot || 4;
+
+    if (psEl) psEl.textContent = `${this.getPlayStyleIcon(ps)} ${this.getPlayStyleLabel(ps).toUpperCase()}`;
+    if (chemEl) chemEl.textContent = `QUÍMICA: ${chem}`;
+    if (starsEl) starsEl.textContent = `FIL: ${sm}★ | PIE: ${wf}★`;
 
     const stats = player.stats || { pac: 80, sho: 80, pas: 80, dri: 80, def: 65, phy: 75 };
     const pacEl = document.getElementById('stat-pac');
@@ -1389,17 +1453,26 @@ class FutApp {
       });
     });
 
-    // 2. Ficha de Jugador FIFA (Estricto: 1 carta por usuario con edición y foto)
+    // 2. Ficha de Jugador FIFA (Personalización completa: kit, playstyles, filigranas, roles, atributos)
     document.getElementById('form-setup-card')?.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const cardData = {
-        avatar: document.getElementById('setup-avatar-url')?.value || document.getElementById('setup-user-avatar')?.src,
+        avatar: document.getElementById('setup-avatar-url')?.value || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
         nickname: document.getElementById('setup-nickname').value,
-        number: document.getElementById('setup-number').value,
+        number: parseInt(document.getElementById('setup-number').value, 10) || 10,
         faculty: document.getElementById('setup-faculty').value,
         preferredFoot: document.getElementById('setup-foot').value,
         cardType: document.getElementById('setup-card-type')?.value || 'gold',
+        kitColor: document.getElementById('setup-kit-primary')?.value || '#f0be2a',
+        kitSecondary: document.getElementById('setup-kit-secondary')?.value || '#111827',
+        kitCollar: document.getElementById('setup-kit-collar')?.value || 'round',
+        kitSleeves: document.getElementById('setup-kit-sleeves')?.value || 'short',
+        playStyle: document.getElementById('setup-playstyle')?.value || 'finesse',
+        celebration: document.getElementById('setup-celebration')?.value || 'siuuu',
+        skillMoves: parseInt(document.getElementById('setup-skill-moves')?.value, 10) || 4,
+        weakFoot: parseInt(document.getElementById('setup-weak-foot')?.value, 10) || 4,
+        chemStyle: document.getElementById('setup-chem-style')?.value || 'HUN',
         roleBest: document.getElementById('setup-role-best').value,
         roleSecond: document.getElementById('setup-role-second').value,
         roleThird: document.getElementById('setup-role-third').value,
@@ -1524,6 +1597,33 @@ class FutApp {
       if (document.getElementById('setup-card-type')) {
         document.getElementById('setup-card-type').value = existing.cardType || 'gold';
       }
+      if (document.getElementById('setup-kit-primary')) {
+        document.getElementById('setup-kit-primary').value = existing.kitColor || '#f0be2a';
+      }
+      if (document.getElementById('setup-kit-secondary')) {
+        document.getElementById('setup-kit-secondary').value = existing.kitSecondary || '#111827';
+      }
+      if (document.getElementById('setup-kit-collar')) {
+        document.getElementById('setup-kit-collar').value = existing.kitCollar || 'round';
+      }
+      if (document.getElementById('setup-kit-sleeves')) {
+        document.getElementById('setup-kit-sleeves').value = existing.kitSleeves || 'short';
+      }
+      if (document.getElementById('setup-playstyle')) {
+        document.getElementById('setup-playstyle').value = existing.playStyle || 'finesse';
+      }
+      if (document.getElementById('setup-celebration')) {
+        document.getElementById('setup-celebration').value = existing.celebration || 'siuuu';
+      }
+      if (document.getElementById('setup-skill-moves')) {
+        document.getElementById('setup-skill-moves').value = existing.skillMoves || 4;
+      }
+      if (document.getElementById('setup-weak-foot')) {
+        document.getElementById('setup-weak-foot').value = existing.weakFoot || 4;
+      }
+      if (document.getElementById('setup-chem-style')) {
+        document.getElementById('setup-chem-style').value = existing.chemStyle || 'HUN';
+      }
       if (existing.rolesHierarchy) {
         document.getElementById('setup-role-best').value = existing.rolesHierarchy.best || 'DC';
         document.getElementById('setup-role-second').value = existing.rolesHierarchy.second || 'MC';
@@ -1551,8 +1651,10 @@ class FutApp {
       if (urlInput) urlInput.value = avatarUrl;
     }
 
-    document.getElementById('setup-user-name').textContent = user.name || 'Jugador FUT';
-    document.getElementById('setup-user-email').textContent = user.email || '';
+    const userNameEl = document.getElementById('setup-user-name');
+    if (userNameEl) userNameEl.textContent = user.name || 'Jugador FUT';
+    const userEmailEl = document.getElementById('setup-user-email');
+    if (userEmailEl) userEmailEl.textContent = user.email || '';
     dialog.showModal();
     this.refreshIcons();
   }
@@ -1733,7 +1835,7 @@ class FutApp {
     const tier = this.getStatTierInfo(val);
     const badgeEl = document.getElementById('wizard-tier-badge');
     if (badgeEl) {
-      badgeEl.className = `mt-1 inline-block text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${tier.badgeClass}`;
+      badgeEl.className = `mt-1 inline-block text-[9px] font-black uppercase tracking-wider px-2 py-0.5  ${tier.badgeClass}`;
       badgeEl.textContent = tier.label;
     }
 
@@ -1791,7 +1893,7 @@ class FutApp {
         const cVal = this.statsTestState.stats[c.key] || c.defaultValue;
         const isActive = idx === step;
         return `
-          <button type="button" class="wizard-step-pill p-1 rounded-xl border text-center transition cursor-pointer ${
+          <button type="button" class="wizard-step-pill p-1  border text-center transition cursor-pointer ${
             isActive 
               ? 'active border-amber-400 bg-amber-400 text-slate-950 font-black shadow-sm' 
               : 'border-slate-800 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold'
@@ -1818,7 +1920,7 @@ class FutApp {
     const tagEl = document.getElementById('wizard-stat-tag');
     if (tagEl) {
       tagEl.textContent = config.short;
-      tagEl.className = `text-xs font-black px-2 py-0.5 rounded-md font-fifa tracking-wider border ${config.tagClass}`;
+      tagEl.className = `text-xs font-black px-2 py-0.5  font-fifa tracking-wider border ${config.tagClass}`;
     }
 
     const titleEl = document.getElementById('wizard-stat-title');
@@ -1842,12 +1944,12 @@ class FutApp {
       if (step < 5) {
         const nextCfg = STATS_TEST_CONFIG[step + 1];
         nextText.textContent = `Siguiente: ${nextCfg.short}`;
-        nextBtn.className = 'px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition active:scale-95 cursor-pointer';
+        nextBtn.className = 'px-5 py-2.5  bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition active:scale-95 cursor-pointer';
         const icon = document.getElementById('wizard-btn-next-icon');
         if (icon) icon.setAttribute('data-lucide', 'chevron-right');
       } else {
         nextText.textContent = 'Finalizar Test y Ver Resultado ✓';
-        nextBtn.className = 'px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer';
+        nextBtn.className = 'px-5 py-2.5  bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer';
         const icon = document.getElementById('wizard-btn-next-icon');
         if (icon) icon.setAttribute('data-lucide', 'check-check');
       }
@@ -1881,7 +1983,7 @@ class FutApp {
         const val = s[c.key] || c.defaultValue;
         const tier = this.getStatTierInfo(val);
         return `
-          <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 shadow-sm text-center">
+          <div class="bg-slate-950 p-2  border border-slate-800 shadow-sm text-center">
             <span class="text-[9px] font-black text-slate-400 block font-sans">${c.short}</span>
             <span class="text-xl sm:text-2xl font-black font-fifa ${tier.textClass} block leading-tight">${val}</span>
             <span class="text-[8px] font-bold text-slate-400 block truncate">${c.short}</span>
@@ -2146,7 +2248,7 @@ class FutApp {
       if (!player) {
         return `
           <div class="fut-card-slot" style="${slotStyle}" data-slot-index="${index}">
-            <div class="fut-card fut-card-size-pitch bg-slate-900/60 border border-dashed border-slate-700/80 rounded-2xl flex flex-col items-center justify-center text-slate-500 font-bold text-xs gap-1 shadow-inner">
+            <div class="fut-card fut-card-size-pitch bg-slate-900/60 border border-dashed border-slate-700/80  flex flex-col items-center justify-center text-slate-500 font-bold text-xs gap-1 shadow-inner">
               <i data-lucide="plus" class="w-5 h-5 text-slate-500"></i>
               <span class="text-[10px] uppercase font-fifa tracking-wider">Vacío</span>
             </div>
@@ -2220,14 +2322,17 @@ class FutApp {
    * hacia el centro y se encogen; el portero queda grande y cerca de cámara.
    */
   projectSlot(slot) {
-    // Escala en perspectiva sobre el trapecio 3D: delanteros rompen ligeramente el borde superior
-    const t = Math.min(1, Math.max(0, (slot.top - 16) / 72));
+    // Escala en perspectiva sobre el trapecio 3D: delanteros al fondo (más pequeños), portero cerca
+    const t = Math.min(1, Math.max(0, (slot.top - 15) / 72));
     const isMobile = window.matchMedia('(max-width: 640px)').matches;
-    const baseScale = isMobile ? 0.80 : 0.86;
-    const scale = +(baseScale + 0.14 * t).toFixed(3);
-    // Mapeo vertical calibrado para evitar solapes y dejar hueco limpio al portero sobre el inspector
-    let mappedTop = 8 + t * 71;
-    if (slot.role === 'DFC' && slot.top >= 70) mappedTop -= 4;
+    const baseScale = isMobile ? 0.78 : 0.84;
+    const scale = +(baseScale + 0.16 * t).toFixed(3);
+
+    // Mapeo vertical calibrado con 4 franjas limpias para que NUNCA exista solapamiento
+    let mappedTop = 13 + t * 70;
+    if (slot.role === 'POR') mappedTop = 83.5;
+    else if (slot.role === 'DC' || slot.role === 'PIV') mappedTop = 14.0;
+
     return {
       top: +mappedTop.toFixed(1),
       left: slot.left,
@@ -2368,13 +2473,13 @@ class FutApp {
               </div>
               <div>
                 <div class="text-xs font-black text-white leading-tight font-fifa text-base tracking-wide">${p.name}</div>
-                <div class="text-[10px] ${fitColor} px-1.5 py-0.5 rounded font-bold inline-block mt-0.5">${fitText}</div>
+                <div class="text-[10px] ${fitColor} px-1.5 py-0.5  font-bold inline-block mt-0.5">${fitText}</div>
                 <div class="text-[9px] text-slate-400 font-semibold mt-0.5">Facultad: ${p.faculty.toUpperCase()} • ${p.preferredFoot}</div>
               </div>
             </div>
             <div class="text-right">
               <div class="font-fifa text-2xl font-bold text-amber-400 leading-none">${p.rating}</div>
-              <span class="inline-block mt-1 text-[9px] uppercase px-2 py-0.5 rounded bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black shadow-sm">Dar Relevo</span>
+              <span class="inline-block mt-1 text-[9px] uppercase px-2 py-0.5  bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black shadow-sm">Dar Relevo</span>
             </div>
           </div>
         `;
@@ -2520,7 +2625,7 @@ class FutApp {
             ${this.renderFutCard(p, { size: 'album' })}
           </div>
 
-          <div class="space-y-1.5 text-xs bg-slate-950/70 p-3 rounded-xl border border-white/10 mb-3">
+          <div class="space-y-1.5 text-xs bg-slate-950/70 p-3  border border-white/10 mb-3">
             <div class="flex items-center justify-between text-emerald-400 font-bold">
               <span class="flex items-center gap-1.5 text-[11px]"><i data-lucide="award" class="w-3.5 h-3.5 text-emerald-400"></i> Principal:</span>
               <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.best}</span>
@@ -2539,7 +2644,7 @@ class FutApp {
             </div>
           </div>
 
-          <button onclick="window.futApp.inspectPlayer('${p.id}')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-amber-400 text-xs font-black uppercase tracking-wider text-amber-400 flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95 cursor-pointer">
+          <button onclick="window.futApp.inspectPlayer('${p.id}')" class="w-full py-2.5  bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-amber-400 text-xs font-black uppercase tracking-wider text-amber-400 flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95 cursor-pointer">
             <i data-lucide="eye" class="w-3.5 h-3.5"></i>
             <span>Ver Ficha Técnica Completa</span>
           </button>
@@ -2559,47 +2664,77 @@ class FutApp {
     const content = document.getElementById('inspect-card-content');
     if (!content) return;
 
+    const ps = p.playStyle || 'finesse';
+    const chem = p.chemStyle || 'HUN';
+    const sm = p.skillMoves || 4;
+    const wf = p.weakFoot || 4;
+    const celeb = p.celebration || 'siuuu';
+    const kitColor = p.kitColor || '#f0be2a';
+
     content.innerHTML = `
-      <div class="flex flex-col sm:flex-row items-center gap-5 bg-slate-900/90 p-4 rounded-xl border border-slate-700/80">
+      <div class="flex flex-col sm:flex-row items-center gap-5 bg-slate-900/90 p-4 border border-slate-700/80">
         <div class="flex-shrink-0">
           ${this.renderFutCard(p, { size: 'inspect' })}
         </div>
         <div class="flex-1 space-y-2 text-center sm:text-left w-full">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <h4 class="font-fifa text-3xl font-bold text-white uppercase tracking-wider">${p.name}</h4>
-            <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-fifa text-base font-black shadow-sm">${p.rating} OVR</span>
+            <span class="text-xs px-2.5 py-0.5 bg-amber-400 text-slate-950 font-fifa text-base font-black shadow-sm">${p.rating} OVR</span>
           </div>
           <p class="text-xs text-slate-400 font-bold">"${p.nickname}" • Dorsal #${p.number} • ${p.preferredFoot}</p>
           <p class="text-xs text-cyan-400 font-bold">${fac.icon} ${fac.name}</p>
-          <div class="pt-1">
-            <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider block font-fifa">FACULTAD: ${fac.name}</span>
+          
+          <!-- Badges de Personalización FIFA FC 25 -->
+          <div class="flex flex-wrap items-center gap-1.5 pt-1">
+            <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-amber-400/20 text-amber-300 border border-amber-400/40 font-fifa">
+              ${this.getPlayStyleIcon(ps)} PLAYSTYLE: ${this.getPlayStyleLabel(ps)}
+            </span>
+            <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/40 font-fifa">
+              QUÍMICA: ${chem}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-1 text-[11px] font-bold text-slate-300">
+            <div class="bg-slate-950/80 p-1.5 border border-slate-800">
+              <span class="text-[9px] uppercase text-slate-500 block">Filigranas / Regate:</span>
+              <span class="font-fifa text-amber-400 text-sm">${sm} ★★★★★</span>
+            </div>
+            <div class="bg-slate-950/80 p-1.5 border border-slate-800">
+              <span class="text-[9px] uppercase text-slate-500 block">Pierna Mala:</span>
+              <span class="font-fifa text-amber-400 text-sm">${wf} ★★★★★</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-950/80 p-2 border border-slate-800 text-[10px] space-y-0.5">
+            <div><span class="text-slate-500 uppercase font-fifa">Celebración:</span> <span class="text-white font-bold">${celeb.toUpperCase()}</span></div>
+            <div><span class="text-slate-500 uppercase font-fifa">Equipación Club:</span> <span class="inline-block w-3 h-3 align-middle border border-white" style="background-color: ${kitColor};"></span> <span class="text-white font-bold">${kitColor} (${p.kitCollar || 'Redondo'})</span></div>
           </div>
         </div>
       </div>
 
-      <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-700/80 space-y-2">
+      <div class="bg-slate-900/90 p-4 border border-slate-700/80 space-y-2">
         <h5 class="text-[10px] font-black uppercase text-amber-400 font-fifa tracking-wider">AFINIDAD DE POSICIONES (ROLES TÁCTICOS)</h5>
         <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/50">
+          <div class="p-2.5 bg-emerald-950/40 border border-emerald-500/50">
             <span class="block text-[10px] text-emerald-400 font-black uppercase">1º Principal</span>
             <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.best}</span>
           </div>
-          <div class="p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/50">
+          <div class="p-2.5 bg-sky-950/40 border border-sky-500/50">
             <span class="block text-[10px] text-sky-400 font-black uppercase">2º Secundaria</span>
             <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.second}</span>
           </div>
-          <div class="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/50">
+          <div class="p-2.5 bg-amber-950/40 border border-amber-500/50">
             <span class="block text-[10px] text-amber-400 font-black uppercase">3º Alternativa</span>
             <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.third}</span>
           </div>
-          <div class="p-2.5 rounded-xl bg-rose-950/40 border border-rose-500/50">
+          <div class="p-2.5 bg-rose-950/40 border border-rose-500/50">
             <span class="block text-[10px] text-rose-400 font-black uppercase">4º Menos Favorable</span>
             <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.worst}</span>
           </div>
         </div>
       </div>
 
-      <div class="space-y-2 bg-slate-900/90 p-4 rounded-xl border border-slate-700/80">
+      <div class="space-y-2 bg-slate-900/90 p-4 border border-slate-700/80">
         <h5 class="text-[10px] font-black uppercase text-amber-400 font-fifa tracking-wider">ATRIBUTOS OFICIALES FIFA</h5>
         ${this.renderStatBar('Ritmo (PAC)', p.stats.pac)}
         ${this.renderStatBar('Tiro (SHO)', p.stats.sho)}
@@ -2615,7 +2750,7 @@ class FutApp {
       </div>
 
       <div class="admin-only pt-3 border-t border-white/10 flex justify-end gap-2">
-        <button onclick="window.futApp.deletePlayer('${p.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-black border border-rose-500/40 transition cursor-pointer">
+        <button onclick="window.futApp.deletePlayer('${p.id}')" class="px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-black border border-rose-500/40 transition cursor-pointer">
           Eliminar de Plantilla
         </button>
       </div>
@@ -2642,8 +2777,8 @@ class FutApp {
           <span>${label}</span>
           <span class="font-black tabular-nums text-white font-fifa text-sm">${value}</span>
         </div>
-        <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-          <div class="h-full ${color} rounded-full shadow-sm" style="width: ${value}%;"></div>
+        <div class="w-full h-1.5 bg-slate-800  overflow-hidden">
+          <div class="h-full ${color}  shadow-sm" style="width: ${value}%;"></div>
         </div>
       </div>
     `;
@@ -2680,30 +2815,30 @@ class FutApp {
         });
 
         breakdown.innerHTML = `
-          <div class="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 text-xs">
+          <div class="p-3.5  bg-emerald-950/40 border border-emerald-500/40 text-xs">
             <div class="font-black text-emerald-400 mb-1 flex items-center justify-between font-fifa text-base">
               <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Confirmados</span>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-black font-fifa text-sm">${confirmed.length}</span>
+              <span class="px-2 py-0.5  bg-emerald-500 text-slate-950 font-black font-fifa text-sm">${confirmed.length}</span>
             </div>
             <div class="text-[11px] text-slate-200 font-bold">
               ${confirmed.length > 0 ? confirmed.map(p => p.nickname).join(', ') : '<span class="text-slate-500 font-normal">Nadie aún</span>'}
             </div>
           </div>
 
-          <div class="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-xs">
+          <div class="p-3.5  bg-amber-950/40 border border-amber-500/40 text-xs">
             <div class="font-black text-amber-400 mb-1 flex items-center justify-between font-fifa text-base">
               <span class="flex items-center gap-1.5"><i data-lucide="help-circle" class="w-4 h-4 text-amber-400"></i> Dudas</span>
-              <span class="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black font-fifa text-sm">${doubts.length}</span>
+              <span class="px-2 py-0.5  bg-amber-500 text-slate-950 font-black font-fifa text-sm">${doubts.length}</span>
             </div>
             <div class="text-[11px] text-slate-200 font-bold">
               ${doubts.length > 0 ? doubts.map(p => p.nickname).join(', ') : '<span class="text-slate-500 font-normal">Ninguna</span>'}
             </div>
           </div>
 
-          <div class="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-xs">
+          <div class="p-3.5  bg-rose-950/40 border border-rose-500/40 text-xs">
             <div class="font-black text-rose-400 mb-1 flex items-center justify-between font-fifa text-base">
               <span class="flex items-center gap-1.5"><i data-lucide="x" class="w-4 h-4 text-rose-400"></i> Bajas</span>
-              <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white font-black font-fifa text-sm">${absent.length}</span>
+              <span class="px-2 py-0.5  bg-rose-500 text-white font-black font-fifa text-sm">${absent.length}</span>
             </div>
             <div class="text-[11px] text-slate-200 font-bold">
               ${absent.length > 0 ? absent.map(p => p.nickname).join(', ') : '<span class="text-slate-500 font-normal">Ninguna</span>'}
@@ -2720,15 +2855,15 @@ class FutApp {
         <div class="fifa-tile p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-amber-400/50 transition">
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-[10px] font-black px-2.5 py-0.5 rounded-md ${m.modality === 'f7' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'}">
+              <span class="text-[10px] font-black px-2.5 py-0.5  ${m.modality === 'f7' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'}">
                 ${m.modality === 'f7' ? 'Fútbol 7' : 'Fútbol Sala'}
               </span>
               <span class="text-xs text-slate-400 font-bold">${m.tournament}</span>
-              ${isFinished ? '<span class="text-[10px] font-black px-2 py-0.5 rounded bg-emerald-500 text-slate-950 shadow-sm font-fifa tracking-wider">FINALIZADO</span>' : ''}
+              ${isFinished ? '<span class="text-[10px] font-black px-2 py-0.5  bg-emerald-500 text-slate-950 shadow-sm font-fifa tracking-wider">FINALIZADO</span>' : ''}
             </div>
             <h4 class="font-fifa text-2xl sm:text-3xl font-bold text-white mt-1.5 flex items-center gap-2.5">
               <span>${settings.teamName}</span>
-              ${isFinished ? `<span class="bg-amber-400 text-slate-950 px-3 py-0.5 rounded-lg font-fifa text-2xl font-black tracking-wider shadow-md">${m.goalsFor} - ${m.goalsAgainst}</span>` : '<span class="text-xs font-bold text-slate-500 uppercase tracking-widest font-sans">vs</span>'}
+              ${isFinished ? `<span class="bg-amber-400 text-slate-950 px-3 py-0.5  font-fifa text-2xl font-black tracking-wider shadow-md">${m.goalsFor} - ${m.goalsAgainst}</span>` : '<span class="text-xs font-bold text-slate-500 uppercase tracking-widest font-sans">vs</span>'}
               <span>${m.rival}</span>
             </h4>
             <div class="text-xs text-slate-400 flex items-center gap-3 mt-1 font-medium">
@@ -2739,22 +2874,22 @@ class FutApp {
           </div>
 
           <div class="flex items-center gap-2">
-            ${isFinished && m.mvp ? `<span class="text-xs text-amber-300 font-bold mr-2 flex items-center gap-1 bg-amber-500/20 px-2.5 py-1 rounded-lg border border-amber-500/40"><i data-lucide="star" class="w-3.5 h-3.5 text-amber-400"></i> MVP: ${m.mvp}</span>` : ''}
+            ${isFinished && m.mvp ? `<span class="text-xs text-amber-300 font-bold mr-2 flex items-center gap-1 bg-amber-500/20 px-2.5 py-1  border border-amber-500/40"><i data-lucide="star" class="w-3.5 h-3.5 text-amber-400"></i> MVP: ${m.mvp}</span>` : ''}
 
             ${!isFinished ? `
-              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-md transition active:scale-95 cursor-pointer">
+              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-4 py-2  bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-md transition active:scale-95 cursor-pointer">
                 <span>Registrar Acta</span>
               </button>
             ` : `
-              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition cursor-pointer">
+              <button onclick="window.futApp.openResultModal('${m.id}')" class="admin-only px-3 py-1.5  bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition cursor-pointer">
                 Editar Acta
               </button>
             `}
 
-            <button onclick="window.futApp.openMatchModal('${m.id}')" class="admin-only p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer" title="Editar" aria-label="Editar partido">
+            <button onclick="window.futApp.openMatchModal('${m.id}')" class="admin-only p-2  bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer" title="Editar" aria-label="Editar partido">
               <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
             </button>
-            <button onclick="window.futApp.deleteMatch('${m.id}')" class="admin-only p-2 rounded-xl bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-400 border border-slate-700 transition cursor-pointer" title="Eliminar" aria-label="Eliminar partido">
+            <button onclick="window.futApp.deleteMatch('${m.id}')" class="admin-only p-2  bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-400 border border-slate-700 transition cursor-pointer" title="Eliminar" aria-label="Eliminar partido">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>

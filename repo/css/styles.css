@@ -466,12 +466,13 @@ dialog[open] {
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.85));
+  clip-path: polygon(3% 0, 97% 0, 100% 2%, 100% 82.5%, 50% 100%, 0 82.5%, 0 2%) !important;
+  overflow: hidden !important;
   display: flex;
   flex-direction: column;
-  overflow: visible;
   user-select: none;
   box-sizing: border-box;
+  box-shadow: none !important;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
 }
 
@@ -483,7 +484,6 @@ dialog[open] {
   --card-num: #221603;
   --card-lbl: #59421b;
   --card-divider: rgba(56, 39, 12, 0.35);
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 10px rgba(217, 119, 6, 0.2));
 }
 
 .fut-card-totw {
@@ -493,7 +493,6 @@ dialog[open] {
   --card-num: #ffffff;
   --card-lbl: #f7d358;
   --card-divider: rgba(247, 211, 88, 0.35);
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 14px rgba(247, 211, 88, 0.35));
 }
 
 .fut-card-toty,
@@ -504,7 +503,6 @@ dialog[open] {
   --card-num: #ffffff;
   --card-lbl: #7dd3fc;
   --card-divider: rgba(0, 240, 255, 0.4);
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 16px rgba(0, 240, 255, 0.4));
 }
 
 .fut-card-tots {
@@ -514,7 +512,6 @@ dialog[open] {
   --card-num: #ffffff;
   --card-lbl: #5eead4;
   --card-divider: rgba(94, 234, 212, 0.4);
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 16px rgba(45, 212, 191, 0.35));
 }
 
 .fut-card-icon {
@@ -524,19 +521,19 @@ dialog[open] {
   --card-num: #171103;
   --card-lbl: #4d3a14;
   --card-divider: rgba(44, 33, 8, 0.35);
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 12px rgba(234, 179, 8, 0.28));
 }
 
-/* Hologram Shimmer Layer */
+/* Hologram Shimmer Layer — Recorte exacto para evitar halos rectangulares */
 .fut-card-holo-layer {
   position: absolute;
   inset: 0;
+  clip-path: polygon(3% 0, 97% 0, 100% 2%, 100% 82.5%, 50% 100%, 0 82.5%, 0 2%) !important;
   background: radial-gradient(
     circle at var(--glare-x, 50%) var(--glare-y, 50%),
-    rgba(255, 255, 255, 0.45) 0%,
-    rgba(252, 211, 77, 0.25) 25%,
-    rgba(0, 240, 255, 0.18) 48%,
-    transparent 75%
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(252, 211, 77, 0.22) 28%,
+    rgba(0, 240, 255, 0.15) 50%,
+    transparent 72%
   );
   mix-blend-mode: color-dodge;
   pointer-events: none;
@@ -780,17 +777,23 @@ dialog[open] {
   opacity: 0.85;
 }
 
-/* Presets de tamaño de carta */
+/* Presets de tamaño de carta — Calibrados para evitar cualquier solapamiento en el campo */
 .fut-card-size-pitch {
-  width: 104px;
-  height: 166px;
-  font-size: 13.5px;
+  width: 78px;
+  height: 124px;
+  font-size: 10px;
+}
+
+.fut-card-size-bench {
+  width: 68px;
+  height: 108px;
+  font-size: 8.8px;
 }
 
 .fut-card-size-album {
-  width: 148px;
-  height: 236px;
-  font-size: 19px;
+  width: 140px;
+  height: 224px;
+  font-size: 17px;
 }
 
 .fut-card-size-walkout {
@@ -800,15 +803,9 @@ dialog[open] {
 }
 
 .fut-card-size-inspect {
-  width: 140px;
-  height: 224px;
-  font-size: 17.5px;
-}
-
-.fut-card-size-bench {
-  width: 60px;
-  height: 96px;
-  font-size: 7.8px;
+  width: 154px;
+  height: 246px;
+  font-size: 19px;
 }
 
 /* ==================== PEDESTAL 3D HEXAGONAL FIFA 18 ==================== */

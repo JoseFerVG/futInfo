@@ -399,19 +399,10 @@ body.hud-canvas {
 }
 
 .hud-panel-watermark {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  font: 900 16rem / 0.72 var(--hud-cond);
-  color: #ffffff;
-  opacity: 0.04;
-  letter-spacing: -0.04em;
-  pointer-events: none;
-  z-index: 0;
-  white-space: nowrap;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .hud-panel > *:not(.hud-panel-watermark):not(.hud-panel-hit) {
@@ -484,9 +475,9 @@ body.hud-canvas {
 }
 
 .hud-panel--squad .hud-title {
-  font: 900 2.2rem / 0.88 var(--hud-cond);
+  font: 900 1.6rem / 1 var(--hud-cond);
   left: 20px;
-  top: 14px;
+  top: 10px;
 }
 
 .hud-bignum {
@@ -519,8 +510,8 @@ body.hud-canvas {
 .hud-squad-head {
   position: absolute !important;
   inset: 0 0 auto 0;
-  height: 74px;
-  padding: 14px 20px;
+  height: 52px;
+  padding: 10px 18px;
   cursor: pointer;
   transition: background 150ms ease;
   z-index: 10;
@@ -530,34 +521,76 @@ body.hud-canvas {
   background: rgba(240, 190, 42, 0.08);
 }
 
-.hud-squad-action-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  background: var(--hud-ink);
-  color: var(--hud-gold);
-  border: 1px solid var(--hud-gold);
-  font: 900 0.8rem / 1 var(--hud-cond);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 120ms ease;
-  transform: skewX(-8deg);
-  margin-top: 2px;
+/* Barra de Acción EA Sports: Cambiar Plantilla & Formación */
+.hud-squad-action-bar {
+  position: absolute !important;
+  left: 16px;
+  right: 16px;
+  top: 44px;
+  height: 34px;
+  z-index: 15;
+  display: flex;
+  align-items: stretch;
 }
 
-.hud-squad-head:hover .hud-squad-action-badge,
-.hud-squad-action-badge:hover {
-  background: var(--hud-gold);
-  color: var(--hud-ink);
-  box-shadow: 0 0 14px rgba(240, 190, 42, 0.6);
+.hud-squad-bar-btn {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(14, 18, 26, 0.98) 0%, rgba(28, 33, 46, 0.95) 100%);
+  border: 1px solid rgba(240, 190, 42, 0.5);
+  border-left: 4px solid var(--hud-gold);
+  color: var(--hud-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  cursor: pointer;
+  transition: all var(--hud-snap);
+}
+
+.hud-squad-bar-btn:hover {
+  background: linear-gradient(90deg, var(--hud-gold-2) 0%, var(--hud-gold) 100%);
+  color: var(--hud-ink) !important;
+  border-color: var(--hud-gold);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(240, 190, 42, 0.45);
+}
+
+.hud-squad-bar-btn:hover .hud-squad-bar-title,
+.hud-squad-bar-btn:hover i {
+  color: var(--hud-ink) !important;
+}
+
+.hud-squad-bar-title {
+  font: 900 1.05rem / 1 var(--hud-cond);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-squad-bar-badge {
+  font: 800 0.75rem / 1 var(--hud-cond);
+  letter-spacing: 0.1em;
+  padding: 3px 8px;
+  background: rgba(240, 190, 42, 0.15);
+  color: var(--hud-gold);
+  border: 1px solid rgba(240, 190, 42, 0.35);
+  transform: skewX(-8deg);
+}
+
+.hud-squad-bar-btn:hover .hud-squad-bar-badge {
+  background: var(--hud-ink);
+  color: var(--hud-gold);
+  border-color: var(--hud-ink);
 }
 
 .hud-squad-meta {
   position: absolute;
   right: 20px;
-  top: 14px;
+  top: 10px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -621,8 +654,8 @@ body.hud-canvas {
   position: absolute !important;
   left: 16px;
   right: 16px;
-  top: 88px;
-  bottom: 58px;
+  top: 86px;
+  bottom: 56px;
   min-height: 0 !important;
   background: transparent !important;
   overflow: visible !important;
@@ -666,14 +699,12 @@ body.hud-canvas {
   inset: 2px;
 }
 
-.hud-pitch .pitch-formation-watermark {
-  z-index: 1;
-  font-family: var(--hud-cond) !important;
-  font-weight: 900 !important;
-  opacity: 0.16 !important;
-  font-size: 8rem;
-  left: 20px;
-  bottom: 40px;
+.hud-pitch .pitch-formation-watermark,
+.pitch-formation-watermark {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 #pitch-slots-container {
@@ -685,16 +716,19 @@ body.hud-canvas {
 /* Escala y posicionamiento de cartas en perspectiva */
 .hud-pitch .fut-card-slot {
   transform: translate(-50%, -50%) scale(calc(var(--depth-scale, 1) * var(--pitch-scale)));
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.75));
   transition: transform var(--hud-snap);
 }
 
 .hud-pitch .fut-card-slot:hover {
-  transform: translate(-50%, -50%) scale(calc(var(--depth-scale, 1) * var(--pitch-scale) * 1.1));
+  transform: translate(-50%, -50%) scale(calc(var(--depth-scale, 1) * var(--pitch-scale) * 1.08));
+  filter: drop-shadow(0 12px 20px rgba(240, 190, 42, 0.45));
   z-index: 40 !important;
 }
 
 .hud-pitch .fut-card-slot.swap-active {
-  transform: translate(-50%, -50%) scale(calc(var(--depth-scale, 1) * var(--pitch-scale) * 1.15));
+  transform: translate(-50%, -50%) scale(calc(var(--depth-scale, 1) * var(--pitch-scale) * 1.12));
+  filter: drop-shadow(0 0 18px #f59e0b) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.8));
   z-index: 45 !important;
 }
 
@@ -785,6 +819,29 @@ body.hud-canvas {
 .hud-insp-ovr {
   font: 900 1.8rem / 1 var(--hud-cond);
   color: var(--hud-gold);
+}
+
+.hud-insp-trait-badge {
+  font: 800 0.72rem / 1 var(--hud-cond);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 6px;
+  background: rgba(240, 190, 42, 0.15);
+  color: var(--hud-gold);
+  border: 1px solid rgba(240, 190, 42, 0.4);
+  transform: skewX(-8deg);
+  white-space: nowrap;
+}
+
+.hud-insp-stars-badge {
+  font: 900 0.72rem / 1 var(--hud-cond);
+  letter-spacing: 0.05em;
+  padding: 3px 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transform: skewX(-8deg);
+  white-space: nowrap;
 }
 
 .hud-insp-stats {
@@ -1456,4 +1513,188 @@ body.hud-canvas {
   background: var(--hud-gold) !important;
   color: var(--hud-ink) !important;
   border-color: var(--hud-gold) !important;
+}
+
+/* =====================================================================
+   MODO CLARO (LIGHT BROADCAST STUDIO) — EA SPORTS FC TV SET
+   Estética de estudio de televisión diurno de EA Sports FC
+   ===================================================================== */
+body.theme-light {
+  --hud-bg: #e2e8f0;
+  --hud-surface: #ffffff;
+  --hud-surface-2: #f1f5f9;
+  --hud-gold: #b45309;
+  --hud-gold-2: #d97706;
+  --hud-accent: #d97706;
+  --hud-ink: #ffffff;
+  --hud-text: #0f172a;
+  --hud-dim: #64748b;
+  background-color: #e2e8f0;
+  color: #0f172a;
+}
+
+body.theme-light .hud-bg {
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.75) 0%, rgba(226, 232, 240, 0.9) 60%, rgba(203, 213, 225, 0.98) 100%),
+    url('../assets/fut_broadcast_bg.jpg') center bottom / cover no-repeat;
+  filter: brightness(1.3) contrast(0.9);
+}
+
+body.theme-light .hud-club {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.96) 100%);
+  border-left-color: var(--hud-gold-2);
+  border-bottom: 2px solid rgba(217, 119, 6, 0.35);
+}
+
+body.theme-light .hud-club-name {
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-club-tournament {
+  color: #475569 !important;
+}
+
+body.theme-light .hud-status {
+  background: linear-gradient(270deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.96) 100%);
+  border-right-color: var(--hud-gold-2);
+  border-bottom: 2px solid rgba(15, 23, 42, 0.15);
+}
+
+body.theme-light .hud-mode {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+body.theme-light .hud-mode-btn {
+  color: #475569;
+}
+
+body.theme-light .hud-mode-btn.active {
+  color: #0f172a !important;
+  background: #fbbf24 !important;
+}
+
+body.theme-light .hud-icon-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+body.theme-light .hud-icon-btn:hover {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+body.theme-light .hud-tabs {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-top: 1px solid #cbd5e1;
+  border-bottom: 2px solid #94a3b8;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
+}
+
+body.theme-light .hud-tabs .tab-btn {
+  color: #475569 !important;
+  border-right-color: #e2e8f0;
+}
+
+body.theme-light .hud-tabs .tab-btn.active {
+  color: #b45309 !important;
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.02) 100%);
+  text-shadow: none;
+}
+
+body.theme-light .hud-panel {
+  background:
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.02) 0 2px, transparent 2px 8px),
+    linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  color: #0f172a;
+  border-bottom: 3px solid #cbd5e1;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+}
+
+body.theme-light .hud-panel::before {
+  background: #cbd5e1;
+}
+
+body.theme-light .hud-panel.is-focus,
+body.theme-light .hud-panel:hover {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 65%, #f59e0b 100%);
+  color: #0f172a;
+  border-bottom-color: #0f172a;
+}
+
+body.theme-light .hud-squad-bar-btn {
+  background: #ffffff;
+  border-color: #f59e0b;
+  border-left-color: #b45309;
+  color: #0f172a;
+}
+
+body.theme-light .hud-squad-bar-title {
+  color: #0f172a;
+}
+
+body.theme-light .hud-inspector {
+  background: rgba(255, 255, 255, 0.98);
+  color: #0f172a;
+  border-left-color: #b45309;
+  border-bottom: 1px solid #cbd5e1;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.06);
+}
+
+body.theme-light .hud-insp-name {
+  color: #0f172a;
+}
+
+body.theme-light .hud-insp-stats em {
+  color: #0f172a;
+}
+
+body.theme-light .hud-prompts {
+  background: #ffffff;
+  color: #0f172a;
+  border-top: 1px solid #cbd5e1;
+}
+
+body.theme-light .hud-prompt em {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+body.theme-light .hud-prompt span {
+  color: #334155;
+}
+
+body.theme-light dialog.fifa-console-modal {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light dialog.fifa-console-modal .bg-slate-900,
+body.theme-light dialog.fifa-console-modal .bg-slate-900\/90,
+body.theme-light dialog.fifa-console-modal .bg-slate-900\/80,
+body.theme-light dialog.fifa-console-modal .bg-slate-950,
+body.theme-light dialog.fifa-console-modal .bg-slate-950\/90 {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light dialog.fifa-console-modal h2,
+body.theme-light dialog.fifa-console-modal h3,
+body.theme-light dialog.fifa-console-modal h4,
+body.theme-light dialog.fifa-console-modal h5 {
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-tile {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-tile h2,
+body.theme-light .fifa-tile h3 {
+  color: #0f172a !important;
 }

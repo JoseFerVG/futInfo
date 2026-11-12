@@ -457,7 +457,21 @@ export class TeamStore {
       if (p.id === 'p4' && (p.cardType === 'special' || !p.cardType)) p.cardType = 'toty';
       if (p.id === 'p5' && !p.cardType) p.cardType = 'totw';
       if (p.id === 'p6' && (!p.cardType || p.cardType === 'gold')) p.cardType = 'tots';
-      if (p.id === 'p8' && (!p.cardType || p.cardType === 'gold')) p.cardType = 'icon';
+      if (p.id === 'p8' && (!p.cardType || p.cardType === 'icon')) p.cardType = 'icon';
+
+      // Personalizaciones de Personaje FIFA
+      if (!p.kitColor) p.kitColor = '#f0be2a';
+      if (!p.kitSecondary) p.kitSecondary = '#111827';
+      if (!p.kitCollar) p.kitCollar = 'round';
+      if (!p.kitSleeves) p.kitSleeves = 'short';
+      if (!p.playStyle) {
+        const best = p.rolesHierarchy?.best || p.roleBest || 'MC';
+        p.playStyle = best === 'POR' ? 'acrobatic' : (['DFC', 'LI', 'LD', 'CIE'].includes(best) ? 'anticipate' : (['DC', 'PIV'].includes(best) ? 'finesse' : 'incisive'));
+      }
+      if (!p.skillMoves) p.skillMoves = 4;
+      if (!p.weakFoot) p.weakFoot = 4;
+      if (!p.celebration) p.celebration = 'siuuu';
+      if (!p.chemStyle) p.chemStyle = 'HUN';
 
       if (p.id) seenIds.add(p.id);
       if (name) seenNames.add(nameKey);
@@ -537,7 +551,15 @@ export class TeamStore {
       rating: parseInt(data.rating, 10) || calculatedRating,
       cardType: data.cardType || 'gold',
       faculty: data.faculty || 'inf',
-      chemStyle: data.chemStyle || 'BAS',
+      chemStyle: data.chemStyle || 'HUN',
+      kitColor: data.kitColor || '#f0be2a',
+      kitSecondary: data.kitSecondary || '#111827',
+      kitCollar: data.kitCollar || 'round',
+      kitSleeves: data.kitSleeves || 'short',
+      playStyle: data.playStyle || 'finesse',
+      skillMoves: parseInt(data.skillMoves, 10) || 4,
+      weakFoot: parseInt(data.weakFoot, 10) || 4,
+      celebration: data.celebration || 'siuuu',
       avatar: data.avatar || `https://images.unsplash.com/photo-${1530000000000 + Math.floor(Math.random() * 50000)}?w=150&auto=format&fit=crop&q=80`,
       preferredFoot: data.preferredFoot || 'Diestro',
       studentId: data.studentId || '',

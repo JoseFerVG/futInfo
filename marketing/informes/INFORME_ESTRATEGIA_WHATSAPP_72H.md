@@ -78,6 +78,7 @@ Cuando los alumnos o delegados respondan en el grupo o por privado con dudas, us
 
 ## 5. REPOSITORIO DE RECURSOS GENERADOS
 
+* 📘 **[GUIA_PASO_A_PASO_EJECUCION_MARKETING_72H.md](file:///C:/Users/josef/Desktop/futInfo/marketing/informes/GUIA_PASO_A_PASO_EJECUCION_MARKETING_72H.md)** (Guía maestra operativa paso a paso)
 * [01_DRAFT_CALLOUT_PERSONAL.md](file:///C:/Users/josef/Desktop/futInfo/marketing/campa%C3%B1as/01_DRAFT_CALLOUT_PERSONAL.md)
 * [02_GUERRA_FACULTADES.md](file:///C:/Users/josef/Desktop/futInfo/marketing/campa%C3%B1as/02_GUERRA_FACULTADES.md)
 * [03_CARTA_FUT_GAMIFICACION.md](file:///C:/Users/josef/Desktop/futInfo/marketing/campa%C3%B1as/03_CARTA_FUT_GAMIFICACION.md)
