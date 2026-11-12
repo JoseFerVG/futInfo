@@ -803,13 +803,8 @@ class FutApp {
     const label = document.getElementById('current-modality-label');
 
     if (bF7 && bFutsal) {
-      if (isF7) {
-        bF7.className = 'px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-black shadow-xs transition flex items-center gap-1.5 cursor-pointer';
-        bFutsal.className = 'px-3 py-1 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5 font-bold cursor-pointer';
-      } else {
-        bFutsal.className = 'px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-black shadow-xs transition flex items-center gap-1.5 cursor-pointer';
-        bF7.className = 'px-3 py-1 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5 font-bold cursor-pointer';
-      }
+      bF7.classList.toggle('active', isF7);
+      bFutsal.classList.toggle('active', !isF7);
     }
 
     if (label) {
@@ -1787,12 +1782,8 @@ class FutApp {
     document.querySelectorAll('.fifa-tab-btn, .tab-btn').forEach(btn => {
       if (btn.dataset.tab === tabId) {
         btn.classList.add('active');
-        btn.classList.remove('text-slate-500');
-        btn.classList.add('text-slate-900');
       } else {
         btn.classList.remove('active');
-        btn.classList.remove('text-slate-900');
-        btn.classList.add('text-slate-500');
       }
     });
 
@@ -1812,17 +1803,17 @@ class FutApp {
       const userPhoto = user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
 
       container.innerHTML = `
-        <div class="flex items-center gap-2 bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-xl shadow-sm">
+        <div class="flex items-center gap-2 bg-[#0B0D10] border border-[#F0BE2A]/40 px-2.5 py-1">
           <div class="flex items-center gap-2 cursor-pointer group" id="btn-open-my-profile" title="Ver / Editar mi Carta y Foto de Perfil">
-            <img src="${userPhoto}" alt="${user.name}" class="w-7 h-7 rounded-lg object-cover border-2 ${isMister ? 'border-amber-500' : 'border-emerald-500'} group-hover:scale-105 transition">
+            <img src="${userPhoto}" alt="${user.name}" class="w-6 h-6 object-cover border ${isMister ? 'border-[#F0BE2A]' : 'border-[#38F89C]'}">
             <div class="hidden sm:block text-left">
-              <div class="text-xs font-black text-slate-900 leading-tight truncate max-w-[120px] group-hover:text-amber-600 transition">${user.name}</div>
-              <div class="text-[10px] ${isMister ? 'text-amber-600' : 'text-emerald-600'} font-bold">
-                ${isMister ? 'Admin' : 'Jugador'}
+              <div class="text-xs font-black text-[#E9E9E9] uppercase tracking-wider leading-none truncate max-w-[110px] group-hover:text-[#F0BE2A]">${user.name}</div>
+              <div class="text-[9px] ${isMister ? 'text-[#F0BE2A]' : 'text-[#38F89C]'} font-bold uppercase tracking-widest leading-none mt-0.5">
+                ${isMister ? 'ADMIN' : 'JUGADOR'}
               </div>
             </div>
           </div>
-          <button id="btn-logout" class="ml-1.5 p-1 text-slate-400 hover:text-rose-600 rounded transition" title="Cerrar Sesión" aria-label="Cerrar Sesión">
+          <button id="btn-logout" class="ml-1 p-1 text-[#8B8F98] hover:text-[#F43F5E] transition cursor-pointer" title="Cerrar Sesión" aria-label="Cerrar Sesión">
             <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
           </button>
         </div>
@@ -1839,14 +1830,14 @@ class FutApp {
       });
     } else {
       container.innerHTML = `
-        <button id="btn-open-login" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-sm transition active:scale-95">
+        <button id="btn-open-login" class="px-3 py-1 bg-[#F0BE2A] hover:bg-white text-[#111111] font-black text-xs uppercase tracking-wider flex items-center gap-1.5 transition cursor-pointer">
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
           </svg>
-          <span>Acceder con Google</span>
+          <span>CONECTAR CUENTA</span>
         </button>
       `;
 
@@ -1925,6 +1916,8 @@ class FutApp {
 
     const headerRating = document.getElementById('header-team-rating');
     if (headerRating) headerRating.textContent = chemRatingData.rating;
+    const ratingFill = document.querySelector('.hud-rating-fill');
+    if (ratingFill) ratingFill.style.width = `${Math.min(100, chemRatingData.rating)}%`;
 
     const sideFormation = document.getElementById('side-formation-tag');
     if (sideFormation) sideFormation.textContent = formationConfig.short || activeFormation;
@@ -2042,13 +2035,16 @@ class FutApp {
    * hacia el centro y se encogen; el portero queda grande y cerca de cámara.
    */
   projectSlot(slot) {
-    // Escala sutil en perspectiva sobre el estadio FIFA de fondo
-    const t = Math.min(1, Math.max(0, (slot.top - 18) / 68));
+    // Escala en perspectiva sobre el trapecio 3D: delanteros rompen ligeramente el borde superior
+    const t = Math.min(1, Math.max(0, (slot.top - 16) / 72));
     const isMobile = window.matchMedia('(max-width: 640px)').matches;
-    const baseScale = isMobile ? 0.82 : 0.88;
-    const scale = +(baseScale + 0.16 * t).toFixed(3);
+    const baseScale = isMobile ? 0.80 : 0.86;
+    const scale = +(baseScale + 0.14 * t).toFixed(3);
+    // Estirar el eje vertical para que no solapen DFC (72) y POR (88)
+    let mappedTop = 9 + t * 79;
+    if (slot.role === 'DFC' && slot.top >= 70) mappedTop -= 5;
     return {
-      top: slot.top,
+      top: +mappedTop.toFixed(1),
       left: slot.left,
       scale,
       z: 12 + Math.round(t * 20)

@@ -1,0 +1,706 @@
+/* =====================================================================
+   BROADCAST HUD — EA SPORTS FUT CONSOLE LAYER
+   Calcado de ReferenciasFifa/d0ef8c089933549d1af8fb3e3d6e12a8.jpg (FIFA 15, 1600x900)
+
+   Medidas extraídas (porcentaje del lienzo 16:9):
+   - HUD superior ........ y 6.0% → 14.0%   | club x 5.3%→36%  | estado x 58.5%→94.3%
+   - Pestañas ............ y 20.5% → 25.8%  | x 5.6%→94.3%, columnas iguales
+   - Cuerpo .............. y 25.8% → 84.0%  | 2 columnas reales:
+       · Izquierda 44.0% ancho x 100% alto (ACTIVE SQUAD, foco por defecto)
+       · Gutter 0.5%
+       · Derecha 44.0% ancho, partida en 2 filas de ~49.3% con gutter ~1.4%
+   - Prompts ............. y ~88%
+
+   Paleta HEX (muestreada de la captura):
+   - Fondo estadio ....... #0B0D10
+   - Superficie inactiva . #17191E  (≈ 92% opacidad sobre estadio)
+   - Superficie activa ... #F0BE2A → #F6CF4B (oro FUT)
+   - Acento texto pestaña  #F2B705
+   - Texto inactivo ...... #E9E9E9   | texto sobre activo #111111
+   ===================================================================== */
+
+:root {
+  --hud-bg: #0b0d10;
+  --hud-surface: #17191e;
+  --hud-surface-2: #1f2228;
+  --hud-line: rgba(255, 255, 255, 0.08);
+  --hud-gold: #f0be2a;
+  --hud-gold-2: #f6cf4b;
+  --hud-accent: #f2b705;
+  --hud-ink: #111111;
+  --hud-text: #e9e9e9;
+  --hud-dim: #8b8f98;
+  --hud-snap: 120ms cubic-bezier(0.2, 1, 0.3, 1);
+  --hud-cond: 'Barlow Condensed', 'Teko', 'Oswald', sans-serif;
+
+  /* Lienzo 16:9 fijo inscrito en la ventana */
+  --W: min(100vw, 177.78vh);
+  --H: min(100vh, 56.25vw);
+  --x0: calc((100vw - var(--W)) / 2);
+  --y0: calc((100vh - var(--H)) / 2);
+  --u: calc(var(--H) / 100);   /* 1% del alto del lienzo */
+  --v: calc(var(--W) / 100);   /* 1% del ancho del lienzo */
+  --pitch-k: 0.49;
+}
+
+/* ---------- 0. LISTA NEGRA: CERO RADIOS, CERO SOMBRAS SaaS ---------- */
+*:not(.fut-card):not(.fut-card *):not(.fut-card-slot::after),
+*::before, *::after {
+  border-radius: 0 !important;
+}
+.hud-canvas [class*="shadow"]:not(.fut-card):not(.fut-card *) { box-shadow: none !important; }
+.hud-canvas [class*="backdrop-blur"] { backdrop-filter: none !important; }
+
+/* ---------- 1. LIENZO ---------- */
+html, body.hud-canvas {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  background: #000;
+}
+body.hud-canvas {
+  position: fixed;
+  inset: 0;
+  font-family: var(--hud-cond);
+  color: var(--hud-text);
+}
+.hud-bg {
+  position: fixed;
+  left: var(--x0); top: var(--y0);
+  width: var(--W); height: var(--H);
+  background:
+    radial-gradient(ellipse 60% 35% at 50% 0%, rgba(255, 236, 170, 0.18), transparent 70%),
+    linear-gradient(180deg, rgba(8, 10, 13, 0.55) 0%, rgba(8, 10, 13, 0.25) 45%, rgba(10, 30, 8, 0.75) 100%),
+    url('../assets/fifa_stadium_master.png') center / cover no-repeat,
+    var(--hud-bg);
+  z-index: 0;
+}
+.hud-bg::after { /* trama televisiva */
+  content: "";
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+}
+
+/* ---------- 2. HUD SUPERIOR (6% → 14%) ---------- */
+.hud-top {
+  position: fixed;
+  left: calc(var(--x0) + 5.3 * var(--v));
+  top: calc(var(--y0) + 6 * var(--u));
+  width: calc(89 * var(--v));
+  height: calc(8 * var(--u));
+  display: flex;
+  justify-content: space-between;
+  z-index: 30;
+  pointer-events: none;
+}
+.hud-top > * { pointer-events: auto; }
+
+.hud-club {
+  width: 35%;
+  display: flex;
+  align-items: center;
+  gap: calc(1.4 * var(--v));
+  padding-left: calc(1.4 * var(--v));
+  background: linear-gradient(90deg, rgba(14,16,20,0.95), rgba(23,25,30,0.88));
+  clip-path: polygon(0 0, 100% 0, 93% 100%, 0 100%);
+  border-bottom: 3px solid var(--hud-gold);
+}
+.hud-crest {
+  width: calc(5.4 * var(--u)); height: calc(6 * var(--u));
+  background: linear-gradient(160deg, var(--hud-gold-2), var(--hud-gold));
+  color: var(--hud-ink);
+  clip-path: polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%);
+  display: grid; place-items: center;
+  font: 900 calc(1.8 * var(--u)) / 1 var(--hud-cond);
+  letter-spacing: 0.05em;
+}
+.hud-club-data { display: flex; flex-direction: column; gap: calc(0.3 * var(--u)); min-width: 0; }
+.hud-club-row { display: flex; align-items: baseline; gap: calc(1.2 * var(--v)); white-space: nowrap; }
+.hud-est { font: 600 calc(1.45 * var(--u)) / 1 var(--hud-cond); color: var(--hud-dim); letter-spacing: 0.04em; }
+.hud-club-name { font: 700 calc(2.4 * var(--u)) / 1 var(--hud-cond); color: #fff; text-transform: uppercase; letter-spacing: 0.02em; overflow: hidden; text-overflow: ellipsis; }
+.hud-club-meta { font: 600 calc(1.45 * var(--u)) / 1 var(--hud-cond); color: var(--hud-text); text-transform: uppercase; letter-spacing: 0.06em; }
+.hud-online { display: inline-flex; align-items: center; gap: 6px; color: #7dff6a; }
+.hud-online i { width: 6px; height: 6px; background: #7dff6a; display: inline-block; }
+
+.hud-status {
+  width: 41%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: calc(0.8 * var(--v));
+  padding: 0 calc(1.2 * var(--v)) 0 calc(3 * var(--v));
+  background: linear-gradient(270deg, rgba(14,16,20,0.95), rgba(23,25,30,0.88));
+  clip-path: polygon(6% 0, 100% 0, 100% 100%, 0 100%);
+  border-bottom: 3px solid rgba(255,255,255,0.15);
+}
+.hud-mode { display: flex; height: calc(4 * var(--u)); }
+.hud-mode-btn {
+  padding: 0 calc(1.1 * var(--v));
+  font: 800 calc(1.7 * var(--u)) / 1 var(--hud-cond);
+  letter-spacing: 0.06em;
+  color: var(--hud-dim);
+  background: transparent;
+  border-bottom: 3px solid transparent;
+  transition: background var(--hud-snap), color var(--hud-snap);
+  cursor: pointer;
+}
+.hud-mode-btn:hover { background: #fff; color: var(--hud-ink); }
+.hud-mode-btn.active { color: var(--hud-ink); background: var(--hud-gold); border-bottom-color: var(--hud-ink); }
+.hud-icon-btn {
+  width: calc(4 * var(--u)); height: calc(4 * var(--u));
+  display: grid; place-items: center;
+  background: var(--hud-surface-2);
+  color: var(--hud-text);
+  transition: background var(--hud-snap), color var(--hud-snap);
+  cursor: pointer;
+}
+.hud-icon-btn:hover { background: #fff; color: var(--hud-ink); }
+.hud-auth > div, .hud-auth button {
+  background: var(--hud-surface-2) !important;
+  border: 0 !important;
+  color: var(--hud-text) !important;
+  font-family: var(--hud-cond) !important;
+}
+.hud-auth .text-slate-900 { color: #fff !important; }
+.hud-auth button:hover { background: #fff !important; color: var(--hud-ink) !important; }
+
+/* ---------- 3. PESTAÑAS (20.5% → 25.8%) ---------- */
+.hud-tabs {
+  position: fixed;
+  left: calc(var(--x0) + 5.6 * var(--v));
+  top: calc(var(--y0) + 20.5 * var(--u));
+  width: calc(88.7 * var(--v));
+  height: calc(5.3 * var(--u));
+  display: flex;
+  z-index: 30;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+.hud-tabs .tab-btn {
+  flex: 1;
+  height: 100%;
+  font: 600 calc(2.75 * var(--u)) / 1 var(--hud-cond) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--hud-text) !important;
+  background: transparent;
+  position: relative;
+  cursor: pointer;
+  transition: background var(--hud-snap), color var(--hud-snap), transform var(--hud-snap);
+}
+.hud-tabs .tab-btn::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+  background: transparent; transition: background var(--hud-snap);
+}
+.hud-tabs .tab-btn.active { color: var(--hud-accent) !important; }
+.hud-tabs .tab-btn.active::after { background: var(--hud-accent); }
+.hud-tabs .tab-btn:hover { background: #fff; color: var(--hud-ink) !important; }
+.hud-tab-count {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 5px;
+  font-size: 0.6em;
+  vertical-align: middle;
+  background: var(--hud-gold);
+  color: var(--hud-ink);
+  transform: skewX(-12deg);
+}
+
+/* ---------- 4. CUERPO (25.8% → 84%) ---------- */
+.hud-body {
+  position: fixed;
+  left: calc(var(--x0) + 5.7 * var(--v));
+  top: calc(var(--y0) + 25.8 * var(--u));
+  width: calc(88.6 * var(--v));
+  height: calc(58.2 * var(--u));
+  z-index: 10;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Composición SQUADS: 2 columnas reales 44% | 0.5% | 44% */
+.hud-squads {
+  width: 100%; height: 100%;
+  display: grid;
+  grid-template-columns: 49.66% 49.66%;
+  grid-template-rows: 1fr 1fr;
+  column-gap: 0.68%;
+  row-gap: calc(1.4 * var(--u));
+}
+.hud-squads.hidden { display: none; }
+.hud-panel--squad { grid-row: 1 / 3; grid-column: 1; }
+.hud-panel--bench { grid-row: 1; grid-column: 2; }
+.hud-panel--tactics { grid-row: 2; grid-column: 2; }
+
+/* ---------- 5. PANEL DE CONSOLA ---------- */
+.hud-panel {
+  position: relative;
+  overflow: visible;
+  color: var(--hud-text);
+  background:
+    repeating-linear-gradient(-45deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 10px),
+    linear-gradient(135deg, rgba(31,34,40,0.94), rgba(20,22,27,0.94));
+  border-bottom: 3px solid rgba(255,255,255,0.14);
+  transition: background var(--hud-snap), color var(--hud-snap), transform var(--hud-snap);
+  cursor: pointer;
+  isolation: isolate;
+}
+.hud-panel::before { /* barra de anclaje sesgada */
+  content: "";
+  position: absolute;
+  left: 0; top: 0;
+  width: 3px; height: 100%;
+  background: rgba(255,255,255,0.18);
+  z-index: 2;
+  transition: background var(--hud-snap), width var(--hud-snap);
+}
+.hud-panel::after { /* corte diagonal en esquina superior derecha */
+  content: "";
+  position: absolute;
+  right: 0; top: 0;
+  width: calc(4 * var(--u)); height: calc(4 * var(--u));
+  background: var(--hud-bg);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  opacity: 0.85;
+  z-index: 3;
+}
+.hud-panel-watermark {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  font: 900 calc(34 * var(--u)) / 0.72 var(--hud-cond);
+  color: #fff;
+  opacity: 0.045;
+  letter-spacing: -0.04em;
+  pointer-events: none;
+  z-index: 0;
+  transform-origin: right bottom;
+  white-space: nowrap;
+}
+.hud-panel > *:not(.hud-panel-watermark):not(.hud-panel-hit) { position: relative; z-index: 4; }
+
+/* FOCO DE MANDO: inundación oro, tinta negra, escala, empuje del texto */
+.hud-panel.is-focus,
+.hud-panel:hover {
+  background:
+    repeating-linear-gradient(-45deg, rgba(0,0,0,0.05) 0 2px, transparent 2px 10px),
+    linear-gradient(135deg, var(--hud-gold-2) 0%, var(--hud-gold) 60%, #e3ac14 100%);
+  color: var(--hud-ink);
+  border-bottom-color: var(--hud-ink);
+  transform: scale(1.02);
+  z-index: 5;
+}
+.hud-panel--squad.is-focus, .hud-panel--squad:hover { transform: scale(1.01); }
+.hud-panel.is-focus::before, .hud-panel:hover::before { background: var(--hud-ink); width: 6px; }
+.hud-panel.is-focus .hud-panel-watermark, .hud-panel:hover .hud-panel-watermark { color: #000; opacity: 0.07; }
+.hud-panel.is-focus .hud-title, .hud-panel:hover .hud-title,
+.hud-panel.is-focus .hud-bignum, .hud-panel:hover .hud-bignum { transform: translateX(4px); }
+
+/* Sólo un foco a la vez, como el joystick */
+.hud-squads:hover .hud-panel.is-focus:not(:hover) {
+  background:
+    repeating-linear-gradient(-45deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 10px),
+    linear-gradient(135deg, rgba(31,34,40,0.94), rgba(20,22,27,0.94));
+  color: var(--hud-text);
+  border-bottom-color: rgba(255,255,255,0.14);
+  transform: none;
+}
+.hud-squads:hover .hud-panel.is-focus:not(:hover)::before { background: rgba(255,255,255,0.18); width: 3px; }
+.hud-squads:hover .hud-panel.is-focus:not(:hover) .hud-title { transform: none; }
+
+/* Tipografía de impacto */
+.hud-title {
+  position: absolute !important;
+  left: calc(1.7 * var(--v)); top: calc(2 * var(--u));
+  margin: 0;
+  font: 800 calc(5.2 * var(--u)) / 0.85 var(--hud-cond);
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  transition: transform var(--hud-snap);
+}
+.hud-bignum {
+  position: absolute !important;
+  left: calc(1.7 * var(--v)); bottom: calc(2 * var(--u));
+  display: flex; flex-direction: column;
+  font: 800 calc(9 * var(--u)) / 0.8 var(--hud-cond);
+  transition: transform var(--hud-snap);
+}
+.hud-bignum small {
+  font: 700 calc(2.6 * var(--u)) / 1 var(--hud-cond);
+  letter-spacing: 0.04em;
+  margin-top: calc(0.8 * var(--u));
+}
+.hud-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font: 800 calc(1.4 * var(--u)) / 1.2 var(--hud-cond);
+  letter-spacing: 0.12em;
+  background: var(--hud-ink);
+  color: var(--hud-gold);
+  transform: skewX(-12deg);
+}
+
+/* ---------- 6. ACTIVE SQUAD ---------- */
+.hud-squad-head { position: absolute !important; inset: 0 0 auto 0; height: 20%; }
+.hud-squad-meta {
+  position: absolute;
+  right: calc(2.2 * var(--v)); top: calc(2.4 * var(--u));
+  display: flex; flex-direction: column; align-items: flex-end;
+  gap: calc(0.5 * var(--u));
+}
+.hud-squad-club { font: 700 calc(2.3 * var(--u)) / 1 var(--hud-cond); text-transform: uppercase; }
+.hud-stars { font-size: calc(2.6 * var(--u)); line-height: 1; letter-spacing: 0.05em; color: inherit; }
+.hud-panel.is-focus .hud-stars, .hud-panel:hover .hud-stars { color: #b07a00; }
+.hud-rating-bar {
+  position: relative;
+  width: calc(12.5 * var(--v));
+  height: calc(2.6 * var(--u));
+  background: #2a2c31;
+}
+.hud-rating-fill {
+  position: absolute; inset: 0 auto 0 0;
+  width: 84%;
+  background: linear-gradient(90deg, #d48a00, #f4a300);
+  transition: width 300ms cubic-bezier(0.2,1,0.3,1);
+}
+.hud-rating-num {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  font: 800 calc(2.2 * var(--u)) / 1 var(--hud-cond) !important;
+  color: #fff !important;
+}
+.hud-swap-banner {
+  position: absolute !important;
+  left: 50%; top: 19%;
+  transform: translateX(-50%) skewX(-12deg);
+  padding: 4px 18px;
+  background: var(--hud-ink); color: var(--hud-gold);
+  font: 800 calc(1.6 * var(--u)) / 1.2 var(--hud-cond);
+  letter-spacing: 0.1em;
+  z-index: 50 !important;
+}
+
+/* Césped en perspectiva (trapecio) — el marco no recorta las cartas */
+.hud-pitch-frame {
+  position: absolute !important;
+  left: 2.5%; right: 2.5%;
+  top: 21%; bottom: 11%;
+  min-height: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+.hud-pitch-frame::before { display: none !important; }
+.fut-pitch.hud-pitch {
+  width: 100% !important; height: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+.hud-pitch::before, .hud-pitch::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(11% 0, 89% 0, 100% 100%, 0 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+.hud-pitch::before { /* línea de cal exterior + base */
+  background: rgba(255,255,255,0.55);
+  inset: -2px -3px -6px -3px;
+  box-shadow: 0 8px 0 #1c2a10;
+}
+.hud-pitch::after {
+  background:
+    linear-gradient(180deg, transparent calc(50% - 1px), rgba(255,255,255,0.5) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
+    radial-gradient(ellipse 13% 9% at 50% 50%, transparent 92%, rgba(255,255,255,0.5) 93% 100%, transparent 100%),
+    repeating-linear-gradient(180deg, #4a6b1f 0 8.33%, #557a25 8.33% 16.66%),
+    #4a6b1f;
+  inset: 2px 2px 0 2px;
+}
+.hud-pitch .pitch-formation-watermark {
+  z-index: 1;
+  font-family: var(--hud-cond) !important;
+  font-weight: 900 !important;
+  opacity: 0.18 !important;
+}
+#pitch-slots-container { position: absolute; inset: 0; z-index: 5; }
+
+/* Escala de cartas dentro del panel */
+.hud-pitch .fut-card-slot { transform: translate(-50%, -50%) scale(calc(var(--depth-scale, 1) * var(--pitch-k))); }
+.hud-pitch .fut-card-slot:hover { transform: translate(-50%, -50%) scale(calc(var(--depth-scale, 1) * var(--pitch-k) * 1.1)); }
+.hud-pitch .fut-card-slot.swap-active { transform: translate(-50%, -50%) scale(calc(var(--depth-scale, 1) * var(--pitch-k) * 1.15)); }
+.hud-pitch .fut-card-slot.slot-drop-active { transform: translate(-50%, -50%) scale(calc(var(--depth-scale, 1) * var(--pitch-k) * 1.12)) !important; }
+.fut-pos-pedestal {
+  background: var(--hud-ink) !important;
+  color: var(--hud-gold) !important;
+  border: 0 !important;
+  font-family: var(--hud-cond) !important;
+  transform: skewX(-12deg);
+}
+
+@media (max-height: 760px) { :root { --pitch-k: 0.45; } }
+@media (min-height: 1000px) { :root { --pitch-k: 0.66; } }
+@media (min-height: 1300px) { :root { --pitch-k: 0.85; } }
+
+/* Chyron inspector (rompe el marco por la izquierda) */
+.hud-inspector {
+  position: absolute !important;
+  left: -1.2%; bottom: calc(1 * var(--u));
+  height: calc(5.6 * var(--u));
+  width: 78%;
+  display: flex; align-items: center; gap: calc(0.8 * var(--v));
+  padding: 0 calc(3 * var(--v)) 0 0;
+  background: var(--hud-ink);
+  color: #fff;
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 0 100%);
+  border-left: 6px solid var(--hud-gold);
+}
+.hud-inspector img { height: 100%; width: auto; aspect-ratio: 1; object-fit: cover; filter: contrast(1.1); }
+.hud-insp-pos {
+  font: 800 calc(1.5 * var(--u)) / 1 var(--hud-cond);
+  background: var(--hud-gold); color: var(--hud-ink);
+  padding: 3px 6px; transform: skewX(-12deg);
+}
+.hud-insp-name {
+  font: 800 calc(2.3 * var(--u)) / 1 var(--hud-cond);
+  text-transform: uppercase;
+  max-width: 24%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.hud-insp-ovr { font: 900 calc(3.4 * var(--u)) / 1 var(--hud-cond); color: var(--hud-gold); }
+.hud-insp-stats { display: flex; gap: calc(0.7 * var(--v)); margin-left: auto; }
+.hud-insp-stats span { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.hud-insp-stats b { font: 700 calc(1.1 * var(--u)) / 1 var(--hud-cond); color: var(--hud-dim); letter-spacing: 0.08em; }
+.hud-insp-stats em { font: 800 calc(2 * var(--u)) / 1 var(--hud-cond); font-style: normal; }
+
+/* ---------- 7. BANQUILLO ---------- */
+.hud-bench-dock {
+  position: absolute !important;
+  left: 34%; right: 2%;
+  bottom: calc(1.5 * var(--u));
+  top: auto !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+.hud-bench-dock .fifa-bench-cards-strip {
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-top: calc(3 * var(--u));
+  scrollbar-width: none;
+  gap: calc(1.2 * var(--v));
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.hud-bench-dock [data-bench-id] {
+  transform: scale(1.15);
+  transform-origin: bottom left;
+  transition: transform var(--hud-snap) !important;
+}
+.hud-bench-dock [data-bench-id]:hover { transform: translateY(calc(-1.8 * var(--u))) scale(1.24) !important; }
+.dock-drop-active { outline: 3px solid var(--hud-ink); outline-offset: 2px; }
+
+/* ---------- 8. TÁCTICA ---------- */
+.hud-panel-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+  cursor: pointer;
+}
+.hud-panel--tactics .hud-panel-watermark { font-size: calc(19 * var(--u)); }
+.hud-specs {
+  position: absolute !important;
+  right: calc(1.6 * var(--v)); bottom: calc(2 * var(--u));
+  width: 52%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.hud-specs label {
+  display: flex; align-items: stretch;
+  background: var(--hud-ink);
+  height: calc(3.6 * var(--u));
+  cursor: pointer;
+}
+.hud-specs b {
+  display: grid; place-items: center;
+  padding: 0 8px;
+  font: 800 calc(1.5 * var(--u)) / 1 var(--hud-cond);
+  letter-spacing: 0.08em;
+  color: var(--hud-ink);
+  background: var(--hud-gold);
+}
+.hud-specs select {
+  flex: 1; min-width: 0;
+  background: var(--hud-ink);
+  color: #fff;
+  border: 0;
+  padding: 0 6px;
+  font: 700 calc(1.6 * var(--u)) / 1 var(--hud-cond);
+  text-transform: uppercase;
+  cursor: pointer;
+  appearance: none;
+}
+.hud-specs select:focus { outline: 2px solid #fff; outline-offset: -2px; }
+
+/* ---------- 9. PROMPTS (≈88%) ---------- */
+.hud-prompts {
+  position: fixed;
+  left: calc(var(--x0) + 5.7 * var(--v));
+  top: calc(var(--y0) + 86.5 * var(--u));
+  height: calc(3.6 * var(--u));
+  display: flex; align-items: center; gap: calc(2 * var(--v));
+  z-index: 20;
+  font: 600 calc(2.2 * var(--u)) / 1 var(--hud-cond);
+  color: #fff;
+}
+.hud-prompts b,
+.hud-prompts em {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 8px;
+  font-style: normal;
+  font-weight: 800;
+  font-size: 0.72em;
+  letter-spacing: 0.1em;
+  background: var(--hud-gold); color: var(--hud-ink);
+  transform: skewX(-12deg);
+}
+
+/* ---------- 10. OTRAS VISTAS (Álbum / Jornadas / Club) ---------- */
+.hud-body > .tab-view:not(#view-pitch) {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: calc(1.6 * var(--u)) calc(1.4 * var(--v));
+  background:
+    repeating-linear-gradient(-45deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 10px),
+    linear-gradient(135deg, rgba(31,34,40,0.95), rgba(18,20,24,0.95));
+  border-left: 6px solid var(--hud-gold);
+  scrollbar-width: thin;
+  scrollbar-color: var(--hud-gold) transparent;
+}
+.hud-body > .tab-view.hidden { display: none !important; }
+
+.hud-canvas .fifa-tile {
+  background: var(--hud-surface) !important;
+  border: 0 !important;
+  border-bottom: 3px solid rgba(255,255,255,0.14) !important;
+  box-shadow: none !important;
+  position: relative;
+  transition: border-color var(--hud-snap);
+}
+.hud-canvas .fifa-tile:hover { border-bottom-color: var(--hud-gold) !important; }
+.hud-canvas .fifa-tile-accent-bar {
+  position: absolute; left: 0; top: 0; width: 40%; height: 4px;
+  background: var(--hud-gold) !important;
+  transform: skewX(-24deg); transform-origin: left;
+}
+.hud-canvas .font-fifa { font-family: var(--hud-cond) !important; font-weight: 800; }
+.hud-canvas h2, .hud-canvas h3 { font-family: var(--hud-cond); text-transform: uppercase; line-height: 0.9; }
+
+/* Neutralizar la estética Tailwind slate por defecto */
+.hud-canvas .bg-slate-900, .hud-canvas .bg-slate-900\/80, .hud-canvas .bg-slate-900\/90,
+.hud-canvas .bg-slate-950, .hud-canvas .bg-slate-950\/70, .hud-canvas .bg-slate-950\/90, .hud-canvas .bg-slate-950\/95,
+.hud-canvas .bg-slate-800 { background-color: #101216 !important; }
+.hud-canvas .border-slate-700, .hud-canvas .border-slate-800,
+.hud-canvas .border-slate-700\/80, .hud-canvas .border-slate-700\/60 { border-color: rgba(255,255,255,0.08) !important; }
+.hud-canvas [class*="bg-gradient-to"] { background-image: none !important; }
+.hud-canvas [class*="bg-gradient-to"][class*="amber"],
+.hud-canvas .bg-amber-500, .hud-canvas .bg-amber-400 { background-color: var(--hud-gold) !important; color: var(--hud-ink) !important; }
+.hud-canvas .text-amber-400, .hud-canvas .text-amber-300 { color: var(--hud-gold) !important; }
+.hud-canvas .text-cyan-400, .hud-canvas .text-cyan-300, .hud-canvas .text-sky-400 { color: #e9e9e9 !important; }
+.hud-canvas .bg-cyan-500, .hud-canvas .bg-cyan-400 { background-color: #fff !important; color: var(--hud-ink) !important; }
+
+/* Botones genéricos → bloques de consola */
+.hud-canvas main button:not(.fut-radial-btn):not(.tab-btn):not(.hud-panel-hit),
+.hud-canvas dialog button {
+  font-family: var(--hud-cond) !important;
+  letter-spacing: 0.06em;
+  transition: background var(--hud-snap), color var(--hud-snap), transform var(--hud-snap) !important;
+}
+.hud-canvas main button:not(.fut-radial-btn):not(.tab-btn):not(.hud-panel-hit):hover,
+.hud-canvas dialog button:hover {
+  background: #fff !important;
+  color: var(--hud-ink) !important;
+  transform: translateX(3px);
+}
+.hud-canvas input, .hud-canvas select, .hud-canvas textarea {
+  background: #0d0f12 !important;
+  border: 0 !important;
+  border-bottom: 2px solid rgba(255,255,255,0.2) !important;
+  color: #fff !important;
+  font-family: var(--hud-cond);
+}
+.hud-canvas input:focus, .hud-canvas select:focus, .hud-canvas textarea:focus {
+  border-bottom-color: var(--hud-gold) !important;
+  outline: none;
+  box-shadow: none !important;
+}
+.hud-canvas input[type="range"] { border: 0 !important; background: transparent !important; }
+
+/* ---------- 11. MODALES = PANTALLAS DE CONSOLA ---------- */
+.hud-canvas dialog.fifa-console-modal {
+  background:
+    repeating-linear-gradient(-45deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 10px),
+    #131519 !important;
+  border: 0 !important;
+  border-top: 6px solid var(--hud-gold) !important;
+  clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 0 100%);
+  max-height: 88vh;
+}
+.hud-canvas dialog::backdrop { background: rgba(0,0,0,0.78); }
+.hud-canvas .tactics-style-btn.active {
+  background: var(--hud-gold) !important;
+  color: var(--hud-ink) !important;
+  box-shadow: none !important;
+}
+.hud-canvas .tactics-style-btn.active span { color: var(--hud-ink) !important; }
+
+/* ---------- 12. DRAWER, TOAST, RADIAL ---------- */
+#fut-sub-drawer { background: #0e1013 !important; border-top: 6px solid var(--hud-gold) !important; z-index: 60; }
+.sub-bench-card { background: var(--hud-surface) !important; border: 0 !important; border-left: 3px solid rgba(255,255,255,0.15) !important; transition: background var(--hud-snap), color var(--hud-snap) !important; }
+.sub-bench-card:hover { background: var(--hud-gold) !important; color: var(--hud-ink) !important; transform: translateX(4px); }
+.sub-bench-card:hover * { color: var(--hud-ink) !important; }
+.fut-toast {
+  background: var(--hud-ink) !important;
+  border: 0 !important;
+  border-left: 6px solid var(--hud-gold) !important;
+  font-family: var(--hud-cond) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  clip-path: polygon(0 0, 100% 0, 96% 100%, 0 100%);
+}
+.fut-radial-btn {
+  background: var(--hud-ink) !important;
+  color: var(--hud-gold) !important;
+  border: 0 !important;
+  transition: background var(--hud-snap), color var(--hud-snap) !important;
+}
+.fut-radial-btn:hover { background: var(--hud-gold) !important; color: var(--hud-ink) !important; }
+
+/* ---------- 13. PANTALLAS PEQUEÑAS (no 16:9 útil) ---------- */
+@media (max-width: 900px), (max-aspect-ratio: 4/5) {
+  html, body.hud-canvas { overflow-y: auto; position: static; height: auto; }
+  .hud-bg { position: fixed; inset: 0; width: 100vw; height: 100vh; }
+  .hud-top, .hud-tabs, .hud-body, .hud-prompts { position: relative; left: auto; top: auto; width: auto; margin: 8px; }
+  .hud-top { height: auto; flex-direction: column; gap: 6px; }
+  .hud-club, .hud-status { width: 100%; min-height: 56px; clip-path: none; }
+  .hud-tabs { height: 44px; overflow-x: auto; }
+  .hud-tabs .tab-btn { font-size: 18px !important; min-width: 110px; }
+  .hud-body { height: auto; }
+  .hud-squads { display: flex; flex-direction: column; gap: 10px; }
+  .hud-panel--squad { height: 120vw; max-height: 720px; }
+  .hud-panel--bench, .hud-panel--tactics { height: 240px; }
+  :root { --u: 7px; --v: 4px; --pitch-k: 0.5; }
+  .hud-prompts { display: none; }
+}

@@ -42,358 +42,150 @@
   <!-- Google Fonts: Teko (FIFA Numbers) & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/broadcast.css">
   <style>
     body {
       font-family: 'Outfit', sans-serif;
     }
   </style>
 </head>
-<body class="min-h-full flex flex-col bg-[#070b14] text-white antialiased selection:bg-amber-500 selection:text-slate-950 fut-console-theme">
+<body class="hud-canvas text-white antialiased">
 
   <!-- CONTENEDOR TOAST NOTIFICACIONES FLOTANTES -->
   <div id="fut-toast-container" aria-live="polite" role="status" aria-atomic="true"></div>
 
-  <!-- NAVBAR SUPERIOR ESTILO FIFA ULTIMATE TEAM (FIFA 19 & FIFA 22 CONSOLE HUD) -->
-  <header class="sticky top-0 z-40 bg-slate-950/90 shadow-2xl border-b border-white/10 text-white backdrop-blur-md">
-    
-    <!-- 1. TOP BAR FIFA CONSOLA: CLUB INFO, MONEDAS, FP, HISTORIAL & NIVEL XP (CAPTURA 2) -->
-    <div class="border-b border-white/10 bg-slate-950/70 px-3 sm:px-6 py-2">
-      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-        
-        <!-- Izquierda: Escudo de Club, Nombre y Fundación -->
-        <div class="flex items-center gap-3">
-          <div class="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-200 flex items-center justify-center shadow-lg border-2 border-amber-300 text-slate-950 font-black text-sm tracking-wider">
-            FUT
-          </div>
-          <div class="leading-tight">
-            <div class="flex items-center gap-2">
-              <span id="nav-team-name" class="font-black text-base tracking-tight text-white">Furia Rector FC</span>
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-bold uppercase">FUND. Oct 2026</span>
-            </div>
-            <div class="text-[11px] text-slate-400 font-medium flex items-center gap-2 mt-0.5">
-              <span>Torneo del Rector</span>
-              <span>•</span>
-              <span id="firebase-status-badge" class="inline-flex items-center gap-1 text-emerald-400 font-bold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>En Línea (Cloud)</span>
-              </span>
-            </div>
-          </div>
+  <!-- ============ LIENZO DE RETRANSMISIÓN 16:9 (HUD CONSOLA) ============ -->
+  <!-- Medidas calcadas de ReferenciasFifa/d0ef8c...jpg (1600x900):
+       HUD 6%-14% alto | Tabs 20.5%-25.8% | Cuerpo 25.8%-84% | Prompts 88%
+       Columnas: izq 44% (5.7%-49.7%) + gutter 0.5% + der 44% partida en 2 filas -->
+  <div class="hud-bg" aria-hidden="true"></div>
+
+  <header class="hud-top">
+    <!-- Chyron izquierdo: escudo + club -->
+    <div class="hud-club">
+      <div class="hud-crest">FUT</div>
+      <div class="hud-club-data">
+        <div class="hud-club-row">
+          <span class="hud-est">EST. OCT 2026</span>
+          <span id="nav-team-name" class="hud-club-name">Furia Rector FC</span>
         </div>
-
-        <!-- Derecha: Selector Modalidad Único, Audio & Auth -->
-        <div class="flex items-center gap-2.5">
-          <button id="btn-toggle-audio" aria-label="Alternar efectos de sonido FUT" title="Efectos de Sonido FUT" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-amber-400 transition flex items-center justify-center focus-visible:ring-2 focus-visible:ring-amber-500 shadow-xs cursor-pointer">
-            <i data-lucide="volume-2" class="w-4 h-4"></i>
-          </button>
-
-          <!-- Selector de Modalidad Único y Responsivo (Sin duplicados) -->
-          <div class="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs font-bold shadow-inner">
-            <button id="btn-mode-f7" class="px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-black shadow-xs transition flex items-center gap-1.5 cursor-pointer">
-              <i data-lucide="circle-dot" class="w-3.5 h-3.5"></i>
-              <span>Fútbol 7</span>
-            </button>
-            <button id="btn-mode-futsal" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5 font-bold cursor-pointer">
-              <i data-lucide="shield" class="w-3.5 h-3.5"></i>
-              <span>Fútbol Sala</span>
-            </button>
-          </div>
-
-          <div id="auth-container" class="flex items-center gap-2">
-            <!-- Renderizado dinámico -->
-          </div>
+        <div class="hud-club-row hud-club-meta">
+          <span id="nav-tournament-badge">Torneo del Rector</span>
+          <span id="firebase-status-badge" class="hud-online"><i></i><span>En Línea</span></span>
         </div>
-
       </div>
     </div>
 
-    <!-- 2. NAVEGACIÓN PRINCIPAL: TABS CON SUBRAYADO NEÓN -->
-    <nav class="bg-slate-950/95 backdrop-blur-md px-3 sm:px-6 lg:px-8 overflow-x-auto border-b border-white/10">
-      <div class="max-w-7xl mx-auto flex items-center justify-between">
-        <div class="flex items-center space-x-1 sm:space-x-3 text-xs font-black uppercase tracking-wider py-1">
-          <button data-tab="pitch" class="tab-btn fifa-tab-btn active py-3 px-3 flex items-center gap-2 transition relative rounded-lg">
-            <span>PLANTILLAS</span>
-            <span class="fifa-tab-indicator"></span>
-          </button>
-          <button data-tab="album" class="tab-btn fifa-tab-btn py-3 px-3 flex items-center gap-2 transition relative rounded-lg">
-            <span>ÁLBUM DE CROMOS (<span id="tab-player-count">0</span>)</span>
-            <span class="fifa-tab-indicator"></span>
-          </button>
-          <button data-tab="partidos" class="tab-btn fifa-tab-btn py-3 px-3 flex items-center gap-2 transition relative rounded-lg">
-            <span>CALENDARIO & JORNADAS</span>
-            <span class="fifa-tab-indicator"></span>
-          </button>
-          <button data-tab="ajustes" class="tab-btn fifa-tab-btn py-3 px-3 flex items-center gap-2 transition relative rounded-lg">
-            <span>MI CLUB & AJUSTES</span>
-            <span class="fifa-tab-indicator"></span>
-          </button>
-        </div>
+    <!-- Chyron derecho: modalidad + audio + sesión -->
+    <div class="hud-status">
+      <div class="hud-mode" role="group" aria-label="Modalidad">
+        <button id="btn-mode-f7" class="hud-mode-btn active">FÚTBOL 7</button>
+        <button id="btn-mode-futsal" class="hud-mode-btn">FÚTBOL SALA</button>
       </div>
-    </nav>
+      <button id="btn-toggle-audio" aria-label="Alternar efectos de sonido" title="Sonido" class="hud-icon-btn">
+        <i data-lucide="volume-2" class="w-4 h-4"></i>
+      </button>
+      <div id="auth-container" class="hud-auth"></div>
+    </div>
   </header>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <main class="flex-1 max-w-[1600px] w-full mx-auto px-2 sm:px-4 lg:px-6 py-4">
+  <nav class="hud-tabs" aria-label="Secciones">
+    <button data-tab="pitch" class="tab-btn fifa-tab-btn active">PLANTILLAS</button>
+    <button data-tab="album" class="tab-btn fifa-tab-btn">ÁLBUM <span class="hud-tab-count" id="tab-player-count">0</span></button>
+    <button data-tab="partidos" class="tab-btn fifa-tab-btn">JORNADAS</button>
+    <button data-tab="ajustes" class="tab-btn fifa-tab-btn">MI CLUB</button>
+  </nav>
 
-    <!-- ==================== 1. VISTA PIZARRA FIFA ULTIMATE TEAM (SQUADS CONSOLE VIEW) ==================== -->
-    <section id="view-pitch" class="tab-view space-y-3.5">
-      
-      <!-- BARRA DE ESTADO DE LA PLANTILLA -->
-      <div class="flex items-center justify-between px-1 text-xs">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="font-fifa text-xl text-white font-bold tracking-wider">PIZARRA TÁCTICA INTERACTIVA</span>
-          <span class="text-slate-500 hidden sm:inline">•</span>
-          <span class="text-xs text-slate-400 font-medium hidden sm:inline">Arrastra y suelta jugadores para cambiarlos de posición o alinearlos</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span id="current-modality-badge" class="px-3 py-1 rounded-md bg-cyan-950/80 text-cyan-400 font-black text-[11px] uppercase border border-cyan-500/40 tracking-wider">
-            FÚTBOL 7
-          </span>
-        </div>
-      </div>
+  <!-- CUERPO PRINCIPAL -->
+  <main class="hud-body">
 
-      <!-- LAYOUT PRINCIPAL SQUADS FIFA: 2 COLUMNAS (68% PITCH + 32% TILES) -->
-      <div class="fifa-squads-main-layout grid grid-cols-1 lg:grid-cols-12 gap-3.5 lg:gap-4 items-start">
-        
-        <!-- COLUMNA IZQUIERDA (lg:col-span-8): ACTIVE SQUAD TILE -->
-        <div class="lg:col-span-8 flex flex-col fifa-tile fifa-active-squad-tile">
-          
-          <!-- BANNER DE CABECERA ACTIVE SQUAD -->
-          <div class="fifa-active-squad-header flex flex-wrap items-center justify-between px-4 py-2.5">
-            <div class="flex items-center gap-3">
-              <span class="fifa-tile-accent-bar"></span>
-              <div>
-                <h2 class="fifa-active-squad-title font-fifa text-3xl sm:text-4xl font-bold uppercase tracking-wider leading-none">
-                  ACTIVE SQUAD
-                </h2>
-                <div class="text-[11px] font-black uppercase tracking-wider text-slate-300 mt-1 flex items-center gap-2">
-                  <span id="hud-team-name-top" class="text-white">FURIA RECTOR FC</span>
-                  <span class="text-cyan-400">•</span>
-                  <span class="text-amber-400 tracking-widest fut-stars">★★★★★</span>
-                </div>
-              </div>
+    <!-- ==================== 1. PLANTILLAS ==================== -->
+    <section id="view-pitch" class="tab-view hud-squads">
+
+      <!-- PANEL A (44% x 100%): ACTIVE SQUAD — foco por defecto -->
+      <article class="hud-panel hud-panel--squad is-focus">
+        <div class="hud-panel-watermark">XI</div>
+        <header class="hud-squad-head">
+          <h2 class="hud-title">ACTIVE<br>SQUAD</h2>
+          <div class="hud-squad-meta">
+            <div class="flex items-center gap-2">
+              <span id="current-modality-badge" class="hud-tag">FUT 7 DRAFT</span>
+              <span id="hud-team-name-top" class="hud-squad-club">FURIA RECTOR FC</span>
             </div>
-
-            <!-- VALORACIÓN GENERAL DEL EQUIPO -->
-            <div class="flex items-center gap-4">
-              <div class="text-right">
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">VALORACIÓN</span>
-                <span id="header-team-rating" class="font-fifa text-4xl font-bold text-amber-400 leading-none">84</span>
-              </div>
+            <span class="fut-stars hud-stars">★★★★★</span>
+            <div class="hud-rating-bar">
+              <span class="hud-rating-fill"></span>
+              <span id="header-team-rating" class="hud-rating-num">84</span>
             </div>
           </div>
+        </header>
 
-          <!-- Mensaje de aviso de intercambio / arrastre -->
-          <div id="swap-banner" class="hidden my-2 mx-4 py-2 px-3 rounded-xl bg-amber-400 text-slate-950 font-black text-xs text-center shadow-lg z-40">
-            <i data-lucide="hand" class="w-3.5 h-3.5 inline mr-1"></i> Arrastra un jugador sobre otro para intercambiar posiciones, o haz click para seleccionar
-          </div>
+        <div id="swap-banner" class="hidden hud-swap-banner">ARRASTRA SOBRE OTRO JUGADOR PARA INTERCAMBIAR</div>
 
-          <!-- CONTENEDOR DEL ESTADIO Y CÉSPED FIFA -->
-          <div class="fut-stadium-container relative flex-1">
-            
-            <!-- Valla Publicitaria LED Superior (Adboard FIFA) -->
-            <div class="pitch-adboard-strip rounded-none">
-              <span><span class="ea-badge">EA SPORTS</span> <span class="brand-glow">FIFA ULTIMATE TEAM</span> • TORNEO DEL RECTOR • <span class="brand-glow">FUT SQUAD BUILDER</span></span>
-              <span class="hidden md:inline-flex"><span class="brand-glow">UNIVERSIDAD</span> • MODALIDAD F7 & SALA • <span class="brand-glow">FURIA RECTOR FC</span></span>
+        <div class="fut-stadium-container hud-pitch-frame">
+          <div id="pitch-wrapper" class="fut-pitch hud-pitch">
+            <div id="pitch-formation-watermark" class="pitch-formation-watermark">1-3-2-1</div>
+
+            <!-- Datos ocultos usados por el renderer -->
+            <span id="hud-team-name" hidden>Furia Rector FC</span>
+            <span id="hud-team-rating" hidden>84</span>
+            <span id="hud-team-starters" hidden>7</span>
+
+            <div id="pitch-slots-container"></div>
+
+            <div id="fut-radial-menu" class="fut-radial-menu hidden" style="top: 50%; left: 50%;">
+              <button type="button" id="btn-radial-sub" class="fut-radial-btn radial-top" title="Sustituir"><i data-lucide="repeat" class="w-4 h-4"></i><span class="radial-label">Sustituir</span></button>
+              <button type="button" id="btn-radial-inspect" class="fut-radial-btn radial-right" title="Ficha"><i data-lucide="eye" class="w-4 h-4"></i><span class="radial-label">Ficha</span></button>
+              <button type="button" id="btn-radial-captain" class="fut-radial-btn radial-left" title="Capitán"><i data-lucide="crown" class="w-4 h-4"></i><span class="radial-label">Capitán</span></button>
+              <button type="button" id="btn-radial-cancel" class="fut-radial-btn radial-bottom" title="Cerrar"><i data-lucide="x" class="w-4 h-4"></i><span class="radial-label">Cerrar</span></button>
             </div>
-
-            <!-- CAMPO DE FÚTBOL CON PERSPECTIVA Y LÍNEAS TÁCTICAS -->
-            <div id="pitch-wrapper" class="fut-pitch relative">
-              
-              <!-- Marca de agua de formación en césped -->
-              <div id="pitch-formation-watermark" class="pitch-formation-watermark">1-3-2-1</div>
-
-              <!-- HUD IZQUIERDO: FORMACIÓN & BOTÓN CENTRO TÁCTICO -->
-              <div class="fifa-squad-left-hud">
-                <div class="flex items-center gap-2 mb-1.5">
-                  <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white font-black text-xs shadow-xs">
-                    FUT
-                  </div>
-                  <div>
-                    <div id="hud-team-name" class="font-black text-xs text-white leading-tight uppercase tracking-wide">Furia Rector FC</div>
-                    <div class="text-amber-400 text-[10px] tracking-wider leading-none">★★★★★</div>
-                  </div>
-                </div>
-
-                <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-white/10 text-xs">
-                  <div>
-                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">OVR</span>
-                    <span id="hud-team-rating" class="font-fifa text-xl font-bold text-amber-400 leading-none">84</span>
-                  </div>
-                  <div class="text-right">
-                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">TITULARES</span>
-                    <span id="hud-team-starters" class="font-fifa text-xl font-bold text-white leading-none">7</span>
-                  </div>
-                </div>
-
-                <button type="button" id="btn-squad-actions" class="mt-2 w-full py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-700 font-black text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer">
-                  <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
-                  <span>Tácticas & Formación</span>
-                </button>
-              </div>
-
-              <!-- HUD DERECHO: INSPECTOR DEL JUGADOR ACTIVO -->
-              <div class="fifa-squad-right-hud" id="hud-player-inspector">
-                <div class="flex items-center gap-2.5">
-                  <div class="relative flex-shrink-0">
-                    <img id="inspector-player-avatar" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80" alt="Player" class="w-10 h-10 rounded-full object-cover border-2 border-amber-400 shadow-xs">
-                    <span id="inspector-player-pos" class="absolute -bottom-1 -right-1 px-1 py-0.2 rounded bg-slate-950 text-amber-400 font-black text-[8px] uppercase border border-amber-400/60">POR</span>
-                  </div>
-                  <div class="overflow-hidden">
-                    <div id="inspector-player-name" class="font-black text-xs text-white uppercase tracking-wide truncate">Pablo García</div>
-                    <div class="flex items-center gap-1.5 text-xs">
-                      <span id="inspector-player-rating" class="font-fifa text-xl font-bold text-amber-400 leading-none">84</span>
-                      <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider">OVR • TITULAR</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Atributos FIFA -->
-                <div id="inspector-stats-grid" class="grid grid-cols-3 gap-1 mt-2 pt-2 border-t border-white/10 text-center font-fifa">
-                  <div class="bg-slate-900/80 rounded p-0.5 border border-slate-700/60"><span class="text-[8px] text-slate-400 block font-sans font-bold leading-tight">PAC</span><span id="stat-pac" class="text-xs font-bold text-white">84</span></div>
-                  <div class="bg-slate-900/80 rounded p-0.5 border border-slate-700/60"><span class="text-[8px] text-slate-400 block font-sans font-bold leading-tight">SHO</span><span id="stat-sho" class="text-xs font-bold text-white">82</span></div>
-                  <div class="bg-slate-900/80 rounded p-0.5 border border-slate-700/60"><span class="text-[8px] text-slate-400 block font-sans font-bold leading-tight">PAS</span><span id="stat-pas" class="text-xs font-bold text-white">80</span></div>
-                  <div class="bg-slate-900/80 rounded p-0.5 border border-slate-700/60"><span class="text-[8px] text-slate-400 block font-sans font-bold leading-tight">DRI</span><span id="stat-dri" class="text-xs font-bold text-white">85</span></div>
-                  <div class="bg-slate-900/80 rounded p-0.5 border border-slate-700/60"><span class="text-[8px] text-slate-400 block font-sans font-bold leading-tight">DEF</span><span id="stat-def" class="text-xs font-bold text-white">60</span></div>
-                  <div class="bg-slate-900/80 rounded p-0.5 border border-slate-700/60"><span class="text-[8px] text-slate-400 block font-sans font-bold leading-tight">PHY</span><span id="stat-phy" class="text-xs font-bold text-white">78</span></div>
-                </div>
-              </div>
-
-              <!-- Nodos de Cartas sobre el Césped -->
-              <div id="pitch-slots-container"></div>
-
-              <!-- Menú de Acciones Rápidas Contextual -->
-              <div id="fut-radial-menu" class="fut-radial-menu hidden" style="top: 50%; left: 50%;">
-                <button type="button" id="btn-radial-sub" class="fut-radial-btn radial-top" title="Sustituir con Suplente">
-                  <i data-lucide="repeat" class="w-4 h-4"></i>
-                  <span class="radial-label">Sustituir</span>
-                </button>
-                <button type="button" id="btn-radial-inspect" class="fut-radial-btn radial-right" title="Ver Ficha Técnica">
-                  <i data-lucide="eye" class="w-4 h-4"></i>
-                  <span class="radial-label">Ficha</span>
-                </button>
-                <button type="button" id="btn-radial-captain" class="fut-radial-btn radial-left" title="Nombrar Capitán">
-                  <i data-lucide="crown" class="w-4 h-4"></i>
-                  <span class="radial-label">Capitán</span>
-                </button>
-                <button type="button" id="btn-radial-cancel" class="fut-radial-btn radial-bottom" title="Cerrar">
-                  <i data-lucide="x" class="w-4 h-4"></i>
-                  <span class="radial-label">Cerrar</span>
-                </button>
-              </div>
-
-              <!-- Muelle de Suplentes en la base del pitch (Arrastra un suplente al campo para sustituir) -->
-              <div class="fifa-bench-dock">
-                <div class="fifa-bench-tag"><span>SUP.</span></div>
-                <div id="pitch-bench-container" class="fifa-bench-cards-strip"></div>
-              </div>
-
-            </div>
-
           </div>
-
         </div>
 
-        <!-- COLUMNA DERECHA (lg:col-span-4): TILES FIFA CONSOLA STACKED -->
-        <div class="lg:col-span-4 flex flex-col gap-3.5">
-          
-          <!-- TILE 1: "BANQUILLO Y SUPLENTES" -->
-          <div class="fifa-tile fifa-bench-tile p-5 relative overflow-hidden group cursor-pointer" onclick="window.futApp.openSubDrawer()">
-            <div class="relative z-10 space-y-1">
-              <span class="text-[10px] font-black uppercase tracking-widest text-cyan-400 block font-fifa">RESERVA DE EQUIPO</span>
-              <h3 class="font-fifa text-3xl sm:text-4xl font-bold text-white uppercase tracking-wider leading-none">
-                BANQUILLO
-              </h3>
-              <p class="text-xs text-slate-300 font-medium">Suplentes listos para saltar al campo o arrastrarlos a una posición</p>
-            </div>
-
-            <div class="relative z-10 pt-4 flex items-end justify-between border-t border-white/10 mt-4">
-              <div>
-                <div class="font-fifa text-5xl font-bold text-white leading-none">
-                  <span id="side-bench-count">7</span>
-                </div>
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">SUPLENTES</span>
-              </div>
-              <button type="button" class="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-lg transition active:scale-95 cursor-pointer">
-                <i data-lucide="users" class="w-3.5 h-3.5"></i>
-                <span>Ver Banquillo</span>
-              </button>
-            </div>
+        <!-- Chyron inferior: inspector del jugador enfocado -->
+        <footer class="hud-inspector" id="hud-player-inspector">
+          <img id="inspector-player-avatar" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80" alt="">
+          <span id="inspector-player-pos" class="hud-insp-pos">POR</span>
+          <span id="inspector-player-name" class="hud-insp-name">Pablo García</span>
+          <span id="inspector-player-rating" class="hud-insp-ovr">84</span>
+          <div id="inspector-stats-grid" class="hud-insp-stats">
+            <span><b>PAC</b><em id="stat-pac">84</em></span>
+            <span><b>SHO</b><em id="stat-sho">82</em></span>
+            <span><b>PAS</b><em id="stat-pas">80</em></span>
+            <span><b>DRI</b><em id="stat-dri">85</em></span>
+            <span><b>DEF</b><em id="stat-def">60</em></span>
+            <span><b>PHY</b><em id="stat-phy">78</em></span>
           </div>
+        </footer>
+      </article>
 
-          <!-- TILE 2: "ROLES & ESPECIALISTAS" -->
-          <div class="fifa-tile fifa-tactics-tile p-5 relative overflow-hidden flex flex-col justify-between">
-            <div class="space-y-1 relative z-10">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-black uppercase tracking-widest text-amber-400 block font-fifa">BALÓN PARADO & TÁCTICA</span>
-                <span id="tile-formation-badge" class="px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/40 text-[10px] font-bold">1-3-2-1</span>
-              </div>
-              <h3 class="font-fifa text-2xl sm:text-3xl font-bold text-white uppercase tracking-wider leading-none">
-                ROLES Y TÁCTICA
-              </h3>
-            </div>
-
-            <!-- Especialistas integrados en el Tile -->
-            <div class="grid grid-cols-2 gap-2 mt-3.5 relative z-10 text-xs">
-              <!-- Capitán -->
-              <div class="bg-slate-950/70 border border-slate-700/80 p-2 rounded-xl">
-                <label for="spec-captain" class="flex items-center gap-1.5 text-[10px] font-black text-amber-400 uppercase tracking-wider mb-1 cursor-pointer">
-                  <i data-lucide="crown" class="w-3 h-3 text-amber-400"></i>
-                  <span>Capitán</span>
-                </label>
-                <select id="spec-captain" name="captain" class="w-full bg-slate-900 border border-slate-700 text-xs rounded-lg px-2 py-1 font-bold text-white focus:ring-2 focus:ring-amber-500 shadow-xs cursor-pointer">
-                </select>
-              </div>
-
-              <!-- Penaltis -->
-              <div class="bg-slate-950/70 border border-slate-700/80 p-2 rounded-xl">
-                <label for="spec-penalties" class="flex items-center gap-1.5 text-[10px] font-black text-rose-400 uppercase tracking-wider mb-1 cursor-pointer">
-                  <i data-lucide="crosshair" class="w-3 h-3 text-rose-400"></i>
-                  <span>Penaltis</span>
-                </label>
-                <select id="spec-penalties" name="penalties" class="w-full bg-slate-900 border border-slate-700 text-xs rounded-lg px-2 py-1 font-bold text-white focus:ring-2 focus:ring-amber-500 shadow-xs cursor-pointer">
-                </select>
-              </div>
-
-              <!-- Faltas Directas -->
-              <div class="bg-slate-950/70 border border-slate-700/80 p-2 rounded-xl">
-                <label for="spec-freekicks" class="flex items-center gap-1.5 text-[10px] font-black text-amber-400 uppercase tracking-wider mb-1 cursor-pointer">
-                  <i data-lucide="zap" class="w-3 h-3 text-amber-400"></i>
-                  <span>Faltas</span>
-                </label>
-                <select id="spec-freekicks" name="freekicks" class="w-full bg-slate-900 border border-slate-700 text-xs rounded-lg px-2 py-1 font-bold text-white focus:ring-2 focus:ring-amber-500 shadow-xs cursor-pointer">
-                </select>
-              </div>
-
-              <!-- Córners -->
-              <div class="bg-slate-950/70 border border-slate-700/80 p-2 rounded-xl">
-                <label for="spec-corners" class="flex items-center gap-1.5 text-[10px] font-black text-sky-400 uppercase tracking-wider mb-1 cursor-pointer">
-                  <i data-lucide="flag" class="w-3.5 h-3.5 text-sky-400"></i>
-                  <span>Córners</span>
-                </label>
-                <select id="spec-corners" name="corners" class="w-full bg-slate-900 border border-slate-700 text-xs rounded-lg px-2 py-1 font-bold text-white focus:ring-2 focus:ring-amber-500 shadow-xs cursor-pointer">
-                </select>
-              </div>
-            </div>
-
-            <!-- Formación y Ajustes -->
-            <div class="pt-3 mt-3 border-t border-white/10 flex items-center justify-between text-xs relative z-10">
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] text-slate-400 uppercase font-black">FORMACIÓN:</span>
-                <span id="side-formation-tag" class="font-fifa text-amber-400 font-bold text-base">1-3-2-1</span>
-              </div>
-              <span class="text-[11px] text-slate-400 font-medium">Gestionable en Centro Táctico</span>
-            </div>
-
-          </div>
-
+      <!-- PANEL B (44% x 49.5%): BANQUILLO -->
+      <article class="hud-panel hud-panel--bench" onclick="if(!event.target.closest('[data-bench-id]')) window.futApp.openSubDrawer()">
+        <div class="hud-panel-watermark">SUB</div>
+        <h3 class="hud-title">BANQUILLO</h3>
+        <div class="hud-bignum"><span id="side-bench-count">7</span><small>SUPLENTES</small></div>
+        <div class="fifa-bench-dock hud-bench-dock">
+          <div id="pitch-bench-container" class="fifa-bench-cards-strip"></div>
         </div>
+      </article>
 
-      </div>
+      <!-- PANEL C (44% x 49.5%): TÁCTICA -->
+      <article class="hud-panel hud-panel--tactics">
+        <div class="hud-panel-watermark" id="tile-formation-badge">1-3-2-1</div>
+        <button type="button" id="btn-squad-actions" class="hud-panel-hit" aria-label="Abrir centro táctico"></button>
+        <h3 class="hud-title">CENTRO<br>TÁCTICO</h3>
+        <div class="hud-bignum"><span id="side-formation-tag">1-3-2-1</span><small>FORMACIÓN</small></div>
+
+        <div class="hud-specs">
+          <label for="spec-captain"><b>CAP</b><select id="spec-captain" name="captain"></select></label>
+          <label for="spec-penalties"><b>PEN</b><select id="spec-penalties" name="penalties"></select></label>
+          <label for="spec-freekicks"><b>FAL</b><select id="spec-freekicks" name="freekicks"></select></label>
+          <label for="spec-corners"><b>COR</b><select id="spec-corners" name="corners"></select></label>
+        </div>
+      </article>
 
     </section>
 
@@ -526,6 +318,13 @@
     </div>
 
   </main>
+
+  <!-- FRANJA TÉCNICA INFERIOR DE CONSOLA (86.5% - 90.1% ALTO) -->
+  <footer class="hud-prompts" aria-label="Indicadores de consola">
+    <span class="hud-prompt"><em>DRAG &amp; DROP</em><span>INTERCAMBIAR TITULAR / SUPLENTE</span></span>
+    <span class="hud-prompt"><em>CLIC CARTA</em><span>MENÚ RADIAL / FICHA TÉCNICA</span></span>
+    <span class="hud-prompt"><em>PANEL DERECHO</em><span>BANQUILLO Y CENTRO TÁCTICO PRO</span></span>
+  </footer>
 
   <!-- ==================== MODALES NATIVOS <dialog> ACCESIBLES ==================== -->
 
@@ -1219,7 +1018,7 @@
               <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">Profundidad Defensiva:</span>
               <span class="font-fifa text-amber-400"><span id="tactics-depth-val">6</span>/10 (<span id="tactics-depth-label">Bloque Medio</span>)</span>
             </div>
-            <input type="range" id="tactics-depth-slider" min="1" max="10" value="6" class="w-full accent-amber-500 cursor-pointer">
+            <input type="range" id="tactics-depth-slider" aria-label="Profundidad Defensiva" min="1" max="10" value="6" class="w-full accent-amber-500 cursor-pointer">
             <div class="flex justify-between text-[9px] text-slate-500 font-bold">
               <span>Bloque Bajo (1)</span>
               <span>Medio (5-6)</span>
@@ -1232,7 +1031,7 @@
               <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">Anchura Defensiva:</span>
               <span class="font-fifa text-amber-400"><span id="tactics-width-val">5</span>/10 (<span id="tactics-width-label">Equilibrado</span>)</span>
             </div>
-            <input type="range" id="tactics-width-slider" min="1" max="10" value="5" class="w-full accent-amber-500 cursor-pointer">
+            <input type="range" id="tactics-width-slider" aria-label="Anchura Defensiva" min="1" max="10" value="5" class="w-full accent-amber-500 cursor-pointer">
             <div class="flex justify-between text-[9px] text-slate-500 font-bold">
               <span>Cerrado (1)</span>
               <span>Equilibrado (5)</span>
