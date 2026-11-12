@@ -2040,9 +2040,9 @@ class FutApp {
     const isMobile = window.matchMedia('(max-width: 640px)').matches;
     const baseScale = isMobile ? 0.80 : 0.86;
     const scale = +(baseScale + 0.14 * t).toFixed(3);
-    // Estirar el eje vertical para que no solapen DFC (72) y POR (88)
-    let mappedTop = 9 + t * 79;
-    if (slot.role === 'DFC' && slot.top >= 70) mappedTop -= 5;
+    // Mapeo vertical calibrado para evitar solapes y dejar hueco limpio al portero sobre el inspector
+    let mappedTop = 8 + t * 71;
+    if (slot.role === 'DFC' && slot.top >= 70) mappedTop -= 4;
     return {
       top: +mappedTop.toFixed(1),
       left: slot.left,
