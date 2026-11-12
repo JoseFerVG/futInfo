@@ -1579,9 +1579,15 @@ class FutApp {
     const dialog = document.getElementById('player-card-setup-dialog');
     if (!dialog) return;
 
+    user = user || authService.currentUser || {
+      uid: 'guest-' + Date.now(),
+      name: 'Nuevo Fichaje',
+      email: 'fichaje@rector.es'
+    };
+
     const existing = store.getPlayers().find(p => 
-      (user.playerId && p.id === user.playerId) || 
-      (p.email && p.email.toLowerCase() === (user.email || '').toLowerCase())
+      (user?.playerId && p.id === user.playerId) || 
+      (p.email && p.email.toLowerCase() === (user?.email || '').toLowerCase())
     );
 
     const titleEl = document.getElementById('setup-title');
@@ -1590,7 +1596,7 @@ class FutApp {
     if (existing) {
       if (titleEl) titleEl.textContent = 'Editar mi Carta FUT Oficial';
       if (submitBtn) submitBtn.textContent = 'Guardar Cambios de mi Carta';
-      document.getElementById('setup-nickname').value = existing.nickname || user.name.split(' ')[0];
+      document.getElementById('setup-nickname').value = existing.nickname || (user.name ? user.name.split(' ')[0] : 'Crack');
       document.getElementById('setup-number').value = existing.number || 10;
       document.getElementById('setup-faculty').value = existing.faculty || 'inf';
       document.getElementById('setup-foot').value = existing.preferredFoot || 'Diestro';

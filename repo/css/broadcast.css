@@ -19,6 +19,26 @@
   --pitch-scale: 0.60;
 }
 
+/* Escalado dinámico y fluido de cartas en el césped según pantalla */
+@media (min-width: 1600px) and (min-height: 850px) {
+  :root { --pitch-scale: 0.72; }
+}
+@media (min-width: 1280px) and (max-width: 1599px) and (min-height: 720px) {
+  :root { --pitch-scale: 0.64; }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  :root { --pitch-scale: 0.58; }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root { --pitch-scale: 0.62; }
+}
+@media (min-width: 480px) and (max-width: 767px) {
+  :root { --pitch-scale: 0.52; }
+}
+@media (max-width: 479px) {
+  :root { --pitch-scale: 0.46; }
+}
+
 /* ---------- 0. LISTA NEGRA: CERO RADIOS AMABLES, CERO SOMBRAS SaaS ---------- */
 *:not(.fut-card):not(.fut-card *):not(.fut-card-slot::after),
 *::before, *::after {
@@ -28,20 +48,45 @@
 .hud-canvas [class*="backdrop-blur"] { backdrop-filter: none !important; }
 
 /* ---------- 1. LIENZO Y FONDO ATMOSFÉRICO DE ESTADIO ---------- */
+html {
+  box-sizing: border-box;
+  -webkit-text-size-adjust: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
 html, body.hud-canvas {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  width: 100%;
+  min-height: 100dvh;
   margin: 0;
   padding: 0;
   background-color: var(--hud-bg);
+  overflow-x: hidden;
+}
+
+/* En pantallas de escritorio / TV (ancho >= 1024px y alto >= 650px): fijado a 100dvh sin scroll */
+@media (min-width: 1024px) and (min-height: 650px) {
+  html, body.hud-canvas {
+    height: 100dvh;
+    overflow: hidden;
+  }
+}
+
+/* En tablets en vertical, móviles o pantallas con altura baja: scroll vertical natural */
+@media (max-width: 1023px), (max-height: 649px) {
+  html, body.hud-canvas {
+    height: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 }
 
 body.hud-canvas {
   display: flex;
   flex-direction: column;
-  padding: 10px 24px 8px 24px;
-  box-sizing: border-box;
+  padding: max(8px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   font-family: var(--hud-cond);
   color: var(--hud-text);
   position: relative;
@@ -81,6 +126,7 @@ body.hud-canvas {
   align-items: center;
   flex-shrink: 0;
   z-index: 30;
+  gap: 12px;
 }
 
 /* Chyron Izquierdo: Escudo y Nombre del Club */
@@ -238,12 +284,11 @@ body.hud-canvas {
 }
 
 /* ---------- 3. BARRA DE PESTAÑAS (MENÚ SÓLIDO DE CONSOLA) ---------- */
-/* Resuelve directamente: "el menu de plantillas, albun y todo eso se ve mal y parece que no hay" */
 .hud-tabs {
   width: 100%;
   max-width: 1680px;
-  margin: 10px auto 12px auto;
-  height: 48px;
+  margin: 6px auto 10px auto;
+  height: 46px;
   flex-shrink: 0;
   display: flex;
   align-items: stretch;
@@ -252,16 +297,25 @@ body.hud-canvas {
   border-bottom: 2px solid rgba(0, 0, 0, 0.85);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
   z-index: 25;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hud-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .hud-tabs .tab-btn {
-  flex: 1;
+  flex: 1 0 auto;
+  min-width: 110px;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font: 800 1.35rem / 1 var(--hud-cond) !important;
+  font: 800 clamp(0.95rem, 1.15vw, 1.35rem) / 1 var(--hud-cond) !important;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #cbd5e1 !important;
@@ -271,6 +325,8 @@ body.hud-canvas {
   position: relative;
   cursor: pointer;
   transition: all var(--hud-snap);
+  white-space: nowrap;
+  padding: 0 14px;
 }
 
 .hud-tabs .tab-btn:last-child {
@@ -326,36 +382,41 @@ body.hud-canvas {
   max-width: 1680px;
   margin: 0 auto;
   position: relative;
-  overflow: hidden;
   z-index: 10;
 }
 
-/* Cuadrícula de Plantillas: 2 Columnas Asimétricas (50% | 50%) */
+/* Cuadrícula de Plantillas Base (Escritorio / TV Consola) */
 .hud-squads {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(520px, 1.15fr) minmax(360px, 0.85fr);
   grid-template-rows: 1fr 1fr;
   column-gap: 14px;
   row-gap: 14px;
 }
 
-.hud-squads.hidden { display: none; }
+.hud-squads.hidden { display: none !important; }
 
 .hud-panel--squad {
   grid-row: 1 / 3;
   grid-column: 1;
+  height: 100%;
+  position: relative;
 }
 
 .hud-panel--bench {
   grid-row: 1;
   grid-column: 2;
+  height: 100%;
+  position: relative;
 }
 
 .hud-panel--tactics {
   grid-row: 2;
   grid-column: 2;
+  height: 100%;
+  position: relative;
 }
 
 /* ---------- 5. PANELES DE CONSOLA (ESTILO BROADCAST) ---------- */
@@ -1180,46 +1241,397 @@ body.hud-canvas {
   color: var(--hud-ink) !important;
 }
 
-/* ---------- 13. RESPONSIVE COMPACTO (PANTALLAS MENORES A 1024PX) ---------- */
-@media (max-width: 1024px) {
-  html, body.hud-canvas {
-    overflow-y: auto !important;
-    height: auto !important;
-  }
-  body.hud-canvas {
-    padding: 8px 12px;
-  }
+/* ---------- 13. RESPONSIVE MAESTRO: CALIBRADO AL MILÍMETRO PARA TODAS LAS PANTALLAS ---------- */
+
+/* 13.1 TABLETS Y PANTALLAS MEDIANAS (768px a 1023px, o apaisado con altura < 650px) */
+@media (min-width: 768px) and (max-width: 1023px), (min-width: 768px) and (max-height: 649px) {
   .hud-top {
-    height: auto;
-    flex-direction: column;
+    height: 44px;
     gap: 8px;
   }
-  .hud-club, .hud-status {
-    width: 100%;
-    clip-path: none;
-    box-sizing: border-box;
+  .hud-club {
+    padding: 0 18px 0 12px;
+  }
+  .hud-status {
+    padding: 0 12px 0 18px;
+    gap: 6px;
   }
   .hud-tabs {
     height: 44px;
-    overflow-x: auto;
+    margin: 6px auto 8px auto;
   }
   .hud-tabs .tab-btn {
-    font-size: 1.1rem !important;
-    min-width: 120px;
+    font-size: 1.05rem !important;
+    min-width: 95px;
+    padding: 0 10px;
   }
   .hud-squads {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 12px !important;
+    height: auto !important;
+    padding-bottom: 24px;
   }
   .hud-panel--squad {
-    height: 580px;
+    grid-column: 1 / 3 !important;
+    grid-row: 1 !important;
+    height: clamp(500px, 62vh, 600px) !important;
+    position: relative;
   }
-  .hud-panel--bench, .hud-panel--tactics {
-    height: 220px;
+  .hud-panel--bench {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    height: 250px !important;
+    position: relative;
+  }
+  .hud-panel--tactics {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    height: 250px !important;
+    position: relative;
   }
   .hud-prompts {
-    display: none;
+    display: none !important;
+  }
+}
+
+/* 13.2 DISPOSITIVOS MÓVILES (Ancho menor a 768px) */
+@media (max-width: 767px) {
+  body.hud-canvas {
+    padding: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  /* HUD Superior compacto */
+  .hud-top {
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .hud-club {
+    height: 38px;
+    padding: 0 14px 0 10px;
+    clip-path: polygon(0 0, 100% 0, 94% 100%, 0 100%);
+    border-left: 3px solid var(--hud-gold);
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .hud-club-name {
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+  }
+
+  .hud-club-tournament {
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+  }
+
+  .hud-status {
+    height: 38px;
+    padding: 0 8px 0 14px;
+    clip-path: polygon(6% 0, 100% 0, 100% 100%, 0 100%);
+    border-right: 3px solid var(--hud-gold);
+    gap: 6px;
+    flex: 0 0 auto;
+  }
+
+  .hud-mode {
+    height: 28px;
+  }
+
+  .hud-mode-btn {
+    padding: 0 8px;
+    font-size: 0.75rem;
+  }
+
+  .hud-icon-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Barra de Pestañas con desplazamiento táctil horizontal */
+  .hud-tabs {
+    height: 40px;
+    margin: 4px auto 8px auto;
+  }
+
+  .hud-tabs .tab-btn {
+    min-width: 82px;
+    padding: 0 8px;
+    font-size: 0.90rem !important;
+    gap: 4px;
+  }
+
+  .hud-tab-count {
+    padding: 1px 4px;
+    font-size: 0.65rem;
+  }
+
+  /* Cuadrícula de Plantillas apilada verticalmente */
+  .hud-squads {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    height: auto !important;
+    padding-bottom: 24px;
+  }
+
+  .hud-panel--squad {
+    width: 100% !important;
+    height: clamp(430px, 72vh, 530px) !important;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .hud-squad-head {
+    padding: 8px 12px 0 12px;
+  }
+
+  .hud-squad-head .hud-title {
+    font-size: 1.35rem;
+  }
+
+  .hud-squad-action-bar {
+    top: 34px;
+    left: 6px;
+    right: 6px;
+    height: 34px;
+  }
+
+  .hud-squad-bar-btn {
+    padding: 0 8px;
+    gap: 6px;
+  }
+
+  .hud-squad-bar-title {
+    font-size: 0.84rem;
+  }
+
+  .hud-squad-bar-badge {
+    display: none !important;
+  }
+
+  .hud-pitch-frame {
+    top: 74px !important;
+    bottom: 50px !important;
+    left: 6px !important;
+    right: 6px !important;
+  }
+
+  /* Inspector inferior en móvil */
+  .hud-inspector {
+    left: 6px !important;
+    right: 6px !important;
+    bottom: 6px !important;
+    height: 42px !important;
+    gap: 6px !important;
+    padding: 0 8px 0 0 !important;
+  }
+
+  .hud-insp-kit {
+    width: 34px !important;
+    height: 42px !important;
+  }
+
+  .hud-insp-pos {
+    font-size: 0.78rem !important;
+    padding: 1px 4px !important;
+  }
+
+  .hud-insp-name {
+    font-size: 0.88rem !important;
+    max-width: 80px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .hud-insp-ovr {
+    font-size: 1.2rem !important;
+  }
+
+  .hud-insp-traits {
+    display: none !important;
+  }
+
+  .hud-insp-stats {
+    gap: 4px !important;
+  }
+
+  .hud-insp-stats span {
+    font-size: 0.65rem !important;
+    gap: 1px !important;
+  }
+
+  .hud-insp-stats b {
+    font-size: 0.58rem !important;
+  }
+
+  .hud-insp-stats em {
+    font-size: 0.70rem !important;
+  }
+
+  /* Banquillo y Tácticas en móvil */
+  .hud-panel--bench {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 185px !important;
+    position: relative !important;
+    padding-top: 50px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .fifa-bench-dock.hud-bench-dock {
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    margin: 8px 12px 0 12px !important;
+    height: 116px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: thin !important;
+  }
+
+  .hud-panel--tactics {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 180px !important;
+    position: relative !important;
+    padding-top: 50px !important;
+    padding-bottom: 14px !important;
+  }
+
+  .hud-specs {
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: 8px 12px 0 12px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px 10px !important;
+  }
+
+  .hud-specs label {
+    height: 42px !important;
+  }
+
+  .hud-prompts {
+    display: none !important;
+  }
+}
+
+/* 13.3 TELÉFONOS ULTRA ESTRECHOS (Ancho menor o igual a 420px) */
+@media (max-width: 420px) {
+  .hud-top {
+    gap: 4px;
+  }
+
+  .hud-club {
+    height: 35px;
+    padding: 0 10px 0 8px;
+  }
+
+  .hud-club-name {
+    font-size: 0.95rem;
+  }
+
+  .hud-club-tournament {
+    display: none !important;
+  }
+
+  .hud-status {
+    height: 35px;
+    padding: 0 6px 0 10px;
+    gap: 4px;
+  }
+
+  .hud-mode-btn {
+    padding: 0 6px;
+    font-size: 0.70rem;
+  }
+
+  .hud-icon-btn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .hud-insp-name {
+    max-width: 65px !important;
+  }
+
+  .hud-insp-stats span:nth-child(n+5) {
+    display: none !important; /* Muestra las 4 stats clave (PAC, SHO, PAS, DRI) */
+  }
+}
+
+/* 13.4 CUADRÍCULA RESPONSIVA DEL ÁLBUM DE CARTAS */
+#album-cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)) !important;
+  gap: 12px !important;
+  padding-bottom: 30px !important;
+}
+
+#album-cards-grid > * {
+  display: flex !important;
+  justify-content: center !important;
+}
+
+@media (max-width: 480px) {
+  #album-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+}
+
+@media (min-width: 1400px) {
+  #album-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+    gap: 18px !important;
+  }
+}
+
+/* 13.5 MODALES RESPONSIVOS CALIBRADOS AL MILÍMETRO */
+dialog.fifa-console-modal {
+  width: min(840px, 94vw) !important;
+  max-width: 840px !important;
+  max-height: min(88vh, 88dvh) !important;
+  margin: auto !important;
+  padding: 22px !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+  dialog.fifa-console-modal {
+    width: 96vw !important;
+    padding: 12px 8px !important;
+    max-height: 92dvh !important;
+  }
+
+  .fifa-formations-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .fifa-modal-tab {
+    padding: 6px 10px !important;
+    font-size: 0.88rem !important;
+  }
+
+  #form-setup-card .grid-cols-2 {
+    grid-template-columns: 1fr !important;
   }
 }
 
