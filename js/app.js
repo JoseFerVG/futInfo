@@ -116,6 +116,231 @@ export const STATS_TEST_CONFIG = [
   }
 ];
 
+export const TACTICAL_FORMATIONS = {
+  f7: {
+    '1-3-2-1': {
+      id: '1-3-2-1',
+      name: '1-3-2-1 (Árbol de Navidad)',
+      short: '1-3-2-1',
+      styleTag: 'Equilibrado / Control Central',
+      desc: 'Línea de 3 atrás muy sólida con 2 mediocentros de apoyo y un ariete en punta.',
+      advice: 'Ideal si tienes dos mediocentros de calidad que sepan combinar y distribuir rápido. Protege los costados con laterales de largo recorrido.',
+      slots: [
+        { role: 'POR', top: 85, left: 50 },
+        { role: 'LI', top: 64, left: 22 },
+        { role: 'DFC', top: 68, left: 50 },
+        { role: 'LD', top: 64, left: 78 },
+        { role: 'MC', top: 43, left: 36 },
+        { role: 'MC', top: 43, left: 64 },
+        { role: 'DC', top: 20, left: 50 }
+      ]
+    },
+    '1-2-3-1': {
+      id: '1-2-3-1',
+      name: '1-2-3-1 (Amplitud y Extremos)',
+      short: '1-2-3-1',
+      styleTag: 'Ofensivo / Desborde por Bandas',
+      desc: '2 centrales puros, 3 centrocampistas abiertos (extremos) y 1 punta de referencia.',
+      advice: 'Desborda por las bandas con extremos rápidos (EI/ED). Los dos centrales deben ser veloces en el 1 vs 1 ante contras rivales.',
+      slots: [
+        { role: 'POR', top: 85, left: 50 },
+        { role: 'DFC', top: 68, left: 33 },
+        { role: 'DFC', top: 68, left: 67 },
+        { role: 'EI', top: 45, left: 18 },
+        { role: 'MC', top: 43, left: 50 },
+        { role: 'ED', top: 45, left: 82 },
+        { role: 'DC', top: 20, left: 50 }
+      ]
+    },
+    '1-3-1-2': {
+      id: '1-3-1-2',
+      name: '1-3-1-2 (Doble Punta Letal)',
+      short: '1-3-1-2',
+      styleTag: 'Ataque Directo / Presión Alta',
+      desc: '3 defensas, 1 mediapunta organizador y 2 delanteros centro sincronizados.',
+      advice: 'Perfecta si tienes dos delanteros definidores (DC). El MCO debe tener gran visión para filtrar balones entre centrales rivales.',
+      slots: [
+        { role: 'POR', top: 85, left: 50 },
+        { role: 'LI', top: 66, left: 22 },
+        { role: 'DFC', top: 70, left: 50 },
+        { role: 'LD', top: 66, left: 78 },
+        { role: 'MCO', top: 45, left: 50 },
+        { role: 'DC', top: 20, left: 35 },
+        { role: 'DC', top: 20, left: 65 }
+      ]
+    },
+    '1-2-2-2': {
+      id: '1-2-2-2',
+      name: '1-2-2-2 (Cuadrado Mágico / Box)',
+      short: '1-2-2-2',
+      styleTag: 'Transición Rápida y Presión',
+      desc: '2 defensas de cierre, 2 mediocentros dinámicos y 2 puntas en constante presión.',
+      advice: 'Favorece el juego vertical e intercepciones en mitad de campo. Requiere mucha intensidad de los 2 MC para bascular y no partirse.',
+      slots: [
+        { role: 'POR', top: 85, left: 50 },
+        { role: 'DFC', top: 70, left: 35 },
+        { role: 'DFC', top: 70, left: 65 },
+        { role: 'MC', top: 46, left: 33 },
+        { role: 'MC', top: 46, left: 67 },
+        { role: 'DC', top: 21, left: 35 },
+        { role: 'DC', top: 21, left: 65 }
+      ]
+    },
+    '1-3-3-0': {
+      id: '1-3-3-0',
+      name: '1-3-3-0 (Falso 9 / Tiqui-Taca)',
+      short: '1-3-3-0',
+      styleTag: 'Posesión y Sobrecarga Central',
+      desc: '3 defensores con 3 mediocentros combinativos que llegan desde segunda línea sin ariete estático.',
+      advice: 'Desespera al rival con posesión continua. Los mediocentros deben incorporarse por sorpresa para rematar desde la frontal.',
+      slots: [
+        { role: 'POR', top: 85, left: 50 },
+        { role: 'LI', top: 66, left: 22 },
+        { role: 'DFC', top: 70, left: 50 },
+        { role: 'LD', top: 66, left: 78 },
+        { role: 'MC', top: 40, left: 24 },
+        { role: 'MCO', top: 32, left: 50 },
+        { role: 'MC', top: 40, left: 76 }
+      ]
+    },
+    '1-4-1-1': {
+      id: '1-4-1-1',
+      name: '1-4-1-1 (Cerrojo Defensivo / Contra)',
+      short: '1-4-1-1',
+      styleTag: 'Bloque Bajo y Contragolpe',
+      desc: 'Línea de 4 defensores para asegurar el resultado, 1 pivote defensivo y 1 delantero rápido.',
+      advice: 'Ideal ante rivales con delantera temible o para aguantar marcadores. Mantén el bloque bajo y busca el balón largo a la contra.',
+      slots: [
+        { role: 'POR', top: 85, left: 50 },
+        { role: 'LI', top: 68, left: 16 },
+        { role: 'DFC', top: 72, left: 38 },
+        { role: 'DFC', top: 72, left: 62 },
+        { role: 'LD', top: 68, left: 84 },
+        { role: 'MC', top: 45, left: 50 },
+        { role: 'DC', top: 20, left: 50 }
+      ]
+    },
+    '1-1-4-1': {
+      id: '1-1-4-1',
+      name: '1-1-4-1 (Ultra Ofensiva / Asedio)',
+      short: '1-1-4-1',
+      styleTag: 'Presión Total / Remontada',
+      desc: '1 solo defensa central, 4 centrocampistas volcados en ataque y 1 delantero centro.',
+      advice: 'Úsala para remontar en los minutos finales. Asedio constante en campo rival, pero ten cuidado con las pérdidas a la contra.',
+      slots: [
+        { role: 'POR', top: 85, left: 50 },
+        { role: 'DFC', top: 72, left: 50 },
+        { role: 'LI', top: 44, left: 18 },
+        { role: 'MC', top: 42, left: 39 },
+        { role: 'MC', top: 42, left: 61 },
+        { role: 'LD', top: 44, left: 82 },
+        { role: 'DC', top: 20, left: 50 }
+      ]
+    }
+  },
+  futsal: {
+    '1-1-2-1': {
+      id: '1-1-2-1',
+      name: '1-1-2-1 (Rombo Clásico Futsal)',
+      short: '1-1-2-1',
+      styleTag: 'Equilibrado / Geometría Pura',
+      desc: '1 Cierre atrás, 2 Alas en las bandas y 1 Pívot de espaldas al marco contrario.',
+      advice: 'La formación por excelencia del fútbol sala. El pívot aguanta la posesión de espaldas y descarga hacia las incorporaciones de las alas.',
+      slots: [
+        { role: 'POR', top: 86, left: 50 },
+        { role: 'CIE', top: 66, left: 50 },
+        { role: 'ALI', top: 44, left: 24 },
+        { role: 'ALD', top: 44, left: 76 },
+        { role: 'PIV', top: 20, left: 50 }
+      ]
+    },
+    '1-2-2': {
+      id: '1-2-2',
+      name: '1-2-2 (Cuadrado / Doble Pareja)',
+      short: '1-2-2',
+      styleTag: 'Defensivo / Espacios Reducidos',
+      desc: '2 cierres/defensas y 2 delanteros/pívots formando dos líneas paralelas.',
+      advice: 'Gran solidez en defensa zonal 2x2. En ataque busca paredes rápidas entre parejas o paralelas buscando la espalda del cierre.',
+      slots: [
+        { role: 'POR', top: 86, left: 50 },
+        { role: 'CIE', top: 66, left: 32 },
+        { role: 'CIE', top: 66, left: 68 },
+        { role: 'PIV', top: 26, left: 32 },
+        { role: 'PIV', top: 26, left: 68 }
+      ]
+    },
+    '1-3-0': {
+      id: '1-3-0',
+      name: '1-3-0 (Línea de Tres / Posesión)',
+      short: '1-3-0',
+      styleTag: 'Control y Rotaciones',
+      desc: '3 jugadores por detrás de la línea de pase creando superioridad y 1 mediapunta flotante.',
+      advice: 'Arrastra a los defensores rivales fuera de su zona mediante rotaciones continuas de pase y corte al espacio generado.',
+      slots: [
+        { role: 'POR', top: 86, left: 50 },
+        { role: 'ALI', top: 56, left: 22 },
+        { role: 'CIE', top: 64, left: 50 },
+        { role: 'ALD', top: 56, left: 78 },
+        { role: 'MC', top: 28, left: 50 }
+      ]
+    },
+    '1-4-0': {
+      id: '1-4-0',
+      name: '1-4-0 (Cuatro en Línea / Rotación Total)',
+      short: '1-4-0',
+      styleTag: 'Técnico y Dinámico',
+      desc: '4 jugadores de campo en línea media para atraer la presión rival y romper al hueco.',
+      advice: 'Exige máxima movilidad y desmarques de ruptura. Atrae al rival arriba para generar un pasillo directo en mano a mano.',
+      slots: [
+        { role: 'POR', top: 86, left: 50 },
+        { role: 'CIE', top: 52, left: 16 },
+        { role: 'MC', top: 48, left: 38 },
+        { role: 'MC', top: 48, left: 62 },
+        { role: 'CIE', top: 52, left: 84 }
+      ]
+    },
+    '1-2-1-1': {
+      id: '1-2-1-1',
+      name: '1-2-1-1 (Y Invertida / Presión)',
+      short: '1-2-1-1',
+      styleTag: 'Presión Alta / Balón Robado',
+      desc: '2 cierres, 1 mediocentro conector y 1 pívot en constante presión.',
+      advice: 'Ahoga la salida de balón rival orientando hacia su pierna débil. Roba en tres cuartos de campo para definir en 1 o 2 toques.',
+      slots: [
+        { role: 'POR', top: 86, left: 50 },
+        { role: 'CIE', top: 68, left: 30 },
+        { role: 'CIE', top: 68, left: 70 },
+        { role: 'MC', top: 42, left: 50 },
+        { role: 'PIV', top: 18, left: 50 }
+      ]
+    },
+    '1-1-1-2': {
+      id: '1-1-1-2',
+      name: '1-1-1-2 (Embudo Ofensivo / Doble Pívot)',
+      short: '1-1-1-2',
+      styleTag: 'Ataque Directo / Remate Inmediato',
+      desc: '1 Cierre atrás, 1 distribuidor y 2 pívots fijando a la defensa contraria en su propia área.',
+      advice: 'Ideal si el rival se encierra en su área. Los dos pívots generan bloqueos continuos y segundas jugadas de rebote.',
+      slots: [
+        { role: 'POR', top: 86, left: 50 },
+        { role: 'CIE', top: 68, left: 50 },
+        { role: 'MC', top: 45, left: 50 },
+        { role: 'PIV', top: 22, left: 32 },
+        { role: 'PIV', top: 22, left: 68 }
+      ]
+    }
+  }
+};
+
+export function getFormationConfig(modality = 'f7', formationId) {
+  const modCatalog = TACTICAL_FORMATIONS[modality] || TACTICAL_FORMATIONS.f7;
+  if (formationId && modCatalog[formationId]) {
+    return modCatalog[formationId];
+  }
+  const defaultId = modality === 'f7' ? '1-3-2-1' : '1-1-2-1';
+  return modCatalog[defaultId] || Object.values(modCatalog)[0];
+}
+
 class FutApp {
   constructor() {
     this.currentTab = 'pitch';
@@ -145,6 +370,7 @@ class FutApp {
 
     // 4. Configurar eventos
     this.bindEvents();
+    this.initDragAndDrop();
 
     // Sprint 1: re-proyectar el césped 3D al cambiar entre móvil y escritorio
     let resizeTimer = null;
@@ -365,17 +591,9 @@ class FutApp {
 
   autoOptimizeSquad() {
     const settings = store.getSettings();
-    const isF7 = settings.modality === 'f7';
     const activeFormation = store.getActiveFormation();
-    const tacticalFormations = {
-      '1-3-2-1': ['POR', 'LI', 'DFC', 'LD', 'MC', 'MC', 'DC'],
-      '1-2-3-1': ['POR', 'DFC', 'DFC', 'EI', 'MC', 'ED', 'DC'],
-      '1-3-1-2': ['POR', 'LI', 'DFC', 'LD', 'MCO', 'DC', 'DC'],
-      '1-1-2-1': ['POR', 'CIE', 'ALI', 'ALD', 'PIV'],
-      '1-2-2': ['POR', 'CIE', 'CIE', 'PIV', 'PIV'],
-      '1-3-0': ['POR', 'ALI', 'CIE', 'ALD', 'MC']
-    };
-    const targetRoles = tacticalFormations[activeFormation] || tacticalFormations[isF7 ? '1-3-2-1' : '1-1-2-1'];
+    const formationConfig = getFormationConfig(settings.modality, activeFormation);
+    const targetRoles = formationConfig.slots.map(s => s.role);
     const all = store.getPlayers();
     const pool = [...all];
     const newStarting = [];
@@ -399,6 +617,7 @@ class FutApp {
     store.setStartingLineup(newStarting);
     document.getElementById('squad-actions-dialog')?.close();
     this.renderPitch();
+    futAudio.playSuccess();
     this.showToast('¡Plantilla auto-alineada por posiciones oficiales!', 'sparkles');
   }
 
@@ -420,7 +639,7 @@ class FutApp {
       });
     });
 
-    // Selector de Modalidad (Fútbol 7 vs Fútbol Sala)
+    // Selector de Modalidad Único (Fútbol 7 vs Fútbol Sala)
     const setModality = (mod) => {
       store.setModality(mod);
       this.updateModalityButtons(mod);
@@ -431,16 +650,77 @@ class FutApp {
 
     document.getElementById('btn-mode-f7')?.addEventListener('click', () => setModality('f7'));
     document.getElementById('btn-mode-futsal')?.addEventListener('click', () => setModality('futsal'));
-    document.getElementById('btn-mode-f7-mobile')?.addEventListener('click', () => setModality('f7'));
-    document.getElementById('btn-mode-futsal-mobile')?.addEventListener('click', () => setModality('futsal'));
 
-    // Selector de Formación activa
+    // Centro Táctico: Selector de Formación activa y Consejo dinámico
     const selectFormation = document.getElementById('select-active-formation');
     if (selectFormation) {
       selectFormation.addEventListener('change', (e) => {
         store.setFormation(e.target.value);
+        this.updateTacticsAdviceCard(e.target.value);
         this.renderPitch();
-        this.showToast(`Formación cambiada a ${e.target.value}`, 'clipboard');
+        futAudio.playSuccess();
+        this.showToast(`Formación cambiada a ${e.target.value}`, 'sliders-horizontal');
+      });
+    }
+
+    // Centro Táctico: Botones de Estilo Defensivo
+    document.querySelectorAll('#tactics-defensive-styles .tactics-style-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const style = btn.dataset.style;
+        store.updateTactics({ defensiveStyle: style });
+        this.updateTacticsControls();
+        futAudio.playSelect();
+        this.showToast(`Estilo defensivo: ${btn.querySelector('span')?.textContent || style}`, 'shield');
+      });
+    });
+
+    // Centro Táctico: Profundidad Defensiva Slider
+    const depthSlider = document.getElementById('tactics-depth-slider');
+    if (depthSlider) {
+      depthSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        store.updateTactics({ defensiveDepth: val });
+        const depthVal = document.getElementById('tactics-depth-val');
+        const depthLabel = document.getElementById('tactics-depth-label');
+        if (depthVal) depthVal.textContent = val;
+        if (depthLabel) {
+          depthLabel.textContent = val <= 3 ? 'Bloque Bajo' : (val >= 8 ? 'Línea Muy Alta' : 'Bloque Medio');
+        }
+      });
+    }
+
+    // Centro Táctico: Anchura Defensiva Slider
+    const widthSlider = document.getElementById('tactics-width-slider');
+    if (widthSlider) {
+      widthSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        store.updateTactics({ defensiveWidth: val });
+        const widthVal = document.getElementById('tactics-width-val');
+        const widthLabel = document.getElementById('tactics-width-label');
+        if (widthVal) widthVal.textContent = val;
+        if (widthLabel) {
+          widthLabel.textContent = val <= 3 ? 'Estrecho' : (val >= 8 ? 'Muy Abierto' : 'Equilibrado');
+        }
+      });
+    }
+
+    // Centro Táctico: Salida de Balón
+    const buildupSel = document.getElementById('tactics-buildup-select');
+    if (buildupSel) {
+      buildupSel.addEventListener('change', (e) => {
+        store.updateTactics({ buildUpPlay: e.target.value });
+        futAudio.playSelect();
+        this.showToast('Construcción ofensiva actualizada', 'zap');
+      });
+    }
+
+    // Centro Táctico: Creación de Oportunidades
+    const chanceSel = document.getElementById('tactics-chance-select');
+    if (chanceSel) {
+      chanceSel.addEventListener('change', (e) => {
+        store.updateTactics({ chanceCreation: e.target.value });
+        futAudio.playSelect();
+        this.showToast('Creación de oportunidades actualizada', 'zap');
       });
     }
 
@@ -520,23 +800,16 @@ class FutApp {
     const isF7 = mod === 'f7';
     const bF7 = document.getElementById('btn-mode-f7');
     const bFutsal = document.getElementById('btn-mode-futsal');
-    const bF7m = document.getElementById('btn-mode-f7-mobile');
-    const bFutsalm = document.getElementById('btn-mode-futsal-mobile');
     const label = document.getElementById('current-modality-label');
 
     if (bF7 && bFutsal) {
       if (isF7) {
-        bF7.className = 'px-3.5 py-1.5 rounded-lg bg-slate-900 text-amber-400 font-black shadow-sm transition flex items-center gap-1.5';
-        bFutsal.className = 'px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
+        bF7.className = 'px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-black shadow-xs transition flex items-center gap-1.5 cursor-pointer';
+        bFutsal.className = 'px-3 py-1 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5 font-bold cursor-pointer';
       } else {
-        bFutsal.className = 'px-3.5 py-1.5 rounded-lg bg-slate-900 text-amber-400 font-black shadow-sm transition flex items-center gap-1.5';
-        bF7.className = 'px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
+        bFutsal.className = 'px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-black shadow-xs transition flex items-center gap-1.5 cursor-pointer';
+        bF7.className = 'px-3 py-1 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5 font-bold cursor-pointer';
       }
-    }
-
-    if (bF7m && bFutsalm) {
-      bF7m.className = isF7 ? 'flex-1 py-1.5 rounded-lg bg-slate-900 text-amber-400 font-black' : 'flex-1 py-1.5 rounded-lg text-slate-600 font-bold';
-      bFutsalm.className = !isF7 ? 'flex-1 py-1.5 rounded-lg bg-slate-900 text-amber-400 font-black' : 'flex-1 py-1.5 rounded-lg text-slate-600 font-bold';
     }
 
     if (label) {
@@ -550,25 +823,82 @@ class FutApp {
 
     const settings = store.getSettings();
     const isF7 = settings.modality === 'f7';
-
-    const formationsF7 = [
-      { id: '1-3-2-1', name: '1-3-2-1 (Árbol de Navidad)' },
-      { id: '1-2-3-1', name: '1-2-3-1 (Bandas y Control)' },
-      { id: '1-3-1-2', name: '1-3-1-2 (Doble Punta Ofensiva)' }
-    ];
-
-    const formationsFutsal = [
-      { id: '1-1-2-1', name: '1-1-2-1 (Rombo Clásico Futsal)' },
-      { id: '1-2-2', name: '1-2-2 (Cuadrado Equilibrado)' },
-      { id: '1-3-0', name: '1-3-0 (Juego de Tres / Falso 9)' }
-    ];
-
-    const list = isF7 ? formationsF7 : formationsFutsal;
+    const list = Object.values(isF7 ? TACTICAL_FORMATIONS.f7 : TACTICAL_FORMATIONS.futsal);
     const current = store.getActiveFormation();
 
     sel.innerHTML = list.map(f => `
       <option value="${f.id}" ${f.id === current ? 'selected' : ''}>${f.name}</option>
     `).join('');
+
+    this.updateTacticsAdviceCard(current);
+    this.updateTacticsControls();
+  }
+
+  updateTacticsAdviceCard(formationId) {
+    const settings = store.getSettings();
+    const conf = getFormationConfig(settings.modality, formationId);
+    if (!conf) return;
+
+    const titleEl = document.getElementById('tactics-formation-name');
+    const styleEl = document.getElementById('tactics-style-tag');
+    const descEl = document.getElementById('tactics-formation-desc');
+    const adviceEl = document.getElementById('tactics-advice-text');
+
+    if (titleEl) titleEl.textContent = conf.name;
+    if (styleEl) styleEl.textContent = conf.styleTag;
+    if (descEl) descEl.textContent = conf.desc;
+    if (adviceEl) adviceEl.textContent = conf.advice;
+  }
+
+  updateTacticsControls() {
+    const tactics = store.getTactics();
+
+    // 1. Estilo defensivo botones
+    document.querySelectorAll('#tactics-defensive-styles .tactics-style-btn').forEach(btn => {
+      const s = btn.dataset.style;
+      if (s === tactics.defensiveStyle) {
+        btn.classList.add('active');
+        btn.classList.remove('border-slate-700', 'bg-slate-950', 'text-slate-300');
+        btn.classList.add('border-amber-500', 'bg-amber-500/18', 'text-white');
+      } else {
+        btn.classList.remove('active', 'border-amber-500', 'bg-amber-500/18', 'text-white');
+        btn.classList.add('border-slate-700', 'bg-slate-950', 'text-slate-300');
+      }
+    });
+
+    // 2. Profundidad defensiva slider
+    const depthSlider = document.getElementById('tactics-depth-slider');
+    const depthVal = document.getElementById('tactics-depth-val');
+    const depthLabel = document.getElementById('tactics-depth-label');
+    if (depthSlider) {
+      depthSlider.value = tactics.defensiveDepth || 6;
+      if (depthVal) depthVal.textContent = tactics.defensiveDepth || 6;
+      if (depthLabel) {
+        const d = tactics.defensiveDepth || 6;
+        depthLabel.textContent = d <= 3 ? 'Bloque Bajo' : (d >= 8 ? 'Línea Muy Alta' : 'Bloque Medio');
+      }
+    }
+
+    // 3. Anchura defensiva slider
+    const widthSlider = document.getElementById('tactics-width-slider');
+    const widthVal = document.getElementById('tactics-width-val');
+    const widthLabel = document.getElementById('tactics-width-label');
+    if (widthSlider) {
+      widthSlider.value = tactics.defensiveWidth || 5;
+      if (widthVal) widthVal.textContent = tactics.defensiveWidth || 5;
+      if (widthLabel) {
+        const w = tactics.defensiveWidth || 5;
+        widthLabel.textContent = w <= 3 ? 'Estrecho' : (w >= 8 ? 'Muy Abierto' : 'Equilibrado');
+      }
+    }
+
+    // 4. Salida de balón
+    const buildupSel = document.getElementById('tactics-buildup-select');
+    if (buildupSel) buildupSel.value = tactics.buildUpPlay || 'balanced';
+
+    // 5. Creación de oportunidades
+    const chanceSel = document.getElementById('tactics-chance-select');
+    if (chanceSel) chanceSel.value = tactics.chanceCreation || 'forward_runs';
   }
 
   setupModals() {
@@ -607,6 +937,10 @@ class FutApp {
     document.getElementById('btn-cancel-result')?.addEventListener('click', () => resultDialog.close());
     setupBackdropDismiss(resultDialog);
 
+    // Modal Centro Táctico
+    const squadDialog = document.getElementById('squad-actions-dialog');
+    setupBackdropDismiss(squadDialog);
+
     document.getElementById('btn-open-create-card')?.addEventListener('click', () => {
       const user = authService.getCurrentUser() || {
         name: 'Nuevo Jugador',
@@ -615,6 +949,205 @@ class FutApp {
       };
       this.openPlayerSetupModal(user);
     });
+  }
+
+  initDragAndDrop() {
+    let draggedData = null;
+    let touchDragClone = null;
+    let touchOriginEl = null;
+
+    // --- HTML5 Desktop Drag & Drop ---
+    document.addEventListener('dragstart', (e) => {
+      const starterSlot = e.target.closest('.fut-card-slot');
+      const benchItem = e.target.closest('[data-bench-id]');
+      const subDrawerItem = e.target.closest('#sub-drawer-bench-list [data-player-id]');
+
+      if (starterSlot) {
+        const slotIdx = parseInt(starterSlot.dataset.slotIndex, 10);
+        draggedData = { type: 'starter', slotIndex: slotIdx };
+        starterSlot.classList.add('is-dragging');
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', JSON.stringify(draggedData));
+        }
+      } else if (benchItem) {
+        const playerId = benchItem.dataset.benchId;
+        draggedData = { type: 'bench', playerId };
+        benchItem.classList.add('is-dragging');
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'copyMove';
+          e.dataTransfer.setData('text/plain', JSON.stringify(draggedData));
+        }
+      } else if (subDrawerItem) {
+        const playerId = subDrawerItem.dataset.playerId;
+        draggedData = { type: 'bench', playerId };
+        subDrawerItem.classList.add('is-dragging');
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'copyMove';
+          e.dataTransfer.setData('text/plain', JSON.stringify(draggedData));
+        }
+      }
+    });
+
+    document.addEventListener('dragend', () => {
+      document.querySelectorAll('.is-dragging').forEach(el => el.classList.remove('is-dragging'));
+      document.querySelectorAll('.slot-drop-active').forEach(el => el.classList.remove('slot-drop-active'));
+      document.querySelectorAll('.dock-drop-active').forEach(el => el.classList.remove('dock-drop-active'));
+      draggedData = null;
+    });
+
+    document.addEventListener('dragover', (e) => {
+      const slot = e.target.closest('.fut-card-slot');
+      const benchDock = e.target.closest('#pitch-bench-container');
+
+      if (slot || benchDock) {
+        e.preventDefault();
+        if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+        if (slot) {
+          document.querySelectorAll('.slot-drop-active').forEach(el => {
+            if (el !== slot) el.classList.remove('slot-drop-active');
+          });
+          slot.classList.add('slot-drop-active');
+        } else if (benchDock && draggedData?.type === 'starter') {
+          benchDock.classList.add('dock-drop-active');
+        }
+      }
+    });
+
+    document.addEventListener('dragleave', (e) => {
+      const slot = e.target.closest('.fut-card-slot');
+      if (slot && !slot.contains(e.relatedTarget)) {
+        slot.classList.remove('slot-drop-active');
+      }
+      const benchDock = e.target.closest('#pitch-bench-container');
+      if (benchDock && !benchDock.contains(e.relatedTarget)) {
+        benchDock.classList.remove('dock-drop-active');
+      }
+    });
+
+    document.addEventListener('drop', (e) => {
+      const slot = e.target.closest('.fut-card-slot');
+      const benchDock = e.target.closest('#pitch-bench-container');
+      
+      document.querySelectorAll('.slot-drop-active').forEach(el => el.classList.remove('slot-drop-active'));
+      document.querySelectorAll('.dock-drop-active').forEach(el => el.classList.remove('dock-drop-active'));
+
+      let data = draggedData;
+      if (!data && e.dataTransfer) {
+        try {
+          const raw = e.dataTransfer.getData('text/plain');
+          if (raw) data = JSON.parse(raw);
+        } catch (_) {}
+      }
+      if (!data) return;
+
+      if (slot) {
+        e.preventDefault();
+        const targetSlotIdx = parseInt(slot.dataset.slotIndex, 10);
+        if (data.type === 'starter') {
+          const fromSlotIdx = data.slotIndex;
+          if (fromSlotIdx !== targetSlotIdx) {
+            store.swapTwoStarters(fromSlotIdx, targetSlotIdx);
+            this.renderPitch();
+            futAudio.playSuccess();
+            this.showToast('¡Posición intercambiada con éxito!', 'repeat');
+          }
+        } else if (data.type === 'bench') {
+          store.swapStartingPlayer(targetSlotIdx, data.playerId);
+          this.closeSubDrawer();
+          this.renderPitch();
+          futAudio.playSuccess();
+          this.showToast('¡Sustitución realizada con éxito!', 'user-check');
+        }
+      } else if (benchDock && data.type === 'starter') {
+        e.preventDefault();
+        this.openSubDrawer(data.slotIndex);
+      }
+      draggedData = null;
+    });
+
+    // --- Touch Drag & Drop (Móvil & Tablet) ---
+    const handleTouchStart = (e) => {
+      const touch = e.touches[0];
+      const starterSlot = e.target.closest('.fut-card-slot');
+      const benchItem = e.target.closest('[data-bench-id]');
+
+      if (starterSlot) {
+        touchOriginEl = starterSlot;
+        const slotIdx = parseInt(starterSlot.dataset.slotIndex, 10);
+        draggedData = { type: 'starter', slotIndex: slotIdx, startX: touch.clientX, startY: touch.clientY };
+      } else if (benchItem) {
+        touchOriginEl = benchItem;
+        draggedData = { type: 'bench', playerId: benchItem.dataset.benchId, startX: touch.clientX, startY: touch.clientY };
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (!draggedData) return;
+      const touch = e.touches[0];
+      const dx = Math.abs(touch.clientX - draggedData.startX);
+      const dy = Math.abs(touch.clientY - draggedData.startY);
+
+      if (dx > 12 || dy > 12) {
+        if (!touchDragClone && touchOriginEl) {
+          touchDragClone = touchOriginEl.cloneNode(true);
+          touchDragClone.style.position = 'fixed';
+          touchDragClone.style.pointerEvents = 'none';
+          touchDragClone.style.zIndex = '9999';
+          touchDragClone.style.opacity = '0.85';
+          touchDragClone.style.transform = 'scale(0.85)';
+          touchDragClone.style.width = '100px';
+          document.body.appendChild(touchDragClone);
+          touchOriginEl.classList.add('is-dragging');
+        }
+
+        if (touchDragClone) {
+          touchDragClone.style.left = `${touch.clientX - 50}px`;
+          touchDragClone.style.top = `${touch.clientY - 60}px`;
+        }
+
+        const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+        const slot = elemBelow?.closest('.fut-card-slot');
+        document.querySelectorAll('.slot-drop-active').forEach(el => {
+          if (el !== slot) el.classList.remove('slot-drop-active');
+        });
+        if (slot) slot.classList.add('slot-drop-active');
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (touchDragClone) {
+        touchDragClone.remove();
+        touchDragClone = null;
+      }
+      if (touchOriginEl) {
+        touchOriginEl.classList.remove('is-dragging');
+      }
+
+      const activeSlot = document.querySelector('.slot-drop-active');
+      if (activeSlot && draggedData) {
+        const targetSlotIdx = parseInt(activeSlot.dataset.slotIndex, 10);
+        if (draggedData.type === 'starter' && draggedData.slotIndex !== targetSlotIdx) {
+          store.swapTwoStarters(draggedData.slotIndex, targetSlotIdx);
+          this.renderPitch();
+          futAudio.playSuccess();
+          this.showToast('¡Posición intercambiada!', 'repeat');
+        } else if (draggedData.type === 'bench') {
+          store.swapStartingPlayer(targetSlotIdx, draggedData.playerId);
+          this.renderPitch();
+          futAudio.playSuccess();
+          this.showToast('¡Sustitución realizada!', 'user-check');
+        }
+      }
+
+      document.querySelectorAll('.slot-drop-active').forEach(el => el.classList.remove('slot-drop-active'));
+      draggedData = null;
+      touchOriginEl = null;
+    };
+
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchmove', handleTouchMove, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd);
   }
 
   setupForms() {
@@ -763,9 +1296,8 @@ class FutApp {
     document.getElementById('form-team-settings')?.addEventListener('submit', (e) => {
       e.preventDefault();
       store.updateSettings({
-        teamName: document.getElementById('set-team-name').value,
-        tournament: document.getElementById('set-tournament-name').value,
-        coachName: document.getElementById('set-coach-name').value
+        teamName: document.getElementById('set-team-name')?.value || '',
+        tournament: document.getElementById('set-tournament-name')?.value || ''
       });
       this.showToast('Datos del equipo guardados', 'user-check');
     });
@@ -1286,7 +1818,7 @@ class FutApp {
             <div class="hidden sm:block text-left">
               <div class="text-xs font-black text-slate-900 leading-tight truncate max-w-[120px] group-hover:text-amber-600 transition">${user.name}</div>
               <div class="text-[10px] ${isMister ? 'text-amber-600' : 'text-emerald-600'} font-bold">
-                ${isMister ? 'Míster (Admin)' : 'Jugador'}
+                ${isMister ? 'Admin' : 'Jugador'}
               </div>
             </div>
           </div>
@@ -1357,24 +1889,17 @@ class FutApp {
     const navBadge = document.getElementById('nav-tournament-badge');
     if (navBadge) navBadge.textContent = settings.tournament;
 
-    const mgrName = document.getElementById('manager-name-tag');
-    if (mgrName) mgrName.textContent = settings.coachName || settings.manager.name;
-
     const setTeam = document.getElementById('set-team-name');
     if (setTeam && !setTeam.value) setTeam.value = settings.teamName;
 
     const setTour = document.getElementById('set-tournament-name');
     if (setTour && !setTour.value) setTour.value = settings.tournament;
-
-    const setCoach = document.getElementById('set-coach-name');
-    if (setCoach && !setCoach.value) setCoach.value = settings.coachName || settings.manager.name;
   }
 
   // ==================== RENDER PIZARRA FIFA FUT ====================
   renderPitch() {
     const slotsContainer = document.getElementById('pitch-slots-container');
     const benchContainer = document.getElementById('pitch-bench-container');
-    const svgLines = document.getElementById('chem-lines-svg');
     const swapBanner = document.getElementById('swap-banner');
     if (!slotsContainer || !benchContainer) return;
 
@@ -1389,105 +1914,11 @@ class FutApp {
     const settings = store.getSettings();
     const isF7 = settings.modality === 'f7';
     const activeFormation = store.getActiveFormation();
-
-    const tacticalFormations = {
-      '1-3-2-1': {
-        slots: [
-          { role: 'POR', top: 85, left: 50 },
-          { role: 'LI', top: 64, left: 22 },
-          { role: 'DFC', top: 68, left: 50 },
-          { role: 'LD', top: 64, left: 78 },
-          { role: 'MC', top: 43, left: 36 },
-          { role: 'MC', top: 43, left: 64 },
-          { role: 'DC', top: 20, left: 50 }
-        ],
-        links: [
-          [0, 1], [0, 2], [0, 3],
-          [1, 2], [2, 3], [1, 4], [3, 5],
-          [2, 4], [2, 5],
-          [4, 5], [4, 6], [5, 6]
-        ]
-      },
-      '1-2-3-1': {
-        slots: [
-          { role: 'POR', top: 85, left: 50 },
-          { role: 'DFC', top: 68, left: 33 },
-          { role: 'DFC', top: 68, left: 67 },
-          { role: 'EI', top: 45, left: 20 },
-          { role: 'MC', top: 43, left: 50 },
-          { role: 'ED', top: 45, left: 80 },
-          { role: 'DC', top: 20, left: 50 }
-        ],
-        links: [
-          [0, 1], [0, 2],
-          [1, 2], [1, 3], [1, 4], [2, 4], [2, 5],
-          [3, 4], [4, 5], [3, 6], [4, 6], [5, 6]
-        ]
-      },
-      '1-3-1-2': {
-        slots: [
-          { role: 'POR', top: 85, left: 50 },
-          { role: 'LI', top: 66, left: 22 },
-          { role: 'DFC', top: 70, left: 50 },
-          { role: 'LD', top: 66, left: 78 },
-          { role: 'MCO', top: 45, left: 50 },
-          { role: 'DC', top: 20, left: 35 },
-          { role: 'DC', top: 20, left: 65 }
-        ],
-        links: [
-          [0, 1], [0, 2], [0, 3],
-          [1, 2], [2, 3], [1, 4], [2, 4], [3, 4],
-          [4, 5], [4, 6], [5, 6]
-        ]
-      },
-      '1-1-2-1': {
-        slots: [
-          { role: 'POR', top: 86, left: 50 },
-          { role: 'CIE', top: 66, left: 50 },
-          { role: 'ALI', top: 44, left: 25 },
-          { role: 'ALD', top: 44, left: 75 },
-          { role: 'PIV', top: 20, left: 50 }
-        ],
-        links: [
-          [0, 1],
-          [1, 2], [1, 3],
-          [2, 3], [2, 4], [3, 4]
-        ]
-      },
-      '1-2-2': {
-        slots: [
-          { role: 'POR', top: 86, left: 50 },
-          { role: 'CIE', top: 66, left: 33 },
-          { role: 'CIE', top: 66, left: 67 },
-          { role: 'PIV', top: 26, left: 33 },
-          { role: 'PIV', top: 26, left: 67 }
-        ],
-        links: [
-          [0, 1], [0, 2],
-          [1, 2], [1, 3], [2, 4], [3, 4]
-        ]
-      },
-      '1-3-0': {
-        slots: [
-          { role: 'POR', top: 86, left: 50 },
-          { role: 'ALI', top: 52, left: 22 },
-          { role: 'CIE', top: 62, left: 50 },
-          { role: 'ALD', top: 52, left: 78 },
-          { role: 'MC', top: 30, left: 50 }
-        ],
-        links: [
-          [0, 2],
-          [1, 2], [2, 3],
-          [1, 4], [2, 4], [3, 4]
-        ]
-      }
-    };
-
-    const formationConfig = tacticalFormations[activeFormation] || tacticalFormations[isF7 ? '1-3-2-1' : '1-1-2-1'];
+    const formationConfig = getFormationConfig(settings.modality, activeFormation);
     const startingPlayers = store.getStartingLineup();
     const slotRoles = formationConfig.slots.map(s => s.role);
 
-    // Rating general y jugadores activos
+    // Rating general del equipo (Química removida)
     const chemRatingData = store.calculateTeamChemistryAndRating(slotRoles);
     const rEl = document.getElementById('hud-team-rating');
     if (rEl) rEl.textContent = chemRatingData.rating;
@@ -1495,14 +1926,11 @@ class FutApp {
     const headerRating = document.getElementById('header-team-rating');
     if (headerRating) headerRating.textContent = chemRatingData.rating;
 
-    const headerChem = document.getElementById('header-team-chem');
-    if (headerChem) headerChem.textContent = chemRatingData.chemistry || 100;
-
-    const headerChemBar = document.getElementById('header-chem-bar');
-    if (headerChemBar) headerChemBar.style.width = `${chemRatingData.chemistry || 100}%`;
-
     const sideFormation = document.getElementById('side-formation-tag');
-    if (sideFormation) sideFormation.textContent = activeFormation;
+    if (sideFormation) sideFormation.textContent = formationConfig.short || activeFormation;
+
+    const tileFormation = document.getElementById('tile-formation-badge');
+    if (tileFormation) tileFormation.textContent = formationConfig.short || activeFormation;
 
     const startersEl = document.getElementById('hud-team-starters');
     if (startersEl) startersEl.textContent = startingPlayers.length;
@@ -1520,27 +1948,17 @@ class FutApp {
 
     const projected = formationConfig.slots.map(s => this.projectSlot(s));
 
-    // LÍNEAS TÁCTICAS DE QUÍMICA SVG (CAPTURA 1: ENLACES VERDES DE JUEGO)
-    if (svgLines && formationConfig.links) {
-      svgLines.innerHTML = formationConfig.links.map(([i1, i2]) => {
-        const p1 = projected[i1];
-        const p2 = projected[i2];
-        if (!p1 || !p2) return '';
-        return `<line x1="${p1.left}%" y1="${p1.top}%" x2="${p2.left}%" y2="${p2.top}%" stroke="rgba(0, 230, 118, 0.75)" stroke-width="3" stroke-linecap="round" style="filter: drop-shadow(0 0 5px rgba(0, 230, 118, 0.7));" />`;
-      }).join('');
-    }
-
-    // Marca de agua táctica de formación sobre el césped (Captura 1)
+    // Marca de agua táctica de formación sobre el césped
     const fWatermark = document.getElementById('pitch-formation-watermark');
     if (fWatermark) {
-      fWatermark.textContent = activeFormation;
+      fWatermark.textContent = formationConfig.short || activeFormation;
     }
 
-    // Actualizar inspector superior derecho (Captura 1 y 5)
+    const allPlayers = store.getPlayers();
     const activePlayer = this.selectedStarterIndex !== null ? startingPlayers[this.selectedStarterIndex] : (startingPlayers[0] || allPlayers[0]);
     this.updatePlayerInspector(activePlayer);
 
-    // Renderizar Cartas sobre el Césped
+    // Renderizar Cartas sobre el Césped con Drag & Drop
     slotsContainer.innerHTML = formationConfig.slots.map((slot, index) => {
       const player = startingPlayers[index];
       const isSelected = this.selectedStarterIndex === index;
@@ -1549,7 +1967,7 @@ class FutApp {
 
       if (!player) {
         return `
-          <div class="fut-card-slot" style="${slotStyle}">
+          <div class="fut-card-slot" style="${slotStyle}" data-slot-index="${index}">
             <div class="fut-card fut-card-size-pitch bg-slate-900/60 border border-dashed border-slate-700/80 rounded-2xl flex flex-col items-center justify-center text-slate-500 font-bold text-xs gap-1 shadow-inner">
               <i data-lucide="plus" class="w-5 h-5 text-slate-500"></i>
               <span class="text-[10px] uppercase font-fifa tracking-wider">Vacío</span>
@@ -1563,6 +1981,7 @@ class FutApp {
         <div class="fut-card-slot ${isSelected ? 'swap-active' : ''}" 
              style="${slotStyle}"
              data-slot-index="${index}"
+             draggable="true"
              onclick="window.futApp.selectStarter(${index})"
              onmouseenter="window.futApp.updatePlayerInspector(window.futApp.store.getStartingLineup()[${index}])">
           
@@ -1577,7 +1996,6 @@ class FutApp {
     }).join('');
 
     // Banquillo (Deduplicación estricta para garantizar 0 duplicados)
-    const allPlayers = store.getPlayers();
     const startingIds = new Set(startingPlayers.map(p => p.id));
     const seenBenchNames = new Set(startingPlayers.map(p => (p.nickname || p.name || '').toLowerCase().trim()));
     const seenBenchEmails = new Set(startingPlayers.map(p => (p.email || '').toLowerCase().trim()).filter(Boolean));
@@ -1605,6 +2023,8 @@ class FutApp {
       benchContainer.innerHTML = bench.map(p => {
         return `
           <div class="cursor-pointer hover:scale-105 transition flex-shrink-0" 
+               data-bench-id="${p.id}"
+               draggable="true"
                onclick="window.futApp.selectBench('${p.id}')"
                onmouseenter="window.futApp.updatePlayerInspector(window.futApp.store.getPlayerById('${p.id}'))"
                title="${p.name} (${p.rolesHierarchy ? p.rolesHierarchy.best : p.roleBest || 'DC'})">
@@ -1637,18 +2057,9 @@ class FutApp {
 
   getActiveSlotRole(index) {
     const settings = store.getSettings();
-    const isF7 = settings.modality === 'f7';
     const activeFormation = store.getActiveFormation();
-    const tacticalFormations = {
-      '1-3-2-1': ['POR', 'LI', 'DFC', 'LD', 'MC', 'MC', 'DC'],
-      '1-2-3-1': ['POR', 'DFC', 'DFC', 'EI', 'MC', 'ED', 'DC'],
-      '1-3-1-2': ['POR', 'LI', 'DFC', 'LD', 'MCO', 'DC', 'DC'],
-      '1-1-2-1': ['POR', 'CIE', 'ALI', 'ALD', 'PIV'],
-      '1-2-2': ['POR', 'CIE', 'CIE', 'PIV', 'PIV'],
-      '1-3-0': ['POR', 'ALI', 'CIE', 'ALD', 'MC']
-    };
-    const list = tacticalFormations[activeFormation] || tacticalFormations[isF7 ? '1-3-2-1' : '1-1-2-1'];
-    return list[index] || 'MC';
+    const conf = getFormationConfig(settings.modality, activeFormation);
+    return conf?.slots[index]?.role || 'MC';
   }
 
   openRadialMenu(index, pr) {
@@ -1807,22 +2218,13 @@ class FutApp {
       }
       this.renderPitch();
       const settings = store.getSettings();
-      const isF7 = settings.modality === 'f7';
       const activeFormation = store.getActiveFormation();
-      const tacticalFormations = {
-        '1-3-2-1': [{ top: 85, left: 50 }, { top: 64, left: 22 }, { top: 68, left: 50 }, { top: 64, left: 78 }, { top: 43, left: 36 }, { top: 43, left: 64 }, { top: 20, left: 50 }],
-        '1-2-3-1': [{ top: 85, left: 50 }, { top: 68, left: 33 }, { top: 68, left: 67 }, { top: 45, left: 20 }, { top: 43, left: 50 }, { top: 45, left: 80 }, { top: 20, left: 50 }],
-        '1-3-1-2': [{ top: 85, left: 50 }, { top: 66, left: 22 }, { top: 70, left: 50 }, { top: 66, left: 78 }, { top: 45, left: 50 }, { top: 20, left: 35 }, { top: 20, left: 65 }],
-        '1-1-2-1': [{ top: 86, left: 50 }, { top: 66, left: 50 }, { top: 44, left: 25 }, { top: 44, left: 75 }, { top: 20, left: 50 }],
-        '1-2-2': [{ top: 86, left: 50 }, { top: 66, left: 33 }, { top: 66, left: 67 }, { top: 26, left: 33 }, { top: 26, left: 67 }],
-        '1-3-0': [{ top: 86, left: 50 }, { top: 52, left: 22 }, { top: 62, left: 50 }, { top: 52, left: 78 }, { top: 30, left: 50 }]
-      };
-      const conf = tacticalFormations[activeFormation] || tacticalFormations[isF7 ? '1-3-2-1' : '1-1-2-1'];
-      const slot = conf[index] || { top: 50, left: 50 };
+      const conf = getFormationConfig(settings.modality, activeFormation);
+      const slot = conf?.slots[index] || { top: 50, left: 50 };
       const pr = this.projectSlot(slot);
 
       this.openRadialMenu(index, pr);
-      this.showToast('Usa el menú o toca otro titular para intercambiar', 'gamepad-2');
+      this.showToast('Arrastra a otra posición o usa las acciones', 'sliders-horizontal');
     } else if (this.selectedStarterIndex === index) {
       this.closeSubDrawer();
     } else {
@@ -1830,10 +2232,9 @@ class FutApp {
       const p1 = starting[this.selectedStarterIndex];
       const p2 = starting[index];
       if (p1 && p2) {
-        store.swapStartingPlayer(this.selectedStarterIndex, p2.id);
-        store.swapStartingPlayer(index, p1.id);
+        store.swapTwoStarters(this.selectedStarterIndex, index);
         futAudio.playCardSwap();
-        this.showToast(`Intercambiados ${p1.nickname} y ${p2.nickname}`, 'repeat');
+        this.showToast(`Intercambiados ${p1.nickname || p1.name} y ${p2.nickname || p2.name}`, 'repeat');
       }
       this.closeSubDrawer();
     }
@@ -1987,7 +2388,7 @@ class FutApp {
           <p class="text-xs text-slate-400 font-bold">"${p.nickname}" • Dorsal #${p.number} • ${p.preferredFoot}</p>
           <p class="text-xs text-cyan-400 font-bold">${fac.icon} ${fac.name}</p>
           <div class="pt-1">
-            <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider block font-fifa">ESTILO DE QUÍMICA: ${p.chemStyle || 'BAS'}</span>
+            <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider block font-fifa">FACULTAD: ${fac.name}</span>
           </div>
         </div>
       </div>

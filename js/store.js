@@ -294,17 +294,19 @@ const DEFAULT_SETTINGS = {
   shortName: 'FRF',
   tournament: 'Torneo del Rector 2026',
   modality: 'f7', // 'f7' o 'futsal'
-  manager: {
-    name: 'Míster José Fer',
-    nationality: 'España',
-    faculty: 'inf',
-    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80'
-  },
   specialists: {
     captain: 'p4',
     penalties: 'p6',
     freeKicks: 'p5',
     corners: 'p4'
+  },
+  tactics: {
+    defensiveStyle: 'balanced', // 'balanced', 'press_loss', 'press_heavy', 'drop_back'
+    defensiveWidth: 5,
+    defensiveDepth: 6,
+    buildUpPlay: 'balanced', // 'balanced', 'fast_break', 'possession', 'long_ball'
+    chanceCreation: 'forward_runs', // 'forward_runs', 'possession', 'direct'
+    playersInBox: 5
   },
   activeFormationF7: '1-3-2-1',
   activeFormationFutsal: '1-1-2-1',
@@ -606,6 +608,38 @@ export class TeamStore {
     return null;
   }
 
+  swapTwoStarters(idx1, idx2) {
+    const isF7 = this.settings.modality === 'f7';
+    const lineup = isF7 ? [...this.settings.startingLineupF7] : [...this.settings.startingLineupFutsal];
+
+    if (idx1 >= 0 && idx1 < lineup.length && idx2 >= 0 && idx2 < lineup.length) {
+      const temp = lineup[idx1];
+      lineup[idx1] = lineup[idx2];
+      lineup[idx2] = temp;
+
+      if (isF7) this.settings.startingLineupF7 = lineup;
+      else this.settings.startingLineupFutsal = lineup;
+
+      this.notify();
+      return true;
+    }
+    return false;
+  }
+
+  getTactics() {
+    return { ...DEFAULT_SETTINGS.tactics, ...(this.settings.tactics || {}) };
+  }
+
+  updateTactics(newTactics) {
+    this.settings.tactics = {
+      ...DEFAULT_SETTINGS.tactics,
+      ...(this.settings.tactics || {}),
+      ...newTactics
+    };
+    this.notify();
+    return this.settings.tactics;
+  }
+
   setSpecialist(role, playerId) {
     if (this.settings.specialists[role] !== undefined) {
       this.settings.specialists[role] = playerId;
@@ -615,15 +649,13 @@ export class TeamStore {
 
   calculateTeamChemistryAndRating(slotRoles) {
     const startingPlayers = this.getStartingLineup();
-    if (startingPlayers.length === 0) return { rating: 0, chemistry: 0, playerChems: [] };
+    if (startingPlayers.length === 0) return { rating: 0 };
 
     const sumRating = startingPlayers.reduce((acc, p) => acc + (p.rating || 75), 0);
     const avgRating = Math.round(sumRating / startingPlayers.length);
 
     return {
-      rating: avgRating,
-      chemistry: 100,
-      playerChems: []
+      rating: avgRating
     };
   }
 
