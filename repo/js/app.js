@@ -716,7 +716,7 @@ class FutApp {
             </div>
           </div>
           <button type="button" class="fifa-form-btn ${isActive ? 'is-active-btn' : ''}">
-            ${isActive ? '★ ACTIVA' : 'SELECCIONAR'}
+            ${isActive ? '★ ESQUEMA ACTIVO' : '<span class="inline-flex items-center justify-center gap-1"><em class="ps-btn ps-x">✕</em> APLICAR</span>'}
           </button>
         </div>
       `;

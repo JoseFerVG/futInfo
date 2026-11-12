@@ -899,30 +899,43 @@ body.hud-canvas {
   overflow: visible !important;
 }
 
-/* Trapecio de césped FIFA con líneas de cal oficiales */
-.hud-pitch::before, .hud-pitch::after {
+/* Trapecio de césped FIFA Oficial: Solo Mitad de Cancha Defensiva (Centro Arriba, Área Abajo) */
+.hud-pitch::before {
+  /* Borde perimetral exterior */
   content: "";
   position: absolute;
-  inset: 0;
-  clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+  inset: -2px -3px -6px -3px;
+  clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 8px 0 #13200b;
   pointer-events: none;
 }
 
-.hud-pitch::before {
-  /* Borde perimetral exterior */
-  background: rgba(255, 255, 255, 0.6);
-  inset: -2px -3px -6px -3px;
-  box-shadow: 0 8px 0 #13200b;
+.hud-pitch::after {
+  /* Césped rayado e iluminación de focos sobre la media cancha */
+  content: "";
+  position: absolute;
+  inset: 2px;
+  clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 15%, rgba(255, 255, 255, 0.18) 0%, transparent 75%),
+    radial-gradient(ellipse 70% 45% at 50% 85%, rgba(0, 0, 0, 0.28) 0%, transparent 65%),
+    repeating-linear-gradient(180deg, #2b4b16 0 10%, #365c1c 10% 20%),
+    #2b4b16;
+  pointer-events: none;
 }
 
-.hud-pitch::after {
-  /* Césped rayado y marcas de cal (círculo central, medio campo) */
-  background:
-    linear-gradient(180deg, transparent calc(50% - 1.5px), rgba(255, 255, 255, 0.55) calc(50% - 1.5px) calc(50% + 1.5px), transparent calc(50% + 1.5px)),
-    radial-gradient(ellipse 16% 12% at 50% 50%, transparent 90%, rgba(255, 255, 255, 0.55) 91% 100%, transparent 100%),
-    repeating-linear-gradient(180deg, #3d5e18 0 8.33%, #4a711f 8.33% 16.66%),
-    #3d5e18;
+/* Marcas de Cal Oficiales FIFA (Mitad de Cancha Defensiva) */
+.pitch-cal-markings-svg {
+  position: absolute !important;
   inset: 2px;
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+  clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+  pointer-events: none;
+  z-index: 2;
+  overflow: visible;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.7));
 }
 
 .hud-pitch .pitch-formation-watermark,
@@ -938,6 +951,11 @@ body.hud-canvas {
   position: absolute !important;
   inset: 0;
   width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+  overflow: visible;
+}
   height: 100%;
   pointer-events: none;
   z-index: 4;
@@ -1245,30 +1263,63 @@ body.hud-canvas {
   max-width: 170px;
   height: 100%;
   max-height: 105px;
-  background: rgba(10, 14, 20, 0.75);
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.12) 0%, transparent 70%),
+    repeating-linear-gradient(180deg, #1b330e 0 20%, #223f13 20% 40%),
+    #1b330e;
   border: 1.5px solid rgba(240, 190, 42, 0.4);
   position: relative;
+  overflow: hidden;
   box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.85);
 }
 
+/* Línea de medio campo en la parte SUPERIOR */
 .mini-pitch-half-line {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 0;
   right: 0;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 1.5px;
+  background: rgba(255, 255, 255, 0.7);
 }
 
+/* Círculo central en la parte SUPERIOR */
 .mini-pitch-center-circ {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 50%;
-  width: 28px;
-  height: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
   border-radius: 50% !important;
   transform: translate(-50%, -50%);
+}
+
+/* Área de penalti en la parte INFERIOR */
+.mini-pitch-schematic::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 18%;
+  right: 18%;
+  height: 28%;
+  border: 1.2px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 0;
+  pointer-events: none;
+}
+
+/* Área pequeña en la parte INFERIOR */
+.mini-pitch-schematic::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 34%;
+  right: 34%;
+  height: 12%;
+  border: 1.2px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 0;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .mini-pitch-dots-wrap {
@@ -2164,12 +2215,15 @@ dialog.fifa-console-modal {
   margin-bottom: 8px;
 }
 
-/* Mini campo de fútbol táctico con puntos */
+/* Mini campo de fútbol táctico con puntos: Media Cancha Oficial (Centro Arriba, Área Abajo) */
 .fifa-form-mini-pitch {
   width: 100%;
-  height: 90px;
-  background: linear-gradient(180deg, #1f3310, #14220b);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  height: 96px;
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.14) 0%, transparent 70%),
+    repeating-linear-gradient(180deg, #1b330e 0 16.66%, #223f13 16.66% 33.33%),
+    #1b330e;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: hidden;
   margin-bottom: 8px;
@@ -2177,28 +2231,84 @@ dialog.fifa-console-modal {
 
 .mini-pitch-box {
   position: absolute;
-  inset: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
+/* Línea de medio campo en la parte SUPERIOR */
 .mini-pitch-line {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 0;
   right: 0;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.3);
+  height: 1.5px;
+  background: rgba(255, 255, 255, 0.75);
 }
 
+/* Círculo central en la parte SUPERIOR */
 .mini-pitch-circle {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 50%;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   transform: translate(-50%, -50%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50% !important;
+}
+
+/* Área de penalti en la parte INFERIOR */
+.mini-pitch-box::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 18%;
+  right: 18%;
+  height: 28%;
+  border: 1.2px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 0;
+  pointer-events: none;
+}
+
+/* Área pequeña en la parte INFERIOR */
+.mini-pitch-box::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 34%;
+  right: 34%;
+  height: 12%;
+  border: 1.2px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.fifa-console-btn-exit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #0d1118;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  font-family: var(--hud-cond);
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--hud-snap);
+}
+
+.fifa-console-btn-exit:hover {
+  background: #ffffff;
+  color: #0b0e14;
+  border-color: #ffffff;
+}
+
+.fifa-console-btn-exit:hover .ps-circle {
+  border-color: #0b0e14;
 }
 
 .mini-pitch-dot {

@@ -156,10 +156,12 @@
 
         <!-- Barra de Acción EA Sports: Cambiar Plantilla / Formación con máxima visibilidad -->
         <div class="hud-squad-action-bar">
-          <button type="button" id="btn-open-squad-modal" class="hud-squad-bar-btn" title="Abrir Gestión de Plantilla y Formaciones">
-            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-amber-400"></i>
-            <span class="hud-squad-bar-title font-fifa">CAMBIAR PLANTILLA &amp; FORMACIÓN</span>
-            <span class="hud-squad-bar-badge font-fifa">ESQUEMAS EA SPORTS FC</span>
+          <button type="button" id="btn-open-squad-modal" class="hud-squad-bar-btn" title="Abrir Centro Táctico y Formaciones (Tecla S)">
+            <span class="hud-squad-bar-title font-fifa">
+              <em class="ps-btn ps-square">■</em>
+              <span>CAMBIAR PLANTILLA &amp; FORMACIÓN</span>
+            </span>
+            <span class="hud-squad-bar-badge font-fifa">ESQUEMAS FC 26</span>
           </button>
         </div>
 
@@ -171,6 +173,44 @@
             <span id="hud-team-name" hidden>Furia Rector FC</span>
             <span id="hud-team-rating" hidden>84</span>
             <span id="hud-team-starters" hidden>7</span>
+
+            <!-- Marcas de Cal Oficiales FIFA: Media Cancha Defensiva (Centro Arriba, Área y Portería Abajo) -->
+            <svg id="pitch-cal-markings-svg" class="pitch-cal-markings-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <!-- 1. Línea de Medio Campo en el Borde Superior -->
+              <line x1="0" y1="0.5" x2="100" y2="0.5" stroke="rgba(255, 255, 255, 0.88)" stroke-width="1.4" vector-effect="non-scaling-stroke" />
+
+              <!-- 2. Círculo Central en la parte superior curvando hacia abajo -->
+              <path d="M 28,0.5 A 22,17 0 0,0 72,0.5" fill="none" stroke="rgba(255, 255, 255, 0.85)" stroke-width="1.4" vector-effect="non-scaling-stroke" />
+
+              <!-- 3. Punto de Saque de Centro (Arriba en el centro) -->
+              <circle cx="50" cy="0.5" r="1.5" fill="#ffffff" />
+
+              <!-- 4. Líneas de Banda Laterales -->
+              <line x1="0.5" y1="0" x2="0.5" y2="100" stroke="rgba(255, 255, 255, 0.75)" stroke-width="1.3" vector-effect="non-scaling-stroke" />
+              <line x1="99.5" y1="0" x2="99.5" y2="100" stroke="rgba(255, 255, 255, 0.75)" stroke-width="1.3" vector-effect="non-scaling-stroke" />
+
+              <!-- 5. Línea de Fondo / Meta (Inferior) -->
+              <line x1="0" y1="99.5" x2="100" y2="99.5" stroke="rgba(255, 255, 255, 0.95)" stroke-width="1.6" vector-effect="non-scaling-stroke" />
+
+              <!-- 6. Arcos de Córner en las esquinas inferiores -->
+              <path d="M 0,94 A 6,6 0 0,0 6,100" fill="none" stroke="rgba(255, 255, 255, 0.8)" stroke-width="1.2" vector-effect="non-scaling-stroke" />
+              <path d="M 94,100 A 6,6 0 0,0 100,94" fill="none" stroke="rgba(255, 255, 255, 0.8)" stroke-width="1.2" vector-effect="non-scaling-stroke" />
+
+              <!-- 7. Área de Penalti / Área Grande (Inferior donde defiende el equipo) -->
+              <path d="M 18,100 L 18,70 L 82,70 L 82,100" fill="none" stroke="rgba(255, 255, 255, 0.88)" stroke-width="1.4" vector-effect="non-scaling-stroke" />
+
+              <!-- 8. Semicírculo del Área de Penalti (Corona) -->
+              <path d="M 38,70 A 12,8 0 0,1 62,70" fill="none" stroke="rgba(255, 255, 255, 0.82)" stroke-width="1.3" vector-effect="non-scaling-stroke" />
+
+              <!-- 9. Punto de Penalti -->
+              <circle cx="50" cy="83" r="1.4" fill="#ffffff" />
+
+              <!-- 10. Área Pequeña / 6 Yardas (Frente a la portería) -->
+              <path d="M 33,100 L 33,87 L 67,87 L 67,100" fill="none" stroke="rgba(255, 255, 255, 0.88)" stroke-width="1.4" vector-effect="non-scaling-stroke" />
+
+              <!-- 11. Portería / Redes (Al fondo en el límite inferior) -->
+              <rect x="36" y="99" width="28" height="3" fill="rgba(255, 255, 255, 0.2)" stroke="#ffffff" stroke-width="1.2" vector-effect="non-scaling-stroke" />
+            </svg>
 
             <!-- Capa Dinámica SVG de Enlaces de Química FIFA FUT (Líneas entre jugadores) -->
             <svg id="pitch-chemistry-svg" class="pitch-chemistry-svg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
@@ -1119,79 +1159,75 @@
     </div>
   </div>
 
-  <!-- 6. MODAL CENTRO TÁCTICO & GESTIÓN DE PLANTILLAS FIFA -->
+  <!-- 6. MODAL CENTRO TÁCTICO & ESQUEMAS FIFA FC -->
   <dialog id="squad-actions-dialog" aria-labelledby="squad-actions-title" class="fifa-console-modal max-w-4xl w-[94vw] text-white p-0 backdrop-blur-xl">
-    <div class="p-6 max-h-[88vh] overflow-y-auto space-y-4">
+    <div class="p-5 sm:p-6 max-h-[88vh] overflow-y-auto space-y-4">
       
-      <!-- Cabecera Broadcast Consola -->
+      <!-- Cabecera Oficial FIFA FUT: Escudo, Título y Salida con botón de mando -->
       <div class="flex items-center justify-between border-b border-white/10 pb-3">
         <div class="flex items-center gap-3">
-          <span class="w-10 h-10 bg-amber-400 text-slate-950 font-fifa text-2xl font-black flex items-center justify-center shadow-lg" style="clip-path: polygon(0 0, 100% 0, 100% 75%, 75% 100%, 0 100%);">
-            <i data-lucide="sliders-horizontal" class="w-5 h-5 text-slate-950"></i>
-          </span>
+          <span class="hud-crest font-fifa">FUT</span>
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-[10px] font-black uppercase tracking-widest text-amber-400 bg-amber-400/10 px-2 py-0.5 border-l-2 border-amber-400">EA SPORTS SQUAD HUB</span>
-              <span id="modal-active-modality-badge" class="text-[10px] font-black uppercase tracking-widest text-slate-400">FUT 7 DRAFT</span>
+              <span class="hud-tag font-fifa">ESQUEMAS TÁCTICOS</span>
+              <span id="modal-active-modality-badge" class="hud-modality-pill font-fifa">FUT 7 DRAFT</span>
             </div>
-            <h2 id="squad-actions-title" class="font-fifa text-3xl font-black text-white uppercase tracking-wider leading-none mt-1">Gestión de Plantilla & Formación</h2>
+            <h2 id="squad-actions-title" class="font-fifa text-2xl sm:text-3xl font-black text-white uppercase tracking-wider leading-none mt-1">FORMACIONES Y PLAN TÁCTICO</h2>
           </div>
         </div>
-        <button type="button" onclick="document.getElementById('squad-actions-dialog').close()" class="px-3 py-1.5 bg-slate-900 hover:bg-amber-400 hover:text-slate-950 text-slate-300 font-fifa text-base font-bold transition flex items-center gap-1.5 cursor-pointer border-l-2 border-amber-400">
-          <i data-lucide="x" class="w-4 h-4"></i>
-          <span>CERRAR</span>
+        <button type="button" onclick="document.getElementById('squad-actions-dialog').close()" class="fifa-console-btn-exit" title="Cerrar (Escape)">
+          <em class="ps-btn ps-circle">◯</em>
+          <span class="font-fifa">VOLVER</span>
         </button>
       </div>
 
-      <!-- Navegación por pestañas del modal (Console HUD Tabs) -->
-      <nav class="fifa-modal-nav flex items-center gap-1 border-b border-white/10 pb-2 overflow-x-auto">
+      <!-- Navegación por pestañas Ribbon Broadcast FIFA (Sin numeración web) -->
+      <nav class="fifa-modal-nav flex items-center gap-1.5 border-b border-white/10 pb-2 overflow-x-auto">
         <button type="button" class="fifa-modal-tab active" data-tab="tab-formations">
           <i data-lucide="layout-grid" class="w-4 h-4"></i>
-          <span>1. FORMACIONES TÁCTICAS</span>
+          <span>FORMACIONES</span>
         </button>
         <button type="button" class="fifa-modal-tab" data-tab="tab-squads">
           <i data-lucide="users" class="w-4 h-4"></i>
-          <span>2. CAMBIAR PLANTILLA</span>
+          <span>PLANTILLAS</span>
         </button>
         <button type="button" class="fifa-modal-tab" data-tab="tab-tactics">
           <i data-lucide="sliders" class="w-4 h-4"></i>
-          <span>3. INSTRUCCIONES Y ESTILO</span>
+          <span>ESTILO Y PLAN</span>
         </button>
         <button type="button" class="fifa-modal-tab" data-tab="tab-tools">
           <i data-lucide="sparkles" class="w-4 h-4"></i>
-          <span>4. HERRAMIENTAS</span>
+          <span>ACCIONES RÁPIDAS</span>
         </button>
       </nav>
 
       <!-- VISTA 1: FORMACIONES TÁCTICAS (Visual FIFA Grid) -->
       <div id="tab-formations" class="fifa-modal-view space-y-4">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-slate-900/80 border-l-4 border-amber-400">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-slate-900/90 border-l-4 border-amber-400">
           <div>
-            <span class="text-[10px] font-black uppercase text-amber-400 tracking-wider block">ESQUEMAS OFICIALES EA SPORTS</span>
-            <span class="text-xs text-slate-300 font-medium">Pulsa en cualquier formación para aplicarla al instante en el césped</span>
+            <span class="text-[11px] font-black uppercase text-amber-400 tracking-wider block font-fifa">ESQUEMAS TÁCTICOS OFICIALES EA SPORTS</span>
+            <span class="text-xs text-slate-300 font-medium">Selecciona cualquier formación para reubicar al instante los jugadores en el césped.</span>
           </div>
-          <div class="w-full sm:w-auto flex items-center gap-2">
-            <label for="select-active-formation" class="text-[10px] uppercase font-bold text-slate-400">Lista:</label>
-            <select id="select-active-formation" name="formation" aria-label="Formación táctica" class="bg-slate-950 border border-slate-700 text-white font-bold px-3 py-1.5 text-xs focus:ring-1 focus:ring-amber-500 cursor-pointer">
-            </select>
-          </div>
+          <!-- Selector accesible sincronizado oculto -->
+          <select id="select-active-formation" name="formation" aria-label="Formación táctica" class="hidden">
+          </select>
         </div>
 
-        <!-- Visual Grid de Esquemas -->
+        <!-- Visual Grid de Esquemas FIFA con media cancha (Centro arriba, área abajo) -->
         <div id="fifa-formations-grid" class="fifa-formations-grid"></div>
 
         <!-- Tarjeta Dinámica de Análisis y Consejo Táctico -->
-        <div id="tactics-advice-card" class="p-4 bg-slate-900/90 border border-slate-800 space-y-2">
+        <div id="tactics-advice-card" class="p-4 bg-slate-900/95 border border-slate-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="w-6 h-6 bg-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-xs">
-                <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+              <span class="w-7 h-7 bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-xs" style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);">
+                <i data-lucide="shield" class="w-4 h-4 text-slate-950"></i>
               </span>
-              <h4 id="tactics-formation-name" class="font-fifa text-xl font-bold text-white uppercase tracking-wider">
+              <h4 id="tactics-formation-name" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">
                 1-3-2-1 (Árbol de Navidad)
               </h4>
             </div>
-            <span id="tactics-style-tag" class="px-2.5 py-0.5 bg-sky-500/20 text-sky-300 text-[10px] font-black uppercase tracking-wider border border-sky-500/40">
+            <span id="tactics-style-tag" class="hud-modality-pill font-fifa">
               Equilibrado / Control Central
             </span>
           </div>
@@ -1201,10 +1237,10 @@
           </p>
 
           <!-- Caja de Consejo Táctico con resplandor dorado -->
-          <div class="p-3 bg-amber-950/30 border-l-4 border-amber-400 text-xs text-amber-200 leading-relaxed font-medium flex items-start gap-2.5 shadow-sm">
+          <div class="p-3 bg-amber-950/40 border-l-4 border-amber-400 text-xs text-amber-200 leading-relaxed font-medium flex items-start gap-2.5 shadow-sm">
             <i data-lucide="lightbulb" class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5"></i>
             <div>
-              <span class="font-fifa font-bold text-amber-300 uppercase tracking-wider block text-[11px] mb-0.5">Consejo del Entrenador</span>
+              <span class="font-fifa font-bold text-amber-300 uppercase tracking-wider block text-[11px] mb-0.5">INSTRUCCIÓN TÁCTICA DEL ENTRENADOR</span>
               <span id="tactics-advice-text">Ideal si tienes dos mediocentros de calidad que sepan combinar y distribuir rápido. Protege los costados con laterales de largo recorrido.</span>
             </div>
           </div>
