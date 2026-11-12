@@ -172,6 +172,7 @@ class AuthService {
         nickname: cardData.nickname || existingPlayer.nickname,
         avatar: avatarUrl,
         number: parseInt(cardData.number, 10) || existingPlayer.number,
+        cardType: cardData.cardType || existingPlayer.cardType || 'gold',
         faculty: cardData.faculty || existingPlayer.faculty,
         preferredFoot: cardData.preferredFoot || existingPlayer.preferredFoot,
         rolesHierarchy: {
@@ -198,6 +199,7 @@ class AuthService {
         avatar: avatarUrl,
         number: parseInt(cardData.number, 10) || 7,
         rating: parseInt(cardData.rating, 10) || 82,
+        cardType: cardData.cardType || 'gold',
         faculty: cardData.faculty || 'inf',
         preferredFoot: cardData.preferredFoot || 'Diestro',
         studentId: cardData.studentId || '',

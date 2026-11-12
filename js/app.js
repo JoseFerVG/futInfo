@@ -184,6 +184,100 @@ class FutApp {
     }
   }
 
+  getCardClass(cardType) {
+    switch (cardType) {
+      case 'totw': return 'fut-card-totw';
+      case 'toty':
+      case 'special': return 'fut-card-toty';
+      case 'tots': return 'fut-card-tots';
+      case 'icon': return 'fut-card-icon';
+      case 'gold':
+      default: return 'fut-card-gold';
+    }
+  }
+
+  renderFutCard(player, options = {}) {
+    if (!player) return '';
+    const {
+      size = 'pitch', // 'pitch', 'bench', 'album', 'walkout', 'inspect'
+      role = null,
+      extraClass = '',
+      customStyle = ''
+    } = options;
+
+    const fac = FACULTIES.find(f => f.id === player.faculty) || FACULTIES[0];
+    const cardClass = this.getCardClass(player.cardType);
+    const displayRole = role || (player.rolesHierarchy ? player.rolesHierarchy.best : (player.roleBest || 'DC'));
+    const displayName = (player.nickname || player.name.split(' ')[0] || 'CRACK').toUpperCase();
+    const stats = player.stats || { pac: 80, sho: 80, pas: 80, dri: 80, def: 65, phy: 75 };
+    const chemStyle = player.chemStyle || 'BAS';
+
+    let sizeClass = 'fut-card-size-pitch';
+    if (size === 'album') sizeClass = 'fut-card-size-album';
+    else if (size === 'walkout') sizeClass = 'fut-card-size-walkout';
+    else if (size === 'bench') sizeClass = 'fut-card-size-bench';
+    else if (size === 'inspect') sizeClass = 'fut-card-size-inspect';
+
+    return `
+      <div class="fut-card ${cardClass} ${sizeClass} ${extraClass}" style="${customStyle}">
+        <div class="fut-card-holo-layer"></div>
+
+        <div class="fut-card-top">
+          <div class="fut-card-badge-col">
+            <span class="fut-card-rating font-fifa">${player.rating}</span>
+            <span class="fut-card-pos">${displayRole}</span>
+            <div class="fut-card-col-divider"></div>
+            <span class="fut-card-flag" title="${fac.name}">${fac.icon}</span>
+            <span class="fut-card-club" title="Universidad">🛡️</span>
+          </div>
+          <div class="fut-card-avatar-wrap">
+            <img src="${player.avatar}" alt="${player.name}" class="fut-card-avatar" loading="lazy">
+          </div>
+        </div>
+
+        <div class="fut-card-name-plate">
+          <span>${displayName}</span>
+        </div>
+
+        <div class="fut-card-stats-grid">
+          <div class="fut-card-stats-col">
+            <div class="fut-card-stat-row">
+              <span class="stat-num font-fifa">${stats.pac}</span>
+              <span class="stat-lbl">PAC</span>
+            </div>
+            <div class="fut-card-stat-row">
+              <span class="stat-num font-fifa">${stats.sho}</span>
+              <span class="stat-lbl">SHO</span>
+            </div>
+            <div class="fut-card-stat-row">
+              <span class="stat-num font-fifa">${stats.pas}</span>
+              <span class="stat-lbl">PAS</span>
+            </div>
+          </div>
+          <div class="fut-card-stats-divider"></div>
+          <div class="fut-card-stats-col">
+            <div class="fut-card-stat-row">
+              <span class="stat-num font-fifa">${stats.dri}</span>
+              <span class="stat-lbl">DRI</span>
+            </div>
+            <div class="fut-card-stat-row">
+              <span class="stat-num font-fifa">${stats.def}</span>
+              <span class="stat-lbl">DEF</span>
+            </div>
+            <div class="fut-card-stat-row">
+              <span class="stat-num font-fifa">${stats.phy}</span>
+              <span class="stat-lbl">PHY</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fut-card-bottom-badge">
+          <span class="fut-chem-pill">${chemStyle}</span>
+        </div>
+      </div>
+    `;
+  }
+
   updateFirebaseBadge(isConnected) {
     const badge = document.getElementById('firebase-status-badge');
     if (!badge) return;
@@ -592,6 +686,7 @@ class FutApp {
         number: document.getElementById('setup-number').value,
         faculty: document.getElementById('setup-faculty').value,
         preferredFoot: document.getElementById('setup-foot').value,
+        cardType: document.getElementById('setup-card-type')?.value || 'gold',
         roleBest: document.getElementById('setup-role-best').value,
         roleSecond: document.getElementById('setup-role-second').value,
         roleThird: document.getElementById('setup-role-third').value,
@@ -714,6 +809,9 @@ class FutApp {
       document.getElementById('setup-number').value = existing.number || 10;
       document.getElementById('setup-faculty').value = existing.faculty || 'inf';
       document.getElementById('setup-foot').value = existing.preferredFoot || 'Diestro';
+      if (document.getElementById('setup-card-type')) {
+        document.getElementById('setup-card-type').value = existing.cardType || 'gold';
+      }
       if (existing.rolesHierarchy) {
         document.getElementById('setup-role-best').value = existing.rolesHierarchy.best || 'DC';
         document.getElementById('setup-role-second').value = existing.rolesHierarchy.second || 'MC';
@@ -730,6 +828,9 @@ class FutApp {
       if (titleEl) titleEl.textContent = 'Crea tu Carta FIFA Ultimate Team';
       if (submitBtn) submitBtn.textContent = 'Guardar y Generar mi Carta FUT';
       document.getElementById('setup-nickname').value = user.name ? user.name.split(' ')[0] : 'Crack';
+      if (document.getElementById('setup-card-type')) {
+        document.getElementById('setup-card-type').value = 'gold';
+      }
       this.setupStatsTestForUser(null);
       const avatarUrl = user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
       const imgEl = document.getElementById('setup-user-avatar');
@@ -1449,16 +1550,14 @@ class FutApp {
       if (!player) {
         return `
           <div class="fut-card-slot" style="${slotStyle}">
-            <div class="fut-card bg-slate-900/60 border border-dashed border-slate-700 flex items-center justify-center text-slate-500 font-bold text-xs">
-              + Vacío
+            <div class="fut-card fut-card-size-pitch bg-slate-900/60 border border-dashed border-slate-700/80 rounded-2xl flex flex-col items-center justify-center text-slate-500 font-bold text-xs gap-1 shadow-inner">
+              <i data-lucide="plus" class="w-5 h-5 text-slate-500"></i>
+              <span class="text-[10px] uppercase font-fifa tracking-wider">Vacío</span>
             </div>
-            <div class="fut-pos-pedestal">${slot.role}</div>
+            <div class="fut-pos-pedestal"><span>${slot.role}</span></div>
           </div>
         `;
       }
-
-      const facultyObj = FACULTIES.find(f => f.id === player.faculty) || FACULTIES[0];
-      const cardTypeClass = player.cardType === 'totw' ? 'fut-card-totw' : (player.cardType === 'special' ? 'fut-card-special' : 'fut-card-gold');
 
       return `
         <div class="fut-card-slot ${isSelected ? 'swap-active' : ''}" 
@@ -1467,27 +1566,7 @@ class FutApp {
              onclick="window.futApp.selectStarter(${index})"
              onmouseenter="window.futApp.updatePlayerInspector(window.futApp.store.getStartingLineup()[${index}])">
           
-          <div class="fut-card ${cardTypeClass}">
-            <!-- Capa Holográfica Reactiva -->
-            <div class="fut-card-holo-layer"></div>
-
-            <div class="fut-card-header">
-              <div class="fut-card-badge-col">
-                <span class="fut-card-rating">${player.rating}</span>
-                <span class="fut-card-pos">${slot.role}</span>
-                <span class="fut-card-emblem" title="${facultyObj.name}">${facultyObj.icon}</span>
-              </div>
-              <div class="fut-card-avatar-wrap">
-                <img src="${player.avatar}" alt="${player.name}" class="fut-card-avatar">
-              </div>
-            </div>
-
-            <div class="fut-card-name-plate">
-              ${player.nickname || player.name.split(' ')[0]}
-            </div>
-
-            <div class="fut-card-footer"></div>
-          </div>
+          ${this.renderFutCard(player, { size: 'pitch', role: slot.role })}
 
           <div class="fut-pos-pedestal">
             <span>${slot.role}</span>
@@ -1524,30 +1603,12 @@ class FutApp {
       `;
     } else {
       benchContainer.innerHTML = bench.map(p => {
-        const fac = FACULTIES.find(f => f.id === p.faculty) || FACULTIES[0];
-        const cardClass = p.cardType === 'totw' ? 'fut-card-totw' : (p.cardType === 'special' ? 'fut-card-special' : 'fut-card-gold');
-
         return `
           <div class="cursor-pointer hover:scale-105 transition flex-shrink-0" 
                onclick="window.futApp.selectBench('${p.id}')"
                onmouseenter="window.futApp.updatePlayerInspector(window.futApp.store.getPlayerById('${p.id}'))"
                title="${p.name} (${p.rolesHierarchy ? p.rolesHierarchy.best : p.roleBest || 'DC'})">
-            <div class="fut-card ${cardClass}" style="width: 60px; height: 86px;">
-              <div class="fut-card-header" style="height: 44px; padding: 2px 3px 0 3px;">
-                <div class="fut-card-badge-col">
-                  <span class="fut-card-rating" style="font-size: 1.15rem; line-height: 1;">${p.rating}</span>
-                  <span class="fut-card-pos" style="font-size: 0.5rem;">${p.rolesHierarchy ? p.rolesHierarchy.best : (p.roleBest || 'DC')}</span>
-                  <span class="fut-card-emblem" style="font-size: 0.55rem;">${fac.icon}</span>
-                </div>
-                <div class="fut-card-avatar-wrap" style="width: 38px; height: 44px; right: 1px; top: 2px;">
-                  <img src="${p.avatar}" alt="${p.name}" class="fut-card-avatar">
-                </div>
-              </div>
-              <div class="fut-card-name-plate" style="font-size: 0.52rem; padding: 1px 2px; margin: 0 1px;">
-                ${p.nickname || p.name.split(' ')[0]}
-              </div>
-              <div class="fut-card-footer" style="padding: 1px;"></div>
-            </div>
+            ${this.renderFutCard(p, { size: 'bench' })}
           </div>
         `;
       }).join('');
@@ -1830,28 +1891,7 @@ class FutApp {
       posStep.classList.add('hidden');
       cardStep.classList.remove('hidden');
 
-      const cardClass = player.cardType === 'totw' ? 'fut-card-totw' : (player.cardType === 'special' ? 'fut-card-special' : 'fut-card-gold');
-      const bestRole = player.rolesHierarchy ? player.rolesHierarchy.best : 'DC';
-
-      cardHost.innerHTML = `
-        <div class="fut-card ${cardClass}">
-          <div class="fut-card-holo-layer"></div>
-          <div class="fut-card-header">
-            <div class="fut-card-badge-col">
-              <span class="fut-card-rating">${player.rating}</span>
-              <span class="fut-card-pos">${bestRole}</span>
-              <span class="fut-card-emblem">${fac.icon}</span>
-            </div>
-            <div class="fut-card-avatar-wrap">
-              <img src="${player.avatar}" alt="${player.name}" class="fut-card-avatar">
-            </div>
-          </div>
-          <div class="fut-card-name-plate">
-            ${player.nickname || player.name}
-          </div>
-          <div class="fut-card-footer"></div>
-        </div>
-      `;
+      cardHost.innerHTML = this.renderFutCard(player, { size: 'walkout' });
 
       nameTag.textContent = (player.nickname || player.name).toUpperCase();
 
@@ -1887,39 +1927,12 @@ class FutApp {
     const players = store.getPlayers();
     grid.innerHTML = players.map(p => {
       const fac = FACULTIES.find(f => f.id === p.faculty) || FACULTIES[0];
-      const cardClass = p.cardType === 'totw' ? 'fut-card-totw' : (p.cardType === 'special' ? 'fut-card-special' : 'fut-card-gold');
 
       return `
         <div class="fifa-tile p-5 flex flex-col justify-between hover:border-amber-400 hover:shadow-xl transition group relative overflow-hidden">
           <div class="fifa-tile-accent-bar mb-2"></div>
           <div class="flex items-center justify-center mb-4">
-            <div class="fut-card ${cardClass}" style="width: 140px; height: 195px; border-radius: 10px 10px 18px 18px;">
-              <div class="fut-card-header" style="height: 105px; padding: 6px 8px 0 8px;">
-                <div class="fut-card-badge-col">
-                  <span class="fut-card-rating" style="font-size: 2.3rem;">${p.rating}</span>
-                  <span class="fut-card-pos" style="font-size: 0.9rem;">${p.rolesHierarchy.best}</span>
-                  <span class="fut-card-emblem" style="font-size: 1.1rem;">${fac.icon}</span>
-                </div>
-                <div class="fut-card-avatar-wrap" style="width: 90px; height: 100px;">
-                  <img src="${p.avatar}" alt="${p.name}" class="fut-card-avatar">
-                </div>
-              </div>
-
-              <div class="fut-card-name-plate" style="font-size: 0.85rem; padding: 3px 6px;">
-                ${p.name.toUpperCase()}
-              </div>
-
-              <div class="fut-card-footer" style="font-size: 0.85rem; padding: 4px 8px;">
-                <div class="grid grid-cols-3 gap-x-2 text-center w-full font-fifa">
-                  <span>${p.stats.pac} PAC</span>
-                  <span>${p.stats.dri} DRI</span>
-                  <span>${p.stats.sho} SHO</span>
-                  <span>${p.stats.def} DEF</span>
-                  <span>${p.stats.pas} PAS</span>
-                  <span>${p.stats.phy} PHY</span>
-                </div>
-              </div>
-            </div>
+            ${this.renderFutCard(p, { size: 'album' })}
           </div>
 
           <div class="space-y-1.5 text-xs bg-slate-950/70 p-3 rounded-xl border border-white/10 mb-3">
@@ -1962,17 +1975,20 @@ class FutApp {
     if (!content) return;
 
     content.innerHTML = `
-      <div class="flex items-center gap-4 bg-slate-900/90 p-4 rounded-xl border border-slate-700/80">
-        <div class="w-16 h-16 rounded-xl overflow-hidden border-2 border-amber-400 shadow-md flex-shrink-0">
-          <img src="${p.avatar}" alt="${p.name}" class="w-full h-full object-cover">
+      <div class="flex flex-col sm:flex-row items-center gap-5 bg-slate-900/90 p-4 rounded-xl border border-slate-700/80">
+        <div class="flex-shrink-0">
+          ${this.renderFutCard(p, { size: 'inspect' })}
         </div>
-        <div class="flex-1">
-          <div class="flex items-center justify-between">
-            <h4 class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">${p.name}</h4>
+        <div class="flex-1 space-y-2 text-center sm:text-left w-full">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h4 class="font-fifa text-3xl font-bold text-white uppercase tracking-wider">${p.name}</h4>
             <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-fifa text-base font-black shadow-sm">${p.rating} OVR</span>
           </div>
-          <p class="text-xs text-slate-400 font-bold">"${p.nickname}" | Dorsal #${p.number} | ${p.preferredFoot}</p>
-          <p class="text-xs text-cyan-400 font-bold mt-0.5">${fac.icon} ${fac.name}</p>
+          <p class="text-xs text-slate-400 font-bold">"${p.nickname}" • Dorsal #${p.number} • ${p.preferredFoot}</p>
+          <p class="text-xs text-cyan-400 font-bold">${fac.icon} ${fac.name}</p>
+          <div class="pt-1">
+            <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider block font-fifa">ESTILO DE QUÍMICA: ${p.chemStyle || 'BAS'}</span>
+          </div>
         </div>
       </div>
 

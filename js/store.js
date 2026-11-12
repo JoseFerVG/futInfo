@@ -163,7 +163,7 @@ const DEFAULT_PLAYERS = [
     nickname: 'Mago',
     number: 8,
     rating: 85,
-    cardType: 'special',
+    cardType: 'toty',
     faculty: 'cafd',
     chemStyle: 'PWR',
     avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80',
@@ -215,7 +215,7 @@ const DEFAULT_PLAYERS = [
     nickname: 'Tanque',
     number: 9,
     rating: 84,
-    cardType: 'gold',
+    cardType: 'tots',
     faculty: 'cafd',
     chemStyle: 'MRK',
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
@@ -267,7 +267,7 @@ const DEFAULT_PLAYERS = [
     nickname: 'Chechu',
     number: 3,
     rating: 79,
-    cardType: 'gold',
+    cardType: 'icon',
     faculty: 'der',
     chemStyle: 'SHA',
     avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80',
@@ -412,6 +412,12 @@ export class TeamStore {
       const nickname = (p.nickname || '').toLowerCase().trim();
       const nameKey = `${name}_${nickname}`;
       if (name && seenNames.has(nameKey)) continue;
+
+      // Actualizar tipos de carta por defecto para iniciales si estaban cacheados
+      if (p.id === 'p4' && (p.cardType === 'special' || !p.cardType)) p.cardType = 'toty';
+      if (p.id === 'p5' && !p.cardType) p.cardType = 'totw';
+      if (p.id === 'p6' && (!p.cardType || p.cardType === 'gold')) p.cardType = 'tots';
+      if (p.id === 'p8' && (!p.cardType || p.cardType === 'gold')) p.cardType = 'icon';
 
       if (p.id) seenIds.add(p.id);
       if (name) seenNames.add(nameKey);
