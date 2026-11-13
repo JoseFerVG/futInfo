@@ -6,6 +6,7 @@
 const STORAGE_KEYS = {
   PLAYERS: 'futinfo_fifa_players_v4',
   MATCHES: 'futinfo_fifa_matches_v4',
+  MATCH_LOGS: 'futinfo_fifa_matchlogs_v1',
   SETTINGS: 'futinfo_fifa_settings_v4'
 };
 
@@ -280,6 +281,7 @@ export class TeamStore {
   constructor() {
     this.players = [];
     this.matches = [];
+    this.matchLogs = [];
     this.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
     this.listeners = new Set();
     this._db = null;
@@ -287,6 +289,8 @@ export class TeamStore {
     this._cloudSaveTimer = null;
     this._isApplyingRemote = false;
     this._lastCloudTs = 0;
+    this._pendingAddIds = new Set();
+    this._deletedPlayerIds = new Set();
     this.init();
   }
 
@@ -300,6 +304,9 @@ export class TeamStore {
 
     const savedMatches = localStorage.getItem(STORAGE_KEYS.MATCHES);
     this.matches = savedMatches ? JSON.parse(savedMatches) : [];
+
+    const savedLogs = localStorage.getItem(STORAGE_KEYS.MATCH_LOGS);
+    this.matchLogs = savedLogs ? JSON.parse(savedLogs) : [];
 
     const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
     this.settings = savedSettings
@@ -396,10 +403,18 @@ export class TeamStore {
         this._isApplyingRemote = true;
         try {
           if (Array.isArray(remote.players)) {
-            this.players = this.deduplicatePlayers(remote.players);
+            const remoteFiltered = remote.players.filter(p => p && !this._deletedPlayerIds.has(p.id));
+            const remoteIds = new Set(remoteFiltered.map(p => p.id));
+            const pendingLocals = this.players.filter(p => p && this._pendingAddIds.has(p.id) && !remoteIds.has(p.id));
+            this.players = this.deduplicatePlayers([...remoteFiltered, ...pendingLocals]);
           }
           if (Array.isArray(remote.matches)) {
             this.matches = remote.matches;
+          }
+          if (Array.isArray(remote.matchLogs)) {
+            const remoteLogIds = new Set(remote.matchLogs.map(l => l.id));
+            const unsyncedLogs = (this.matchLogs || []).filter(l => l && !remoteLogIds.has(l.id));
+            this.matchLogs = [...remote.matchLogs, ...unsyncedLogs];
           }
           if (remote.settings && typeof remote.settings === 'object') {
             this.settings = { ...this.settings, ...remote.settings };
@@ -440,9 +455,11 @@ export class TeamStore {
       await setDoc(doc(this._db, 'teams', FIRESTORE_TEAM_DOC), {
         players: this.players,
         matches: this.matches,
+        matchLogs: this.matchLogs,
         settings: this.settings,
         updatedAt: ts
       }, { merge: true });
+      this._pendingAddIds.clear();
     } catch (err) {
       console.warn("[Firestore] Guardado local activo (nube no escribió):", err.code || err.message);
     }
@@ -451,6 +468,7 @@ export class TeamStore {
   saveLocal() {
     localStorage.setItem(STORAGE_KEYS.PLAYERS, JSON.stringify(this.players));
     localStorage.setItem(STORAGE_KEYS.MATCHES, JSON.stringify(this.matches));
+    localStorage.setItem(STORAGE_KEYS.MATCH_LOGS, JSON.stringify(this.matchLogs));
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(this.settings));
   }
 
@@ -509,12 +527,25 @@ export class TeamStore {
       studentId: data.studentId || '',
       phone: data.phone || '',
       email: data.email || '',
-      rolesHierarchy: {
-        best: data.roleBest || 'DC',
-        second: data.roleSecond || 'MC',
-        third: data.roleThird || 'DFC',
-        worst: data.roleWorst || 'POR'
-      },
+      rolesHierarchy: (() => {
+        const best = data.roleBest || 'DC';
+        const second = data.roleSecond || 'MC';
+        const third = data.roleThird || 'DFC';
+        const fourth = data.roleFourth || 'MCO';
+        const worst = data.roleWorst || 'POR';
+        const rawOrder = Array.isArray(data.priorityOrder) && data.priorityOrder.length > 0
+          ? data.priorityOrder
+          : [best, second, third, fourth];
+        const priorityOrder = rawOrder.filter((v, idx, arr) => v && arr.indexOf(v) === idx);
+        return {
+          best: priorityOrder[0] || best,
+          second: priorityOrder[1] || second,
+          third: priorityOrder[2] || third,
+          fourth: priorityOrder[3] || fourth,
+          worst,
+          priorityOrder
+        };
+      })(),
       stats: defaultStats,
       goals: parseInt(data.goals, 10) || 0,
       assists: parseInt(data.assists, 10) || 0,
@@ -522,6 +553,7 @@ export class TeamStore {
       redCards: 0
     };
 
+    this._pendingAddIds.add(newPlayer.id);
     this.players.push(newPlayer);
     this._placeNewPlayerInLineups(newPlayer.id);
     this.notify();
@@ -587,6 +619,8 @@ export class TeamStore {
   }
 
   deletePlayer(id) {
+    this._deletedPlayerIds.add(id);
+    this._pendingAddIds.delete(id);
     this.players = this.players.filter(p => p.id !== id);
     if (Array.isArray(this.settings.startingLineupF7)) {
       this.settings.startingLineupF7 = this.settings.startingLineupF7.map(pid => (pid === id ? null : pid));
@@ -637,6 +671,7 @@ export class TeamStore {
     } else {
       this.settings.activeFormationFutsal = formation;
     }
+    this._syncActiveSquadLineup();
     this.notify();
   }
 
@@ -666,11 +701,29 @@ export class TeamStore {
     return this.getStartingLineup().filter(Boolean);
   }
 
+  _syncActiveSquadLineup() {
+    const sq = this.getActiveSquad();
+    if (!sq) return;
+    const isF7 = this.settings.modality === 'f7';
+    sq.modality = this.settings.modality;
+    sq.formation = isF7 ? this.settings.activeFormationF7 : this.settings.activeFormationFutsal;
+    const rawLineup = isF7 ? (this.settings.startingLineupF7 || []) : (this.settings.startingLineupFutsal || []);
+    sq.startingLineup = [...rawLineup];
+    const starterSet = new Set(sq.startingLineup.filter(Boolean));
+    sq.benchPlayers = this.players.filter(p => !starterSet.has(p.id)).map(p => p.id);
+    const startingPlayers = sq.startingLineup.map(id => (id ? this.getPlayerById(id) : null)).filter(Boolean);
+    if (startingPlayers.length > 0) {
+      const sum = startingPlayers.reduce((acc, p) => acc + (p.rating || 75), 0);
+      sq.rating = Math.round(sum / startingPlayers.length);
+    }
+  }
+
   setStartingLineup(players) {
     const isF7 = this.settings.modality === 'f7';
     const ids = players.map(p => (p ? (typeof p === 'string' ? p : p.id) : null));
     if (isF7) this.settings.startingLineupF7 = ids;
     else this.settings.startingLineupFutsal = ids;
+    this._syncActiveSquadLineup();
     this.notify();
   }
 
@@ -678,6 +731,7 @@ export class TeamStore {
     const sorted = this.getPlayers().map(p => p.id);
     this.settings.startingLineupF7 = sorted.slice(0, 7);
     this.settings.startingLineupFutsal = sorted.slice(0, 5);
+    this._syncActiveSquadLineup();
     this.notify();
   }
 
@@ -700,6 +754,7 @@ export class TeamStore {
     if (isF7) this.settings.startingLineupF7 = lineup;
     else this.settings.startingLineupFutsal = lineup;
 
+    this._syncActiveSquadLineup();
     this.notify();
     return { oldPlayerId, newPlayerId };
   }
@@ -719,6 +774,7 @@ export class TeamStore {
     if (isF7) this.settings.startingLineupF7 = lineup;
     else this.settings.startingLineupFutsal = lineup;
 
+    this._syncActiveSquadLineup();
     this.notify();
     return true;
   }
@@ -927,9 +983,58 @@ export class TeamStore {
     };
   }
 
+  // ==================== HISTORIAL DE MINUTOS Y PARTIDOS JUGADOS ====================
+  getMatchLogs() {
+    if (!Array.isArray(this.matchLogs)) this.matchLogs = [];
+    return [...this.matchLogs].sort((a, b) => new Date(b?.date || 0) - new Date(a?.date || 0));
+  }
+
+  recordPlayedMatch({ date, opponent, modality, duration, entries }) {
+    if (!Array.isArray(this.matchLogs)) this.matchLogs = [];
+    const newLog = {
+      id: 'ml_' + Date.now(),
+      date: date || new Date().toISOString().slice(0, 10),
+      opponent: (opponent || 'Partido Oficial').trim(),
+      modality: modality || this.settings.modality || 'f7',
+      duration: Math.max(10, parseInt(duration, 10) || 50),
+      entries: Array.isArray(entries) ? entries : [],
+      createdAt: Date.now()
+    };
+    this.matchLogs.push(newLog);
+    this.notify();
+    return newLog;
+  }
+
+  deleteMatchLog(logId) {
+    this.matchLogs = (this.matchLogs || []).filter(l => l.id !== logId);
+    this.notify();
+  }
+
+  getPlayerMinutesSummary() {
+    const summary = {};
+    for (const p of this.players) {
+      summary[p.id] = { totalMinutes: 0, matchesPlayed: 0, starterCount: 0, benchCount: 0 };
+    }
+    for (const log of this.getMatchLogs()) {
+      for (const entry of (log.entries || [])) {
+        if (!entry?.playerId) continue;
+        if (!summary[entry.playerId]) {
+          summary[entry.playerId] = { totalMinutes: 0, matchesPlayed: 0, starterCount: 0, benchCount: 0 };
+        }
+        const mins = Math.max(0, Number(entry.minutes) || 0);
+        summary[entry.playerId].totalMinutes += mins;
+        if (mins > 0 || entry.convoked) summary[entry.playerId].matchesPlayed += 1;
+        if (entry.started) summary[entry.playerId].starterCount += 1;
+        else if (entry.convoked) summary[entry.playerId].benchCount += 1;
+      }
+    }
+    return summary;
+  }
+
   resetToDefault() {
     this.players = [...DEFAULT_PLAYERS];
     this.matches = [...DEFAULT_MATCHES];
+    this.matchLogs = [];
     this.settings = { ...DEFAULT_SETTINGS };
     this.notify();
   }

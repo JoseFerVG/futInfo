@@ -7,7 +7,8 @@
   <meta name="theme-color" content="#0a0c10">
   <title>futInfo - FIFA Ultimate Team</title>
   <meta name="description" content="Plataforma de gestión de equipo estilo FIFA Ultimate Team (Fútbol 7 y Fútbol Sala) con Google Sign-In">
-  <link rel="icon" type="image/png" href="assets/club_logo.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+  <link rel="apple-touch-icon" sizes="256x256" href="assets/favicon.png">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -122,21 +123,39 @@
           </div>
         </header>
 
-        <!-- Barra de Acción: Cambiar Plantilla / Formación -->
-        <div class="hud-squad-action-bar">
-          <button type="button" id="btn-open-squad-modal" class="hud-squad-action-tile" title="Abrir Centro Táctico y Formaciones">
-            <div class="hud-action-left">
-              <span class="hud-action-icon-pill">
-                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
-              </span>
-              <div class="hud-action-text-group">
-                <span class="hud-action-title font-fifa">CAMBIAR PLANTILLA Y FORMACIÓN</span>
-                <span class="hud-action-sub">GESTIONAR ESQUEMA TÁCTICO, ROLES Y ALINEACIÓN</span>
-              </div>
+        <!-- Barra Integrada Directa: Plantilla Activa + Formación en Vivo + Centro Táctico -->
+        <div class="hud-pitch-tactical-dock" role="region" aria-label="Control rápido de plantilla y formación">
+          <div class="hud-dock-group">
+            <label for="inline-squad-select" class="hud-dock-label font-fifa">
+              <i data-lucide="users" class="w-3.5 h-3.5"></i>
+              <span>PLANTILLA</span>
+            </label>
+            <div class="hud-dock-select-wrap">
+              <select id="inline-squad-select" name="inlineSquad" class="hud-dock-select font-fifa" aria-label="Cambiar plantilla activa"></select>
+              <button type="button" id="btn-inline-new-squad" class="hud-dock-mini-btn" title="Guardar plantilla actual como nueva">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              </button>
             </div>
-            <div class="hud-action-right">
-              <span class="hud-action-prompt font-fifa">GESTIONAR <i data-lucide="chevron-right" class="w-3.5 h-3.5 inline"></i></span>
-            </div>
+          </div>
+
+          <div class="hud-dock-divider" aria-hidden="true"></div>
+
+          <div class="hud-dock-group">
+            <label for="inline-formation-select" class="hud-dock-label font-fifa">
+              <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+              <span>FORMACIÓN</span>
+            </label>
+            <select id="inline-formation-select" name="inlineFormation" class="hud-dock-select font-fifa" aria-label="Cambiar formación táctica"></select>
+          </div>
+
+          <button type="button" id="btn-open-squad-modal" class="hud-dock-tactics-btn font-fifa" title="Abrir Centro Táctico, Formaciones y Estilos">
+            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+            <span>TÁCTICA</span>
+          </button>
+
+          <button type="button" id="btn-open-matchplan" class="hud-dock-matchplan-btn font-fifa" title="Convocar jugadores, calcular mejor XI, cambios y reparto justo de minutos">
+            <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
+            <span>PLAN PARTIDO</span>
           </button>
         </div>
 
@@ -241,15 +260,30 @@
 
       <!-- PANEL C (44% x 49.5%): TÁCTICA -->
       <article class="hud-panel hud-panel--tactics">
-        <button type="button" id="btn-squad-actions" class="hud-panel-hit" aria-label="Abrir centro táctico"></button>
         <div class="fifa-panel-gold-strip"></div>
         <div class="hud-tactics-head-block">
-          <h3 class="hud-title font-fifa">CENTRO<br>TÁCTICO</h3>
-          <div class="hud-bignum"><span id="side-formation-tag">1-3-2-1</span><small>FORMACIÓN</small></div>
+          <div class="hud-tactics-top-row">
+            <h3 class="hud-title font-fifa">CENTRO<br>TÁCTICO</h3>
+            <button type="button" id="btn-squad-actions" class="hud-tactics-open-btn font-fifa" title="Abrir Centro Táctico Completo">
+              <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+              <span>PLAN</span>
+            </button>
+          </div>
+
+          <!-- Cambio rápido de formación integrado -->
+          <div id="side-formation-chips" class="hud-formation-chips" role="group" aria-label="Cambio rápido de formación"></div>
+
+          <div class="hud-tactics-foot-meta">
+            <div class="hud-bignum"><span id="side-formation-tag">1-3-2-1</span><small>FORMACIÓN</small></div>
+            <button type="button" id="btn-open-tactics-style" class="hud-tactics-style-summary font-fifa" title="Ajustar estilo defensivo y ofensivo">
+              <span id="side-tactics-summary">EQUILIBRADO · PROF. 6</span>
+              <i data-lucide="chevron-right" class="w-3 h-3"></i>
+            </button>
+          </div>
         </div>
 
-        <!-- Mini Pizarra Táctica Integrada (Estilo Concept Squads FIFA Referencias) -->
-        <div class="hud-tactics-mini-pitch" id="hud-tactics-mini-pitch" title="Pizarra táctica de esquema actual">
+        <!-- Mini Pizarra Táctica Integrada (Pulsar para comparador visual) -->
+        <div class="hud-tactics-mini-pitch" id="hud-tactics-mini-pitch" role="button" tabindex="0" title="Abrir comparador visual de formaciones">
           <div class="mini-pitch-schematic">
             <div class="mini-pitch-half-line"></div>
             <div class="mini-pitch-center-circ"></div>
@@ -302,7 +336,13 @@
           <button type="button" class="hud-filter-pill" data-role="POR">PORTEROS</button>
         </div>
 
-        <div class="flex items-center justify-between md:justify-end gap-3">
+        <div class="flex items-center justify-between md:justify-end gap-2 flex-wrap">
+          <label for="album-squad-filter" class="sr-only">Filtrar por equipo o rol en plantilla</label>
+          <select id="album-squad-filter" class="bg-slate-950/90 border border-slate-700/70 text-[11px] font-bold text-slate-200 py-2 px-3 uppercase tracking-wider focus:border-amber-400">
+            <option value="all">TODAS LAS CARTAS DEL CLUB</option>
+            <option value="starters">TITULARES EN PLANTILLA ACTIVA</option>
+            <option value="bench">BANQUILLO EN PLANTILLA ACTIVA</option>
+          </select>
           <label for="album-sort-select" class="sr-only">Ordenar cromos</label>
           <select id="album-sort-select" class="bg-slate-950/90 border border-slate-700/70 text-[11px] font-bold text-slate-200 py-2 px-3 uppercase tracking-wider focus:border-amber-400">
             <option value="ovr-desc">VALORACIÓN (MÁS ALTA)</option>
@@ -530,7 +570,7 @@
             <span id="setup-status-badge" class="text-[10px] font-fifa text-amber-400 uppercase tracking-wider bg-amber-400/10 px-2 py-0.5 border border-amber-400/30">FICHA FUT</span>
           </div>
 
-          <div id="setup-live-card-preview" class="py-1 flex items-center justify-center min-h-[210px]">
+          <div id="setup-live-card-preview" class="setup-card-stage w-full py-3 flex items-center justify-center min-h-[246px]" data-skin="gold">
             <!-- Renderizado en vivo con face detrás de la camiseta -->
           </div>
 
@@ -626,22 +666,22 @@
             <div>
               <label for="setup-skill-moves" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Filigranas / Regate</label>
               <select id="setup-skill-moves" name="skillMoves" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
-                <option value="5">5★ — Mago</option>
-                <option value="4" selected>4★ — Regateador</option>
-                <option value="3">3★ — Competente</option>
-                <option value="2">2★ — Básico</option>
-                <option value="1">1★ — Sobrio</option>
+                <option value="5">5 Estrellas — Mago</option>
+                <option value="4" selected>4 Estrellas — Regateador</option>
+                <option value="3">3 Estrellas — Competente</option>
+                <option value="2">2 Estrellas — Básico</option>
+                <option value="1">1 Estrella — Sobrio</option>
               </select>
             </div>
 
             <div>
               <label for="setup-weak-foot" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Pierna Mala</label>
               <select id="setup-weak-foot" name="weakFoot" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
-                <option value="5">5★ — Ambidiestro</option>
-                <option value="4" selected>4★ — Solvente</option>
-                <option value="3">3★ — Aceptable</option>
-                <option value="2">2★ — Solo apoyo</option>
-                <option value="1">1★ — De palo</option>
+                <option value="5">5 Estrellas — Ambidiestro</option>
+                <option value="4" selected>4 Estrellas — Solvente</option>
+                <option value="3">3 Estrellas — Aceptable</option>
+                <option value="2">2 Estrellas — Solo apoyo</option>
+                <option value="1">1 Estrella — De palo</option>
               </select>
             </div>
           </div>
@@ -675,78 +715,78 @@
           </div>
         </div>
 
-        <!-- ROLES DE MEJOR A PEOR -->
-        <div class="p-4  bg-slate-900/80 border border-slate-800 space-y-3">
-          <div class="flex items-center gap-1.5 text-xs font-black text-amber-400 uppercase tracking-wide font-fifa text-base">
-            <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
-            <span>JERARQUÍA DE POSICIONES (DE MEJOR A PEOR)</span>
+        <!-- ROLES DE MEJOR A PEOR (ORDEN DE PRIORIDAD SIN DUPLICADOS) -->
+        <div class="p-4 bg-slate-900/80 border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <div class="flex items-center gap-1.5 font-black text-amber-400 uppercase tracking-wide font-fifa text-base">
+              <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
+              <span>ORDEN DE PRIORIDAD DE POSICIONES</span>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Usado por el optimizador de partido</span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <div>
               <label for="setup-role-best" class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 mb-1 cursor-pointer">
                 <i data-lucide="award" class="w-3.5 h-3.5 text-emerald-400"></i>
-                <span>1º Mejor Posición (Favorita)</span>
+                <span>1º Prioridad Máxima</span>
               </label>
-              <select id="setup-role-best" name="roleBest" class="w-full bg-emerald-950/40 border border-emerald-500/50  px-2 py-1.5 text-xs text-emerald-300 font-bold">
-                <option value="DC">Delantero Centro (ST / DC)</option>
-                <option value="PIV">Pívot Futsal (PIV)</option>
-                <option value="MC">Mediocentro (CM / MC)</option>
-                <option value="MCO">Mediapunta (CAM)</option>
-                <option value="EI">Extremo / Ala Izq</option>
-                <option value="ED">Extremo / Ala Der</option>
-                <option value="DFC">Defensa Central (CB)</option>
-                <option value="CIE">Cierre Futsal (CIE)</option>
-                <option value="LI">Lateral Izquierdo (LB)</option>
-                <option value="LD">Lateral Derecho (RB)</option>
-                <option value="POR">Portero (GK)</option>
+              <select id="setup-role-best" name="roleBest" class="setup-role-priority-select w-full bg-emerald-950/40 border border-emerald-500/50 px-2 py-1.5 text-xs text-emerald-300 font-bold" data-priority-rank="1">
+                <option value="DC">Delantero Centro (DC)</option>
               </select>
             </div>
 
             <div>
               <label for="setup-role-second" class="flex items-center gap-1.5 text-[11px] font-bold text-sky-400 mb-1 cursor-pointer">
                 <i data-lucide="check-circle" class="w-3.5 h-3.5 text-sky-400"></i>
-                <span>2º Segunda Posición (Aceptable)</span>
+                <span>2º Segunda Opción</span>
               </label>
-              <select id="setup-role-second" name="roleSecond" class="w-full bg-sky-950/40 border border-sky-500/50  px-2 py-1.5 text-xs text-sky-300 font-bold">
-                <option value="MC">Mediocentro (CM / MC)</option>
-                <option value="ALD">Ala Derecho Futsal</option>
-                <option value="ALI">Ala Izquierdo Futsal</option>
-                <option value="CIE">Cierre Futsal</option>
-                <option value="DC">Delantero Centro</option>
-                <option value="DFC">Defensa Central</option>
-                <option value="LI">Lateral Izquierdo</option>
-                <option value="LD">Lateral Derecho</option>
-                <option value="POR">Portero</option>
+              <select id="setup-role-second" name="roleSecond" class="setup-role-priority-select w-full bg-sky-950/40 border border-sky-500/50 px-2 py-1.5 text-xs text-sky-300 font-bold" data-priority-rank="2">
+                <option value="MC">Mediocentro (MC)</option>
               </select>
             </div>
 
             <div>
-              <label for="setup-role-third" class="flex items-center gap-1.5 text-[11px] font-bold text-amber-400 mb-1 cursor-pointer">
+              <label for="setup-role-third" class="flex items-center gap-1.5 text-[11px] font-bold text-cyan-400 mb-1 cursor-pointer">
+                <i data-lucide="layers" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>3º Tercera Opción</span>
+              </label>
+              <select id="setup-role-third" name="roleThird" class="setup-role-priority-select w-full bg-cyan-950/40 border border-cyan-500/50 px-2 py-1.5 text-xs text-cyan-300 font-bold" data-priority-rank="3">
+                <option value="DFC">Defensa Central (DFC)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="setup-role-fourth" class="flex items-center gap-1.5 text-[11px] font-bold text-amber-400 mb-1 cursor-pointer">
                 <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-400"></i>
-                <span>3º Tercera Posición (Emergencia)</span>
+                <span>4º Cuarta / Reserva</span>
               </label>
-              <select id="setup-role-third" name="roleThird" class="w-full bg-amber-950/40 border border-amber-500/50  px-2 py-1.5 text-xs text-amber-300 font-bold">
-                <option value="DFC">Defensa Central (CB)</option>
-                <option value="MC">Mediocentro</option>
-                <option value="LI">Lateral Izquierdo</option>
-                <option value="LD">Lateral Derecho</option>
-                <option value="POR">Portero</option>
+              <select id="setup-role-fourth" name="roleFourth" class="setup-role-priority-select w-full bg-amber-950/40 border border-amber-500/50 px-2 py-1.5 text-xs text-amber-300 font-bold" data-priority-rank="4">
+                <option value="MCO">Mediapunta (MCO)</option>
               </select>
             </div>
 
-            <div>
+            <div class="sm:col-span-2 lg:col-span-2">
               <label for="setup-role-worst" class="flex items-center gap-1.5 text-[11px] font-bold text-rose-400 mb-1 cursor-pointer">
                 <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-400"></i>
-                <span>4º Peor Rol (NO ponerlo aquí)</span>
+                <span>Evitar (Peor Posición — No asignar salvo urgencia)</span>
               </label>
-              <select id="setup-role-worst" name="roleWorst" class="w-full bg-rose-950/40 border border-rose-500/50  px-2 py-1.5 text-xs text-rose-300 font-bold">
-                <option value="POR">Portero (Riesgo cantada)</option>
-                <option value="DFC">Defensa Central</option>
-                <option value="CIE">Cierre Futsal</option>
-                <option value="DC">Delantero Centro</option>
+              <select id="setup-role-worst" name="roleWorst" class="setup-role-priority-select w-full bg-rose-950/40 border border-rose-500/50 px-2 py-1.5 text-xs text-rose-300 font-bold" data-priority-rank="avoid">
+                <option value="POR">Portero (GK)</option>
               </select>
             </div>
+          </div>
+
+          <div id="setup-role-priority-preview" class="role-priority-preview">
+            <span class="role-priority-lbl font-fifa">CADENA TÁCTICA:</span>
+            <span class="role-priority-chip is-r1 font-fifa">1º DC</span>
+            <i data-lucide="arrow-right" class="w-3 h-3 text-slate-400"></i>
+            <span class="role-priority-chip is-r2 font-fifa">2º MC</span>
+            <i data-lucide="arrow-right" class="w-3 h-3 text-slate-400"></i>
+            <span class="role-priority-chip is-r3 font-fifa">3º DFC</span>
+            <i data-lucide="arrow-right" class="w-3 h-3 text-slate-400"></i>
+            <span class="role-priority-chip is-r4 font-fifa">4º MCO</span>
+            <span class="role-priority-chip is-avoid font-fifa">EVITAR: POR</span>
           </div>
         </div>
 
@@ -844,8 +884,9 @@
 
               <!-- Niveles Rápidos de Referencia (Presets) -->
               <div class="pt-2 border-t border-white/10 space-y-1.5">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block font-fifa">
-                  🎯 NIVELES DE REFERENCIA RÁPIDOS (CLICK PARA APLICAR):
+                <span class="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-wider font-fifa">
+                  <i data-lucide="crosshair" class="w-3.5 h-3.5 text-amber-400"></i>
+                  <span>NIVELES DE REFERENCIA RÁPIDOS (CLICK PARA APLICAR):</span>
                 </span>
                 <div class="grid grid-cols-5 gap-1.5 text-center" id="wizard-preset-buttons">
                   <button type="button" data-val="45" class="wizard-preset-btn p-1.5  border border-slate-800 bg-slate-900/80 text-[10px] font-bold text-slate-300 hover:border-amber-400 transition cursor-pointer">
@@ -1073,37 +1114,125 @@
     </div>
   </dialog>
 
-  <!-- SPRINT 3: CINEMÁTICA DE WALKOUT / APERTURA DE CROMO FIFA FUT -->
-  <div id="fut-walkout-overlay" class="fut-walkout-screen hidden">
-    <div class="walkout-spotlight spotlight-1"></div>
-    <div class="walkout-spotlight spotlight-2"></div>
-    <div class="walkout-sparks-bg"></div>
+  <!-- SPRINT 3+: CINEMÁTICA DE WALKOUT / REVELACIÓN EA SPORTS FIFA FUT -->
+  <div id="fut-walkout-overlay" class="fut-walkout-screen hidden" data-skin="gold" role="dialog" aria-modal="true" aria-labelledby="walkout-player-nickname">
+    <canvas id="walkout-fx-canvas" class="walkout-fx-canvas" aria-hidden="true"></canvas>
+
+    <!-- Escenario Arquitectónico de Túnel y Flares de Estadio -->
+    <div class="walkout-tunnel-grid" aria-hidden="true"></div>
+    <div class="walkout-spotlight spotlight-1" aria-hidden="true"></div>
+    <div class="walkout-spotlight spotlight-2" aria-hidden="true"></div>
+    <div class="walkout-spotlight spotlight-center" aria-hidden="true"></div>
+    <div class="walkout-sparks-bg" aria-hidden="true"></div>
+    <div id="walkout-laser-sweep" class="walkout-laser-sweep" aria-hidden="true"></div>
+    <div id="walkout-flash-burst" class="walkout-flash-burst" aria-hidden="true"></div>
+
+    <!-- Puertas Metálicas del Túnel que se abren en el Walkout -->
+    <div class="walkout-tunnel-doors" aria-hidden="true">
+      <div class="walkout-door walkout-door-left"></div>
+      <div class="walkout-door walkout-door-right"></div>
+    </div>
+
+    <!-- Banda Broadcast Superior -->
+    <header class="walkout-topbar">
+      <div class="walkout-broadcast-tag">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+        <span>EA SPORTS FUT</span>
+        <span class="walkout-tag-divider">·</span>
+        <span id="walkout-edition-pill" class="walkout-edition-label">ORO RARE</span>
+      </div>
+      <button type="button" id="btn-skip-walkout" class="walkout-skip-btn" aria-label="Cerrar animación de carta">
+        <i data-lucide="x" class="w-4 h-4"></i>
+        <span>Saltar</span>
+      </button>
+    </header>
 
     <div class="walkout-stage">
-      <!-- Paso 1: Escudo de Facultad -->
-      <div id="walkout-crest-step" class="walkout-step">
-        <div id="walkout-crest-icon" class="w-20 h-20 mx-auto flex items-center justify-center animate-bounce text-amber-400">
-          <i data-lucide="shield" class="w-16 h-16"></i>
+      <!-- Paso 1: Escudo del Club y Facultad en el Túnel -->
+      <div id="walkout-crest-step" class="walkout-step walkout-teaser-step">
+        <div class="walkout-crest-badge-ring">
+          <div id="walkout-crest-icon" class="walkout-crest-emblem">
+            <i data-lucide="shield" class="w-16 h-16"></i>
+          </div>
+          <div id="walkout-fac-crest" class="walkout-fac-emblem"></div>
         </div>
-        <div id="walkout-crest-name" class="font-fifa text-2xl text-amber-300 uppercase tracking-widest mt-2">FACULTAD</div>
+        <div id="walkout-crest-kicker" class="walkout-teaser-kicker">CLUB OFICIAL</div>
+        <div id="walkout-crest-name" class="walkout-teaser-title">FACULTAD</div>
       </div>
 
-      <!-- Paso 2: Posición Principal -->
-      <div id="walkout-pos-step" class="walkout-step hidden">
-        <div id="walkout-pos-pill" class="font-fifa text-5xl text-slate-950 font-black px-6 py-1 bg-amber-400  shadow-2xl">DC</div>
+      <!-- Paso 2: Posición Principal, Dorsal y Edición -->
+      <div id="walkout-pos-step" class="walkout-step walkout-teaser-step hidden">
+        <div id="walkout-tier-banner" class="walkout-tier-banner">WALKOUT · EDICIÓN ORO RARE</div>
+        <div class="walkout-pos-showcase">
+          <div id="walkout-pos-pill" class="walkout-pos-pill font-fifa">DC</div>
+          <div id="walkout-dorsal-pill" class="walkout-dorsal-pill font-fifa">#10</div>
+        </div>
+        <div id="walkout-pos-subline" class="walkout-pos-subline">PREPARANDO SALIDA AL CÉSPED...</div>
       </div>
 
-      <!-- Paso 3: Carta Gigante y Revelación -->
-      <div id="walkout-card-step" class="walkout-step hidden flex flex-col items-center">
-        <div id="walkout-card-host" class="walkout-card-host"></div>
-        <div class="mt-4 text-center">
-          <div id="walkout-rating-ticker" class="font-fifa text-8xl font-black text-amber-400 leading-none drop-shadow-[0_0_25px_rgba(251,191,36,0.8)]">00</div>
-          <div id="walkout-player-nickname" class="font-fifa text-4xl font-black text-white uppercase tracking-widest mt-1">FICHAJE ESTRELLA</div>
-          <p id="walkout-status-text" class="text-xs text-amber-300/80 font-bold mt-1">¡Nuevo Jugador Fichado para el Torneo del Rector!</p>
-          <button type="button" id="btn-close-walkout" class="mt-4 px-8 py-2.5  bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-2xl hover:scale-105 active:scale-95 transition flex items-center justify-center gap-2 mx-auto cursor-pointer">
-            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-            <span>Confirmar Fichaje y Entrar a la Plantilla</span>
-          </button>
+      <!-- Paso 3: Carta 3D Interactiva + Chyron Broadcast EA FC -->
+      <div id="walkout-card-step" class="walkout-step walkout-reveal-step hidden">
+        <div class="walkout-reveal-grid">
+          <div class="walkout-card-col">
+            <div class="walkout-card-pedestal">
+              <div id="walkout-card-host" class="walkout-card-host"></div>
+              <div class="walkout-pedestal-ring" aria-hidden="true"></div>
+            </div>
+            <div class="walkout-card-hint">
+              <i data-lucide="move-3d" class="w-3.5 h-3.5"></i>
+              <span>Pasa el cursor por tu carta · Holograma 3D</span>
+            </div>
+          </div>
+
+          <div class="walkout-chyron-col">
+            <div class="walkout-chyron-header">
+              <div class="walkout-ovr-box">
+                <span class="walkout-ovr-lbl">MED</span>
+                <div id="walkout-rating-ticker" class="walkout-ovr-num font-fifa">00</div>
+              </div>
+              <div class="walkout-identity-block">
+                <div class="walkout-identity-badges">
+                  <span id="walkout-chyron-pos" class="walkout-chyron-pos">DC</span>
+                  <span id="walkout-chyron-edition" class="walkout-chyron-edition">ORO RARE</span>
+                  <span id="walkout-chyron-dorsal" class="walkout-chyron-dorsal">#10</span>
+                </div>
+                <h2 id="walkout-player-nickname" class="walkout-player-name font-fifa">FICHAJE ESTRELLA</h2>
+                <p id="walkout-player-subline" class="walkout-player-subline">Jugador Oficial · Facultad</p>
+              </div>
+            </div>
+
+            <div id="walkout-stats-bars" class="walkout-stats-bars">
+              <!-- Rellenado dinámicamente con RIT, TIR, PAS, REG, DEF, FÍS -->
+            </div>
+
+            <div class="walkout-signature-row">
+              <div id="walkout-celeb-pill" class="walkout-sig-chip">
+                <i data-lucide="trophy" class="w-3.5 h-3.5"></i>
+                <span>Celebración: SIUUU</span>
+              </div>
+              <div id="walkout-stars-row" class="walkout-sig-chip">
+                <span>Filigranas 4 · Pierna Mala 4</span>
+              </div>
+              <div id="walkout-foot-pill" class="walkout-sig-chip">
+                <span>Diestro</span>
+              </div>
+            </div>
+
+            <p id="walkout-status-text" class="walkout-status-copy">
+              Carta oficial sincronizada con la plantilla del club.
+            </p>
+
+            <div class="walkout-actions-row">
+              <button type="button" id="btn-close-walkout" class="walkout-confirm-btn">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                <span>Confirmar Fichaje y Entrar a la Plantilla</span>
+              </button>
+              <button type="button" id="btn-replay-walkout" class="walkout-replay-btn" title="Repetir secuencia de salida FIFA">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                <span>Repetir</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1125,7 +1254,7 @@
             <h2 id="squad-actions-title" class="font-fifa text-2xl sm:text-3xl font-black text-white uppercase tracking-wider leading-none mt-1">FORMACIONES Y PLAN TÁCTICO</h2>
           </div>
         </div>
-        <button type="button" onclick="document.getElementById('squad-actions-dialog').close()" class="text-slate-400 hover:text-white p-1.5 border border-white/10 hover:border-amber-400 transition cursor-pointer" title="Cerrar">
+        <button type="button" id="btn-close-squad-actions" onclick="document.getElementById('squad-actions-dialog').close()" class="text-slate-400 hover:text-white p-1.5 border border-white/10 hover:border-amber-400 transition cursor-pointer" title="Cerrar" aria-label="Cerrar centro táctico">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -1143,6 +1272,10 @@
         <button type="button" class="fifa-modal-tab" data-tab="tab-tactics">
           <i data-lucide="sliders" class="w-4 h-4"></i>
           <span>ESTILO Y PLAN</span>
+        </button>
+        <button type="button" class="fifa-modal-tab" data-tab="tab-matchplan">
+          <i data-lucide="calendar-check" class="w-4 h-4"></i>
+          <span>PLAN DE PARTIDO</span>
         </button>
         <button type="button" class="fifa-modal-tab" data-tab="tab-tools">
           <i data-lucide="sparkles" class="w-4 h-4"></i>
@@ -1301,6 +1434,78 @@
               </select>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- VISTA 3B: PLANIFICADOR INTELIGENTE DE PARTIDO, CONVOCATORIA Y ROTACIÓN DE MINUTOS -->
+      <div id="tab-matchplan" class="fifa-modal-view hidden space-y-4">
+        <div class="matchplan-header-card p-3 bg-slate-900/90 border-l-4 border-amber-400 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span class="text-[11px] font-black uppercase text-amber-400 tracking-wider block font-fifa">CONVOCATORIA, MEJOR ALINEACIÓN Y ROTACIÓN EQUITATIVA</span>
+              <span id="matchplan-squad-context" class="text-xs text-slate-300 font-medium">Selecciona quién va hoy al partido para calcular el mejor once, ventanas de cambios por minuto y compensación de historial.</span>
+            </div>
+            <div class="flex items-center flex-wrap gap-1.5">
+              <button type="button" id="btn-convoke-all" class="matchplan-ctrl-btn">Todos</button>
+              <button type="button" id="btn-convoke-none" class="matchplan-ctrl-btn">Limpiar</button>
+              <button type="button" id="btn-convoke-fairness" class="matchplan-ctrl-btn is-accent">Priorizar Menos Minutos</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+            <div>
+              <label for="matchplan-duration" class="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">Duración Partido (min)</label>
+              <input type="number" id="matchplan-duration" min="10" max="120" value="50" class="w-full bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white font-bold">
+            </div>
+            <div>
+              <label for="matchplan-strategy" class="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">Criterio de Reparto</label>
+              <select id="matchplan-strategy" class="w-full bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white font-bold">
+                <option value="balanced">Equilibrado (Nivel + Compensación)</option>
+                <option value="rotation">Máxima Igualdad de Minutos</option>
+                <option value="competitive">Máximo Nivel Competitivo</option>
+              </select>
+            </div>
+            <div>
+              <label for="matchplan-opponent" class="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">Rival / Jornada (para registro)</label>
+              <input type="text" id="matchplan-opponent" maxlength="40" value="Partido Torneo Rector" placeholder="Nombre del rival..." class="w-full bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white font-bold">
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista Completa de Jugadores Convocables con TODA la Información -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <h4 class="font-fifa text-sm font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <i data-lucide="user-check" class="w-4 h-4"></i>
+              <span>SELECCIONAR CONVOCADOS DEL DÍA</span>
+            </h4>
+            <span id="matchplan-selected-counter" class="text-[11px] font-fifa font-bold text-slate-300 uppercase">0 / 0 CONVOCADOS</span>
+          </div>
+          <div id="matchplan-convocation-list" class="matchplan-convocation-grid"></div>
+        </div>
+
+        <!-- Resultado Dinámico Calculado (KPIs, Mejor XI, Ventanas por Minuto, Tabla de Minutos) -->
+        <div id="matchplan-output" class="space-y-3"></div>
+
+        <!-- Botones de Acción Táctica y Registro Post-Partido -->
+        <div id="matchplan-actions-bar" class="matchplan-actions-bar flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-900/90 border border-slate-800">
+          <button type="button" id="btn-apply-matchplan-lineup" class="matchplan-primary-btn font-fifa">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span>Aplicar Titular al Campo</span>
+          </button>
+          <button type="button" id="btn-save-matchplan-minutes" class="matchplan-save-btn font-fifa">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Guardar Minutos Jugados (Compensar Próximo Partido)</span>
+          </button>
+        </div>
+
+        <!-- Historial de Partidos Registrados para Compensación -->
+        <div class="space-y-2">
+          <h4 class="font-fifa text-sm font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+            <i data-lucide="history" class="w-4 h-4 text-amber-400"></i>
+            <span>HISTORIAL DE MINUTOS REGISTRADOS</span>
+          </h4>
+          <div id="matchplan-history-list" class="space-y-1.5"></div>
         </div>
       </div>
 

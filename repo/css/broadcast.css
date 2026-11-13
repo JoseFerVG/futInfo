@@ -355,8 +355,9 @@ body.hud-canvas {
 }
 
 .hud-icon-btn:hover {
-  background: #ffffff;
+  background: var(--hud-gold);
   color: var(--hud-ink);
+  border-color: var(--hud-gold);
 }
 
 .hud-auth {
@@ -372,8 +373,23 @@ body.hud-canvas {
 }
 
 .hud-auth button:hover {
-  background: #ffffff !important;
+  background: var(--hud-gold) !important;
   color: var(--hud-ink) !important;
+  border-color: var(--hud-gold) !important;
+}
+
+.hud-auth button:hover * {
+  color: var(--hud-ink) !important;
+}
+
+.hud-auth #btn-logout:hover {
+  background: #e11d48 !important;
+  color: #ffffff !important;
+  border-color: #f43f5e !important;
+}
+
+.hud-auth #btn-logout:hover * {
+  color: #ffffff !important;
 }
 
 /* ---------- 3. BARRA DE PESTAÑAS (MENÚ SÓLIDO DE CONSOLA) ---------- */
@@ -547,12 +563,21 @@ body.hud-canvas {
 
 .hud-panel--tactics .hud-tactics-head-block {
   height: 100%;
-  width: 37%;
+  width: 44%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 18px 8px 16px 22px;
-  pointer-events: none;
+  gap: 6px;
+  padding: 14px 8px 14px 18px;
+  position: relative;
+  z-index: 6;
+}
+
+.hud-tactics-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .hud-panel--tactics .hud-title,
@@ -561,7 +586,7 @@ body.hud-canvas {
 }
 
 .hud-panel--tactics .hud-bignum {
-  font-size: clamp(2.1rem, 4.3vh, 3.25rem);
+  font-size: clamp(1.65rem, 3.3vh, 2.55rem);
   line-height: 0.88;
 }
 
@@ -889,7 +914,8 @@ body.hud-canvas {
   transition: color var(--hud-snap);
 }
 
-.hud-squad-action-tile:hover .hud-action-title {
+.hud-squad-action-tile:hover .hud-action-title,
+.hud-squad-action-tile:hover .hud-action-prompt {
   color: #0b0e14 !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 }
@@ -1366,15 +1392,16 @@ body.hud-canvas {
 /* Mini Pizarra Táctica Integrada (Concept Squads FIFA) */
 .hud-tactics-mini-pitch {
   position: absolute !important;
-  left: 38%;
+  left: 46%;
   top: 14px;
-  bottom: 56px;
-  right: 18px;
+  bottom: 58px;
+  right: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 4;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .mini-pitch-schematic {
@@ -1459,9 +1486,9 @@ body.hud-canvas {
 
 .hud-specs {
   position: absolute !important;
-  right: 18px;
+  right: 16px;
   bottom: 14px;
-  width: 58%;
+  width: 52%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
@@ -1585,23 +1612,69 @@ body.hud-canvas {
 }
 
 .hud-canvas .bg-cyan-500, .hud-canvas .bg-cyan-400 {
-  background-color: #ffffff !important;
+  background-color: #06b6d4 !important;
   color: var(--hud-ink) !important;
 }
 
-/* Botones como bloques de consola */
+/* Botones como bloques de consola (sin pisar hovers específicos) */
 .hud-canvas main button:not(.fut-radial-btn):not(.tab-btn):not(.hud-panel-hit),
 .hud-canvas dialog button {
   font-family: var(--hud-cond) !important;
   letter-spacing: 0.06em;
-  transition: all var(--hud-snap) !important;
+  transition: border-color var(--hud-snap), transform var(--hud-snap), filter var(--hud-snap) !important;
 }
 
-.hud-canvas main button:not(.fut-radial-btn):not(.tab-btn):not(.hud-panel-hit):hover,
-.hud-canvas dialog button:hover {
-  background: #ffffff !important;
+/* Hovers seguros en modo oscuro para botones generales de modal/main */
+.hud-canvas dialog [id^="btn-close-"]:hover,
+.hud-canvas dialog #btn-close-pitch-fs:hover {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+  border-color: var(--hud-gold) !important;
+}
+
+.hud-canvas dialog [id^="btn-cancel-"]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+.hud-canvas dialog .wizard-preset-btn:hover:not(.active),
+.hud-canvas dialog .wizard-step-pill:hover:not(.active),
+.hud-canvas dialog .tactics-style-btn:hover:not(.active) {
+  background-color: #1e293b !important;
+  border-color: var(--hud-gold) !important;
+  color: #ffffff !important;
+}
+
+.hud-canvas dialog .wizard-preset-btn.active *,
+.hud-canvas dialog .wizard-step-pill.active *,
+.hud-canvas dialog .tactics-style-btn.active * {
   color: var(--hud-ink) !important;
-  transform: translateX(3px);
+}
+
+.hud-canvas dialog .fifa-form-btn:hover,
+.hud-canvas dialog .fifa-formation-card:hover .fifa-form-btn {
+  background-color: var(--hud-gold) !important;
+  border-color: var(--hud-gold) !important;
+  color: var(--hud-ink) !important;
+}
+
+.hud-canvas dialog .fifa-squad-btn:hover,
+.hud-canvas dialog .fifa-squad-card:hover .fifa-squad-btn {
+  background-color: var(--hud-gold) !important;
+  border-color: var(--hud-gold) !important;
+  color: var(--hud-ink) !important;
+}
+
+.hud-canvas dialog .fifa-squad-btn.is-active-btn,
+.hud-canvas dialog .fifa-form-btn.is-active-btn {
+  background-color: var(--hud-gold) !important;
+  border-color: var(--hud-gold) !important;
+  color: var(--hud-ink) !important;
+}
+
+.hud-canvas dialog .fifa-squad-btn.is-active-btn *,
+.hud-canvas dialog .fifa-form-btn.is-active-btn * {
+  color: var(--hud-ink) !important;
 }
 
 .hud-canvas input, .hud-canvas select, .hud-canvas textarea {
@@ -1654,7 +1727,7 @@ body.hud-canvas {
   background: var(--hud-surface) !important;
   border: 0 !important;
   border-left: 3px solid rgba(255, 255, 255, 0.15) !important;
-  transition: all var(--hud-snap) !important;
+  transition: transform 0.12s ease, border-color 0.12s ease !important;
 }
 
 .sub-bench-card:hover {
@@ -1663,8 +1736,123 @@ body.hud-canvas {
   transform: translateX(4px);
 }
 
-.sub-bench-card:hover * {
+.sub-bench-card:hover *,
+.sub-bench-card:hover span,
+.sub-bench-card:hover div {
   color: var(--hud-ink) !important;
+}
+
+.sub-bench-card:hover .sub-relevo-badge,
+.sub-bench-card:hover [class*="bg-slate-"],
+.sub-bench-card:hover [class*="bg-black"],
+.sub-bench-card:hover [class*="bg-emerald-"],
+.sub-bench-card:hover [class*="bg-rose-"],
+.sub-bench-card:hover [class*="bg-amber-"] {
+  background: var(--hud-ink) !important;
+  color: var(--hud-gold) !important;
+  border-color: var(--hud-ink) !important;
+}
+
+.sub-bench-card:hover [class*="bg-"] * {
+  color: var(--hud-gold) !important;
+}
+
+body.theme-light #fut-sub-drawer {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-top-color: #d97706 !important;
+}
+
+body.theme-light #btn-close-sub-drawer {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+  transition: transform 0.12s ease, border-color 0.12s ease !important;
+}
+
+body.theme-light #btn-close-sub-drawer * {
+  color: #0f172a !important;
+}
+
+body.theme-light #btn-close-sub-drawer:hover {
+  background: #fbbf24 !important;
+  color: #0f172a !important;
+  border-color: #d97706 !important;
+}
+
+body.theme-light #btn-close-sub-drawer:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light .sub-bench-card {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0 !important;
+  border-left: 3px solid #94a3b8 !important;
+}
+
+body.theme-light .sub-bench-card [class*="bg-rose-"] {
+  background: #ffe4e6 !important;
+  color: #9f1239 !important;
+  border-color: #fda4af !important;
+}
+
+body.theme-light .sub-bench-card [class*="bg-rose-"] * {
+  color: #9f1239 !important;
+}
+
+body.theme-light .sub-bench-card [class*="bg-emerald-"] {
+  background: #d1fae5 !important;
+  color: #065f46 !important;
+  border-color: #6ee7b7 !important;
+}
+
+body.theme-light .sub-bench-card [class*="bg-emerald-"] * {
+  color: #065f46 !important;
+}
+
+body.theme-light .sub-bench-card [class*="bg-amber-"] {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #fcd34d !important;
+}
+
+body.theme-light .sub-bench-card [class*="bg-amber-"] * {
+  color: #92400e !important;
+}
+
+body.theme-light .sub-bench-card [class*="bg-sky-"] {
+  background: #e0f2fe !important;
+  color: #0369a1 !important;
+  border-color: #7dd3fc !important;
+}
+
+body.theme-light .sub-bench-card [class*="bg-sky-"] * {
+  color: #0369a1 !important;
+}
+
+body.theme-light .sub-bench-card:hover {
+  background: #fffbeb !important;
+  color: #0f172a !important;
+  border-color: #f59e0b !important;
+  border-left-color: #d97706 !important;
+}
+
+body.theme-light .sub-bench-card:hover *,
+body.theme-light .sub-bench-card:hover span,
+body.theme-light .sub-bench-card:hover div {
+  color: #0f172a !important;
+}
+
+body.theme-light .sub-bench-card:hover .sub-relevo-badge,
+body.theme-light .sub-bench-card:hover [class*="bg-"] {
+  background: #0f172a !important;
+  color: #fde68a !important;
+  border-color: #0f172a !important;
+}
+
+body.theme-light .sub-bench-card:hover [class*="bg-"] * {
+  color: #fde68a !important;
 }
 
 .fut-radial-btn {
@@ -2080,11 +2268,32 @@ body.hud-canvas {
     width: 100% !important;
     height: auto !important;
     display: flex !important;
-    flex-direction: row !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    padding: 0 !important;
+  }
+
+  .hud-tactics-foot-meta {
+    display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 10px !important;
-    padding: 0 18px 0 0 !important;
+    gap: 8px !important;
+  }
+
+  .hud-pitch-tactical-dock {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 8px 10px !important;
+  }
+
+  .hud-dock-group {
+    flex: 1 1 140px !important;
+  }
+
+  .hud-dock-divider {
+    display: none !important;
   }
 
   .hud-panel--tactics .hud-title {
@@ -2643,7 +2852,7 @@ dialog.fifa-console-modal {
   color: #94a3b8;
   border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
-  transition: all var(--hud-snap);
+  transition: transform 0.12s ease, border-color 0.12s ease;
 }
 
 .fifa-form-btn.is-active-btn {
@@ -2807,20 +3016,36 @@ body.theme-light .hud-mode-btn {
   color: #475569;
 }
 
-body.theme-light .hud-mode-btn.active {
+body.theme-light .hud-mode-btn:not(.active):hover {
+  color: #0f172a !important;
+  background: #e2e8f0 !important;
+}
+
+body.theme-light .hud-mode-btn.active,
+body.theme-light .hud-mode-btn.active:hover {
   color: #0f172a !important;
   background: #fbbf24 !important;
 }
 
 body.theme-light .hud-icon-btn {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-  color: #0f172a;
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  transition: transform 0.12s ease, border-color 0.12s ease !important;
+}
+
+body.theme-light .hud-icon-btn * {
+  color: #0f172a !important;
 }
 
 body.theme-light .hud-icon-btn:hover {
-  background: #0f172a;
-  color: #ffffff;
+  background: #fbbf24 !important;
+  border-color: #d97706 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-icon-btn:hover * {
+  color: #0f172a !important;
 }
 
 body.theme-light .hud-tabs {
@@ -2923,6 +3148,15 @@ body.theme-light .hud-squad-action-tile:hover {
   border-color: #b45309;
 }
 
+body.theme-light .hud-squad-action-tile:hover .hud-action-title,
+body.theme-light .hud-squad-action-tile:hover .hud-action-prompt {
+  color: #0b0e14 !important;
+}
+
+body.theme-light .hud-squad-action-tile:hover .hud-action-sub {
+  color: #1e293b !important;
+}
+
 body.theme-light .hud-filter-bar,
 body.theme-light .fifa-album-filter-bar {
   background: #ffffff !important;
@@ -2941,12 +3175,21 @@ body.theme-light .hud-filter-pill {
   color: #334155;
 }
 
-body.theme-light .hud-filter-pill:hover {
-  background: #e2e8f0;
-  color: #0f172a;
+body.theme-light .hud-filter-pill:not(.active):hover {
+  background: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-filter-pill.active,
+body.theme-light .hud-filter-pill.active:hover {
+  background: #b45309 !important;
+  border-color: #92400e !important;
+  color: #ffffff !important;
 }
 
 body.theme-light #album-search-input,
+body.theme-light #album-squad-filter,
 body.theme-light #album-sort-select,
 body.theme-light .hud-specs select {
   background: #f8fafc !important;
@@ -2996,23 +3239,6 @@ body.theme-light #sub-drawer-target-player {
   border-color: #7dd3fc !important;
 }
 
-body.theme-light #btn-close-sub-drawer {
-  background: #f1f5f9 !important;
-  color: #0f172a !important;
-  border-color: #cbd5e1 !important;
-}
-
-body.theme-light #btn-close-sub-drawer:hover {
-  background: #0f172a !important;
-  color: #ffffff !important;
-}
-
-body.theme-light .sub-bench-card {
-  background: #f8fafc !important;
-  border-left-color: #cbd5e1 !important;
-  color: #0f172a !important;
-}
-
 body.theme-light dialog.fifa-console-modal {
   background: #ffffff !important;
   color: #0f172a !important;
@@ -3020,24 +3246,24 @@ body.theme-light dialog.fifa-console-modal {
   color-scheme: light;
 }
 
-body.theme-light dialog.fifa-console-modal .bg-slate-800,
-body.theme-light dialog.fifa-console-modal .bg-slate-800\/80,
-body.theme-light dialog.fifa-console-modal .bg-slate-900,
-body.theme-light dialog.fifa-console-modal .bg-slate-900\/95,
-body.theme-light dialog.fifa-console-modal .bg-slate-900\/90,
-body.theme-light dialog.fifa-console-modal .bg-slate-900\/80,
-body.theme-light dialog.fifa-console-modal .bg-slate-950,
-body.theme-light dialog.fifa-console-modal .bg-slate-950\/95,
-body.theme-light dialog.fifa-console-modal .bg-slate-950\/90,
-body.theme-light dialog.fifa-console-modal .bg-slate-950\/80 {
+body.theme-light dialog.fifa-console-modal .bg-slate-800:not(.wizard-preset-btn):not(.wizard-step-pill),
+body.theme-light dialog.fifa-console-modal .bg-slate-800\/80:not(.wizard-preset-btn):not(.wizard-step-pill),
+body.theme-light dialog.fifa-console-modal .bg-slate-900:not(.wizard-preset-btn):not(.wizard-step-pill):not(.tactics-style-btn),
+body.theme-light dialog.fifa-console-modal .bg-slate-900\/95:not(.wizard-preset-btn):not(.wizard-step-pill):not(.tactics-style-btn),
+body.theme-light dialog.fifa-console-modal .bg-slate-900\/90:not(.wizard-preset-btn):not(.wizard-step-pill):not(.tactics-style-btn),
+body.theme-light dialog.fifa-console-modal .bg-slate-900\/80:not(.wizard-preset-btn):not(.wizard-step-pill):not(.tactics-style-btn),
+body.theme-light dialog.fifa-console-modal .bg-slate-950:not(.tactics-style-btn):not(.wizard-step-pill),
+body.theme-light dialog.fifa-console-modal .bg-slate-950\/95:not(.tactics-style-btn):not(.wizard-step-pill),
+body.theme-light dialog.fifa-console-modal .bg-slate-950\/90:not(.tactics-style-btn):not(.wizard-step-pill),
+body.theme-light dialog.fifa-console-modal .bg-slate-950\/80:not(.tactics-style-btn):not(.wizard-step-pill) {
   background: #f1f5f9 !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
 }
 
 body.theme-light dialog.fifa-console-modal .bg-amber-950\/30,
-body.theme-light dialog.fifa-console-modal .bg-amber-500\/10,
-body.theme-light dialog.fifa-console-modal .bg-amber-500\/20 {
+body.theme-light dialog.fifa-console-modal .bg-amber-500\/10:not(.tactics-style-btn):not(.wizard-preset-btn):not(.wizard-step-pill),
+body.theme-light dialog.fifa-console-modal .bg-amber-500\/20:not(.tactics-style-btn):not(.wizard-preset-btn):not(.wizard-step-pill) {
   background: #fffbeb !important;
   border-color: #f59e0b !important;
 }
@@ -3060,20 +3286,101 @@ body.theme-light dialog.fifa-console-modal textarea {
   border-color: #cbd5e1 !important;
 }
 
-body.theme-light dialog.fifa-console-modal .text-white:not(.fut-card *):not(.bg-emerald-600):not(.bg-rose-600),
-body.theme-light dialog.fifa-console-modal h2,
-body.theme-light dialog.fifa-console-modal h3,
-body.theme-light dialog.fifa-console-modal h4,
-body.theme-light dialog.fifa-console-modal h5 {
+body.theme-light dialog.fifa-console-modal .text-white:not(.fut-card *):not(.bg-emerald-600):not(.bg-emerald-600 *):not(.bg-rose-600):not(.bg-rose-600 *):not(.bg-rose-500\/20:hover):not(.bg-rose-500\/20:hover *):not(.fifa-squad-btn:hover):not(.fifa-squad-btn:hover *):not(.tactics-style-btn.active):not(.tactics-style-btn.active *):not([id^="btn-close-"]:hover):not([id^="btn-close-"]:hover *):not(#btn-close-pitch-fs:hover):not(#btn-close-pitch-fs:hover *),
+body.theme-light dialog.fifa-console-modal h2:not(.fut-card *),
+body.theme-light dialog.fifa-console-modal h3:not(.fut-card *),
+body.theme-light dialog.fifa-console-modal h4:not(.fut-card *),
+body.theme-light dialog.fifa-console-modal h5:not(.fut-card *) {
   color: #0f172a !important;
 }
 
-body.theme-light dialog.fifa-console-modal .bg-emerald-600,
-body.theme-light dialog.fifa-console-modal .bg-rose-600,
+/* Botones en modales en modo claro: contraste garantizado normal y :hover */
+body.theme-light dialog.fifa-console-modal .bg-emerald-600 {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-emerald-600 * {
+  color: #ffffff !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-emerald-600:hover {
+  background-color: #047857 !important;
+  color: #ffffff !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-emerald-600:hover * {
+  color: #ffffff !important;
+}
+
+body.theme-light dialog.fifa-console-modal .bg-rose-600 {
+  background-color: #e11d48 !important;
+  color: #ffffff !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-rose-600 * {
+  color: #ffffff !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-rose-600:hover {
+  background-color: #be123c !important;
+  color: #ffffff !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-rose-600:hover * {
+  color: #ffffff !important;
+}
+
+body.theme-light dialog.fifa-console-modal .bg-rose-500\/20 {
+  background-color: #ffe4e6 !important;
+  color: #9f1239 !important;
+  border-color: #fda4af !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-rose-500\/20 * {
+  color: #9f1239 !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-rose-500\/20:hover {
+  background-color: #fecdd3 !important;
+  color: #881337 !important;
+  border-color: #f43f5e !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-rose-500\/20:hover * {
+  color: #881337 !important;
+}
+
 body.theme-light dialog.fifa-console-modal .bg-amber-400,
 body.theme-light dialog.fifa-console-modal .bg-amber-500,
-body.theme-light dialog.fifa-console-modal .from-amber-500 {
-  color: #ffffff !important;
+body.theme-light dialog.fifa-console-modal .from-amber-500,
+body.theme-light .fifa-broadcast-action-btn,
+body.theme-light .fifa-save-club-btn,
+body.theme-light #btn-fs-open-tactics {
+  background-color: #fbbf24 !important;
+  background-image: none !important;
+  color: #0f172a !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-amber-400 *:not(.fut-card *),
+body.theme-light dialog.fifa-console-modal .bg-amber-500 *:not(.fut-card *),
+body.theme-light dialog.fifa-console-modal .from-amber-500 *:not(.fut-card *),
+body.theme-light .fifa-broadcast-action-btn *,
+body.theme-light .fifa-save-club-btn *,
+body.theme-light #btn-fs-open-tactics * {
+  color: #0f172a !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-amber-400:hover,
+body.theme-light dialog.fifa-console-modal .bg-amber-500:hover,
+body.theme-light dialog.fifa-console-modal .from-amber-500:hover,
+body.theme-light .fifa-broadcast-action-btn:hover,
+body.theme-light .fifa-save-club-btn:hover,
+body.theme-light #btn-fs-open-tactics:hover {
+  background-color: #f59e0b !important;
+  background-image: none !important;
+  color: #0f172a !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-amber-400:hover *:not(.fut-card *),
+body.theme-light dialog.fifa-console-modal .bg-amber-500:hover *:not(.fut-card *),
+body.theme-light dialog.fifa-console-modal .from-amber-500:hover *:not(.fut-card *),
+body.theme-light .fifa-broadcast-action-btn:hover *,
+body.theme-light .fifa-save-club-btn:hover *,
+body.theme-light #btn-fs-open-tactics:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light .text-amber-400:not(.fut-card *):not(.hud-header *):not(.wizard-preset-btn.active *):not(.tactics-style-btn.active *):not(.hud-mode-btn.active *) {
+  color: #b45309 !important;
 }
 
 body.theme-light dialog.fifa-console-modal .h-1\.5.bg-slate-800 {
@@ -3122,6 +3429,132 @@ body.theme-light dialog.fifa-console-modal .border-slate-700 {
   border-color: #e2e8f0 !important;
 }
 
+body.theme-light dialog.fifa-console-modal [id^="btn-close-"],
+body.theme-light #btn-close-pitch-fs {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light dialog.fifa-console-modal [id^="btn-close-"] *,
+body.theme-light #btn-close-pitch-fs * {
+  color: #334155 !important;
+}
+
+body.theme-light dialog.fifa-console-modal [id^="btn-close-"]:hover,
+body.theme-light #btn-close-pitch-fs:hover {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  border-color: #fca5a5 !important;
+}
+
+body.theme-light dialog.fifa-console-modal [id^="btn-close-"]:hover *,
+body.theme-light #btn-close-pitch-fs:hover * {
+  color: #991b1b !important;
+}
+
+body.theme-light dialog.fifa-console-modal [id^="btn-cancel-"],
+body.theme-light #wizard-btn-prev,
+body.theme-light #btn-restart-stats-test,
+body.theme-light #wizard-btn-minus,
+body.theme-light #wizard-btn-plus {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light dialog.fifa-console-modal [id^="btn-cancel-"] *,
+body.theme-light #wizard-btn-prev *,
+body.theme-light #btn-restart-stats-test *,
+body.theme-light #wizard-btn-minus *,
+body.theme-light #wizard-btn-plus * {
+  color: #0f172a !important;
+}
+
+body.theme-light dialog.fifa-console-modal [id^="btn-cancel-"]:hover,
+body.theme-light #wizard-btn-prev:hover,
+body.theme-light #btn-restart-stats-test:hover,
+body.theme-light #wizard-btn-minus:hover,
+body.theme-light #wizard-btn-plus:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+}
+
+body.theme-light dialog.fifa-console-modal [id^="btn-cancel-"]:hover *,
+body.theme-light #wizard-btn-prev:hover *,
+body.theme-light #btn-restart-stats-test:hover *,
+body.theme-light #wizard-btn-minus:hover *,
+body.theme-light #wizard-btn-plus:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light dialog.fifa-console-modal .wizard-preset-btn,
+body.theme-light dialog.fifa-console-modal .wizard-step-pill {
+  background: #f8fafc !important;
+  color: #1e293b !important;
+  border-color: #cbd5e1 !important;
+  transition: transform 0.12s ease, border-color 0.12s ease !important;
+}
+
+body.theme-light dialog.fifa-console-modal .wizard-preset-btn:hover,
+body.theme-light dialog.fifa-console-modal .wizard-step-pill:hover {
+  background: #fbbf24 !important;
+  color: #0f172a !important;
+  border-color: #d97706 !important;
+}
+
+body.theme-light dialog.fifa-console-modal .wizard-preset-btn:hover *,
+body.theme-light dialog.fifa-console-modal .wizard-step-pill:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light dialog.fifa-console-modal .wizard-preset-btn.active,
+body.theme-light dialog.fifa-console-modal .wizard-step-pill.active,
+body.theme-light dialog.fifa-console-modal .wizard-preset-btn.active:hover,
+body.theme-light dialog.fifa-console-modal .wizard-step-pill.active:hover {
+  background: #b45309 !important;
+  color: #ffffff !important;
+  border-color: #92400e !important;
+}
+
+body.theme-light dialog.fifa-console-modal .wizard-preset-btn.active *,
+body.theme-light dialog.fifa-console-modal .wizard-step-pill.active * {
+  color: #ffffff !important;
+}
+
+body.theme-light #btn-google-signin {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+body.theme-light #btn-google-signin:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+}
+
+body.theme-light #btn-setup-google-avatar {
+  background: #e0f2fe !important;
+  color: #0369a1 !important;
+  border-color: #7dd3fc !important;
+}
+
+body.theme-light #btn-setup-google-avatar * {
+  color: #0369a1 !important;
+}
+
+body.theme-light #btn-setup-google-avatar:hover {
+  background: #bae6fd !important;
+  color: #0c4a6e !important;
+  border-color: #38bdf8 !important;
+}
+
+body.theme-light #btn-setup-google-avatar:hover * {
+  color: #0c4a6e !important;
+}
+
 body.theme-light .fifa-formation-card,
 body.theme-light .fifa-modal-tab {
   background: #f8fafc !important;
@@ -3129,10 +3562,20 @@ body.theme-light .fifa-modal-tab {
   border-color: #cbd5e1 !important;
 }
 
-body.theme-light .fifa-modal-tab.active {
+body.theme-light .fifa-modal-tab:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-modal-tab.active,
+body.theme-light .fifa-modal-tab.active:hover {
   background: #fffbeb !important;
   color: #b45309 !important;
   border-bottom-color: #d97706 !important;
+}
+
+body.theme-light .fifa-modal-tab.active * {
+  color: #b45309 !important;
 }
 
 body.theme-light .fifa-form-code,
@@ -3992,17 +4435,38 @@ body.theme-light .hud-auth .hud-my-card-btn {
   background: #fef3c7 !important;
   color: #92400e !important;
   border-color: #f59e0b !important;
+  transition: transform 0.12s ease, border-color 0.12s ease !important;
 }
 
-body.theme-light .hud-auth .hud-my-card-btn:hover,
-body.theme-light .hud-auth button:hover {
-  background: #0f172a !important;
-  color: #ffffff !important;
-  border-color: #0f172a !important;
+body.theme-light .hud-auth .hud-my-card-btn:hover {
+  background: #fbbf24 !important;
+  color: #0f172a !important;
+  border-color: #d97706 !important;
 }
 
-body.theme-light .hud-auth button:hover * {
-  color: #ffffff !important;
+body.theme-light .hud-auth .hud-my-card-btn:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-auth #btn-logout {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1 !important;
+  transition: transform 0.12s ease, border-color 0.12s ease !important;
+}
+
+body.theme-light .hud-auth #btn-logout * {
+  color: #475569 !important;
+}
+
+body.theme-light .hud-auth #btn-logout:hover {
+  background: #ffe4e6 !important;
+  color: #be123c !important;
+  border-color: #fda4af !important;
+}
+
+body.theme-light .hud-auth #btn-logout:hover * {
+  color: #be123c !important;
 }
 
 /* Selects & Dropdown Options Contrast Fix (Oscuro + Claro) */
@@ -4522,24 +4986,71 @@ body.theme-light .fifa-album-pos-chip.is-muted {
   color: #475569 !important;
 }
 
-body.theme-light .fifa-album-inspect-btn {
-  background: #0f172a !important;
-  border-color: #0f172a !important;
-  color: #fde68a !important;
+body.theme-light .fifa-form-badge {
+  background: #e2e8f0 !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
 }
 
-body.theme-light .fifa-album-tile:hover .fifa-album-inspect-btn,
-body.theme-light .fifa-album-inspect-btn:hover {
-  background: #d97706 !important;
-  border-color: #b45309 !important;
+body.theme-light .fifa-formation-card.is-active .fifa-form-badge {
+  background: #b45309 !important;
   color: #ffffff !important;
+  border-color: #92400e !important;
 }
 
 body.theme-light .fifa-squad-card,
 body.theme-light .fifa-form-btn {
+  background: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-formation-card {
   background: #f8fafc !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
+}
+
+body.theme-light .fifa-formation-card:hover {
+  background: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-formation-card:hover .fifa-form-code,
+body.theme-light .fifa-formation-card:hover .fifa-form-name {
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-formation-card.is-active,
+body.theme-light .fifa-formation-card.is-active:hover {
+  background: #fffbeb !important;
+  border-color: #d97706 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-form-btn:hover,
+body.theme-light .fifa-formation-card:hover .fifa-form-btn:not(.is-active-btn) {
+  background: #fbbf24 !important;
+  border-color: #d97706 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-form-btn:hover *,
+body.theme-light .fifa-formation-card:hover .fifa-form-btn:not(.is-active-btn) * {
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-form-btn.is-active-btn,
+body.theme-light .fifa-formation-card.is-active .fifa-form-btn,
+body.theme-light .fifa-formation-card.is-active:hover .fifa-form-btn {
+  background: #b45309 !important;
+  border-color: #92400e !important;
+  color: #ffffff !important;
+}
+
+body.theme-light .fifa-form-btn.is-active-btn * {
+  color: #ffffff !important;
 }
 
 body.theme-light .fifa-squad-name,
@@ -4555,36 +5066,2407 @@ body.theme-light .fifa-squad-btn {
   background: #e2e8f0 !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
+  transition: transform 0.12s ease, border-color 0.12s ease !important;
+}
+
+body.theme-light .fifa-squad-btn * {
+  color: #0f172a !important;
 }
 
 body.theme-light .fifa-squad-btn:hover {
-  background: #0f172a !important;
-  border-color: #0f172a !important;
-  color: #ffffff !important;
+  background: #fbbf24 !important;
+  border-color: #d97706 !important;
+  color: #0f172a !important;
 }
 
-body.theme-light .fifa-squad-btn.is-active-btn {
+body.theme-light .fifa-squad-btn:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-squad-btn.is-active-btn,
+body.theme-light .fifa-squad-btn.is-active-btn:hover {
   background: #b45309 !important;
   border-color: #92400e !important;
   color: #ffffff !important;
 }
 
-body.theme-light .tactics-style-btn {
+body.theme-light .fifa-squad-btn.is-active-btn *,
+body.theme-light .fifa-squad-btn.is-active-btn:hover * {
+  color: #ffffff !important;
+}
+
+body.theme-light dialog.fifa-console-modal .tactics-style-btn {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  transition: transform 0.12s ease, border-color 0.12s ease !important;
+}
+
+body.theme-light dialog.fifa-console-modal .tactics-style-btn * {
+  color: #334155 !important;
+}
+
+body.theme-light dialog.fifa-console-modal .tactics-style-btn span:first-child {
+  color: #0f172a !important;
+}
+
+body.theme-light dialog.fifa-console-modal .tactics-style-btn:hover {
+  background: #fbbf24 !important;
+  border-color: #d97706 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light dialog.fifa-console-modal .tactics-style-btn:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light dialog.fifa-console-modal .tactics-style-btn.active,
+body.theme-light dialog.fifa-console-modal .tactics-style-btn.active:hover {
+  background: #b45309 !important;
+  border-color: #92400e !important;
+  color: #ffffff !important;
+}
+
+body.theme-light dialog.fifa-console-modal .tactics-style-btn.active span,
+body.theme-light dialog.fifa-console-modal .tactics-style-btn.active:hover span {
+  color: #ffffff !important;
+}
+
+body.theme-light dialog.fifa-console-modal .tactics-style-btn.active span:last-child,
+body.theme-light dialog.fifa-console-modal .tactics-style-btn.active:hover span:last-child {
+  color: #fef3c7 !important;
+}
+
+body.theme-light .fut-skin-option {
   background: #f8fafc !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
 }
 
-body.theme-light .tactics-style-btn.active {
+body.theme-light .fut-skin-option * {
+  color: #0f172a !important;
+}
+
+body.theme-light .fut-skin-option:hover {
+  background: #e2e8f0 !important;
+  border-color: #64748b !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fut-skin-option:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light .fut-skin-option.active,
+body.theme-light .fut-skin-option.active:hover {
+  background: #fffbeb !important;
+  border-color: #d97706 !important;
+  color: #92400e !important;
+}
+
+body.theme-light .fut-skin-option.active *,
+body.theme-light .fut-skin-option.active:hover * {
+  color: #92400e !important;
+}
+
+body.theme-light .hud-panel:hover {
+  background: #ffffff !important;
+  border-color: #f59e0b !important;
+}
+
+body.theme-light .hud-panel:hover .hud-label {
+  color: #b45309 !important;
+}
+
+body.theme-light .hud-panel:hover .hud-val {
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-album-inspect-btn {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+  transition: transform 0.12s ease, border-color 0.12s ease !important;
+}
+
+body.theme-light .fifa-album-inspect-btn * {
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-album-tile:hover .fifa-album-inspect-btn,
+body.theme-light .fifa-album-inspect-btn:hover {
+  background: #fbbf24 !important;
+  color: #0f172a !important;
+  border-color: #d97706 !important;
+}
+
+body.theme-light .fifa-album-tile:hover .fifa-album-inspect-btn *,
+body.theme-light .fifa-album-inspect-btn:hover * {
+  color: #0f172a !important;
+}
+
+/* Evita cruces transitorios de contraste durante hover en botones críticos */
+.hud-canvas .hud-icon-btn,
+.hud-icon-btn,
+.hud-auth .hud-my-card-btn,
+.hud-auth #btn-logout,
+.fifa-album-inspect-btn,
+.fifa-form-btn,
+.fifa-formation-card,
+.fifa-squad-btn,
+.hud-dock-mini-btn,
+.hud-dock-tactics-btn,
+.hud-tactics-open-btn,
+.hud-form-chip,
+.hud-tactics-style-summary {
+  transition: transform 0.12s ease, border-color 0.12s ease !important;
+}
+
+.hud-canvas .hud-icon-btn:hover,
+.hud-icon-btn:hover {
+  background: var(--hud-gold, #f0be2a) !important;
+  background-color: #f0be2a !important;
+  border-color: #f0be2a !important;
+  color: #111111 !important;
+}
+
+.hud-canvas .hud-icon-btn:hover *,
+.hud-canvas .hud-icon-btn:hover svg,
+.hud-icon-btn:hover *,
+.hud-icon-btn:hover svg {
+  color: #111111 !important;
+  stroke: #111111 !important;
+}
+
+body.theme-light .hud-canvas .hud-icon-btn:hover,
+body.theme-light .hud-icon-btn:hover {
+  background: #fbbf24 !important;
+  background-color: #fbbf24 !important;
+  border-color: #d97706 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-canvas .hud-icon-btn:hover *,
+body.theme-light .hud-canvas .hud-icon-btn:hover svg,
+body.theme-light .hud-icon-btn:hover *,
+body.theme-light .hud-icon-btn:hover svg {
+  color: #0f172a !important;
+  stroke: #0f172a !important;
+}
+
+/* ============================================================
+ * BARRA INTEGRADA DIRECTA DE PLANTILLA Y FORMACIÓN (PANEL A)
+ * ============================================================ */
+.hud-pitch-tactical-dock {
+  position: absolute !important;
+  top: 56px;
+  left: 0;
+  right: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 14px;
+  background: linear-gradient(90deg, #0d121b 0%, #151c29 100%);
+  border-bottom: 1.5px solid rgba(240, 190, 42, 0.3);
+  z-index: 8;
+}
+
+@media (max-width: 900px) {
+  .hud-panel--squad {
+    height: clamp(495px, 72vh, 590px) !important;
+  }
+
+  .hud-pitch-tactical-dock {
+    top: 52px !important;
+    height: auto !important;
+    padding: 7px 10px !important;
+  }
+
+  .hud-pitch-frame {
+    top: 138px !important;
+  }
+}
+
+.hud-dock-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+.hud-dock-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--hud-gold);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hud-dock-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.hud-dock-select {
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  background: #080b10 !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 0 8px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.hud-dock-select:focus {
+  outline: 2px solid var(--hud-gold);
+  outline-offset: 1px;
+}
+
+.hud-dock-mini-btn {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--hud-gold);
+  cursor: pointer;
+}
+
+.hud-dock-mini-btn:hover {
+  background: var(--hud-gold);
+  border-color: var(--hud-gold);
+  color: #0b0e14;
+}
+
+.hud-dock-mini-btn:hover * {
+  color: #0b0e14 !important;
+}
+
+.hud-dock-divider {
+  width: 1px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.14);
+  flex-shrink: 0;
+}
+
+.hud-dock-tactics-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 11px;
+  background: rgba(240, 190, 42, 0.14);
+  border: 1px solid rgba(240, 190, 42, 0.55);
+  color: var(--hud-gold);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.hud-dock-tactics-btn:hover {
+  background: var(--hud-gold);
+  border-color: var(--hud-gold);
+  color: #0b0e14;
+}
+
+.hud-dock-tactics-btn:hover * {
+  color: #0b0e14 !important;
+}
+
+/* Selector rápido de formación + Estilo dentro del Panel C */
+.hud-tactics-open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--hud-gold);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hud-tactics-open-btn:hover {
+  background: var(--hud-gold);
+  border-color: var(--hud-gold);
+  color: #0b0e14;
+}
+
+.hud-tactics-open-btn:hover * {
+  color: #0b0e14 !important;
+}
+
+.hud-formation-chips {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.hud-form-chip {
+  padding: 4px 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-align: center;
+  cursor: pointer;
+}
+
+.hud-form-chip:hover:not(.is-active) {
+  background: #f0be2a;
+  border-color: #f0be2a;
+  color: #0b0e14;
+}
+
+.hud-form-chip:hover:not(.is-active) * {
+  color: #0b0e14 !important;
+}
+
+.hud-form-chip.is-active,
+.hud-form-chip.is-active:hover {
+  background: var(--hud-gold);
+  border-color: var(--hud-gold);
+  color: #0b0e14;
+  box-shadow: 0 0 10px rgba(240, 190, 42, 0.35);
+}
+
+.hud-form-chip.is-active * {
+  color: #0b0e14 !important;
+}
+
+.hud-tactics-foot-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hud-tactics-style-summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  padding: 3px 7px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #cbd5e1;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: left;
+}
+
+.hud-tactics-style-summary:hover {
+  background: #f0be2a;
+  border-color: #f0be2a;
+  color: #0b0e14;
+}
+
+.hud-tactics-style-summary:hover * {
+  color: #0b0e14 !important;
+}
+
+/* MODO CLARO — BARRA INTEGRADA + PANEL C */
+body.theme-light .hud-pitch-tactical-dock {
+  background: #f8fafc !important;
+  border-bottom: 1.5px solid #cbd5e1 !important;
+}
+
+body.theme-light .hud-dock-label {
+  color: #b45309 !important;
+}
+
+body.theme-light .hud-dock-select {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+}
+
+body.theme-light .hud-dock-mini-btn {
+  background: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-dock-mini-btn * {
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-dock-mini-btn:hover {
+  background: #fbbf24 !important;
+  border-color: #d97706 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-dock-mini-btn:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-dock-divider {
+  background: #cbd5e1 !important;
+}
+
+body.theme-light .hud-dock-tactics-btn,
+body.theme-light .hud-tactics-open-btn {
+  background: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+body.theme-light .hud-dock-tactics-btn *,
+body.theme-light .hud-tactics-open-btn * {
+  color: #92400e !important;
+}
+
+body.theme-light .hud-dock-tactics-btn:hover,
+body.theme-light .hud-tactics-open-btn:hover {
+  background: #fbbf24 !important;
+  border-color: #d97706 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-dock-tactics-btn:hover *,
+body.theme-light .hud-tactics-open-btn:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-form-chip {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-form-chip:hover:not(.is-active) {
+  background: #fbbf24 !important;
+  border-color: #d97706 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-form-chip.is-active,
+body.theme-light .hud-form-chip.is-active:hover {
   background: #b45309 !important;
   border-color: #92400e !important;
   color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(180, 83, 9, 0.25) !important;
 }
 
-body.theme-light .tactics-style-btn.active span {
+body.theme-light .hud-form-chip.is-active * {
   color: #ffffff !important;
 }
 
-body.theme-light .tactics-style-btn.active span:last-child {
-  color: #fef3c7 !important;
+body.theme-light .hud-tactics-style-summary {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+body.theme-light .hud-tactics-style-summary * {
+  color: #334155 !important;
+}
+
+body.theme-light .hud-tactics-style-summary:hover {
+  background: #fbbf24 !important;
+  border-color: #d97706 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .hud-tactics-style-summary:hover * {
+  color: #0f172a !important;
+}
+
+/* =====================================================================
+   WALKOUT EA SPORTS FIFA FUT, STAGE DE PREVIEW & FICHA TÉCNICA SYNC
+   Sincronización total Modo Oscuro / Modo Claro + Skin de Carta FUT
+   ===================================================================== */
+
+/* ---------- 1. Stage del Preview en Creación y Ficha Técnica ---------- */
+.setup-card-stage,
+.inspect-card-stage {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: radial-gradient(circle at 50% 42%, rgba(240, 190, 42, 0.16) 0%, #0b111e 72%);
+}
+
+.setup-card-stage[data-skin="totw"],
+.inspect-card-stage[data-skin="totw"] {
+  background: radial-gradient(circle at 50% 42%, rgba(247, 211, 88, 0.2) 0%, #090b10 74%);
+  border-color: rgba(247, 211, 88, 0.45);
+}
+
+.setup-card-stage[data-skin="toty"],
+.inspect-card-stage[data-skin="toty"] {
+  background: radial-gradient(circle at 50% 42%, rgba(56, 189, 248, 0.24) 0%, #081229 74%);
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.setup-card-stage[data-skin="tots"],
+.inspect-card-stage[data-skin="tots"] {
+  background: radial-gradient(circle at 50% 42%, rgba(45, 212, 191, 0.22) 0%, #071923 74%);
+  border-color: rgba(45, 212, 191, 0.45);
+}
+
+.setup-card-stage[data-skin="icon"],
+.inspect-card-stage[data-skin="icon"] {
+  background: radial-gradient(circle at 50% 42%, rgba(245, 230, 200, 0.22) 0%, #15110a 74%);
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.inspect-edition-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 10px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #fde047;
+  border: 1px solid rgba(250, 204, 21, 0.45);
+}
+
+.inspect-walkout-btn {
+  background: rgba(14, 165, 233, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  color: #7dd3fc;
+}
+
+.inspect-walkout-btn * {
+  color: #7dd3fc;
+}
+
+.inspect-walkout-btn:hover {
+  background: #38bdf8;
+  border-color: #7dd3fc;
+  color: #082f49;
+}
+
+.inspect-walkout-btn:hover * {
+  color: #082f49;
+}
+
+body.theme-light .setup-card-stage,
+body.theme-light dialog.fifa-console-modal .inspect-card-stage {
+  background: radial-gradient(circle at 50% 35%, #ffffff 0%, #f1f5f9 78%) !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light .setup-card-stage[data-skin="gold"],
+body.theme-light dialog.fifa-console-modal .inspect-card-stage[data-skin="gold"] {
+  background: radial-gradient(circle at 50% 35%, #fffbeb 0%, #f1f5f9 78%) !important;
+  border-color: #f59e0b !important;
+}
+
+body.theme-light .setup-card-stage[data-skin="totw"],
+body.theme-light dialog.fifa-console-modal .inspect-card-stage[data-skin="totw"] {
+  background: radial-gradient(circle at 50% 35%, #fefce8 0%, #e2e8f0 80%) !important;
+  border-color: #ca8a04 !important;
+}
+
+body.theme-light .setup-card-stage[data-skin="toty"],
+body.theme-light dialog.fifa-console-modal .inspect-card-stage[data-skin="toty"] {
+  background: radial-gradient(circle at 50% 35%, #eff6ff 0%, #e2e8f0 80%) !important;
+  border-color: #2563eb !important;
+}
+
+body.theme-light .setup-card-stage[data-skin="tots"],
+body.theme-light dialog.fifa-console-modal .inspect-card-stage[data-skin="tots"] {
+  background: radial-gradient(circle at 50% 35%, #f0fdfa 0%, #e2e8f0 80%) !important;
+  border-color: #0d9488 !important;
+}
+
+body.theme-light .setup-card-stage[data-skin="icon"],
+body.theme-light dialog.fifa-console-modal .inspect-card-stage[data-skin="icon"] {
+  background: radial-gradient(circle at 50% 35%, #fffcf5 0%, #f1f5f9 80%) !important;
+  border-color: #b45309 !important;
+}
+
+body.theme-light dialog.fifa-console-modal .inspect-meta-tile {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .inspect-edition-tag {
+  background: #0f172a !important;
+  color: #fde047 !important;
+  border-color: #b45309 !important;
+}
+
+body.theme-light .inspect-walkout-btn {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+  color: #0369a1 !important;
+}
+
+body.theme-light .inspect-walkout-btn * {
+  color: #0369a1 !important;
+}
+
+body.theme-light .inspect-walkout-btn:hover {
+  background: #0284c7 !important;
+  border-color: #0369a1 !important;
+  color: #ffffff !important;
+}
+
+body.theme-light .inspect-walkout-btn:hover * {
+  color: #ffffff !important;
+}
+
+/* ---------- 2. Walkout Fullscreen Arena: Paletas Skin x Tema ---------- */
+.fut-walkout-screen {
+  --wo-bg: radial-gradient(circle at 50% 36%, #131c31 0%, #070b14 58%, #020408 100%);
+  --wo-surface: rgba(13, 18, 30, 0.94);
+  --wo-surface-2: rgba(22, 30, 48, 0.96);
+  --wo-border: rgba(240, 190, 42, 0.45);
+  --wo-ink: #f8fafc;
+  --wo-muted: #cbd5e1;
+  --wo-accent: #f0be2a;
+  --wo-accent-ink: #111111;
+  --wo-accent-soft: rgba(240, 190, 42, 0.16);
+  --wo-beam-1: rgba(240, 190, 42, 0.42);
+  --wo-beam-2: rgba(56, 189, 248, 0.34);
+  --wo-door: linear-gradient(135deg, #101624 0%, #1c2438 50%, #0b101b 100%);
+  --wo-grid-line: rgba(255, 255, 255, 0.055);
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  background: var(--wo-bg);
+  color: var(--wo-ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 58px 18px 24px;
+  overflow-y: auto;
+  overflow-x: hidden !important;
+  max-width: 100vw;
+  box-sizing: border-box;
+  font-family: var(--hud-cond);
+  animation: walkout-fade-in 0.3s ease-out forwards;
+}
+
+.fut-walkout-screen[data-skin="totw"] {
+  --wo-bg: radial-gradient(circle at 50% 36%, #1f1b10 0%, #090b10 60%, #020305 100%);
+  --wo-border: rgba(250, 204, 21, 0.65);
+  --wo-accent: #facc15;
+  --wo-beam-1: rgba(250, 204, 21, 0.48);
+  --wo-beam-2: rgba(245, 158, 11, 0.32);
+}
+
+.fut-walkout-screen[data-skin="toty"] {
+  --wo-bg: radial-gradient(circle at 50% 36%, #0c244f 0%, #050d21 60%, #020611 100%);
+  --wo-border: rgba(56, 189, 248, 0.65);
+  --wo-accent: #38bdf8;
+  --wo-accent-ink: #082f49;
+  --wo-accent-soft: rgba(56, 189, 248, 0.16);
+  --wo-beam-1: rgba(56, 189, 248, 0.46);
+  --wo-beam-2: rgba(250, 204, 21, 0.38);
+}
+
+.fut-walkout-screen[data-skin="tots"] {
+  --wo-bg: radial-gradient(circle at 50% 36%, #092c34 0%, #04131c 60%, #02080d 100%);
+  --wo-border: rgba(45, 212, 191, 0.65);
+  --wo-accent: #2dd4bf;
+  --wo-accent-ink: #042f2e;
+  --wo-accent-soft: rgba(45, 212, 191, 0.16);
+  --wo-beam-1: rgba(45, 212, 191, 0.45);
+  --wo-beam-2: rgba(254, 240, 138, 0.34);
+}
+
+.fut-walkout-screen[data-skin="icon"] {
+  --wo-bg: radial-gradient(circle at 50% 36%, #292012 0%, #100d07 60%, #050402 100%);
+  --wo-border: rgba(245, 210, 140, 0.68);
+  --wo-accent: #f3d49b;
+  --wo-accent-ink: #1c1204;
+  --wo-accent-soft: rgba(243, 212, 155, 0.18);
+  --wo-beam-1: rgba(243, 212, 155, 0.46);
+  --wo-beam-2: rgba(245, 158, 11, 0.35);
+}
+
+/* MODO CLARO: EA FC Frost / Marble Studio Arena (Contraste alto garantizado) */
+body.theme-light .fut-walkout-screen,
+.fut-walkout-screen.is-light-mode {
+  --wo-bg: radial-gradient(circle at 50% 26%, #ffffff 0%, #f1f5f9 55%, #cbd5e1 100%);
+  --wo-surface: rgba(255, 255, 255, 0.96);
+  --wo-surface-2: #f1f5f9;
+  --wo-border: #d97706;
+  --wo-ink: #0f172a;
+  --wo-muted: #334155;
+  --wo-accent: #b45309;
+  --wo-accent-ink: #ffffff;
+  --wo-accent-soft: #fef3c7;
+  --wo-beam-1: rgba(245, 158, 11, 0.24);
+  --wo-beam-2: rgba(14, 165, 233, 0.2);
+  --wo-door: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 52%, #cbd5e1 100%);
+  --wo-grid-line: rgba(15, 23, 42, 0.08);
+}
+
+body.theme-light .fut-walkout-screen[data-skin="toty"],
+.fut-walkout-screen.is-light-mode[data-skin="toty"] {
+  --wo-bg: radial-gradient(circle at 50% 26%, #ffffff 0%, #eff6ff 55%, #bfdbfe 100%);
+  --wo-border: #1d4ed8;
+  --wo-accent: #1d4ed8;
+  --wo-accent-ink: #ffffff;
+  --wo-accent-soft: #dbeafe;
+  --wo-beam-1: rgba(37, 99, 235, 0.22);
+  --wo-beam-2: rgba(217, 119, 6, 0.18);
+}
+
+body.theme-light .fut-walkout-screen[data-skin="tots"],
+.fut-walkout-screen.is-light-mode[data-skin="tots"] {
+  --wo-bg: radial-gradient(circle at 50% 26%, #ffffff 0%, #f0fdfa 55%, #99f6e4 100%);
+  --wo-border: #0f766e;
+  --wo-accent: #0f766e;
+  --wo-accent-ink: #ffffff;
+  --wo-accent-soft: #ccfbf1;
+  --wo-beam-1: rgba(13, 148, 136, 0.22);
+  --wo-beam-2: rgba(217, 119, 6, 0.16);
+}
+
+body.theme-light .fut-walkout-screen[data-skin="totw"],
+.fut-walkout-screen.is-light-mode[data-skin="totw"] {
+  --wo-bg: radial-gradient(circle at 50% 26%, #ffffff 0%, #fefce8 55%, #e2e8f0 100%);
+  --wo-border: #a16207;
+  --wo-accent: #92400e;
+  --wo-accent-ink: #ffffff;
+  --wo-accent-soft: #fef3c7;
+}
+
+body.theme-light .fut-walkout-screen[data-skin="icon"],
+.fut-walkout-screen.is-light-mode[data-skin="icon"] {
+  --wo-bg: radial-gradient(circle at 50% 26%, #ffffff 0%, #fffaf0 55%, #e7e5e4 100%);
+  --wo-border: #92400e;
+  --wo-accent: #78350f;
+  --wo-accent-ink: #ffffff;
+  --wo-accent-soft: #fef3c7;
+}
+
+.walkout-fx-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.walkout-tunnel-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--wo-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--wo-grid-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.95) 0%, transparent 78%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.fut-walkout-screen .walkout-spotlight {
+  inset: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: none !important;
+  animation: none !important;
+  filter: none;
+}
+
+.fut-walkout-screen .walkout-spotlight.spotlight-1 {
+  left: 0;
+  background: radial-gradient(circle at 18% 20%, var(--wo-beam-1) 0%, transparent 56%);
+  z-index: 2;
+}
+
+.fut-walkout-screen .walkout-spotlight.spotlight-2 {
+  right: 0;
+  background: radial-gradient(circle at 82% 20%, var(--wo-beam-2) 0%, transparent 56%);
+  z-index: 2;
+}
+
+.fut-walkout-screen .walkout-spotlight.spotlight-center {
+  inset: 0;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: none !important;
+  background: radial-gradient(ellipse at 50% 15%, var(--wo-beam-1) 0%, transparent 64%);
+  z-index: 2;
+  opacity: 0.65;
+}
+
+.walkout-laser-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent 0%, var(--wo-accent) 50%, transparent 100%);
+  opacity: 0;
+  transform: translateY(-50%) scaleX(0.2);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.fut-walkout-screen.is-laser-active .walkout-laser-sweep {
+  animation: walkout-laser-wipe 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes walkout-laser-wipe {
+  0% { opacity: 0; transform: translateY(-50%) scaleX(0.1); }
+  45% { opacity: 0.95; transform: translateY(-50%) scaleX(1); }
+  100% { opacity: 0; transform: translateY(-50%) scaleX(1); }
+}
+
+.walkout-flash-burst {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, var(--wo-accent) 0%, transparent 66%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 7;
+}
+
+.fut-walkout-screen.is-flash-active .walkout-flash-burst {
+  animation: walkout-single-flash 0.72s ease-out forwards;
+}
+
+@keyframes walkout-single-flash {
+  0% { opacity: 0.42; transform: scale(0.82); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+/* Puertas del Túnel FIFA */
+.walkout-tunnel-doors {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.walkout-door {
+  flex: 1;
+  background: var(--wo-door);
+  border-color: var(--wo-border);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease;
+  opacity: 0.9;
+}
+
+.walkout-door-left {
+  border-right: 3px solid var(--wo-border);
+}
+
+.walkout-door-right {
+  border-left: 3px solid var(--wo-border);
+}
+
+.fut-walkout-screen.doors-cracked .walkout-door-left {
+  transform: translateX(-28%);
+}
+
+.fut-walkout-screen.doors-cracked .walkout-door-right {
+  transform: translateX(28%);
+}
+
+.fut-walkout-screen.doors-open .walkout-door-left {
+  transform: translateX(-104%);
+  opacity: 0;
+}
+
+.fut-walkout-screen.doors-open .walkout-door-right {
+  transform: translateX(104%);
+  opacity: 0;
+}
+
+/* Banda Superior Broadcast */
+.walkout-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+}
+
+.walkout-broadcast-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background: var(--wo-surface);
+  border: 1px solid var(--wo-border);
+  color: var(--wo-ink);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.walkout-broadcast-tag svg,
+.walkout-edition-label {
+  color: var(--wo-accent);
+}
+
+.hud-canvas .fut-walkout-screen .walkout-skip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--wo-surface) !important;
+  background-color: var(--wo-surface) !important;
+  border: 1px solid var(--wo-border) !important;
+  color: var(--wo-ink) !important;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.12s ease !important;
+}
+
+.hud-canvas .fut-walkout-screen .walkout-skip-btn * {
+  color: var(--wo-ink) !important;
+}
+
+.hud-canvas .fut-walkout-screen .walkout-skip-btn:hover,
+.hud-canvas .fut-walkout-screen .walkout-skip-btn:focus-visible {
+  background: var(--wo-accent) !important;
+  background-color: var(--wo-accent) !important;
+  border-color: var(--wo-accent) !important;
+  color: var(--wo-accent-ink) !important;
+}
+
+.hud-canvas .fut-walkout-screen .walkout-skip-btn:hover *,
+.hud-canvas .fut-walkout-screen .walkout-skip-btn:focus-visible * {
+  color: var(--wo-accent-ink) !important;
+}
+
+/* Escenario Central */
+.fut-walkout-screen .walkout-stage {
+  position: relative;
+  z-index: 15;
+  width: 100%;
+  max-width: 920px;
+  margin: auto 0;
+}
+
+.walkout-teaser-step {
+  gap: 14px;
+}
+
+.walkout-crest-badge-ring {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 28px;
+  background: var(--wo-surface);
+  border: 2px solid var(--wo-border);
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+}
+
+.walkout-club-logo-img {
+  width: 72px;
+  height: 86px;
+  object-fit: contain;
+}
+
+.walkout-fac-emblem svg {
+  width: 58px;
+  height: 66px;
+}
+
+.walkout-teaser-kicker {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--wo-accent);
+}
+
+.walkout-teaser-title {
+  font-size: clamp(1.6rem, 3.6vw, 2.5rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wo-ink);
+}
+
+.walkout-tier-banner {
+  padding: 5px 16px;
+  background: var(--wo-accent-soft);
+  border: 1px solid var(--wo-border);
+  color: var(--wo-accent);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.walkout-pos-showcase {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.walkout-pos-pill {
+  font-size: clamp(3rem, 6vw, 4.4rem);
+  font-weight: 900;
+  line-height: 0.95;
+  padding: 10px 28px;
+  background: var(--wo-accent);
+  color: var(--wo-accent-ink);
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+
+.walkout-dorsal-pill {
+  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  font-weight: 900;
+  line-height: 1;
+  padding: 10px 20px;
+  background: var(--wo-surface);
+  border: 2px solid var(--wo-border);
+  color: var(--wo-ink);
+}
+
+.walkout-pos-subline {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wo-muted);
+}
+
+/* Fase 3: Grid Carta 3D + Chyron Broadcast */
+.walkout-reveal-step {
+  width: 100%;
+  text-align: left;
+  animation: walkout-reveal-enter 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes walkout-reveal-enter {
+  0% { opacity: 0; transform: scale(1.06) translateY(14px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.walkout-reveal-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(220px, 270px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  background: var(--wo-surface);
+  border: 2px solid var(--wo-border);
+  padding: 24px 26px;
+}
+
+.walkout-card-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.walkout-card-pedestal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 14px;
+}
+
+.walkout-card-inner {
+  position: relative;
+  overflow: hidden;
+  animation: walkout-card-hero 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes walkout-card-hero {
+  0% { opacity: 0; transform: perspective(900px) rotateY(-24deg) scale(0.76); }
+  70% { opacity: 1; transform: perspective(900px) rotateY(4deg) scale(1.03); }
+  100% { opacity: 1; transform: perspective(900px) rotateY(0deg) scale(1); }
+}
+
+.walkout-card-glint {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(3% 0, 97% 0, 100% 2%, 100% 82.5%, 50% 100%, 0 82.5%, 0 2%);
+  background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.45) 48%, transparent 64%);
+  background-size: 220% 100%;
+  animation: walkout-glint-sweep 2.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 8;
+}
+
+@keyframes walkout-glint-sweep {
+  0%, 100% { background-position: 180% 0; opacity: 0.1; }
+  45%, 55% { background-position: -80% 0; opacity: 0.75; }
+}
+
+.walkout-pedestal-ring {
+  width: 210px;
+  height: 22px;
+  margin-top: -10px;
+  background: radial-gradient(ellipse at center, var(--wo-beam-1) 0%, transparent 72%);
+  pointer-events: none;
+}
+
+.walkout-card-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--wo-muted);
+}
+
+.walkout-chyron-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.walkout-chyron-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--wo-border);
+}
+
+.walkout-ovr-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 8px 14px;
+  background: var(--wo-accent);
+  color: var(--wo-accent-ink);
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+
+.walkout-ovr-lbl {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  line-height: 1;
+}
+
+.walkout-ovr-num {
+  font-size: 3.1rem;
+  font-weight: 900;
+  line-height: 0.88;
+}
+
+.walkout-identity-block {
+  min-width: 0;
+  flex: 1;
+}
+
+.walkout-identity-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.walkout-chyron-pos,
+.walkout-chyron-edition,
+.walkout-chyron-dorsal {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+}
+
+.walkout-chyron-pos {
+  background: var(--wo-accent-soft);
+  border: 1px solid var(--wo-border);
+  color: var(--wo-accent);
+}
+
+.walkout-chyron-edition {
+  background: var(--wo-surface-2);
+  border: 1px solid var(--wo-border);
+  color: var(--wo-ink);
+}
+
+.walkout-chyron-dorsal {
+  background: var(--wo-surface-2);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: var(--wo-muted);
+}
+
+.walkout-player-name {
+  font-size: clamp(1.9rem, 3.8vw, 2.75rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--wo-ink);
+  margin: 0;
+  word-break: break-word;
+}
+
+.walkout-player-subline {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wo-muted);
+  margin: 4px 0 0;
+}
+
+/* 6 Barras de Atributos FIFA */
+.walkout-stats-bars {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.walkout-stat-tile {
+  background: var(--wo-surface-2);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  padding: 8px 10px;
+}
+
+.walkout-stat-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.walkout-stat-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--wo-muted);
+}
+
+.walkout-stat-num {
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--wo-ink);
+}
+
+.walkout-stat-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(148, 163, 184, 0.24);
+  overflow: hidden;
+}
+
+.walkout-stat-fill {
+  height: 100%;
+  width: var(--stat-pct, 75%);
+  background: var(--wo-accent);
+  animation: walkout-bar-grow 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.walkout-stat-tile.is-elite .walkout-stat-fill {
+  background: #10b981;
+}
+
+.walkout-stat-tile.is-mid .walkout-stat-fill {
+  background: #64748b;
+}
+
+@keyframes walkout-bar-grow {
+  from { transform: scaleX(0); transform-origin: left center; }
+  to { transform: scaleX(1); transform-origin: left center; }
+}
+
+.walkout-signature-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.walkout-sig-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: var(--wo-surface-2);
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  color: var(--wo-ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.walkout-sig-chip svg {
+  color: var(--wo-accent);
+}
+
+.walkout-status-copy {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wo-muted);
+  margin: 0;
+}
+
+.walkout-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.hud-canvas .fut-walkout-screen .walkout-confirm-btn {
+  flex: 1 1 220px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  background: var(--wo-accent) !important;
+  background-color: var(--wo-accent) !important;
+  border: 1px solid var(--wo-accent) !important;
+  color: var(--wo-accent-ink) !important;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.12s ease !important;
+}
+
+.hud-canvas .fut-walkout-screen .walkout-confirm-btn * {
+  color: var(--wo-accent-ink) !important;
+}
+
+.hud-canvas .fut-walkout-screen .walkout-confirm-btn:hover,
+.hud-canvas .fut-walkout-screen .walkout-confirm-btn:focus-visible {
+  background: #fde047 !important;
+  background-color: #fde047 !important;
+  border-color: #fde047 !important;
+  color: #111111 !important;
+}
+
+.hud-canvas .fut-walkout-screen .walkout-confirm-btn:hover *,
+.hud-canvas .fut-walkout-screen .walkout-confirm-btn:focus-visible * {
+  color: #111111 !important;
+}
+
+body.theme-light .hud-canvas .fut-walkout-screen .walkout-confirm-btn:hover,
+.hud-canvas .fut-walkout-screen.is-light-mode .walkout-confirm-btn:hover,
+body.theme-light .hud-canvas .fut-walkout-screen .walkout-confirm-btn:focus-visible,
+.hud-canvas .fut-walkout-screen.is-light-mode .walkout-confirm-btn:focus-visible {
+  background: #0f172a !important;
+  background-color: #0f172a !important;
+  border-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+body.theme-light .hud-canvas .fut-walkout-screen .walkout-confirm-btn:hover *,
+.hud-canvas .fut-walkout-screen.is-light-mode .walkout-confirm-btn:hover *,
+body.theme-light .hud-canvas .fut-walkout-screen .walkout-confirm-btn:focus-visible *,
+.hud-canvas .fut-walkout-screen.is-light-mode .walkout-confirm-btn:focus-visible * {
+  color: #ffffff !important;
+}
+
+.hud-canvas .fut-walkout-screen .walkout-replay-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 16px;
+  background: var(--wo-surface-2) !important;
+  background-color: var(--wo-surface-2) !important;
+  border: 1px solid var(--wo-border) !important;
+  color: var(--wo-ink) !important;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.12s ease !important;
+}
+
+.hud-canvas .fut-walkout-screen .walkout-replay-btn * {
+  color: var(--wo-ink) !important;
+}
+
+.hud-canvas .fut-walkout-screen .walkout-replay-btn:hover,
+.hud-canvas .fut-walkout-screen .walkout-replay-btn:focus-visible {
+  background: var(--wo-accent) !important;
+  background-color: var(--wo-accent) !important;
+  border-color: var(--wo-accent) !important;
+  color: var(--wo-accent-ink) !important;
+}
+
+.hud-canvas .fut-walkout-screen .walkout-replay-btn:hover *,
+.hud-canvas .fut-walkout-screen .walkout-replay-btn:focus-visible * {
+  color: var(--wo-accent-ink) !important;
+}
+
+@media (max-width: 767px) {
+  .fut-walkout-screen {
+    justify-content: flex-start;
+    padding: 54px 10px 20px;
+  }
+
+  .walkout-topbar {
+    padding: 10px 10px;
+    gap: 8px;
+  }
+
+  .walkout-broadcast-tag {
+    padding: 4px 8px;
+    gap: 5px;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    max-width: calc(100% - 108px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .hud-canvas .fut-walkout-screen .walkout-skip-btn {
+    padding: 5px 9px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .walkout-reveal-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .walkout-reveal-step {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .walkout-reveal-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 12px;
+  }
+
+  .walkout-card-host .fut-card {
+    width: 146px !important;
+    height: 234px !important;
+    font-size: 18px !important;
+  }
+
+  .walkout-actions-row .walkout-confirm-btn {
+    flex: 1 1 180px;
+  }
+
+  .walkout-stats-bars {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .walkout-card-glint,
+  .walkout-flash-burst,
+  .walkout-laser-sweep,
+  .walkout-sparks-bg,
+  .walkout-spotlight {
+    animation: none !important;
+  }
+
+  .walkout-reveal-step,
+  .walkout-card-inner,
+  .walkout-stat-fill {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ================================================================
+   PLANIFICADOR DE PARTIDO, CONVOCATORIA, MINUTOS Y PRIORIDADES
+================================================================ */
+.hud-canvas .hud-dock-matchplan-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: #0284c7 !important;
+  background-color: #0284c7 !important;
+  border: 1px solid #38bdf8 !important;
+  color: #ffffff !important;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hud-canvas .hud-dock-matchplan-btn * {
+  color: #ffffff !important;
+}
+
+.hud-canvas .hud-dock-matchplan-btn:hover,
+.hud-canvas .hud-dock-matchplan-btn:focus-visible {
+  background: #38bdf8 !important;
+  background-color: #38bdf8 !important;
+  border-color: #bae6fd !important;
+  color: #082f49 !important;
+}
+
+.hud-canvas .hud-dock-matchplan-btn:hover *,
+.hud-canvas .hud-dock-matchplan-btn:focus-visible * {
+  color: #082f49 !important;
+}
+
+body.theme-light .hud-canvas .hud-dock-matchplan-btn {
+  background: #0369a1 !important;
+  background-color: #0369a1 !important;
+  border-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+body.theme-light .hud-canvas .hud-dock-matchplan-btn * {
+  color: #ffffff !important;
+}
+
+body.theme-light .hud-canvas .hud-dock-matchplan-btn:hover,
+body.theme-light .hud-canvas .hud-dock-matchplan-btn:focus-visible {
+  background: #0c4a6e !important;
+  background-color: #0c4a6e !important;
+  border-color: #0c4a6e !important;
+  color: #ffffff !important;
+}
+
+body.theme-light .hud-canvas .hud-dock-matchplan-btn:hover *,
+body.theme-light .hud-canvas .hud-dock-matchplan-btn:focus-visible * {
+  color: #ffffff !important;
+}
+
+/* Cadena de Prioridad de Posiciones en Creación de Ficha */
+.role-priority-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.role-priority-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #f0be2a;
+}
+
+.role-priority-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #f8fafc;
+  background: rgba(30, 41, 59, 0.9);
+}
+
+.role-priority-chip.is-r1 {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: #34d399;
+  color: #6ee7b7;
+}
+
+.role-priority-chip.is-r2 {
+  background: rgba(14, 165, 233, 0.22);
+  border-color: #38bdf8;
+  color: #7dd3fc;
+}
+
+.role-priority-chip.is-r3 {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: #22d3ee;
+  color: #67e8f9;
+}
+
+.role-priority-chip.is-r4 {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #fbbf24;
+  color: #fde68a;
+}
+
+.role-priority-chip.is-avoid {
+  margin-left: auto;
+  background: rgba(244, 63, 94, 0.22);
+  border-color: #fb7185;
+  color: #fecdd3;
+}
+
+body.theme-light .role-priority-preview {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light .role-priority-lbl {
+  color: #92400e !important;
+}
+
+body.theme-light .role-priority-chip {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+}
+
+body.theme-light .role-priority-chip.is-r1 {
+  background: #d1fae5 !important;
+  border-color: #059669 !important;
+  color: #065f46 !important;
+}
+
+body.theme-light .role-priority-chip.is-r2 {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+  color: #075985 !important;
+}
+
+body.theme-light .role-priority-chip.is-r3 {
+  background: #cffafe !important;
+  border-color: #0891b2 !important;
+  color: #155e75 !important;
+}
+
+body.theme-light .role-priority-chip.is-r4 {
+  background: #fef3c7 !important;
+  border-color: #d97706 !important;
+  color: #92400e !important;
+}
+
+body.theme-light .role-priority-chip.is-avoid {
+  background: #ffe4e6 !important;
+  border-color: #e11d48 !important;
+  color: #9f1239 !important;
+}
+
+/* Badges de Diferenciación entre Plantillas y Álbum */
+.fifa-squad-preview-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 0 4px;
+}
+
+.fifa-squad-member-chip {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #e2e8f0;
+}
+
+.fifa-squad-member-empty {
+  font-size: 11px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+body.theme-light .fifa-squad-member-chip {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-squad-member-empty {
+  color: #475569 !important;
+}
+
+.fifa-album-squad-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 3px 8px;
+  margin-bottom: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #e2e8f0;
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.fifa-album-squad-tag.is-starter {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #34d399;
+  color: #6ee7b7;
+}
+
+.fifa-album-mins {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  background: rgba(14, 165, 233, 0.22);
+  border: 1px solid #38bdf8;
+  color: #bae6fd;
+}
+
+body.theme-light .fifa-album-squad-tag {
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #334155 !important;
+}
+
+body.theme-light .fifa-album-squad-tag.is-starter {
+  background: #d1fae5 !important;
+  border-color: #059669 !important;
+  color: #065f46 !important;
+}
+
+body.theme-light .fifa-album-mins {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+  color: #075985 !important;
+}
+
+/* Modal Tab: Plan de Partido */
+.hud-canvas dialog.fifa-console-modal .matchplan-ctrl-btn {
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #1e293b !important;
+  background-color: #1e293b !important;
+  border: 1px solid #475569 !important;
+  color: #f8fafc !important;
+  cursor: pointer;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-ctrl-btn:hover {
+  background: #f0be2a !important;
+  background-color: #f0be2a !important;
+  border-color: #f0be2a !important;
+  color: #111111 !important;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-ctrl-btn.is-accent {
+  background: #0284c7 !important;
+  background-color: #0284c7 !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-ctrl-btn.is-accent:hover {
+  background: #38bdf8 !important;
+  background-color: #38bdf8 !important;
+  color: #082f49 !important;
+}
+
+.matchplan-convocation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+  gap: 8px;
+  max-height: 290px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-player-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 10px;
+  background: rgba(15, 23, 42, 0.92) !important;
+  background-color: rgba(15, 23, 42, 0.92) !important;
+  border: 1px solid #334155 !important;
+  color: #f8fafc !important;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-player-card.is-selected {
+  background: rgba(16, 40, 32, 0.94) !important;
+  background-color: rgba(16, 40, 32, 0.94) !important;
+  border-color: #10b981 !important;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-player-card:hover {
+  border-color: #f0be2a !important;
+  background: rgba(30, 41, 59, 0.96) !important;
+  background-color: rgba(30, 41, 59, 0.96) !important;
+}
+
+.matchplan-player-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.matchplan-check-box {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f172a;
+  border: 1px solid #64748b;
+  color: #052e16;
+}
+
+.matchplan-player-card.is-selected .matchplan-check-box {
+  background: #34d399;
+  border-color: #34d399;
+  color: #052e16;
+}
+
+.matchplan-avatar {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border: 1px solid #475569;
+  flex-shrink: 0;
+}
+
+.matchplan-player-name {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.matchplan-player-sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.matchplan-ovr-badge {
+  font-size: 18px;
+  font-weight: 900;
+  padding: 2px 7px;
+  background: #f0be2a;
+  color: #111111;
+  line-height: 1.1;
+  flex-shrink: 0;
+}
+
+.matchplan-priority-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.mp-rank {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 5px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #cbd5e1;
+}
+
+.mp-rank.is-1 {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: #34d399;
+  color: #6ee7b7;
+}
+
+.mp-rank.is-avoid {
+  background: rgba(244, 63, 94, 0.18);
+  border-color: #fb7185;
+  color: #fda4af;
+}
+
+.matchplan-stats-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #cbd5e1;
+  background: rgba(2, 6, 23, 0.55);
+  padding: 3px 4px;
+}
+
+.matchplan-stats-strip span b {
+  color: #f8fafc;
+}
+
+.matchplan-foot-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.matchplan-deficit-pill {
+  padding: 1px 6px;
+  background: #1e293b;
+  border: 1px solid #475569;
+  color: #e2e8f0;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.matchplan-deficit-pill.is-low {
+  background: rgba(245, 158, 11, 0.22);
+  border-color: #fbbf24;
+  color: #fde68a;
+}
+
+.matchplan-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.matchplan-kpi-box {
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid #334155;
+  padding: 8px 10px;
+}
+
+.matchplan-kpi-lbl {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.matchplan-kpi-val {
+  display: block;
+  font-size: 20px;
+  font-weight: 900;
+  color: #f0be2a;
+}
+
+.matchplan-section-box {
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid #334155;
+  padding: 10px 12px;
+}
+
+.matchplan-starters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 6px;
+}
+
+.matchplan-starter-slot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(2, 6, 23, 0.65);
+  border: 1px solid #334155;
+}
+
+.matchplan-role-pill {
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 6px;
+  background: #f0be2a;
+  color: #111111;
+  flex-shrink: 0;
+}
+
+.matchplan-mini-ovr {
+  font-size: 16px;
+  font-weight: 900;
+  color: #f0be2a;
+}
+
+.matchplan-fit-chip {
+  font-size: 10px;
+  font-weight: 800;
+  color: #bae6fd;
+}
+
+.matchplan-fit-chip.is-r1 {
+  color: #6ee7b7;
+}
+
+.matchplan-fit-chip.is-avoid {
+  color: #fda4af;
+}
+
+.matchplan-bench-chip {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  background: #1e293b;
+  border: 1px solid #475569;
+  color: #e2e8f0;
+}
+
+.matchplan-window-card {
+  background: rgba(2, 6, 23, 0.6);
+  border: 1px solid #334155;
+  padding: 8px 10px;
+}
+
+.matchplan-window-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.matchplan-minute-pill {
+  font-size: 12px;
+  font-weight: 900;
+  padding: 2px 8px;
+  background: #0284c7;
+  color: #ffffff;
+  letter-spacing: 0.06em;
+}
+
+.matchplan-swap-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  padding: 4px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.matchplan-swap-players {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.matchplan-in-pill {
+  font-weight: 800;
+  padding: 1px 6px;
+  background: rgba(16, 185, 129, 0.22);
+  border: 1px solid #34d399;
+  color: #6ee7b7;
+}
+
+.matchplan-out-pill {
+  font-weight: 800;
+  padding: 1px 6px;
+  background: rgba(244, 63, 94, 0.2);
+  border: 1px solid #fb7185;
+  color: #fecdd3;
+}
+
+.matchplan-swap-reason {
+  margin-left: auto;
+  color: #cbd5e1;
+  font-size: 11px;
+}
+
+.matchplan-table th {
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  padding: 6px 4px;
+  border-bottom: 1px solid #334155;
+}
+
+.matchplan-table td {
+  padding: 6px 4px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+  color: #f8fafc;
+}
+
+.matchplan-badge-tiny {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border: 1px solid #475569;
+  color: #cbd5e1;
+}
+
+.matchplan-badge-tiny.is-start {
+  border-color: #34d399;
+  color: #6ee7b7;
+}
+
+.matchplan-min-input {
+  width: 64px;
+  padding: 2px 6px;
+  text-align: right;
+  font-weight: 800;
+  background: #020617;
+  border: 1px solid #475569;
+  color: #f8fafc;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  background: #f0be2a !important;
+  background-color: #f0be2a !important;
+  border: 1px solid #f0be2a !important;
+  color: #111111 !important;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-primary-btn * {
+  color: #111111 !important;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-primary-btn:hover {
+  background: #fde047 !important;
+  background-color: #fde047 !important;
+  color: #111111 !important;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  background: #059669 !important;
+  background-color: #059669 !important;
+  border: 1px solid #34d399 !important;
+  color: #ffffff !important;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-save-btn * {
+  color: #ffffff !important;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-save-btn:hover {
+  background: #047857 !important;
+  background-color: #047857 !important;
+  color: #ffffff !important;
+}
+
+.matchplan-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 10px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid #334155;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-del-log-btn {
+  padding: 5px;
+  background: #334155 !important;
+  border: 1px solid #64748b !important;
+  color: #fecdd3 !important;
+  cursor: pointer;
+}
+
+.hud-canvas dialog.fifa-console-modal .matchplan-del-log-btn:hover {
+  background: #be123c !important;
+  border-color: #fb7185 !important;
+  color: #ffffff !important;
+}
+
+.matchplan-empty-box {
+  padding: 14px;
+  text-align: center;
+  font-size: 12px;
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px dashed #475569;
+}
+
+/* MODO CLARO PARA PLANIFICADOR DE PARTIDO */
+body.theme-light dialog.fifa-console-modal .matchplan-header-card,
+body.theme-light dialog.fifa-console-modal .matchplan-section-box,
+body.theme-light dialog.fifa-console-modal .matchplan-kpi-box,
+body.theme-light dialog.fifa-console-modal .matchplan-actions-bar,
+body.theme-light dialog.fifa-console-modal .matchplan-history-item {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light dialog.fifa-console-modal .matchplan-ctrl-btn {
+  background: #e2e8f0 !important;
+  background-color: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light dialog.fifa-console-modal .matchplan-ctrl-btn:hover {
+  background: #0f172a !important;
+  background-color: #0f172a !important;
+  border-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+body.theme-light dialog.fifa-console-modal .matchplan-ctrl-btn.is-accent {
+  background: #0369a1 !important;
+  background-color: #0369a1 !important;
+  border-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+body.theme-light dialog.fifa-console-modal .matchplan-ctrl-btn.is-accent:hover {
+  background: #0c4a6e !important;
+  background-color: #0c4a6e !important;
+  color: #ffffff !important;
+}
+
+body.theme-light dialog.fifa-console-modal .matchplan-player-card {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light dialog.fifa-console-modal .matchplan-player-card.is-selected {
+  background: #ecfdf5 !important;
+  background-color: #ecfdf5 !important;
+  border-color: #059669 !important;
+}
+
+body.theme-light dialog.fifa-console-modal .matchplan-player-card:hover {
+  border-color: #b45309 !important;
+  background: #f8fafc !important;
+  background-color: #f8fafc !important;
+}
+
+body.theme-light .matchplan-player-name,
+body.theme-light .matchplan-table td,
+body.theme-light .matchplan-kpi-val,
+body.theme-light .matchplan-stats-strip span b {
+  color: #0f172a !important;
+}
+
+body.theme-light .matchplan-kpi-val {
+  color: #92400e !important;
+}
+
+body.theme-light .matchplan-player-sub,
+body.theme-light .matchplan-foot-meta,
+body.theme-light .matchplan-kpi-lbl,
+body.theme-light .matchplan-table th,
+body.theme-light .matchplan-swap-reason {
+  color: #475569 !important;
+}
+
+body.theme-light .mp-rank,
+body.theme-light .matchplan-stats-strip,
+body.theme-light .matchplan-starter-slot,
+body.theme-light .matchplan-window-card,
+body.theme-light .matchplan-bench-chip,
+body.theme-light .matchplan-min-input,
+body.theme-light .matchplan-empty-box,
+body.theme-light .matchplan-deficit-pill {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .mp-rank.is-1,
+body.theme-light .matchplan-in-pill,
+body.theme-light .matchplan-badge-tiny.is-start {
+  background: #d1fae5 !important;
+  border-color: #059669 !important;
+  color: #065f46 !important;
+}
+
+body.theme-light .mp-rank.is-avoid,
+body.theme-light .matchplan-out-pill {
+  background: #ffe4e6 !important;
+  border-color: #e11d48 !important;
+  color: #9f1239 !important;
+}
+
+body.theme-light .matchplan-deficit-pill.is-low {
+  background: #fef3c7 !important;
+  border-color: #d97706 !important;
+  color: #92400e !important;
+}
+
+body.theme-light .matchplan-fit-chip {
+  color: #0369a1 !important;
+}
+
+body.theme-light .matchplan-fit-chip.is-r1 {
+  color: #065f46 !important;
+}
+
+body.theme-light .matchplan-fit-chip.is-avoid {
+  color: #be123c !important;
+}
+
+body.theme-light .matchplan-mini-ovr {
+  color: #b45309 !important;
+}
+
+@media (max-width: 767px) {
+  .matchplan-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hud-canvas .hud-dock-matchplan-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
 }

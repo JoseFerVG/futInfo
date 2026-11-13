@@ -182,12 +182,25 @@ class AuthService {
         skillMoves: parseInt(cardData.skillMoves, 10) || existingPlayer.skillMoves || 4,
         weakFoot: parseInt(cardData.weakFoot, 10) || existingPlayer.weakFoot || 4,
         chemStyle: cardData.chemStyle || existingPlayer.chemStyle || 'HUN',
-        rolesHierarchy: {
-          best: cardData.roleBest || existingPlayer.rolesHierarchy?.best || 'DC',
-          second: cardData.roleSecond || existingPlayer.rolesHierarchy?.second || 'MC',
-          third: cardData.roleThird || existingPlayer.rolesHierarchy?.third || 'DFC',
-          worst: cardData.roleWorst || existingPlayer.rolesHierarchy?.worst || 'POR'
-        },
+        rolesHierarchy: (() => {
+          const best = cardData.roleBest || existingPlayer.rolesHierarchy?.best || 'DC';
+          const second = cardData.roleSecond || existingPlayer.rolesHierarchy?.second || 'MC';
+          const third = cardData.roleThird || existingPlayer.rolesHierarchy?.third || 'DFC';
+          const fourth = cardData.roleFourth || existingPlayer.rolesHierarchy?.fourth || 'MCO';
+          const worst = cardData.roleWorst || existingPlayer.rolesHierarchy?.worst || 'POR';
+          const rawOrder = Array.isArray(cardData.priorityOrder) && cardData.priorityOrder.length > 0
+            ? cardData.priorityOrder
+            : [best, second, third, fourth];
+          const priorityOrder = rawOrder.filter((v, idx, arr) => v && arr.indexOf(v) === idx);
+          return {
+            best: priorityOrder[0] || best,
+            second: priorityOrder[1] || second,
+            third: priorityOrder[2] || third,
+            fourth: priorityOrder[3] || fourth,
+            worst,
+            priorityOrder
+          };
+        })(),
         stats: nextStats
       });
     } else {
@@ -216,7 +229,9 @@ class AuthService {
         roleBest: cardData.roleBest || 'DC',
         roleSecond: cardData.roleSecond || 'MC',
         roleThird: cardData.roleThird || 'DFC',
+        roleFourth: cardData.roleFourth || 'MCO',
         roleWorst: cardData.roleWorst || 'POR',
+        priorityOrder: cardData.priorityOrder || undefined,
         pac: parseInt(cardData.pac, 10) || 82,
         sho: parseInt(cardData.sho, 10) || 80,
         pas: parseInt(cardData.pas, 10) || 80,

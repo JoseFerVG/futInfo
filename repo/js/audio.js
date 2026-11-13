@@ -335,6 +335,63 @@ class FUTAudioEngine {
       });
     } catch (_) {}
   }
+
+  // Elevador cinematográfico al abrir las puertas del túnel FIFA
+  playWalkoutTunnelRiser() {
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const t = this.ctx.currentTime;
+
+      const osc = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(65, t);
+      osc.frequency.exponentialRampToValueAtTime(196, t + 0.65);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(220, t);
+      filter.frequency.exponentialRampToValueAtTime(1800, t + 0.65);
+
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.16, t + 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.72);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.72);
+    } catch (_) {}
+  }
+
+  // Impacto de estadio y acorde cristalino al salir la carta 3D
+  playWalkoutCardSlam() {
+    this.playWalkoutExplosion();
+    if (this.muted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const t = this.ctx.currentTime;
+      const chord = [523.25, 659.25, 783.99, 1046.5];
+      chord.forEach((f, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = idx === 3 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(f, t + 0.03);
+        gain.gain.setValueAtTime(0.001, t + 0.03);
+        gain.gain.linearRampToValueAtTime(0.09, t + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.85);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t + 0.03);
+        osc.stop(t + 0.85);
+      });
+    } catch (_) {}
+  }
 }
 
 export const futAudio = new FUTAudioEngine();

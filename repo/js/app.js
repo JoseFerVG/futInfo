@@ -5,6 +5,16 @@
 import { store, FACULTIES } from './store.js';
 import { authService } from './auth.js';
 import { futAudio } from './audio.js';
+import {
+  ALL_TACTICAL_ROLES,
+  getRoleLabel,
+  getPlayerPriorityChain,
+  getPositionPriorityRank,
+  computeStatRoleFit,
+  solveOptimalAssignment,
+  buildHistorySummaryMap,
+  computeMatchPlan
+} from './lineup-planner.js';
 import { 
   initFirebaseServices, 
   saveFirebaseConfig, 
@@ -22,11 +32,11 @@ export const STATS_TEST_CONFIG = [
     question: '¿Cómo calificarías tu velocidad punta y aceleración al sprint?',
     defaultValue: 82,
     tiers: [
-      { min: 90, label: 'Élite Mundial (90+)', emoji: '⚡', desc: 'Velocidad sobrehumana. Superas a cualquier rival en carrera larga al contraataque.' },
-      { min: 80, label: 'Muy Rápido (80-89)', emoji: '🚀', desc: 'Gran zancada. Ganas la mayoría de balones divididos y repliegas al instante.' },
-      { min: 70, label: 'Competitivo (70-79)', emoji: '🏃', desc: 'Buen ritmo de carrera. Repliegas a tiempo y aguantas transiciones rápidas.' },
-      { min: 55, label: 'Nivel Medio (55-69)', emoji: '👟', desc: 'Ritmo estándar de pachanga. Cumples en carreras cortas, pero te cuesta en sprints largos.' },
-      { min: 40, label: 'Básico / Lento (~50)', emoji: '🐢', desc: 'Carrera pausada. Prefieres recibir al pie antes que desgastarte corriendo al hueco.' }
+      { min: 90, label: 'Élite Mundial (90+)', icon: 'zap', desc: 'Velocidad sobrehumana. Superas a cualquier rival en carrera larga al contraataque.' },
+      { min: 80, label: 'Muy Rápido (80-89)', icon: 'rocket', desc: 'Gran zancada. Ganas la mayoría de balones divididos y repliegas al instante.' },
+      { min: 70, label: 'Competitivo (70-79)', icon: 'wind', desc: 'Buen ritmo de carrera. Repliegas a tiempo y aguantas transiciones rápidas.' },
+      { min: 55, label: 'Nivel Medio (55-69)', icon: 'footprints', desc: 'Ritmo estándar de pachanga. Cumples en carreras cortas, pero te cuesta en sprints largos.' },
+      { min: 40, label: 'Básico / Lento (~50)', icon: 'gauge', desc: 'Carrera pausada. Prefieres recibir al pie antes que desgastarte corriendo al hueco.' }
     ]
   },
   {
@@ -39,11 +49,11 @@ export const STATS_TEST_CONFIG = [
     question: '¿Cómo es tu puntería, potencia y efectividad de cara a puerta?',
     defaultValue: 80,
     tiers: [
-      { min: 90, label: 'Goleador Letal (90+)', emoji: '🎯', desc: 'Francotirador clínico. Ocasión que tienes, balón que enchufas a la escuadra.' },
-      { min: 80, label: 'Gran Definidor (80-89)', emoji: '💥', desc: 'Gran pegada. Disparo potente y colocado; alto porcentaje de gol ante el portero.' },
-      { min: 70, label: 'Buen Disparo (70-79)', emoji: '⚽', desc: 'Buen golpeo a puerta. Sabes colocarla si te dejan espacio para armar la pierna.' },
-      { min: 55, label: 'Disparo Ocasional (55-69)', emoji: '🥅', desc: 'Puntería media. Intentas asegurar a puerta vacía; desde lejos suele irse desviada.' },
-      { min: 40, label: 'Básico / Sin Gol (~50)', emoji: '🛡️', desc: 'Poco disparo. Prefieres buscar el pase o asistir antes que rematar a portería.' }
+      { min: 90, label: 'Goleador Letal (90+)', icon: 'crosshair', desc: 'Francotirador clínico. Ocasión que tienes, balón que enchufas a la escuadra.' },
+      { min: 80, label: 'Gran Definidor (80-89)', icon: 'flame', desc: 'Gran pegada. Disparo potente y colocado; alto porcentaje de gol ante el portero.' },
+      { min: 70, label: 'Buen Disparo (70-79)', icon: 'target', desc: 'Buen golpeo a puerta. Sabes colocarla si te dejan espacio para armar la pierna.' },
+      { min: 55, label: 'Disparo Ocasional (55-69)', icon: 'circle-dot', desc: 'Puntería media. Intentas asegurar a puerta vacía; desde lejos suele irse desviada.' },
+      { min: 40, label: 'Básico / Sin Gol (~50)', icon: 'shield', desc: 'Poco disparo. Prefieres buscar el pase o asistir antes que rematar a portería.' }
     ]
   },
   {
@@ -56,11 +66,11 @@ export const STATS_TEST_CONFIG = [
     question: '¿Qué tal distribuyes el balón y conectas pases con tus compañeros?',
     defaultValue: 80,
     tiers: [
-      { min: 90, label: 'Visión Total (90+)', emoji: '🧠', desc: 'Director de orquesta. Pases quirúrgicos al hueco y cambios de juego teledirigidos.' },
-      { min: 80, label: 'Gran Organizador (80-89)', emoji: '📐', desc: 'Gran visión. Metes balones con peligro, marcas el ritmo y casi no fallas en corto.' },
-      { min: 70, label: 'Pase Seguro (70-79)', emoji: '👟', desc: 'Pase limpio y seguro. Buen criterio asociativo en corto y apoyos continuos.' },
-      { min: 55, label: 'Pase Elemental (55-69)', emoji: '🔄', desc: 'Aseguras en corto; pases largos o con oposición conllevan alto riesgo de pérdida.' },
-      { min: 40, label: 'Básico (~50)', emoji: '⚠️', desc: 'Dificultad distributiva. Cuesta conectar bajo presión rival o filtrar al espacio.' }
+      { min: 90, label: 'Visión Total (90+)', icon: 'compass', desc: 'Director de orquesta. Pases quirúrgicos al hueco y cambios de juego teledirigidos.' },
+      { min: 80, label: 'Gran Organizador (80-89)', icon: 'ruler', desc: 'Gran visión. Metes balones con peligro, marcas el ritmo y casi no fallas en corto.' },
+      { min: 70, label: 'Pase Seguro (70-79)', icon: 'check-circle-2', desc: 'Pase limpio y seguro. Buen criterio asociativo en corto y apoyos continuos.' },
+      { min: 55, label: 'Pase Elemental (55-69)', icon: 'repeat', desc: 'Aseguras en corto; pases largos o con oposición conllevan alto riesgo de pérdida.' },
+      { min: 40, label: 'Básico (~50)', icon: 'alert-triangle', desc: 'Dificultad distributiva. Cuesta conectar bajo presión rival o filtrar al espacio.' }
     ]
   },
   {
@@ -73,11 +83,11 @@ export const STATS_TEST_CONFIG = [
     question: '¿Cómo manejas el balón en espacios reducidos y el uno contra uno?',
     defaultValue: 82,
     tiers: [
-      { min: 90, label: 'Mago del Balón (90+)', emoji: '🪄', desc: 'Balón pegado a la bota. Cambios de ritmo letales, agilidad pura y regates de fantasía.' },
-      { min: 80, label: 'Muy Técnico (80-89)', emoji: '💫', desc: 'Muy desequilibrante. Te vas con facilidad en el uno contra uno y sales de la presión.' },
-      { min: 70, label: 'Buen Control (70-79)', emoji: '✨', desc: 'Buen control orientado. Conduces cómodo con ambos pies y proteges bien la pelota.' },
-      { min: 55, label: 'Regate Justo (55-69)', emoji: '👌', desc: 'Conducción funcional. Regates básicos en línea recta sin complicarte la vida.' },
-      { min: 40, label: 'Básico (~50)', emoji: '🧱', desc: 'El balón se te escapa si intentas quiebros; prefieres soltarla rápido al primer toque.' }
+      { min: 90, label: 'Mago del Balón (90+)', icon: 'sparkles', desc: 'Balón pegado a la bota. Cambios de ritmo letales, agilidad pura y regates de fantasía.' },
+      { min: 80, label: 'Muy Técnico (80-89)', icon: 'star', desc: 'Muy desequilibrante. Te vas con facilidad en el uno contra uno y sales de la presión.' },
+      { min: 70, label: 'Buen Control (70-79)', icon: 'check-circle-2', desc: 'Buen control orientado. Conduces cómodo con ambos pies y proteges bien la pelota.' },
+      { min: 55, label: 'Regate Justo (55-69)', icon: 'move', desc: 'Conducción funcional. Regates básicos en línea recta sin complicarte la vida.' },
+      { min: 40, label: 'Básico (~50)', icon: 'layers', desc: 'El balón se te escapa si intentas quiebros; prefieres soltarla rápido al primer toque.' }
     ]
   },
   {
@@ -90,11 +100,11 @@ export const STATS_TEST_CONFIG = [
     question: '¿Cómo defiendes en el 1 vs 1, cortes de balón y posicionamiento táctico?',
     defaultValue: 60,
     tiers: [
-      { min: 90, label: 'Muralla Infranqueable (90+)', emoji: '🛡️', desc: 'Lectura defensiva perfecta. Robas limpio sin hacer falta y ganas cualquier duelo.' },
-      { min: 80, label: 'Gran Defensor (80-89)', emoji: '🧱', desc: 'Cierre de garantías. Muy difícil de superar, anticipas cortes y despejas el peligro.' },
-      { min: 70, label: 'Defensa Sólida (70-79)', emoji: '🔒', desc: 'Posicionamiento correcto. Metes pierna con criterio y ayudas al repliegue del equipo.' },
-      { min: 55, label: 'Defensa de Empuje (55-69)', emoji: '⚔️', desc: 'Presionas por insistencia y ayudas, aunque a veces muerdes a destiempo en falso.' },
-      { min: 40, label: 'Básico (~50)', emoji: '⚠️', desc: 'Poca vocación defensiva. Cuesta temporizar o meter el cuerpo en divididos.' }
+      { min: 90, label: 'Muralla Infranqueable (90+)', icon: 'shield', desc: 'Lectura defensiva perfecta. Robas limpio sin hacer falta y ganas cualquier duelo.' },
+      { min: 80, label: 'Gran Defensor (80-89)', icon: 'layers', desc: 'Cierre de garantías. Muy difícil de superar, anticipas cortes y despejas el peligro.' },
+      { min: 70, label: 'Defensa Sólida (70-79)', icon: 'lock', desc: 'Posicionamiento correcto. Metes pierna con criterio y ayudas al repliegue del equipo.' },
+      { min: 55, label: 'Defensa de Empuje (55-69)', icon: 'swords', desc: 'Presionas por insistencia y ayudas, aunque a veces muerdes a destiempo en falso.' },
+      { min: 40, label: 'Básico (~50)', icon: 'alert-triangle', desc: 'Poca vocación defensiva. Cuesta temporizar o meter el cuerpo en divididos.' }
     ]
   },
   {
@@ -107,11 +117,11 @@ export const STATS_TEST_CONFIG = [
     question: '¿Cómo vas de fondo físico para aguantar minutos y choque cuerpo a cuerpo?',
     defaultValue: 78,
     tiers: [
-      { min: 90, label: 'Portento Inagotable (90+)', emoji: '🦾', desc: 'Pulmones de acero. Presión continua sin cansancio y ganador de todo choque físico.' },
-      { min: 80, label: 'Gran Fondo Físico (80-89)', emoji: '💪', desc: 'Gran aguante físico a ritmo alto todo el partido y firmeza corporal en disputas.' },
-      { min: 70, label: 'Buena Capacidad (70-79)', emoji: '🏃‍♂️', desc: 'Aguantas el partido con soltura física y sabes regular tus esfuerzos en carrera.' },
-      { min: 55, label: 'Físico Estándar (55-69)', emoji: '⏱️', desc: 'Cumples bien el primer tiempo, pero en los minutos finales notas el bajón.' },
-      { min: 40, label: 'Fondo Justo (~50)', emoji: '🪫', desc: 'Tras varios piques necesitas aire urgentemente y pedir la rotación al banquillo.' }
+      { min: 90, label: 'Portento Inagotable (90+)', icon: 'dumbbell', desc: 'Pulmones de acero. Presión continua sin cansancio y ganador de todo choque físico.' },
+      { min: 80, label: 'Gran Fondo Físico (80-89)', icon: 'heart-pulse', desc: 'Gran aguante físico a ritmo alto todo el partido y firmeza corporal en disputas.' },
+      { min: 70, label: 'Buena Capacidad (70-79)', icon: 'activity', desc: 'Aguantas el partido con soltura física y sabes regular tus esfuerzos en carrera.' },
+      { min: 55, label: 'Físico Estándar (55-69)', icon: 'timer', desc: 'Cumples bien el primer tiempo, pero en los minutos finales notas el bajón.' },
+      { min: 40, label: 'Fondo Justo (~50)', icon: 'battery-low', desc: 'Tras varios piques necesitas aire urgentemente y pedir la rotación al banquillo.' }
     ]
   }
 ];
@@ -347,6 +357,16 @@ class FutApp {
     this.selectedStarterIndex = null;
     this.activeRadialIndex = null;
     this._justDraggedUntil = 0;
+    this.albumSquadFilter = 'all';
+    this._lastRoleValues = { best: 'DC', second: 'MC', third: 'DFC', fourth: 'MCO', worst: 'POR' };
+    this._matchPlanState = {
+      selectedIds: null,
+      strategy: 'balanced',
+      duration: null,
+      modalityKey: null,
+      customMinutes: {},
+      lastPlan: null
+    };
     this.store = store;
     this.authService = authService;
     this.init();
@@ -356,6 +376,7 @@ class FutApp {
     // 0. Tema Claro / Oscuro y Catálogo Oficial de Facultades UMU
     this.initTheme();
     this.populateFacultiesSelect();
+    this.populateRolePrioritySelects();
 
     // 1. Inicializar Firebase Auth & Firestore en Tiempo Real
     const fb = await initFirebaseServices();
@@ -424,6 +445,7 @@ class FutApp {
       document.documentElement.classList.remove('theme-light');
     }
     document.documentElement.style.colorScheme = isLight ? 'light' : 'dark';
+    document.getElementById('fut-walkout-overlay')?.classList.toggle('is-light-mode', isLight);
     localStorage.setItem('fut_theme', theme);
     const icon = document.getElementById('theme-toggle-icon');
     if (icon) {
@@ -468,6 +490,96 @@ class FutApp {
       case 'gold':
       default: return 'fut-card-gold';
     }
+  }
+
+  /**
+   * Devuelve etiquetas y paletas de iluminación sincronizadas para cada edición de carta FUT.
+   */
+  getCardSkinMeta(cardType) {
+    const skins = {
+      totw: {
+        skinKey: 'totw',
+        label: 'IN-FORM · TOTW',
+        editionTag: 'EDICIÓN TOTW',
+        particlesDark: ['#f0be2a', '#fde047', '#ffffff', '#f59e0b'],
+        particlesLight: ['#92400e', '#b45309', '#0f172a', '#d97706']
+      },
+      toty: {
+        skinKey: 'toty',
+        label: 'TEAM OF THE YEAR · TOTY',
+        editionTag: 'EDICIÓN TOTY',
+        particlesDark: ['#38bdf8', '#fde047', '#ffffff', '#2563eb'],
+        particlesLight: ['#1d4ed8', '#0284c7', '#b45309', '#0f172a']
+      },
+      tots: {
+        skinKey: 'tots',
+        label: 'TEAM OF THE SEASON · TOTS',
+        editionTag: 'EDICIÓN TOTS',
+        particlesDark: ['#2dd4bf', '#fef08a', '#ffffff', '#0891b2'],
+        particlesLight: ['#0f766e', '#0369a1', '#b45309', '#0f172a']
+      },
+      icon: {
+        skinKey: 'icon',
+        label: 'ICONO DEL CLUB',
+        editionTag: 'EDICIÓN ICONO',
+        particlesDark: ['#f5e6c8', '#fbbf24', '#ffffff', '#d97706'],
+        particlesLight: ['#92400e', '#78350f', '#b45309', '#334155']
+      },
+      gold: {
+        skinKey: 'gold',
+        label: 'ORO RARE',
+        editionTag: 'EDICIÓN ORO RARE',
+        particlesDark: ['#f0be2a', '#fde047', '#ffffff', '#f59e0b'],
+        particlesLight: ['#b45309', '#d97706', '#0f172a', '#92400e']
+      }
+    };
+    const key = cardType === 'special' ? 'toty' : cardType;
+    return skins[key] || skins.gold;
+  }
+
+  /**
+   * Traduce el código interno de celebración a un nombre legible para las vistas de carta.
+   */
+  getCelebrationLabel(code) {
+    const celebMap = {
+      siuuu: 'SIUUU',
+      calma: 'Calma',
+      samba: 'Samba Brasileña',
+      corazon: 'Corazón',
+      robot: 'El Robot',
+      desliz: 'Deslizamiento',
+      cielo: 'Señalar al cielo',
+      dormido: 'Night Night'
+    };
+    return celebMap[code] || 'Estándar';
+  }
+
+  /**
+   * Activa el giro 3D holográfico reactivo al puntero sobre las cartas destacadas.
+   */
+  bindCardInteractiveTilt(rootEl) {
+    if (!rootEl) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    rootEl.querySelectorAll('.fut-card').forEach((card) => {
+      card.addEventListener('pointermove', (ev) => {
+        const rect = card.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        const px = Math.max(0, Math.min(1, (ev.clientX - rect.left) / rect.width));
+        const py = Math.max(0, Math.min(1, (ev.clientY - rect.top) / rect.height));
+        const tiltY = ((px - 0.5) * 18).toFixed(2);
+        const tiltX = (((0.5 - py) * 18)).toFixed(2);
+        card.style.setProperty('--tilt-x', `${tiltX}deg`);
+        card.style.setProperty('--tilt-y', `${tiltY}deg`);
+        card.style.setProperty('--glare-x', `${(px * 100).toFixed(1)}%`);
+        card.style.setProperty('--glare-y', `${(py * 100).toFixed(1)}%`);
+      });
+      card.addEventListener('pointerleave', () => {
+        card.style.setProperty('--tilt-x', '0deg');
+        card.style.setProperty('--tilt-y', '0deg');
+        card.style.setProperty('--glare-x', '50%');
+        card.style.setProperty('--glare-y', '50%');
+      });
+    });
   }
 
   getPlayStyleIcon(ps) {
@@ -557,6 +669,12 @@ class FutApp {
         ${collarMarkup}
       </svg>
     `;
+  }
+
+  renderStarSvg(filled = true, sizeClass = 'w-3 h-3') {
+    return filled
+      ? `<svg viewBox="0 0 24 24" class="${sizeClass} inline-block align-middle" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.5" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`
+      : `<svg viewBox="0 0 24 24" class="${sizeClass} inline-block align-middle" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
   }
 
   hasRealAvatar(avatar) {
@@ -712,7 +830,10 @@ class FutApp {
 
     const sm = player.skillMoves || 4;
     const wf = player.weakFoot || 4;
-    if (starsEl) starsEl.textContent = `FIL: ${sm}★ | PIE: ${wf}★`;
+    if (starsEl) {
+      const sSvg = this.renderStarSvg(true, 'w-3 h-3 text-amber-400 -mt-0.5');
+      starsEl.innerHTML = `FIL: ${sm}${sSvg} | PIE: ${wf}${sSvg}`;
+    }
 
     const stats = player.stats || { pac: 80, sho: 80, pas: 80, dri: 80, def: 65, phy: 75 };
     statIds.forEach(key => {
@@ -746,6 +867,9 @@ class FutApp {
     this.renderFormationsVisualGrid();
     this.renderSquadsVisualGrid();
     this.populateFormationsSelect();
+    if (tab === 'tab-matchplan') {
+      this.renderMatchPlanTab();
+    }
 
     if (tab) {
       const tabBtn = dialog.querySelector(`.fifa-modal-tab[data-tab="${tab}"]`);
@@ -772,6 +896,9 @@ class FutApp {
             view.classList.add('hidden');
           }
         });
+        if (targetViewId === 'tab-matchplan') {
+          this.renderMatchPlanTab();
+        }
         futAudio.playFocus();
       });
     });
@@ -809,7 +936,7 @@ class FutApp {
             </div>
           </div>
           <button type="button" class="fifa-form-btn ${isActive ? 'is-active-btn' : ''}">
-            ${isActive ? '★ ESQUEMA ACTIVO' : 'APLICAR ESQUEMA'}
+            ${isActive ? '<i data-lucide="star" class="w-3.5 h-3.5 inline fill-current mr-1 -mt-0.5"></i>ESQUEMA ACTIVO' : 'APLICAR ESQUEMA'}
           </button>
         </div>
       `;
@@ -822,6 +949,8 @@ class FutApp {
         this.selectFormation(formId);
       });
     });
+
+    this.refreshIcons();
   }
 
   selectFormation(formId) {
@@ -855,6 +984,10 @@ class FutApp {
       const startersLabel = startersCount === 1 ? 'Titular' : 'Titulares';
       const benchLabel = benchCount === 1 ? 'Suplente' : 'Suplentes';
 
+      const startersHtml = starters.length > 0
+        ? starters.slice(0, 7).map(p => `<span class="fifa-squad-member-chip">#${p.number || 10} ${(p.nickname || p.name || '').split(' ')[0]}</span>`).join('')
+        : '<span class="fifa-squad-member-empty">Sin titulares aún · Crea cartas con Google</span>';
+
       return `
         <div class="fifa-squad-card ${isActive ? 'is-active' : ''}" data-squad-id="${s.id}">
           <div class="flex items-start justify-between gap-2">
@@ -871,8 +1004,9 @@ class FutApp {
             <span><i data-lucide="shield" class="w-3 h-3 inline text-amber-400"></i> Esquema: <b>${s.formation}</b></span>
             <span><i data-lucide="users" class="w-3 h-3 inline text-cyan-400"></i> ${startersCount} ${startersLabel} · ${benchCount} ${benchLabel}</span>
           </div>
+          <div class="fifa-squad-preview-strip">${startersHtml}</div>
           <button type="button" class="fifa-squad-btn ${isActive ? 'is-active-btn' : ''}">
-            ${isActive ? '★ PLANTILLA ACTIVA' : 'ACTIVAR PLANTILLA'}
+            ${isActive ? '<i data-lucide="star" class="w-3.5 h-3.5 inline fill-current mr-1 -mt-0.5"></i>PLANTILLA ACTIVA' : 'ACTIVAR PLANTILLA'}
           </button>
         </div>
       `;
@@ -963,30 +1097,32 @@ class FutApp {
     const formationConfig = getFormationConfig(settings.modality, activeFormation);
     const targetRoles = formationConfig.slots.map(s => s.role);
     const all = store.getPlayers();
-    const pool = [...all];
-    const newStarting = [];
+    if (all.length === 0) {
+      this.showToast('Aún no hay jugadores registrados para alinear', 'alert-triangle');
+      return;
+    }
 
-    targetRoles.forEach(role => {
-      // 1. Exact best match
-      let idx = pool.findIndex(p => p.rolesHierarchy?.best === role || p.roleBest === role);
-      // 2. Second best match
-      if (idx === -1) {
-        idx = pool.findIndex(p => p.rolesHierarchy?.second === role || p.roleSecond === role);
-      }
-      // 3. Fallback to highest rated available
-      if (idx === -1) {
-        idx = 0;
-      }
-      if (idx !== -1 && pool.length > 0) {
-        newStarting.push(pool.splice(idx, 1)[0]);
-      }
+    const scoreMatrix = all.map(player =>
+      targetRoles.map(role => {
+        const rankInfo = getPositionPriorityRank(player, role);
+        const statFit = computeStatRoleFit(player, role);
+        return ((player.rating || 75) - 70) * 1.1 + rankInfo.bonus + statFit;
+      })
+    );
+
+    const assignment = solveOptimalAssignment(scoreMatrix);
+    const newStarting = targetRoles.map((_, slotIdx) => {
+      const pIdx = assignment[slotIdx] ?? -1;
+      return pIdx >= 0 ? all[pIdx] : null;
     });
 
     store.setStartingLineup(newStarting);
     document.getElementById('squad-actions-dialog')?.close();
     this.renderPitch();
+    this.renderSquadsVisualGrid();
+    this.renderAlbumCards();
     futAudio.playSuccess();
-    this.showToast('¡Plantilla auto-alineada por posiciones oficiales!', 'sparkles');
+    this.showToast('Once óptimo calculado por media, stats y prioridad de roles', 'sparkles');
   }
 
   resetSquadPositions() {
@@ -1029,8 +1165,101 @@ class FutApp {
       this.openSquadActionsModal('tab-formations');
     });
 
+    document.getElementById('btn-open-matchplan')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.openSquadActionsModal('tab-matchplan');
+    });
+
+    // Controles del Planificador de Partido y Minutos
+    document.getElementById('btn-convoke-all')?.addEventListener('click', () => {
+      this._matchPlanState.selectedIds = new Set(store.getPlayers().map(p => p.id));
+      this._matchPlanState.customMinutes = {};
+      this.renderMatchPlanTab();
+      futAudio.playSelect();
+    });
+
+    document.getElementById('btn-convoke-none')?.addEventListener('click', () => {
+      this._matchPlanState.selectedIds = new Set();
+      this._matchPlanState.customMinutes = {};
+      this.renderMatchPlanTab();
+      futAudio.playNav();
+    });
+
+    document.getElementById('btn-convoke-fairness')?.addEventListener('click', () => {
+      const all = store.getPlayers();
+      const historyMap = buildHistorySummaryMap(store.getMatchLogs(), all);
+      const cap = store.getModalityCapacity();
+      const sorted = [...all].sort((a, b) => (historyMap[a.id]?.totalMinutes || 0) - (historyMap[b.id]?.totalMinutes || 0));
+      const targetPick = Math.min(all.length, cap + 3);
+      this._matchPlanState.selectedIds = new Set(sorted.slice(0, targetPick).map(p => p.id));
+      this._matchPlanState.strategy = 'rotation';
+      const stratSel = document.getElementById('matchplan-strategy');
+      if (stratSel) stratSel.value = 'rotation';
+      this._matchPlanState.customMinutes = {};
+      this.renderMatchPlanTab();
+      futAudio.playSuccess();
+      this.showToast('Priorizados los jugadores con menos minutos acumulados', 'sparkles');
+    });
+
+    document.getElementById('matchplan-duration')?.addEventListener('change', (e) => {
+      const val = Math.max(10, Math.min(120, parseInt(e.target.value, 10) || 50));
+      e.target.value = val;
+      this._matchPlanState.duration = val;
+      this._matchPlanState.customMinutes = {};
+      this.renderMatchPlanTab();
+    });
+
+    document.getElementById('matchplan-strategy')?.addEventListener('change', (e) => {
+      this._matchPlanState.strategy = e.target.value || 'balanced';
+      this._matchPlanState.customMinutes = {};
+      this.renderMatchPlanTab();
+      futAudio.playSelect();
+    });
+
+    document.getElementById('btn-apply-matchplan-lineup')?.addEventListener('click', () => {
+      this.applyMatchPlanToPitch();
+    });
+
+    document.getElementById('btn-save-matchplan-minutes')?.addEventListener('click', () => {
+      this.saveMatchPlanMinutesLog();
+    });
+
+    // Selectores de Prioridad de Posiciones (Creación / Edición de Carta)
+    document.querySelectorAll('.setup-role-priority-select').forEach(sel => {
+      sel.addEventListener('change', () => {
+        this.handleRolePriorityChange(sel);
+      });
+    });
+
     document.getElementById('btn-squad-actions')?.addEventListener('click', () => {
       this.openSquadActionsModal('tab-formations');
+    });
+
+    document.getElementById('btn-open-tactics-style')?.addEventListener('click', () => {
+      this.openSquadActionsModal('tab-tactics');
+    });
+
+    const miniPitch = document.getElementById('hud-tactics-mini-pitch');
+    miniPitch?.addEventListener('click', () => {
+      this.openSquadActionsModal('tab-formations');
+    });
+    miniPitch?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.openSquadActionsModal('tab-formations');
+      }
+    });
+
+    document.getElementById('inline-squad-select')?.addEventListener('change', (e) => {
+      this.selectSquad(e.target.value);
+    });
+
+    document.getElementById('btn-inline-new-squad')?.addEventListener('click', () => {
+      this.saveCurrentSquadPrompt();
+    });
+
+    document.getElementById('inline-formation-select')?.addEventListener('change', (e) => {
+      this.selectFormation(e.target.value);
     });
 
     // Pestañas
@@ -1299,6 +1528,15 @@ class FutApp {
       });
     });
 
+    const squadFilterSel = document.getElementById('album-squad-filter');
+    if (squadFilterSel) {
+      squadFilterSel.addEventListener('change', (e) => {
+        this.albumSquadFilter = e.target.value || 'all';
+        futAudio.playNav();
+        this.renderAlbumCards();
+      });
+    }
+
     const sortSelect = document.getElementById('album-sort-select');
     if (sortSelect) {
       sortSelect.addEventListener('change', (e) => {
@@ -1311,7 +1549,9 @@ class FutApp {
     document.getElementById('btn-reset-album-filters')?.addEventListener('click', () => {
       this.albumSearchQuery = '';
       this.albumRoleFilter = 'all';
+      this.albumSquadFilter = 'all';
       if (searchInput) searchInput.value = '';
+      if (squadFilterSel) squadFilterSel.value = 'all';
       document.querySelectorAll('#album-role-filters .hud-filter-pill').forEach((b, i) => {
         b.classList.toggle('active', i === 0);
       });
@@ -1366,19 +1606,59 @@ class FutApp {
 
   populateFormationsSelect() {
     const sel = document.getElementById('select-active-formation');
-    if (!sel) return;
+    const inlineSel = document.getElementById('inline-formation-select');
+    const chipsWrap = document.getElementById('side-formation-chips');
 
     const settings = store.getSettings();
     const isF7 = settings.modality === 'f7';
     const list = Object.values(isF7 ? TACTICAL_FORMATIONS.f7 : TACTICAL_FORMATIONS.futsal);
     const current = store.getActiveFormation();
 
-    sel.innerHTML = list.map(f => `
-      <option value="${f.id}" ${f.id === current ? 'selected' : ''}>${f.name}</option>
-    `).join('');
+    if (sel) {
+      sel.innerHTML = list.map(f => `
+        <option value="${f.id}" ${f.id === current ? 'selected' : ''}>${f.name}</option>
+      `).join('');
+    }
 
+    if (inlineSel) {
+      inlineSel.innerHTML = list.map(f => `
+        <option value="${f.id}" ${f.id === current ? 'selected' : ''}>${f.short || f.id} · ${f.name.replace(/^[0-9-]+\s*\(?|\)?$/g, '').trim()}</option>
+      `).join('');
+      inlineSel.value = current;
+    }
+
+    if (chipsWrap) {
+      chipsWrap.innerHTML = list.map(f => {
+        const isActive = f.id === current;
+        return `
+          <button type="button" class="hud-form-chip font-fifa ${isActive ? 'is-active' : ''}" data-formation="${f.id}" title="${f.name}">
+            <span>${f.short || f.id}</span>
+          </button>
+        `;
+      }).join('');
+      chipsWrap.querySelectorAll('.hud-form-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.selectFormation(btn.dataset.formation);
+        });
+      });
+    }
+
+    this.populateSquadsSelect();
     this.updateTacticsAdviceCard(current);
     this.updateTacticsControls();
+  }
+
+  /** Sincroniza el selector inline de plantillas activas en la cabecera del césped. */
+  populateSquadsSelect() {
+    const sel = document.getElementById('inline-squad-select');
+    if (!sel) return;
+    const squads = store.getSquads();
+    const activeId = store.getActiveSquadId();
+    sel.innerHTML = squads.map(s => {
+      const mod = s.modality === 'futsal' ? 'SALA' : 'F7';
+      return `<option value="${s.id}" ${s.id === activeId ? 'selected' : ''}>[${mod}] ${s.name}</option>`;
+    }).join('');
+    sel.value = activeId;
   }
 
   updateTacticsAdviceCard(formationId) {
@@ -1446,6 +1726,19 @@ class FutApp {
     // 5. Creación de oportunidades
     const chanceSel = document.getElementById('tactics-chance-select');
     if (chanceSel) chanceSel.value = tactics.chanceCreation || 'forward_runs';
+
+    // 6. Resumen en Panel C (Centro Táctico)
+    const summaryEl = document.getElementById('side-tactics-summary');
+    if (summaryEl) {
+      const styleNames = {
+        balanced: 'EQUILIBRADO',
+        press_loss: 'TRAS PÉRDIDA',
+        press_heavy: 'PRESIÓN ALTA',
+        drop_back: 'REPLIEGUE'
+      };
+      const stName = styleNames[tactics.defensiveStyle] || 'EQUILIBRADO';
+      summaryEl.textContent = `${stName} · PROF. ${tactics.defensiveDepth || 6}`;
+    }
   }
 
   openConfirmModal({ title = 'Confirmar Acción', message = '', confirmLabel = 'Confirmar', onConfirm = null } = {}) {
@@ -1526,7 +1819,10 @@ class FutApp {
       if (!name) return;
       const squad = store.saveCurrentAsSquad(name);
       squadCreateDialog.close();
+      this.populateSquadsSelect();
+      this.populateFormationsSelect();
       this.renderSquadsVisualGrid();
+      this.renderPitch();
       futAudio.playSuccess();
       this.showToast(`Plantilla "${squad.name}" guardada y activada`, 'sparkles');
     });
@@ -1910,7 +2206,14 @@ class FutApp {
         roleBest: document.getElementById('setup-role-best').value,
         roleSecond: document.getElementById('setup-role-second').value,
         roleThird: document.getElementById('setup-role-third').value,
+        roleFourth: document.getElementById('setup-role-fourth')?.value || 'MCO',
         roleWorst: document.getElementById('setup-role-worst').value,
+        priorityOrder: [
+          document.getElementById('setup-role-best').value,
+          document.getElementById('setup-role-second').value,
+          document.getElementById('setup-role-third').value,
+          document.getElementById('setup-role-fourth')?.value || 'MCO'
+        ],
         pac: document.getElementById('setup-pac').value,
         sho: document.getElementById('setup-sho').value,
         pas: document.getElementById('setup-pas').value,
@@ -1920,11 +2223,20 @@ class FutApp {
       };
 
       try {
-        const wasNew = !authService.getCurrentUser()?.playerId;
+        const currentUser = authService.getCurrentUser();
+        const prevEmail = (currentUser?.email || '').toLowerCase();
+        const prevPlayer = store.getPlayers().find(p =>
+          (currentUser?.playerId && p.id === currentUser.playerId) ||
+          (p.email && prevEmail && p.email.toLowerCase() === prevEmail)
+        );
+        const wasNew = !prevPlayer;
+        const prevSkin = prevPlayer?.cardType || null;
+        const prevRating = prevPlayer?.rating || null;
+
         const newPlayer = await authService.completePlayerCard(cardData);
         document.getElementById('player-card-setup-dialog').close();
         this.showToast(wasNew ? '¡Tu Carta FIFA FUT ha sido generada con éxito!' : '¡Carta actualizada correctamente!', 'sparkles');
-        if (wasNew && newPlayer) {
+        if (newPlayer && (wasNew || prevSkin !== newPlayer.cardType || prevRating !== newPlayer.rating)) {
           this.triggerWalkout(newPlayer);
         }
       } catch (err) {
@@ -2079,7 +2391,9 @@ class FutApp {
       },
       stats
     };
+    host.dataset.skin = previewPlayer.cardType || 'gold';
     host.innerHTML = this.renderFutCard(previewPlayer, { size: 'inspect' });
+    this.bindCardInteractiveTilt(host);
   }
 
   openPlayerSetupModal(user) {
@@ -2087,6 +2401,7 @@ class FutApp {
     if (!dialog) return;
 
     this.populateFacultiesSelect();
+    this.populateRolePrioritySelects();
 
     user = user || authService.getCurrentUser();
     if (!user) {
@@ -2122,10 +2437,19 @@ class FutApp {
       setVal('setup-skill-moves', existing.skillMoves || 4);
       setVal('setup-weak-foot', existing.weakFoot || 4);
       if (existing.rolesHierarchy) {
-        setVal('setup-role-best', existing.rolesHierarchy.best || 'DC');
-        setVal('setup-role-second', existing.rolesHierarchy.second || 'MC');
-        setVal('setup-role-third', existing.rolesHierarchy.third || 'DFC');
-        setVal('setup-role-worst', existing.rolesHierarchy.worst || 'POR');
+        const chain = getPlayerPriorityChain(existing);
+        setVal('setup-role-best', chain.best);
+        setVal('setup-role-second', chain.second);
+        setVal('setup-role-third', chain.third);
+        setVal('setup-role-fourth', chain.fourth);
+        setVal('setup-role-worst', chain.worst);
+        this._lastRoleValues = {
+          best: chain.best,
+          second: chain.second,
+          third: chain.third,
+          fourth: chain.fourth,
+          worst: chain.worst
+        };
       }
       this.setupStatsTestForUser(existing);
       const avatarUrl = existing.avatar || user.photoURL || 'assets/club_logo.png';
@@ -2148,7 +2472,9 @@ class FutApp {
       setVal('setup-role-best', 'DC');
       setVal('setup-role-second', 'MC');
       setVal('setup-role-third', 'DFC');
+      setVal('setup-role-fourth', 'MCO');
       setVal('setup-role-worst', 'POR');
+      this._lastRoleValues = { best: 'DC', second: 'MC', third: 'DFC', fourth: 'MCO', worst: 'POR' };
       this.setupStatsTestForUser(null);
       const avatarUrl = user.photoURL || 'assets/club_logo.png';
       const imgEl = document.getElementById('setup-user-avatar');
@@ -2156,6 +2482,8 @@ class FutApp {
       if (imgEl) imgEl.src = avatarUrl;
       if (urlInput) urlInput.value = avatarUrl;
     }
+
+    this.updateRolePriorityPreview();
 
     const userNameEl = document.getElementById('setup-user-name');
     if (userNameEl) userNameEl.textContent = user.name || 'Jugador FUT';
@@ -2354,7 +2682,9 @@ class FutApp {
       const activeTierObj = currentConfig.tiers.find(t => val >= t.min) || currentConfig.tiers[currentConfig.tiers.length - 1];
       descBox.innerHTML = `
         <div class="flex items-start gap-2.5">
-          <span class="text-xl flex-shrink-0">${activeTierObj.emoji}</span>
+          <span class="w-8 h-8 bg-amber-400/15 border border-amber-400/40 text-amber-400 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="${activeTierObj.icon || currentConfig.icon}" class="w-4 h-4"></i>
+          </span>
           <div class="space-y-0.5">
             <span class="text-[11px] font-black ${tier.textClass} uppercase tracking-wide block">
               ${activeTierObj.label} · ${val} Puntos
@@ -2365,6 +2695,7 @@ class FutApp {
           </div>
         </div>
       `;
+      this.refreshIcons();
     }
 
     // Actualizar highlight de botones preset
@@ -2457,7 +2788,7 @@ class FutApp {
         const icon = document.getElementById('wizard-btn-next-icon');
         if (icon) icon.setAttribute('data-lucide', 'chevron-right');
       } else {
-        nextText.textContent = 'Finalizar Test y Ver Resultado ✓';
+        nextText.textContent = 'Finalizar Test y Ver Resultado';
         nextBtn.className = 'px-5 py-2.5  bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer';
         const icon = document.getElementById('wizard-btn-next-icon');
         if (icon) icon.setAttribute('data-lucide', 'check-check');
@@ -2685,6 +3016,7 @@ class FutApp {
   }
 
   renderAll() {
+    this.populateSquadsSelect();
     this.populateFormationsSelect();
     this.renderHeaderAndSettings();
     this.renderPitch();
@@ -2702,8 +3034,12 @@ class FutApp {
     const navName = document.getElementById('nav-team-name');
     if (navName) navName.textContent = settings.teamName;
 
+    const activeSq = store.getActiveSquad();
     const hudTop = document.getElementById('hud-team-name-top');
-    if (hudTop) hudTop.textContent = settings.teamName;
+    if (hudTop) {
+      const clubUpper = (settings.teamName || 'Furia Rector FC').toUpperCase();
+      hudTop.textContent = activeSq?.name ? `${clubUpper} · ${activeSq.name.toUpperCase()}` : clubUpper;
+    }
 
     const setTeam = document.getElementById('set-team-name');
     if (setTeam && !setTeam.value) setTeam.value = settings.teamName;
@@ -2902,7 +3238,7 @@ class FutApp {
              onclick="window.futApp.selectStarter(${index})"
              onmouseenter="window.futApp.updatePlayerInspector(window.futApp.store.getStartingLineup()[${index}])">
           
-          ${isSelected ? `<div class="fifa-player-cursor font-fifa" title="Jugador Activo">▼</div>` : ''}
+          ${isSelected ? `<div class="fifa-player-cursor font-fifa" title="Jugador Activo"><svg viewBox="0 0 12 8" class="w-3 h-2 inline-block" aria-hidden="true"><polygon points="0,0 12,0 6,8" fill="currentColor"/></svg></div>` : ''}
           ${this.renderFutCard(player, { size: 'pitch', role: slot.role })}
 
           <div class="fut-pos-pedestal ${fitClass}" title="${fitTitle}">
@@ -3379,70 +3715,332 @@ class FutApp {
   }
 
   // ==================== CINEMÁTICA WALKOUT FIFA FUT ====================
+  clearWalkoutState() {
+    if (Array.isArray(this._walkoutTimers)) {
+      this._walkoutTimers.forEach(t => clearTimeout(t));
+    }
+    this._walkoutTimers = [];
+    if (this._walkoutInterval) {
+      clearInterval(this._walkoutInterval);
+      this._walkoutInterval = null;
+    }
+    if (this._walkoutRaf) {
+      cancelAnimationFrame(this._walkoutRaf);
+      this._walkoutRaf = null;
+    }
+    if (this._walkoutEscHandler) {
+      document.removeEventListener('keydown', this._walkoutEscHandler);
+      this._walkoutEscHandler = null;
+    }
+    const canvas = document.getElementById('walkout-fx-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    const overlay = document.getElementById('fut-walkout-overlay');
+    overlay?.classList.remove('doors-cracked', 'doors-open', 'is-flash-active', 'is-laser-active');
+  }
+
+  /**
+   * Lanza cañones pirotécnicos y confeti geométrico en el canvas sincronizado con la skin y tema.
+   */
+  launchWalkoutParticles(canvas, skinMeta, isLight) {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const palette = isLight ? skinMeta.particlesLight : skinMeta.particlesDark;
+    const particles = [];
+
+    // Dos fuentes de pirotecnia desde la base del escenario hacia arriba y los laterales
+    const origins = [
+      { x: w * 0.24, y: h * 0.88, baseAngle: -Math.PI / 2 + 0.32 },
+      { x: w * 0.76, y: h * 0.88, baseAngle: -Math.PI / 2 - 0.32 },
+      { x: w * 0.50, y: h * 0.52, baseAngle: -Math.PI / 2, radial: true }
+    ];
+
+    for (let i = 0; i < 110; i++) {
+      const org = origins[i % origins.length];
+      const angle = org.radial
+        ? Math.random() * Math.PI * 2
+        : org.baseAngle + (Math.random() - 0.5) * 0.95;
+      const speed = org.radial ? (3 + Math.random() * 9) : (7 + Math.random() * 11);
+      particles.push({
+        x: org.x + (Math.random() - 0.5) * 32,
+        y: org.y + (Math.random() - 0.5) * 20,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 3 + Math.random() * 5.5,
+        rot: Math.random() * Math.PI * 2,
+        vRot: (Math.random() - 0.5) * 0.22,
+        color: palette[i % palette.length],
+        life: 0,
+        maxLife: 115 + Math.random() * 75,
+        shape: i % 3 // 0 = diamante FUT, 1 = cinta metálica, 2 = chispa
+      });
+    }
+
+    const startTime = performance.now();
+    const tick = (now) => {
+      if (now - startTime > 4600 || particles.length === 0) {
+        ctx.clearRect(0, 0, w, h);
+        this._walkoutRaf = null;
+        return;
+      }
+      ctx.clearRect(0, 0, w, h);
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const pt = particles[i];
+        pt.life += 1;
+        if (pt.life >= pt.maxLife) {
+          particles.splice(i, 1);
+          continue;
+        }
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.vx *= 0.985;
+        pt.vy = pt.vy * 0.985 + 0.14;
+        pt.rot += pt.vRot;
+
+        const alpha = Math.max(0, 1 - pt.life / pt.maxLife);
+        ctx.save();
+        ctx.globalAlpha = alpha * (isLight ? 0.9 : 0.95);
+        ctx.translate(pt.x, pt.y);
+        ctx.rotate(pt.rot);
+        ctx.fillStyle = pt.color;
+
+        if (pt.shape === 0) {
+          // Diamante FUT
+          ctx.beginPath();
+          ctx.moveTo(0, -pt.size);
+          ctx.lineTo(pt.size * 0.72, 0);
+          ctx.lineTo(0, pt.size);
+          ctx.lineTo(-pt.size * 0.72, 0);
+          ctx.closePath();
+          ctx.fill();
+        } else if (pt.shape === 1) {
+          // Confeti angular
+          ctx.fillRect(-pt.size * 0.85, -pt.size * 0.35, pt.size * 1.7, pt.size * 0.7);
+        } else {
+          // Estrella / destello circular
+          ctx.beginPath();
+          ctx.arc(0, 0, pt.size * 0.42, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+      this._walkoutRaf = requestAnimationFrame(tick);
+    };
+    this._walkoutRaf = requestAnimationFrame(tick);
+  }
+
+  /**
+   * Rellena el panel Lower-Third estilo retransmisión EA Sports FC en el Walkout.
+   */
+  populateWalkoutTelemetry(player, skinMeta) {
+    const fac = FACULTIES.find(f => f.id === player.faculty) || FACULTIES[0];
+    const bestRole = player.rolesHierarchy?.best || player.roleBest || 'DC';
+    const stats = player.stats || { pac: 80, sho: 80, pas: 80, dri: 80, def: 65, phy: 75 };
+    const dorsal = player.number || 10;
+    const sm = player.skillMoves || 4;
+    const wf = player.weakFoot || 4;
+
+    const setText = (id, txt) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = txt;
+    };
+
+    setText('walkout-edition-pill', skinMeta.label);
+    setText('walkout-tier-banner', `WALKOUT · ${skinMeta.editionTag}`);
+    setText('walkout-crest-kicker', (store.getSettings().teamName || 'CLUB OFICIAL').toUpperCase());
+    setText('walkout-crest-name', fac.name.toUpperCase());
+    setText('walkout-pos-pill', bestRole);
+    setText('walkout-dorsal-pill', `#${dorsal}`);
+    setText('walkout-pos-subline', `${fac.short.toUpperCase()} · PREPARANDO WALKOUT ${skinMeta.editionTag}`);
+    setText('walkout-chyron-pos', bestRole);
+    setText('walkout-chyron-edition', skinMeta.editionTag);
+    setText('walkout-chyron-dorsal', `#${dorsal}`);
+    setText('walkout-player-nickname', (player.nickname || player.name || 'FICHAJE ESTRELLA').toUpperCase());
+    setText('walkout-player-subline', `${player.name || 'Jugador'} · ${fac.short} · Dorsal #${dorsal}`);
+
+    const facCrestEl = document.getElementById('walkout-fac-crest');
+    if (facCrestEl) facCrestEl.innerHTML = fac.icon || '';
+
+    const crestIconEl = document.getElementById('walkout-crest-icon');
+    if (crestIconEl) {
+      crestIconEl.innerHTML = `<img src="assets/club_logo.png" alt="Escudo Oficial" class="walkout-club-logo-img">`;
+    }
+
+    const celebPill = document.getElementById('walkout-celeb-pill');
+    if (celebPill) {
+      celebPill.innerHTML = `<i data-lucide="trophy" class="w-3.5 h-3.5"></i><span>Celebración: ${this.getCelebrationLabel(player.celebration)}</span>`;
+    }
+
+    const starsEl = document.getElementById('walkout-stars-row');
+    if (starsEl) {
+      starsEl.innerHTML = `
+        <span>Filigranas ${sm} ${this.renderStarSvg(true, 'w-3.5 h-3.5')}</span>
+        <span class="opacity-45">·</span>
+        <span>P. Mala ${wf} ${this.renderStarSvg(true, 'w-3.5 h-3.5')}</span>
+      `;
+    }
+
+    setText('walkout-foot-pill', player.preferredFoot || 'Diestro');
+
+    const statDefs = [
+      { key: 'pac', lbl: 'RIT' },
+      { key: 'sho', lbl: 'TIR' },
+      { key: 'pas', lbl: 'PAS' },
+      { key: 'dri', lbl: 'REG' },
+      { key: 'def', lbl: 'DEF' },
+      { key: 'phy', lbl: 'FÍS' }
+    ];
+    const statsHost = document.getElementById('walkout-stats-bars');
+    if (statsHost) {
+      statsHost.innerHTML = statDefs.map(s => {
+        const val = stats[s.key] || 75;
+        const tier = val >= 85 ? 'is-elite' : (val >= 72 ? 'is-good' : 'is-mid');
+        return `
+          <div class="walkout-stat-tile ${tier}">
+            <div class="walkout-stat-top">
+              <span class="walkout-stat-lbl">${s.lbl}</span>
+              <span class="walkout-stat-num font-fifa">${val}</span>
+            </div>
+            <div class="walkout-stat-track">
+              <div class="walkout-stat-fill" style="--stat-pct: ${Math.min(100, Math.max(15, val))}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
   triggerWalkout(player) {
     const overlay = document.getElementById('fut-walkout-overlay');
-    if (!overlay) return;
+    if (!overlay || !player) return;
 
-    const fac = FACULTIES.find(f => f.id === player.faculty) || FACULTIES[0];
+    this.clearWalkoutState();
+
+    const isLight = document.body.classList.contains('theme-light');
+    const skinMeta = this.getCardSkinMeta(player.cardType);
     const crestStep = document.getElementById('walkout-crest-step');
     const posStep = document.getElementById('walkout-pos-step');
     const cardStep = document.getElementById('walkout-card-step');
     const cardHost = document.getElementById('walkout-card-host');
     const ticker = document.getElementById('walkout-rating-ticker');
-    const nameTag = document.getElementById('walkout-player-nickname');
 
-    // Resetear visibilidad de pasos
-    crestStep.classList.remove('hidden');
-    posStep.classList.add('hidden');
-    cardStep.classList.add('hidden');
+    overlay.dataset.skin = skinMeta.skinKey;
+    overlay.classList.toggle('is-light-mode', isLight);
 
-    document.getElementById('walkout-crest-icon').innerHTML = `
-      <img src="assets/club_logo.png" alt="Escudo Oficial" class="w-24 h-28 object-contain drop-shadow-[0_0_24px_rgba(240,190,42,0.8)]">
-    `;
-    document.getElementById('walkout-crest-name').textContent = `${(store.getSettings().teamName || 'CLUB').toUpperCase()} • ${fac.short}`;
-    document.getElementById('walkout-pos-pill').textContent = player.rolesHierarchy ? player.rolesHierarchy.best : 'DC';
+    this.populateWalkoutTelemetry(player, skinMeta);
 
-    overlay.classList.remove('hidden');
-    futAudio.playWalkoutExplosion();
-
-    // Paso 2: Revelar Posición a los 750ms
-    setTimeout(() => {
-      crestStep.classList.add('hidden');
-      posStep.classList.remove('hidden');
-      futAudio.playCardSelect();
-    }, 750);
-
-    // Paso 3: Revelar Carta y Ticker a los 1500ms
-    setTimeout(() => {
-      posStep.classList.add('hidden');
-      cardStep.classList.remove('hidden');
-
-      cardHost.innerHTML = this.renderFutCard(player, { size: 'walkout' });
-
-      nameTag.textContent = (player.nickname || player.name).toUpperCase();
-
-      // Animación del Ticker de Media (Rating counter)
-      let currentVal = Math.max(40, player.rating - 24);
-      ticker.textContent = currentVal;
-      const targetVal = player.rating;
-      const interval = setInterval(() => {
-        if (currentVal < targetVal) {
-          currentVal++;
-          ticker.textContent = currentVal;
-          futAudio.playRatingTick();
-        } else {
-          clearInterval(interval);
-          futAudio.playFanfare();
-        }
-      }, 35);
-    }, 1500);
-
-    // Cerrar Walkout
-    document.getElementById('btn-close-walkout').onclick = () => {
+    const closeOverlay = (playConfirmSfx = false) => {
+      this.clearWalkoutState();
       overlay.classList.add('hidden');
-      futAudio.playSuccess();
+      if (playConfirmSfx) futAudio.playSuccess();
       this.renderAll();
     };
+
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const revealFinalCard = () => {
+      crestStep.classList.add('hidden');
+      posStep.classList.add('hidden');
+      cardStep.classList.remove('hidden');
+      overlay.classList.remove('is-laser-active');
+      overlay.classList.add('doors-open');
+
+      if (!prefersReducedMotion) {
+        overlay.classList.add('is-flash-active');
+        this.launchWalkoutParticles(document.getElementById('walkout-fx-canvas'), skinMeta, isLight);
+      }
+
+      if (cardHost) {
+        cardHost.innerHTML = `
+          <div class="walkout-card-inner">
+            ${this.renderFutCard(player, { size: 'walkout' })}
+            <div class="walkout-card-glint" aria-hidden="true"></div>
+          </div>
+        `;
+        this.bindCardInteractiveTilt(cardHost);
+      }
+
+      this.refreshIcons();
+
+      if (prefersReducedMotion) {
+        if (ticker) ticker.textContent = player.rating;
+        return;
+      }
+
+      futAudio.playWalkoutCardSlam();
+      let currentVal = Math.max(40, player.rating - 24);
+      if (ticker) ticker.textContent = currentVal;
+      const targetVal = player.rating;
+      this._walkoutInterval = setInterval(() => {
+        if (currentVal < targetVal) {
+          currentVal++;
+          if (ticker) ticker.textContent = currentVal;
+          futAudio.playRatingTick();
+        } else {
+          clearInterval(this._walkoutInterval);
+          this._walkoutInterval = null;
+          futAudio.playFanfare();
+        }
+      }, 32);
+    };
+
+    overlay.classList.remove('hidden');
+
+    if (prefersReducedMotion) {
+      revealFinalCard();
+    } else {
+      crestStep.classList.remove('hidden');
+      posStep.classList.add('hidden');
+      cardStep.classList.add('hidden');
+
+      overlay.classList.add('doors-cracked');
+      futAudio.playWalkoutTunnelRiser();
+
+      this._walkoutTimers.push(setTimeout(() => {
+        crestStep.classList.add('hidden');
+        posStep.classList.remove('hidden');
+        overlay.classList.add('is-laser-active');
+        futAudio.playCardSwap();
+      }, 800));
+
+      this._walkoutTimers.push(setTimeout(() => {
+        revealFinalCard();
+      }, 1620));
+    }
+
+    const closeBtn = document.getElementById('btn-close-walkout');
+    if (closeBtn) closeBtn.onclick = () => closeOverlay(true);
+
+    const skipBtn = document.getElementById('btn-skip-walkout');
+    if (skipBtn) skipBtn.onclick = () => closeOverlay(false);
+
+    const replayBtn = document.getElementById('btn-replay-walkout');
+    if (replayBtn) {
+      replayBtn.onclick = () => {
+        this.triggerWalkout(player);
+      };
+    }
+
+    this._walkoutEscHandler = (ev) => {
+      if (ev.key === 'Escape' && !overlay.classList.contains('hidden')) {
+        ev.preventDefault();
+        closeOverlay(false);
+      }
+    };
+    document.addEventListener('keydown', this._walkoutEscHandler);
+    this.refreshIcons();
   }
 
   // ==================== ÁLBUM DE CARTAS (PATRÓN LINEAR / EA SPORTS) ====================
@@ -3479,6 +4077,16 @@ class FutApp {
       });
     }
 
+    // 2B. Filtrado por participación en la plantilla activa (por defecto TODAS las cartas)
+    const activeSquad = store.getActiveSquad();
+    const starterSet = new Set(store.getStartingLineup().filter(Boolean).map(p => p.id));
+    const squadFilter = this.albumSquadFilter || 'all';
+    if (squadFilter === 'starters') {
+      players = players.filter(p => starterSet.has(p.id));
+    } else if (squadFilter === 'bench') {
+      players = players.filter(p => !starterSet.has(p.id));
+    }
+
     // 3. Ordenación
     const sortBy = this.albumSortBy || 'ovr-desc';
     players.sort((a, b) => {
@@ -3488,6 +4096,8 @@ class FutApp {
       if (sortBy === 'name-asc') return (a.nickname || a.name || '').localeCompare(b.nickname || b.name || '');
       return 0;
     });
+
+    const historyMap = buildHistorySummaryMap(store.getMatchLogs(), players);
 
     if (countBadge) {
       countBadge.textContent = `${players.length} CROMO${players.length === 1 ? '' : 'S'}`;
@@ -3503,9 +4113,12 @@ class FutApp {
 
     grid.innerHTML = players.map(p => {
       const fac = FACULTIES.find(f => f.id === p.faculty) || FACULTIES[0];
-      const best = p.rolesHierarchy?.best || 'MC';
-      const second = p.rolesHierarchy?.second || '';
-      const third = p.rolesHierarchy?.third || '';
+      const chain = getPlayerPriorityChain(p);
+      const isStarter = starterSet.has(p.id);
+      const hist = historyMap[p.id] || { totalMinutes: 0, matchesPlayed: 0 };
+      const sqTagLabel = isStarter
+        ? `TITULAR · ${(activeSquad?.name || 'EQUIPO ACTIVO').toUpperCase()}`
+        : `BANQUILLO · ${(activeSquad?.name || 'EQUIPO ACTIVO').toUpperCase()}`;
 
       return `
         <article class="fifa-album-tile group">
@@ -3513,17 +4126,19 @@ class FutApp {
           <div class="fifa-album-meta-row font-fifa">
             <span class="fifa-album-dorsal">#${p.number || 10}</span>
             <span class="fifa-album-faculty">${fac.short}</span>
-            ${p.goals > 0 ? `<span class="fifa-album-goals">${p.goals}G</span>` : ''}
+            ${hist.totalMinutes > 0 ? `<span class="fifa-album-mins">${hist.totalMinutes}'</span>` : (p.goals > 0 ? `<span class="fifa-album-goals">${p.goals}G</span>` : '')}
           </div>
+
+          <div class="fifa-album-squad-tag ${isStarter ? 'is-starter' : 'is-bench'} font-fifa">${sqTagLabel}</div>
 
           <div class="fifa-album-stage" onclick="window.futApp.inspectPlayer('${p.id}')" title="Ver ficha técnica de ${p.nickname || p.name}">
             ${this.renderFutCard(p, { size: 'album' })}
           </div>
 
-          <div class="fifa-album-pos-row font-fifa" aria-label="Posiciones">
-            <span class="fifa-album-pos-chip is-primary">★ ${best}</span>
-            ${second ? `<span class="fifa-album-pos-chip">${second}</span>` : ''}
-            ${third ? `<span class="fifa-album-pos-chip is-muted">${third}</span>` : ''}
+          <div class="fifa-album-pos-row font-fifa" aria-label="Orden de prioridad de posiciones">
+            <span class="fifa-album-pos-chip is-primary inline-flex items-center gap-1"><i data-lucide="star" class="w-3 h-3 fill-current"></i><span>1º ${chain.best}</span></span>
+            <span class="fifa-album-pos-chip">2º ${chain.second}</span>
+            <span class="fifa-album-pos-chip is-muted">3º ${chain.third}</span>
           </div>
 
           <button type="button" onclick="window.futApp.inspectPlayer('${p.id}')" class="fifa-album-inspect-btn font-fifa">
@@ -3546,26 +4161,22 @@ class FutApp {
     const content = document.getElementById('inspect-card-content');
     if (!content) return;
 
+    const skinMeta = this.getCardSkinMeta(p.cardType);
     const sm = p.skillMoves || 4;
     const wf = p.weakFoot || 4;
-    const celebMap = {
-      siuuu: 'SIUUU',
-      calma: 'Calma',
-      samba: 'Samba Brasileña',
-      corazon: 'Corazón',
-      robot: 'El Robot',
-      desliz: 'Deslizamiento',
-      cielo: 'Señalar al cielo',
-      dormido: 'Night Night'
-    };
     const kit = this.resolvePlayerKit(p);
     const kitDesc = `${this.getKitColorName(kit.primary)} · Dorsal #${p.number || 10}`;
-    const starBar = (n) => `<span class="text-amber-400">${'★'.repeat(n)}</span><span class="text-slate-600">${'★'.repeat(Math.max(0, 5 - n))}</span>`;
+    const starBar = (n) => {
+      const filled = this.renderStarSvg(true, 'w-3.5 h-3.5 text-amber-400');
+      const empty = this.renderStarSvg(false, 'w-3.5 h-3.5 text-slate-500');
+      return `<span class="inline-flex items-center gap-0.5 align-middle">${filled.repeat(n)}${empty.repeat(Math.max(0, 5 - n))}</span>`;
+    };
 
     content.innerHTML = `
-      <div class="flex flex-col sm:flex-row items-center gap-5 bg-slate-900/90 p-4 border border-slate-700/80">
-        <div class="flex-shrink-0">
+      <div class="inspect-card-stage flex flex-col sm:flex-row items-center gap-5 bg-slate-900/90 p-4 border border-slate-700/80" data-skin="${skinMeta.skinKey}">
+        <div class="inspect-card-pedestal flex-shrink-0 flex flex-col items-center gap-2">
           ${this.renderFutCard(p, { size: 'inspect' })}
+          <span class="inspect-edition-tag font-fifa">${skinMeta.editionTag}</span>
         </div>
         <div class="flex-1 space-y-2 text-center sm:text-left w-full">
           <div class="flex flex-wrap items-center justify-between gap-2">
@@ -3576,43 +4187,52 @@ class FutApp {
           <p class="text-xs text-cyan-400 font-bold inline-flex items-center gap-1.5">${fac.icon} <span>${fac.name}</span></p>
 
           <div class="grid grid-cols-2 gap-2 pt-1 text-[11px] font-bold text-slate-300">
-            <div class="bg-slate-950/80 p-1.5 border border-slate-800">
+            <div class="inspect-meta-tile bg-slate-950/80 p-1.5 border border-slate-800">
               <span class="text-[9px] uppercase text-slate-500 block">Filigranas / Regate</span>
               <span class="font-fifa text-amber-400 text-sm">${sm} ${starBar(sm)}</span>
             </div>
-            <div class="bg-slate-950/80 p-1.5 border border-slate-800">
+            <div class="inspect-meta-tile bg-slate-950/80 p-1.5 border border-slate-800">
               <span class="text-[9px] uppercase text-slate-500 block">Pierna Mala</span>
               <span class="font-fifa text-amber-400 text-sm">${wf} ${starBar(wf)}</span>
             </div>
           </div>
 
-          <div class="bg-slate-950/80 p-2 border border-slate-800 text-[10px] space-y-1">
-            <div><span class="text-slate-500 uppercase font-fifa">Celebración:</span> <span class="text-white font-bold">${celebMap[p.celebration] || 'Estándar'}</span></div>
+          <div class="inspect-meta-tile bg-slate-950/80 p-2 border border-slate-800 text-[10px] space-y-1">
+            <div><span class="text-slate-500 uppercase font-fifa">Celebración:</span> <span class="text-white font-bold">${this.getCelebrationLabel(p.celebration)}</span></div>
             <div><span class="text-slate-500 uppercase font-fifa">Edición:</span> <span class="text-white font-bold">${kitDesc}</span></div>
           </div>
         </div>
       </div>
 
       <div class="bg-slate-900/90 p-4 border border-slate-700/80 space-y-2">
-        <h5 class="text-[10px] font-black uppercase text-amber-400 font-fifa tracking-wider">AFINIDAD DE POSICIONES (ROLES TÁCTICOS)</h5>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="p-2.5 bg-emerald-950/40 border border-emerald-500/50">
-            <span class="block text-[10px] text-emerald-400 font-black uppercase">1º Principal</span>
-            <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.best}</span>
-          </div>
-          <div class="p-2.5 bg-sky-950/40 border border-sky-500/50">
-            <span class="block text-[10px] text-sky-400 font-black uppercase">2º Secundaria</span>
-            <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.second}</span>
-          </div>
-          <div class="p-2.5 bg-amber-950/40 border border-amber-500/50">
-            <span class="block text-[10px] text-amber-400 font-black uppercase">3º Alternativa</span>
-            <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.third}</span>
-          </div>
-          <div class="p-2.5 bg-rose-950/40 border border-rose-500/50">
-            <span class="block text-[10px] text-rose-400 font-black uppercase">4º Menos Favorable</span>
-            <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.worst}</span>
-          </div>
-        </div>
+        <h5 class="text-[10px] font-black uppercase text-amber-400 font-fifa tracking-wider">ORDEN DE PRIORIDAD DE POSICIONES</h5>
+        ${(() => {
+          const chain = getPlayerPriorityChain(p);
+          return `
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+              <div class="p-2.5 bg-emerald-950/40 border border-emerald-500/50">
+                <span class="block text-[10px] text-emerald-400 font-black uppercase">1º Prioridad</span>
+                <span class="font-black text-white font-fifa text-base">${chain.best}</span>
+              </div>
+              <div class="p-2.5 bg-sky-950/40 border border-sky-500/50">
+                <span class="block text-[10px] text-sky-400 font-black uppercase">2º Opción</span>
+                <span class="font-black text-white font-fifa text-base">${chain.second}</span>
+              </div>
+              <div class="p-2.5 bg-cyan-950/40 border border-cyan-500/50">
+                <span class="block text-[10px] text-cyan-400 font-black uppercase">3º Alternativa</span>
+                <span class="font-black text-white font-fifa text-base">${chain.third}</span>
+              </div>
+              <div class="p-2.5 bg-amber-950/40 border border-amber-500/50">
+                <span class="block text-[10px] text-amber-400 font-black uppercase">4º Reserva</span>
+                <span class="font-black text-white font-fifa text-base">${chain.fourth}</span>
+              </div>
+              <div class="p-2.5 bg-rose-950/40 border border-rose-500/50 col-span-2 sm:col-span-2">
+                <span class="block text-[10px] text-rose-400 font-black uppercase">Evitar (Peor Rol)</span>
+                <span class="font-black text-white font-fifa text-base">${chain.worst}</span>
+              </div>
+            </div>
+          `;
+        })()}
       </div>
 
       <div class="space-y-2 bg-slate-900/90 p-4 border border-slate-700/80">
@@ -3631,6 +4251,10 @@ class FutApp {
       </div>
 
       <div class="pt-3 border-t border-white/10 flex flex-wrap items-center justify-end gap-2">
+        <button type="button" id="btn-inspect-walkout" class="inspect-walkout-btn px-3.5 py-1.5 font-black text-xs uppercase tracking-wider inline-flex items-center gap-1.5 transition cursor-pointer">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>Ver Walkout FIFA</span>
+        </button>
         ${((authService.getCurrentUser()?.playerId === p.id) || (authService.getCurrentUser()?.email && p.email && authService.getCurrentUser().email.toLowerCase() === p.email.toLowerCase()))
           ? `<button type="button" onclick="document.getElementById('player-inspect-dialog').close(); window.futApp.openPlayerSetupModal(window.futApp.authService.getCurrentUser());" class="px-3.5 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider transition cursor-pointer">
                Editar Mi Carta / Skin
@@ -3643,6 +4267,12 @@ class FutApp {
       </div>
     `;
 
+    document.getElementById('btn-inspect-walkout')?.addEventListener('click', () => {
+      document.getElementById('player-inspect-dialog')?.close();
+      this.triggerWalkout(p);
+    });
+
+    this.bindCardInteractiveTilt(content);
     document.getElementById('player-inspect-dialog').showModal();
     this.refreshIcons();
   }
@@ -3982,6 +4612,469 @@ class FutApp {
         el.innerHTML = optionsMarkup;
       });
     });
+  }
+
+  // ==================== PRIORIDAD DE POSICIONES SIN DUPLICADOS ====================
+  populateRolePrioritySelects() {
+    const ids = [
+      { id: 'setup-role-best', key: 'best', def: 'DC' },
+      { id: 'setup-role-second', key: 'second', def: 'MC' },
+      { id: 'setup-role-third', key: 'third', def: 'DFC' },
+      { id: 'setup-role-fourth', key: 'fourth', def: 'MCO' },
+      { id: 'setup-role-worst', key: 'worst', def: 'POR' }
+    ];
+    const optionsMarkup = ALL_TACTICAL_ROLES
+      .map(r => `<option value="${r.code}">${r.name} · ${r.modality}</option>`)
+      .join('');
+
+    ids.forEach(({ id, key, def }) => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      const prevVal = sel.value || this._lastRoleValues?.[key] || def;
+      sel.innerHTML = optionsMarkup;
+      sel.value = ALL_TACTICAL_ROLES.some(r => r.code === prevVal) ? prevVal : def;
+    });
+    this.updateRolePriorityPreview();
+  }
+
+  handleRolePriorityChange(changedSelect) {
+    if (!changedSelect) return;
+    const slotMap = {
+      'setup-role-best': 'best',
+      'setup-role-second': 'second',
+      'setup-role-third': 'third',
+      'setup-role-fourth': 'fourth',
+      'setup-role-worst': 'worst'
+    };
+    const changedKey = slotMap[changedSelect.id];
+    const newValue = changedSelect.value;
+    const oldValue = this._lastRoleValues?.[changedKey];
+
+    if (changedKey && oldValue && oldValue !== newValue) {
+      for (const [id, key] of Object.entries(slotMap)) {
+        if (key === changedKey) continue;
+        const otherSel = document.getElementById(id);
+        if (otherSel && otherSel.value === newValue) {
+          otherSel.value = oldValue;
+          this._lastRoleValues[key] = oldValue;
+        }
+      }
+      this._lastRoleValues[changedKey] = newValue;
+    }
+
+    this.updateRolePriorityPreview();
+    this.renderSetupLiveCardPreview();
+    futAudio.playSelect();
+  }
+
+  updateRolePriorityPreview() {
+    const preview = document.getElementById('setup-role-priority-preview');
+    if (!preview) return;
+    const b = document.getElementById('setup-role-best')?.value || 'DC';
+    const s = document.getElementById('setup-role-second')?.value || 'MC';
+    const t = document.getElementById('setup-role-third')?.value || 'DFC';
+    const f = document.getElementById('setup-role-fourth')?.value || 'MCO';
+    const w = document.getElementById('setup-role-worst')?.value || 'POR';
+
+    preview.innerHTML = `
+      <span class="role-priority-lbl font-fifa">CADENA TÁCTICA:</span>
+      <span class="role-priority-chip is-r1 font-fifa">1º ${b}</span>
+      <i data-lucide="arrow-right" class="w-3 h-3 text-slate-400"></i>
+      <span class="role-priority-chip is-r2 font-fifa">2º ${s}</span>
+      <i data-lucide="arrow-right" class="w-3 h-3 text-slate-400"></i>
+      <span class="role-priority-chip is-r3 font-fifa">3º ${t}</span>
+      <i data-lucide="arrow-right" class="w-3 h-3 text-slate-400"></i>
+      <span class="role-priority-chip is-r4 font-fifa">4º ${f}</span>
+      <span class="role-priority-chip is-avoid font-fifa">EVITAR: ${w}</span>
+    `;
+    this.refreshIcons();
+  }
+
+  // ==================== PLANIFICADOR INTELIGENTE DE PARTIDO Y MINUTOS ====================
+  renderMatchPlanTab() {
+    const convGrid = document.getElementById('matchplan-convocation-list');
+    const outWrap = document.getElementById('matchplan-output');
+    const countEl = document.getElementById('matchplan-selected-counter');
+    const ctxEl = document.getElementById('matchplan-squad-context');
+    const durInput = document.getElementById('matchplan-duration');
+    const stratSel = document.getElementById('matchplan-strategy');
+    if (!convGrid || !outWrap) return;
+
+    const settings = store.getSettings();
+    const modality = settings.modality || 'f7';
+    const activeFormation = store.getActiveFormation();
+    const formationConfig = getFormationConfig(modality, activeFormation);
+    const activeSquad = store.getActiveSquad();
+    const players = store.getPlayers();
+    const matchLogs = store.getMatchLogs();
+    const historyMap = buildHistorySummaryMap(matchLogs, players);
+
+    if (this._matchPlanState.modalityKey !== modality) {
+      this._matchPlanState.modalityKey = modality;
+      this._matchPlanState.duration = modality === 'futsal' ? 40 : 50;
+      if (durInput) durInput.value = this._matchPlanState.duration;
+    } else if (!this._matchPlanState.duration) {
+      this._matchPlanState.duration = modality === 'futsal' ? 40 : 50;
+      if (durInput) durInput.value = this._matchPlanState.duration;
+    }
+
+    if (stratSel) stratSel.value = this._matchPlanState.strategy || 'balanced';
+
+    const validIds = new Set(players.map(p => p.id));
+    if (this._matchPlanState.selectedIds === null) {
+      this._matchPlanState.selectedIds = new Set(validIds);
+    } else {
+      for (const id of [...this._matchPlanState.selectedIds]) {
+        if (!validIds.has(id)) this._matchPlanState.selectedIds.delete(id);
+      }
+    }
+    const selectedSet = this._matchPlanState.selectedIds;
+
+    if (ctxEl) {
+      const modText = modality === 'f7' ? 'FÚTBOL 7' : 'FÚTBOL SALA';
+      ctxEl.textContent = `Plantilla "${activeSquad?.name || 'Principal'}" · ${modText} · Esquema ${formationConfig.short || activeFormation} · ${matchLogs.length} partido(s) previo(s) guardado(s).`;
+    }
+    if (countEl) {
+      countEl.textContent = `${selectedSet.size} / ${players.length} CONVOCADOS`;
+    }
+
+    const avgPrior = players.length > 0
+      ? players.reduce((acc, p) => acc + (historyMap[p.id]?.totalMinutes || 0), 0) / players.length
+      : 0;
+
+    if (players.length === 0) {
+      convGrid.innerHTML = '<div class="matchplan-empty-box">No hay jugadores creados aún. Cada jugador debe registrarse con Google para crear su carta FUT.</div>';
+      outWrap.innerHTML = '';
+      this.renderMatchPlanHistory();
+      this.refreshIcons();
+      return;
+    }
+
+    convGrid.innerHTML = players.map(p => {
+      const isSelected = selectedSet.has(p.id);
+      const fac = FACULTIES.find(f => f.id === p.faculty) || FACULTIES[0];
+      const chain = getPlayerPriorityChain(p);
+      const skinMeta = this.getCardSkinMeta(p.cardType);
+      const s = p.stats || {};
+      const hist = historyMap[p.id] || { totalMinutes: 0, matchesPlayed: 0 };
+      const deficit = Math.round(avgPrior - hist.totalMinutes);
+      const deficitBadge = matchLogs.length > 0 && deficit >= 6
+        ? `<span class="matchplan-deficit-pill is-low">Compensar +${deficit}'</span>`
+        : `<span class="matchplan-deficit-pill">${hist.totalMinutes}' (${hist.matchesPlayed} PJ)</span>`;
+
+      return `
+        <button type="button" class="matchplan-player-card ${isSelected ? 'is-selected' : ''}" data-convoke-id="${p.id}" aria-pressed="${isSelected ? 'true' : 'false'}">
+          <div class="matchplan-player-top">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="matchplan-check-box" aria-hidden="true">${isSelected ? '<i data-lucide="check" class="w-3.5 h-3.5"></i>' : ''}</span>
+              <img src="${p.avatar || 'assets/club_logo.png'}" alt="" class="matchplan-avatar">
+              <div class="min-w-0 text-left">
+                <div class="matchplan-player-name font-fifa">#${p.number || 10} ${p.nickname || p.name}</div>
+                <div class="matchplan-player-sub">
+                  <span>${fac.short}</span>
+                  <span>·</span>
+                  <span>${p.preferredFoot || 'Diestro'}</span>
+                  <span>·</span>
+                  <span>${skinMeta.label}</span>
+                </div>
+              </div>
+            </div>
+            <div class="matchplan-ovr-badge font-fifa">${p.rating || 75}</div>
+          </div>
+
+          <div class="matchplan-priority-strip font-fifa">
+            <span class="mp-rank is-1">1º ${chain.best}</span>
+            <span class="mp-rank">2º ${chain.second}</span>
+            <span class="mp-rank">3º ${chain.third}</span>
+            <span class="mp-rank">4º ${chain.fourth}</span>
+            <span class="mp-rank is-avoid">Evitar: ${chain.worst}</span>
+          </div>
+
+          <div class="matchplan-stats-strip font-fifa">
+            <span>PAC <b>${s.pac || 75}</b></span>
+            <span>SHO <b>${s.sho || 75}</b></span>
+            <span>PAS <b>${s.pas || 75}</b></span>
+            <span>DRI <b>${s.dri || 75}</b></span>
+            <span>DEF <b>${s.def || 70}</b></span>
+            <span>PHY <b>${s.phy || 75}</b></span>
+          </div>
+
+          <div class="matchplan-foot-meta">
+            <span>Hab ${p.skillMoves || 4} / PM ${p.weakFoot || 4}</span>
+            ${deficitBadge}
+          </div>
+        </button>
+      `;
+    }).join('');
+
+    convGrid.querySelectorAll('.matchplan-player-card[data-convoke-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pid = btn.dataset.convokeId;
+        if (this._matchPlanState.selectedIds.has(pid)) {
+          this._matchPlanState.selectedIds.delete(pid);
+        } else {
+          this._matchPlanState.selectedIds.add(pid);
+        }
+        this._matchPlanState.customMinutes = {};
+        this.renderMatchPlanTab();
+        futAudio.playSelect();
+      });
+    });
+
+    if (selectedSet.size === 0) {
+      this._matchPlanState.lastPlan = null;
+      outWrap.innerHTML = '<div class="matchplan-empty-box">Marca al menos un jugador convocado arriba para calcular la mejor alineación, cambios y minutos.</div>';
+      this.renderMatchPlanHistory();
+      this.refreshIcons();
+      return;
+    }
+
+    const plan = computeMatchPlan({
+      players,
+      selectedIds: [...selectedSet],
+      formationSlots: formationConfig.slots,
+      matchLogs,
+      modality,
+      matchDuration: this._matchPlanState.duration,
+      strategy: this._matchPlanState.strategy
+    });
+    this._matchPlanState.lastPlan = plan;
+    this.renderMatchPlanOutput(plan);
+    this.renderMatchPlanHistory();
+    this.refreshIcons();
+  }
+
+  renderMatchPlanOutput(plan) {
+    const outWrap = document.getElementById('matchplan-output');
+    if (!outWrap || !plan) return;
+
+    const startersHtml = plan.starterSlots.map(slot => {
+      if (!slot.player) {
+        return `
+          <div class="matchplan-starter-slot is-empty">
+            <span class="matchplan-role-pill">${slot.role}</span>
+            <span class="text-xs text-slate-400 font-bold">Vacante</span>
+          </div>
+        `;
+      }
+      const rankTag = slot.rankInfo?.label || 'Titular';
+      const rankClass = slot.rankInfo?.rank === 1 ? 'is-r1' : (slot.rankInfo?.matchType === 'avoid' ? 'is-avoid' : 'is-ok');
+      return `
+        <div class="matchplan-starter-slot">
+          <span class="matchplan-role-pill font-fifa">${slot.role}</span>
+          <div class="min-w-0 flex-1">
+            <div class="font-fifa text-sm font-black uppercase truncate text-white">#${slot.player.number || 10} ${slot.player.nickname || slot.player.name}</div>
+            <span class="matchplan-fit-chip ${rankClass}">${rankTag}</span>
+          </div>
+          <span class="matchplan-mini-ovr font-fifa">${slot.player.rating || 75}</span>
+        </div>
+      `;
+    }).join('');
+
+    const benchHtml = plan.bench.length === 0
+      ? '<span class="text-xs text-slate-400 italic">Sin suplentes (todos juegan el partido completo).</span>'
+      : plan.bench.map(p => `<span class="matchplan-bench-chip font-fifa">#${p.number || 10} ${p.nickname || p.name} (${p.rating || 75} MED)</span>`).join('');
+
+    const timelineHtml = plan.subWindows.length === 0
+      ? '<div class="matchplan-empty-box">No hacen falta cambios: hay tantas plazas en campo como jugadores convocados.</div>'
+      : plan.subWindows.map(win => `
+          <div class="matchplan-window-card">
+            <div class="matchplan-window-head">
+              <span class="matchplan-minute-pill font-fifa">${win.periodLabel}</span>
+              <span class="text-[11px] font-bold text-slate-400">${win.swaps.length} relevo(s)</span>
+            </div>
+            <div class="space-y-1.5">
+              ${win.swaps.map(sw => `
+                <div class="matchplan-swap-row">
+                  <span class="matchplan-role-pill font-fifa">${sw.role}</span>
+                  <div class="matchplan-swap-players">
+                    <span class="matchplan-in-pill">ENTRA: #${sw.inPlayer.number || 10} ${sw.inPlayer.nickname || sw.inPlayer.name}</span>
+                    <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-amber-400 flex-shrink-0"></i>
+                    <span class="matchplan-out-pill">SALE: #${sw.outPlayer.number || 10} ${sw.outPlayer.nickname || sw.outPlayer.name}</span>
+                  </div>
+                  <span class="matchplan-swap-reason">${sw.reason}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('');
+
+    const reportRows = plan.minutesReport.map(r => {
+      const overrideVal = this._matchPlanState.customMinutes[r.player.id];
+      const minsHoy = overrideVal !== undefined ? overrideVal : r.matchMinutes;
+      const totalAfter = r.beforeMinutes + minsHoy;
+      return `
+        <tr class="matchplan-min-row">
+          <td class="matchplan-td-player">
+            <span class="font-fifa font-black">#${r.player.number || 10} ${r.player.nickname || r.player.name}</span>
+            <span class="matchplan-badge-tiny ${r.started ? 'is-start' : 'is-sub'}">${r.started ? `Titular (${r.assignedRole})` : 'Suplente'}</span>
+          </td>
+          <td class="text-right font-bold">${r.beforeMinutes}' <small class="text-slate-400">(${r.matchesPlayedBefore})</small></td>
+          <td class="text-right">
+            <input type="number" min="0" max="120" value="${minsHoy}" data-min-player="${r.player.id}" aria-label="Minutos jugados por ${r.player.nickname || r.player.name}" class="matchplan-min-input">
+          </td>
+          <td class="text-right font-black text-amber-400">${totalAfter}'</td>
+        </tr>
+      `;
+    }).join('');
+
+    outWrap.innerHTML = `
+      <div class="matchplan-kpi-grid">
+        <div class="matchplan-kpi-box">
+          <span class="matchplan-kpi-lbl">MED TITULAR</span>
+          <strong class="matchplan-kpi-val font-fifa">${plan.startersAvgOvr}</strong>
+        </div>
+        <div class="matchplan-kpi-box">
+          <span class="matchplan-kpi-lbl">CONVOCADOS</span>
+          <strong class="matchplan-kpi-val font-fifa">${plan.convokedCount} (${plan.bench.length} sup.)</strong>
+        </div>
+        <div class="matchplan-kpi-box">
+          <span class="matchplan-kpi-lbl">MEDIA MIN / JUG.</span>
+          <strong class="matchplan-kpi-val font-fifa">${plan.avgMatchMinutes}' / ${plan.matchDuration}'</strong>
+        </div>
+        <div class="matchplan-kpi-box">
+          <span class="matchplan-kpi-lbl">DIF. ACUM. CAMPO</span>
+          <strong class="matchplan-kpi-val font-fifa">${plan.cumulativeSpread}' máx</strong>
+        </div>
+      </div>
+
+      <div class="matchplan-section-box space-y-2.5">
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <h5 class="font-fifa text-base font-black uppercase tracking-wider text-amber-400">MEJOR ALINEACIÓN INICIAL RECOMENDADA</h5>
+          ${plan.protectGk ? '<span class="text-[10px] font-bold uppercase text-cyan-300">Portero único protegido 100%</span>' : ''}
+        </div>
+        <div class="matchplan-starters-grid">${startersHtml}</div>
+        <div class="pt-1 flex flex-wrap items-center gap-1.5">
+          <span class="text-[10px] font-black uppercase text-slate-400">BANQUILLO:</span>
+          ${benchHtml}
+        </div>
+      </div>
+
+      <div class="matchplan-section-box space-y-2.5">
+        <h5 class="font-fifa text-base font-black uppercase tracking-wider text-amber-400">PLAN DE CAMBIOS POR MINUTO (${plan.subWindows.length} VENTANAS)</h5>
+        <div class="space-y-2">${timelineHtml}</div>
+      </div>
+
+      <div class="matchplan-section-box space-y-2">
+        <h5 class="font-fifa text-base font-black uppercase tracking-wider text-amber-400">REPARTO COMPENSADO DE MINUTOS (EDITABLE ANTES DE GUARDAR)</h5>
+        <div class="overflow-x-auto">
+          <table class="matchplan-table w-full text-xs">
+            <thead>
+              <tr>
+                <th class="text-left">Jugador</th>
+                <th class="text-right">Previos (PJ)</th>
+                <th class="text-right">Hoy (min)</th>
+                <th class="text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>${reportRows}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    outWrap.querySelectorAll('.matchplan-min-input[data-min-player]').forEach(inp => {
+      inp.addEventListener('change', (e) => {
+        const pid = e.target.dataset.minPlayer;
+        const val = Math.max(0, Math.min(120, parseInt(e.target.value, 10) || 0));
+        e.target.value = val;
+        this._matchPlanState.customMinutes[pid] = val;
+      });
+    });
+  }
+
+  renderMatchPlanHistory() {
+    const listEl = document.getElementById('matchplan-history-list');
+    if (!listEl) return;
+    const logs = store.getMatchLogs();
+    if (logs.length === 0) {
+      listEl.innerHTML = '<div class="text-xs text-slate-400 italic p-2 border border-slate-800/70">Todavía no hay actas de minutos guardadas. Tras un partido, guarda los minutos aquí para que el sistema compense automáticamente al que menos jugó.</div>';
+      return;
+    }
+
+    listEl.innerHTML = logs.slice(0, 6).map(log => {
+      const topEntries = [...(log.entries || [])]
+        .filter(e => e.minutes > 0)
+        .map(e => {
+          const pl = store.getPlayerById(e.playerId);
+          return pl ? `${pl.nickname || pl.name} ${e.minutes}'` : '';
+        })
+        .filter(Boolean)
+        .slice(0, 5)
+        .join(' · ');
+
+      return `
+        <div class="matchplan-history-item">
+          <div class="min-w-0">
+            <div class="font-fifa text-sm font-black uppercase text-white">${log.opponent || 'Partido'} · ${log.duration}' (${log.modality === 'futsal' ? 'Sala' : 'F7'})</div>
+            <div class="text-[11px] text-slate-400 truncate">${log.date || ''} · ${topEntries || `${(log.entries || []).length} jugadores`}</div>
+          </div>
+          <button type="button" class="matchplan-del-log-btn" data-delete-matchlog="${log.id}" title="Eliminar acta">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    listEl.querySelectorAll('[data-delete-matchlog]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        store.deleteMatchLog(btn.dataset.deleteMatchlog);
+        this.renderMatchPlanTab();
+        this.renderAlbumCards();
+        this.showToast('Acta de minutos eliminada', 'trash-2');
+      });
+    });
+  }
+
+  applyMatchPlanToPitch() {
+    const plan = this._matchPlanState?.lastPlan;
+    if (!plan || !plan.starterSlots || plan.starterSlots.length === 0) {
+      this.showToast('Selecciona primero los convocados para aplicar la alineación', 'alert-triangle');
+      return;
+    }
+    const lineIds = plan.starterSlots.map(s => s.player?.id || null);
+    store.setStartingLineup(lineIds);
+    document.getElementById('squad-actions-dialog')?.close();
+    this.renderPitch();
+    this.renderSquadsVisualGrid();
+    this.renderAlbumCards();
+    futAudio.playSuccess();
+    this.showToast('Alineación óptima aplicada al campo con éxito', 'sparkles');
+  }
+
+  saveMatchPlanMinutesLog() {
+    const plan = this._matchPlanState?.lastPlan;
+    if (!plan || !plan.minutesReport || plan.minutesReport.length === 0) {
+      this.showToast('No hay plan de minutos calculado para guardar', 'alert-triangle');
+      return;
+    }
+
+    const opponent = document.getElementById('matchplan-opponent')?.value?.trim() || 'Partido Torneo Rector';
+    const entries = plan.minutesReport.map(r => {
+      const inp = document.querySelector(`.matchplan-min-input[data-min-player="${r.player.id}"]`);
+      const mins = inp ? Math.max(0, Math.min(120, parseInt(inp.value, 10) || 0)) : r.matchMinutes;
+      return {
+        playerId: r.player.id,
+        convoked: true,
+        started: r.started,
+        minutes: mins,
+        role: r.assignedRole || ''
+      };
+    });
+
+    store.recordPlayedMatch({
+      date: new Date().toISOString().slice(0, 10),
+      opponent,
+      modality: plan.modality,
+      duration: plan.matchDuration,
+      entries
+    });
+
+    this._matchPlanState.customMinutes = {};
+    this.renderMatchPlanTab();
+    this.renderAlbumCards();
+    futAudio.playSuccess();
+    this.showToast(`Minutos de "${opponent}" guardados para equilibrar próximas alineaciones`, 'save');
   }
 }
 
