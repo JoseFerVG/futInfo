@@ -35,7 +35,7 @@ body.theme-light {
   outline-offset: 2px;
 }
 
-button, select, input, textarea, .tab-btn, .fut-card-slot, .fut-radial-btn, .sub-bench-card {
+button, select, input, textarea, .tab-btn, .fut-card-slot, .sub-bench-card, .pizarra-roster-chip, .cap-action-btn, .cap-spec-chip {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
@@ -1281,89 +1281,25 @@ dialog[open] {
 
 
 
-/* ---------- 4. Menú Radial de Consola (Action Wheel) ---------- */
-.fut-radial-menu {
-  position: absolute;
-  width: 190px;
-  height: 190px;
-  transform: translate(-50%, -50%);
-  z-index: 85;
-  pointer-events: none;
-  animation: radial-pop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes radial-pop {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.65);
+/* ---------- 4. Indicador de intercambio activo entre cartas ---------- */
+@keyframes swap-candidate-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.45));
   }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+  50% {
+    filter: drop-shadow(0 0 14px rgba(240, 190, 42, 0.85));
   }
 }
 
-.fut-radial-btn {
-  position: absolute;
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  font-family: 'Outfit', sans-serif;
-  font-size: 0.72rem;
-  font-weight: 800;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.75);
-  cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
-  white-space: nowrap;
+.fut-card-slot.is-swap-candidate .fut-card {
+  outline: 2px dashed rgba(34, 211, 238, 0.88);
+  outline-offset: 2px;
+  animation: swap-candidate-pulse 1.3s ease-in-out infinite;
 }
 
-.fut-radial-btn:hover {
-  transform: scale(1.12);
-  border-color: #f59e0b;
-  background: rgba(30, 41, 59, 0.98);
-}
-
-.fut-radial-btn.radial-top {
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.fut-radial-btn.radial-top:hover {
-  transform: translateX(-50%) scale(1.12);
-}
-
-.fut-radial-btn.radial-bottom {
-  bottom: -16px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.fut-radial-btn.radial-bottom:hover {
-  transform: translateX(-50%) scale(1.12);
-}
-
-.fut-radial-btn.radial-left {
-  left: -22px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.fut-radial-btn.radial-left:hover {
-  transform: translateY(-50%) scale(1.12);
-}
-
-.fut-radial-btn.radial-right {
-  right: -22px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.fut-radial-btn.radial-right:hover {
-  transform: translateY(-50%) scale(1.12);
+.fut-card-slot.is-swap-candidate:hover .fut-card {
+  outline-color: #fbbf24;
+  transform: scale(1.06);
 }
 
 /* Drag and Drop de Jugadores en el Campo y Banquillo */

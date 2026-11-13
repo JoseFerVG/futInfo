@@ -1,7 +1,14 @@
 /**
  * Capa de Datos (Store) - Estilo FIFA Ultimate Team (FUT)
- * Torneo del Rector: Fútbol 7 y Fútbol Sala
+ * Torneo del Rector: Fútbol 7 (Sincronización real multi-dispositivo en Cloud Firestore)
  */
+import {
+  sanitizeForFirestore,
+  probeFirestoreHealth,
+  auth as fbAuth
+} from './firebase-config.js';
+
+const ADMIN_EMAIL = 'josef.caniles.murcia@gmail.com';
 
 const STORAGE_KEYS = {
   PLAYERS: 'futinfo_fifa_players_v4',
@@ -200,15 +207,6 @@ export const ROLES_F7 = [
   { code: 'DC', name: 'Delantero Centro (ST)', category: 'FWD' }
 ];
 
-export const ROLES_FUTSAL = [
-  { code: 'POR', name: 'Portero de Sala (GK)', category: 'GK' },
-  { code: 'CIE', name: 'Cierre (Último hombre)', category: 'DEF' },
-  { code: 'ALD', name: 'Ala Derecho', category: 'MID' },
-  { code: 'ALI', name: 'Ala Izquierdo', category: 'MID' },
-  { code: 'PIV', name: 'Pívot (Delantero boya)', category: 'FWD' },
-  { code: 'UNI', name: 'Universal (Polivalente)', category: 'MID' }
-];
-
 // Jugadores iniciales vacíos — se completa exclusivamente con usuarios reales autenticados con Google
 const DEFAULT_PLAYERS = [];
 
@@ -216,7 +214,7 @@ const DEFAULT_SETTINGS = {
   teamName: 'Furia Rector FC',
   shortName: 'FUR',
   tournament: '',
-  modality: 'f7', // 'f7' o 'futsal'
+  modality: 'f7',
   crest: 'shield_gold',
   kitColor: '#f8fafc',
   kitSecondary: '#f0be2a',
@@ -239,9 +237,7 @@ const DEFAULT_SETTINGS = {
     playersInBox: 5
   },
   activeFormationF7: '1-3-2-1',
-  activeFormationFutsal: '1-1-2-1',
   startingLineupF7: [],
-  startingLineupFutsal: [],
   benchPlayers: [],
   activeSquadId: 'sq_furia_f7',
   squads: [
@@ -262,15 +258,6 @@ const DEFAULT_SETTINGS = {
       startingLineup: [],
       benchPlayers: [],
       rating: 0
-    },
-    {
-      id: 'sq_sala_elite',
-      name: 'Furia Futsal Sala',
-      modality: 'futsal',
-      formation: '1-1-2-1',
-      startingLineup: [],
-      benchPlayers: [],
-      rating: 0
     }
   ]
 };
@@ -283,14 +270,29 @@ export class TeamStore {
     this.matches = [];
     this.matchLogs = [];
     this.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    this.tacticalBoard = null;
     this.listeners = new Set();
+    this.statusListeners = new Set();
+    this._tacticalBoardListener = null;
     this._db = null;
-    this._cloudUnsub = null;
+    this._cloudUnsubs = [];
+    this._privateUnsub = null;
     this._cloudSaveTimer = null;
     this._isApplyingRemote = false;
     this._lastCloudTs = 0;
+    this._isAdminSession = false;
+    this._currentUid = '';
+    this._publicPlayersMap = new Map();
+    this._privatePlayersMap = new Map();
     this._pendingAddIds = new Set();
     this._deletedPlayerIds = new Set();
+    this.cloudStatus = {
+      state: 'initializing',
+      code: '',
+      message: 'Comprobando conexión con Cloud Firestore…',
+      dbVerified: false,
+      lastSyncAt: 0
+    };
     this.init();
   }
 
@@ -313,15 +315,30 @@ export class TeamStore {
       ? { ...JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), ...JSON.parse(savedSettings) }
       : JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
 
-    if (!this.settings.squads || !Array.isArray(this.settings.squads) || this.settings.squads.length === 0) {
-      this.settings.squads = JSON.parse(JSON.stringify(DEFAULT_SETTINGS.squads));
-      this.settings.activeSquadId = DEFAULT_SETTINGS.activeSquadId;
+    this._enforceF7Settings();
+    this.saveLocal();
+  }
+
+  _enforceF7Settings() {
+    this.settings.modality = 'f7';
+    if (!this.settings.activeFormationF7) {
+      this.settings.activeFormationF7 = DEFAULT_SETTINGS.activeFormationF7;
     }
-    if (!this.settings.activeSquadId) {
+    if (!Array.isArray(this.settings.startingLineupF7)) {
+      this.settings.startingLineupF7 = [];
+    }
+    const rawSquads = Array.isArray(this.settings.squads) ? this.settings.squads : [];
+    const f7Squads = rawSquads.filter(sq => sq && sq.modality !== 'futsal').map(sq => ({
+      ...sq,
+      modality: 'f7',
+      formation: sq.formation || '1-3-2-1'
+    }));
+    this.settings.squads = f7Squads.length > 0
+      ? f7Squads
+      : JSON.parse(JSON.stringify(DEFAULT_SETTINGS.squads));
+    if (!this.settings.squads.some(sq => sq.id === this.settings.activeSquadId)) {
       this.settings.activeSquadId = this.settings.squads[0]?.id || 'sq_furia_f7';
     }
-
-    this.saveLocal();
   }
 
   deduplicatePlayers(list) {
@@ -374,7 +391,7 @@ export class TeamStore {
 
   notify() {
     this.saveLocal();
-    if (!this._isApplyingRemote) {
+    if (!this._isApplyingRemote && this._canWriteTeamSettings()) {
       this.scheduleCloudSave();
     }
     for (const listener of this.listeners) {
@@ -386,60 +403,513 @@ export class TeamStore {
     }
   }
 
-  async initCloudSync(db) {
-    if (!db || this._cloudUnsub) return;
+  onCloudStatusChange(cb) {
+    this.statusListeners.add(cb);
+    cb({ ...this.cloudStatus });
+    return () => this.statusListeners.delete(cb);
+  }
+
+  getCloudStatus() {
+    return { ...this.cloudStatus };
+  }
+
+  setCloudStatus(partial) {
+    this.cloudStatus = { ...this.cloudStatus, ...partial };
+    for (const cb of this.statusListeners) {
+      try {
+        cb({ ...this.cloudStatus });
+      } catch (err) {
+        console.error("Error en statusListener store:", err);
+      }
+    }
+  }
+
+  registerTacticalBoardListener(fn) {
+    this._tacticalBoardListener = fn;
+    if (this.tacticalBoard && typeof fn === 'function') {
+      try { fn(this.tacticalBoard); } catch {}
+    }
+  }
+
+  _canWriteTeamSettings() {
+    if (this._isAdminSession) return true;
+    const u = fbAuth?.currentUser;
+    return Boolean(u && u.emailVerified && (u.email || '').toLowerCase().trim() === ADMIN_EMAIL);
+  }
+
+  _classifyFirestoreError(err) {
+    const code = (err?.code || '').toLowerCase();
+    const msg = (err?.message || '').toLowerCase();
+    if (msg.includes('database (default) does not exist') || msg.includes('does not exist for project') || code === 'not-found') {
+      return {
+        state: 'missing_db',
+        code: 'not-found',
+        dbVerified: false,
+        message: 'La base de datos Firestore (default) no está creada aún en futinfo-382e8. Los datos NO se guardan entre móviles.'
+      };
+    }
+    if (code === 'permission-denied' || msg.includes('missing or insufficient permissions')) {
+      return {
+        state: 'permission_denied',
+        code: 'permission-denied',
+        dbVerified: true,
+        message: 'Cloud Firestore rechazó la operación por reglas de seguridad o falta publicar firestore.rules.'
+      };
+    }
+    if (code === 'unavailable' || msg.includes('offline') || msg.includes('failed to fetch') || msg.includes('network')) {
+      return {
+        state: 'offline',
+        code: code || 'offline',
+        dbVerified: false,
+        message: 'Sin conexión estable con Cloud Firestore.'
+      };
+    }
+    return {
+      state: 'error',
+      code: code || 'error',
+      dbVerified: false,
+      message: err?.message || 'Error conectando con Cloud Firestore.'
+    };
+  }
+
+  _rebuildMergedPlayers() {
+    const mergedRemote = [];
+    for (const [pid, pubData] of this._publicPlayersMap.entries()) {
+      if (!pid || this._deletedPlayerIds.has(pid)) continue;
+      const priv = this._privatePlayersMap.get(pid) || {};
+      mergedRemote.push({
+        ...pubData,
+        email: pubData.email || priv.email || '',
+        phone: pubData.phone || priv.phone || '',
+        studentId: pubData.studentId || priv.studentId || ''
+      });
+    }
+    const remoteIds = new Set(mergedRemote.map(p => p.id));
+    const pendingLocals = this.players.filter(
+      p => p && !this._deletedPlayerIds.has(p.id) && this._pendingAddIds.has(p.id) && !remoteIds.has(p.id)
+    );
+    this.players = this.deduplicatePlayers([...mergedRemote, ...pendingLocals]);
+  }
+
+  _emitListenersOnly() {
+    for (const listener of this.listeners) {
+      try {
+        listener(this);
+      } catch (err) {
+        console.error("Error en suscriptor store tras sync:", err);
+      }
+    }
+  }
+
+  async initCloudSync(db, initialHealth = null) {
+    if (!db) {
+      this.setCloudStatus({
+        state: 'unconfigured',
+        code: 'no-db',
+        dbVerified: false,
+        message: 'Firestore SDK no inicializado.'
+      });
+      return;
+    }
+
+    // Limpiar suscripciones anteriores si se reintenta la conexión
+    this._cloudUnsubs.forEach(unsub => { try { unsub(); } catch {} });
+    this._cloudUnsubs = [];
     this._db = db;
+
+    const health = initialHealth || await probeFirestoreHealth();
+    if (health.state === 'missing_db') {
+      this.setCloudStatus({ ...health, dbVerified: false });
+      console.error("[Firestore] BASE DE DATOS NO PROVISIONADA:", health.message);
+      return;
+    }
+
+    this.setCloudStatus({
+      ...health,
+      dbVerified: health.state === 'connected'
+    });
+
     try {
-      const { doc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-      const teamRef = doc(db, 'teams', FIRESTORE_TEAM_DOC);
+      const { doc, collection, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
 
-      this._cloudUnsub = onSnapshot(teamRef, (snap) => {
-        if (!snap.exists()) return;
-        const remote = snap.data();
-        const remoteTs = remote?.updatedAt || 0;
-        if (remoteTs && remoteTs <= this._lastCloudTs) return;
+      const handleSnapshotError = (channel) => (err) => {
+        const info = this._classifyFirestoreError(err);
+        this.setCloudStatus(info);
+        console.warn(`[Firestore:${channel}] ${info.message}`);
+      };
 
-        this._lastCloudTs = remoteTs;
+      // 1. Suscripción en tiempo real a TODOS los jugadores registrados (1 doc por jugador)
+      const unsubPlayers = onSnapshot(collection(db, 'players'), (snap) => {
         this._isApplyingRemote = true;
         try {
-          if (Array.isArray(remote.players)) {
-            const remoteFiltered = remote.players.filter(p => p && !this._deletedPlayerIds.has(p.id));
-            const remoteIds = new Set(remoteFiltered.map(p => p.id));
-            const pendingLocals = this.players.filter(p => p && this._pendingAddIds.has(p.id) && !remoteIds.has(p.id));
-            this.players = this.deduplicatePlayers([...remoteFiltered, ...pendingLocals]);
+          if (!snap.metadata.fromCache) {
+            this.setCloudStatus({
+              state: 'connected',
+              code: 'ok',
+              dbVerified: true,
+              lastSyncAt: Date.now(),
+              message: 'Base de datos compartida activa en tiempo real.'
+            });
           }
-          if (Array.isArray(remote.matches)) {
-            this.matches = remote.matches;
-          }
-          if (Array.isArray(remote.matchLogs)) {
-            const remoteLogIds = new Set(remote.matchLogs.map(l => l.id));
-            const unsyncedLogs = (this.matchLogs || []).filter(l => l && !remoteLogIds.has(l.id));
-            this.matchLogs = [...remote.matchLogs, ...unsyncedLogs];
-          }
-          if (remote.settings && typeof remote.settings === 'object') {
-            this.settings = { ...this.settings, ...remote.settings };
-          }
-          this.saveLocal();
-          for (const listener of this.listeners) {
-            try {
-              listener(this);
-            } catch (err) {
-              console.error("Error en suscriptor store tras sync:", err);
+
+          this._publicPlayersMap.clear();
+          snap.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (!data) return;
+            const pid = data.id || docSnap.id;
+            this._publicPlayersMap.set(pid, { ...data, id: pid });
+            if (!snap.metadata.fromCache) {
+              this._pendingAddIds.delete(pid);
             }
+          });
+
+          if (snap.size > 0 || !snap.metadata.fromCache) {
+            this._rebuildMergedPlayers();
+            this.saveLocal();
+            this._emitListenersOnly();
           }
         } finally {
           this._isApplyingRemote = false;
         }
-      }, (err) => {
-        console.warn("[Firestore] Canal tiempo real en modo lectura local:", err.code || err.message);
-      });
+      }, handleSnapshotError('players'));
+
+      // 2. Suscripción al documento del Club (settings, alineaciones, especialistas, pizarra)
+      const unsubTeam = onSnapshot(doc(db, 'teams', FIRESTORE_TEAM_DOC), (snap) => {
+        if (!snap.metadata.fromCache) {
+          this.setCloudStatus({
+            state: 'connected',
+            code: 'ok',
+            dbVerified: true,
+            lastSyncAt: Date.now(),
+            message: 'Base de datos compartida activa en tiempo real.'
+          });
+        }
+        if (!snap.exists()) return;
+        const remote = snap.data();
+        const remoteTs = remote?.updatedAt || 0;
+        if (remoteTs && remoteTs < this._lastCloudTs) return;
+
+        this._lastCloudTs = remoteTs;
+        this._isApplyingRemote = true;
+        try {
+          // Compatibilidad con documentos antiguos si aún no hay docs individuales en `players`
+          if (this._publicPlayersMap.size === 0 && Array.isArray(remote.players) && remote.players.length > 0) {
+            remote.players.forEach(p => {
+              if (p?.id && !this._deletedPlayerIds.has(p.id)) {
+                this._publicPlayersMap.set(p.id, p);
+              }
+            });
+            this._rebuildMergedPlayers();
+          }
+          if (remote.settings && typeof remote.settings === 'object') {
+            this.settings = { ...this.settings, ...remote.settings };
+            this._enforceF7Settings();
+          }
+          if (remote.tacticalBoard && typeof remote.tacticalBoard === 'object') {
+            this.tacticalBoard = remote.tacticalBoard;
+            if (typeof this._tacticalBoardListener === 'function') {
+              this._tacticalBoardListener(remote.tacticalBoard);
+            }
+          }
+          this.saveLocal();
+          this._emitListenersOnly();
+        } finally {
+          this._isApplyingRemote = false;
+        }
+      }, handleSnapshotError('team'));
+
+      // 3. Suscripción en tiempo real a Jornadas / Partidos (1 doc por partido)
+      const unsubMatches = onSnapshot(collection(db, 'matches'), (snap) => {
+        if (snap.metadata.fromCache && snap.empty) return;
+        this._isApplyingRemote = true;
+        try {
+          const list = [];
+          snap.forEach((docSnap) => {
+            const d = docSnap.data();
+            if (d) list.push({ ...d, id: d.id || docSnap.id });
+          });
+          if (!snap.metadata.fromCache || list.length > 0) {
+            this.matches = list;
+            this.saveLocal();
+            this._emitListenersOnly();
+          }
+        } finally {
+          this._isApplyingRemote = false;
+        }
+      }, handleSnapshotError('matches'));
+
+      // 4. Suscripción en tiempo real a Historial de Actas / Minutos
+      const unsubLogs = onSnapshot(collection(db, 'matchLogs'), (snap) => {
+        if (snap.metadata.fromCache && snap.empty) return;
+        this._isApplyingRemote = true;
+        try {
+          const list = [];
+          snap.forEach((docSnap) => {
+            const d = docSnap.data();
+            if (d) list.push({ ...d, id: d.id || docSnap.id });
+          });
+          if (!snap.metadata.fromCache || list.length > 0) {
+            this.matchLogs = list;
+            this.saveLocal();
+            this._emitListenersOnly();
+          }
+        } finally {
+          this._isApplyingRemote = false;
+        }
+      }, handleSnapshotError('matchLogs'));
+
+      this._cloudUnsubs.push(unsubPlayers, unsubTeam, unsubMatches, unsubLogs);
     } catch (err) {
-      console.warn("[Firestore] No se pudo activar sync:", err);
+      const info = this._classifyFirestoreError(err);
+      this.setCloudStatus(info);
+      console.warn("[Firestore] Error iniciando canales en tiempo real:", info.message);
+    }
+  }
+
+  async syncPrivatePlayerData(fbUser, isAdmin = false) {
+    this._isAdminSession = Boolean(isAdmin);
+    this._currentUid = fbUser?.uid || '';
+    if (this._privateUnsub) {
+      try { this._privateUnsub(); } catch {}
+      this._privateUnsub = null;
+    }
+
+    if (!this._db || !fbUser || this.cloudStatus.state === 'missing_db') return;
+
+    try {
+      const { doc, collection, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      if (isAdmin) {
+        this._privateUnsub = onSnapshot(collection(this._db, 'playerPrivate'), (snap) => {
+          snap.forEach((docSnap) => {
+            const d = docSnap.data();
+            if (d) this._privatePlayersMap.set(d.id || docSnap.id, d);
+          });
+          this._isApplyingRemote = true;
+          try {
+            this._rebuildMergedPlayers();
+            this.saveLocal();
+            this._emitListenersOnly();
+          } finally {
+            this._isApplyingRemote = false;
+          }
+        }, () => {});
+      } else {
+        const ownDocId = 'u_' + fbUser.uid;
+        this._privateUnsub = onSnapshot(doc(this._db, 'playerPrivate', ownDocId), (snap) => {
+          if (!snap.exists()) return;
+          const d = snap.data();
+          this._privatePlayersMap.set(d.id || ownDocId, d);
+          this._isApplyingRemote = true;
+          try {
+            this._rebuildMergedPlayers();
+            this.saveLocal();
+            this._emitListenersOnly();
+          } finally {
+            this._isApplyingRemote = false;
+          }
+        }, () => {});
+      }
+    } catch (err) {
+      console.warn("[Firestore] No se pudo suscribir a datos privados del jugador:", err?.message || err);
+    }
+  }
+
+  _toPublicPlayerDoc(player) {
+    const clean = {
+      id: player.id,
+      uid: player.uid || this._currentUid || '',
+      name: String(player.name || 'Jugador FUT').slice(0, 80),
+      nickname: String(player.nickname || 'Crack').slice(0, 40),
+      number: Math.max(1, Math.min(99, parseInt(player.number, 10) || 10)),
+      rating: Math.max(40, Math.min(99, parseInt(player.rating, 10) || 75)),
+      cardType: String(player.cardType || 'gold').slice(0, 24),
+      faculty: String(player.faculty || 'inf').slice(0, 24),
+      chemStyle: String(player.chemStyle || 'HUN').slice(0, 12),
+      kitColor: String(player.kitColor || '#f8fafc').slice(0, 20),
+      kitSecondary: String(player.kitSecondary || '#f0be2a').slice(0, 20),
+      kitCollar: String(player.kitCollar || 'round').slice(0, 16),
+      kitSleeves: String(player.kitSleeves || 'short').slice(0, 16),
+      playStyle: String(player.playStyle || 'finesse').slice(0, 24),
+      skillMoves: Math.max(1, Math.min(5, parseInt(player.skillMoves, 10) || 4)),
+      weakFoot: Math.max(1, Math.min(5, parseInt(player.weakFoot, 10) || 4)),
+      celebration: String(player.celebration || 'siuuu').slice(0, 24),
+      avatar: String(player.avatar || 'assets/club_logo.png').slice(0, 240000),
+      preferredFoot: String(player.preferredFoot || 'Diestro').slice(0, 24),
+      rolesHierarchy: {
+        best: player.rolesHierarchy?.best || 'DC',
+        second: player.rolesHierarchy?.second || 'MC',
+        third: player.rolesHierarchy?.third || 'DFC',
+        fourth: player.rolesHierarchy?.fourth || 'MCO',
+        worst: player.rolesHierarchy?.worst || 'POR',
+        priorityOrder: Array.isArray(player.rolesHierarchy?.priorityOrder)
+          ? player.rolesHierarchy.priorityOrder.slice(0, 8)
+          : ['DC', 'MC', 'DFC', 'MCO']
+      },
+      stats: {
+        pac: Math.max(1, Math.min(99, parseInt(player.stats?.pac, 10) || 80)),
+        sho: Math.max(1, Math.min(99, parseInt(player.stats?.sho, 10) || 75)),
+        pas: Math.max(1, Math.min(99, parseInt(player.stats?.pas, 10) || 78)),
+        dri: Math.max(1, Math.min(99, parseInt(player.stats?.dri, 10) || 80)),
+        def: Math.max(1, Math.min(99, parseInt(player.stats?.def, 10) || 70)),
+        phy: Math.max(1, Math.min(99, parseInt(player.stats?.phy, 10) || 76))
+      },
+      goals: Math.max(0, parseInt(player.goals, 10) || 0),
+      assists: Math.max(0, parseInt(player.assists, 10) || 0),
+      yellowCards: Math.max(0, parseInt(player.yellowCards, 10) || 0),
+      redCards: Math.max(0, parseInt(player.redCards, 10) || 0),
+      updatedAt: Date.now()
+    };
+    return sanitizeForFirestore(clean);
+  }
+
+  async upsertPlayerCloud(player, explicitUid = '') {
+    if (!this._db) {
+      throw new Error('Firebase Firestore no está inicializado en este dispositivo.');
+    }
+    if (this.cloudStatus.state === 'missing_db') {
+      throw new Error('Falta crear la base de datos Cloud Firestore (default) en el proyecto futinfo-382e8. Sin ella no se puede guardar en la nube.');
+    }
+
+    const uid = explicitUid || player.uid || fbAuth?.currentUser?.uid || '';
+    const pubDoc = this._toPublicPlayerDoc({ ...player, uid });
+    const privDoc = sanitizeForFirestore({
+      id: player.id,
+      uid,
+      email: String(player.email || fbAuth?.currentUser?.email || '').slice(0, 140),
+      phone: String(player.phone || '').slice(0, 40),
+      studentId: String(player.studentId || '').slice(0, 40),
+      updatedAt: Date.now()
+    });
+
+    try {
+      const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await setDoc(doc(this._db, 'players', player.id), pubDoc, { merge: true });
+      this._publicPlayersMap.set(player.id, pubDoc);
+
+      if (uid) {
+        await setDoc(doc(this._db, 'playerPrivate', player.id), privDoc, { merge: true });
+        this._privatePlayersMap.set(player.id, privDoc);
+      }
+
+      this._pendingAddIds.delete(player.id);
+      this.setCloudStatus({
+        state: 'connected',
+        code: 'ok',
+        dbVerified: true,
+        lastSyncAt: Date.now(),
+        message: 'Base de datos compartida activa en tiempo real.'
+      });
+
+      if (this._canWriteTeamSettings()) {
+        await this.pushCloudState();
+      }
+      return true;
+    } catch (err) {
+      const info = this._classifyFirestoreError(err);
+      this.setCloudStatus(info);
+      throw new Error(info.message);
+    }
+  }
+
+  async deletePlayerCloud(id) {
+    if (!this._db || this.cloudStatus.state === 'missing_db') return false;
+    try {
+      const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await deleteDoc(doc(this._db, 'players', id));
+      try { await deleteDoc(doc(this._db, 'playerPrivate', id)); } catch {}
+      this._publicPlayersMap.delete(id);
+      this._privatePlayersMap.delete(id);
+      return true;
+    } catch (err) {
+      const info = this._classifyFirestoreError(err);
+      this.setCloudStatus(info);
+      console.warn("[Firestore] Error borrando jugador:", info.message);
+      return false;
+    }
+  }
+
+  async saveMatchCloud(match) {
+    if (!this._db || this.cloudStatus.state === 'missing_db' || !this._canWriteTeamSettings()) return;
+    try {
+      const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await setDoc(doc(this._db, 'matches', match.id), sanitizeForFirestore({ ...match, updatedAt: Date.now() }), { merge: true });
+    } catch (err) {
+      const info = this._classifyFirestoreError(err);
+      this.setCloudStatus(info);
+    }
+  }
+
+  async deleteMatchCloud(id) {
+    if (!this._db || this.cloudStatus.state === 'missing_db' || !this._canWriteTeamSettings()) return;
+    try {
+      const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await deleteDoc(doc(this._db, 'matches', id));
+    } catch (err) {
+      const info = this._classifyFirestoreError(err);
+      this.setCloudStatus(info);
+    }
+  }
+
+  async setAttendanceCloud(matchId, playerId, status) {
+    if (!this._db || this.cloudStatus.state === 'missing_db') return false;
+    try {
+      const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await updateDoc(doc(this._db, 'matches', matchId), {
+        [`lineup.convocatoria.${playerId}`]: status,
+        updatedAt: Date.now()
+      });
+      return true;
+    } catch (err) {
+      const info = this._classifyFirestoreError(err);
+      this.setCloudStatus(info);
+      return false;
+    }
+  }
+
+  async saveMatchLogCloud(log) {
+    if (!this._db || this.cloudStatus.state === 'missing_db' || !this._canWriteTeamSettings()) return;
+    try {
+      const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await setDoc(doc(this._db, 'matchLogs', log.id), sanitizeForFirestore({ ...log, updatedAt: Date.now() }), { merge: true });
+    } catch (err) {
+      const info = this._classifyFirestoreError(err);
+      this.setCloudStatus(info);
+    }
+  }
+
+  async deleteMatchLogCloud(logId) {
+    if (!this._db || this.cloudStatus.state === 'missing_db' || !this._canWriteTeamSettings()) return;
+    try {
+      const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await deleteDoc(doc(this._db, 'matchLogs', logId));
+    } catch (err) {
+      const info = this._classifyFirestoreError(err);
+      this.setCloudStatus(info);
+    }
+  }
+
+  async saveTacticalBoardCloud(boardState) {
+    this.tacticalBoard = sanitizeForFirestore({ ...boardState, updatedAt: Date.now() });
+    if (!this._db || this.cloudStatus.state === 'missing_db' || !this._canWriteTeamSettings()) return false;
+    try {
+      const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const ts = Date.now();
+      this._lastCloudTs = ts;
+      await setDoc(doc(this._db, 'teams', FIRESTORE_TEAM_DOC), sanitizeForFirestore({
+        settings: this.settings,
+        tacticalBoard: this.tacticalBoard,
+        updatedAt: ts
+      }), { merge: true });
+      return true;
+    } catch (err) {
+      const info = this._classifyFirestoreError(err);
+      this.setCloudStatus(info);
+      return false;
     }
   }
 
   scheduleCloudSave() {
-    if (!this._db) return;
+    if (!this._db || this.cloudStatus.state === 'missing_db' || !this._canWriteTeamSettings()) return;
     clearTimeout(this._cloudSaveTimer);
     this._cloudSaveTimer = setTimeout(() => {
       this.pushCloudState();
@@ -447,21 +917,28 @@ export class TeamStore {
   }
 
   async pushCloudState() {
-    if (!this._db) return;
+    if (!this._db || this.cloudStatus.state === 'missing_db' || !this._canWriteTeamSettings()) return;
     try {
       const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
       const ts = Date.now();
       this._lastCloudTs = ts;
-      await setDoc(doc(this._db, 'teams', FIRESTORE_TEAM_DOC), {
-        players: this.players,
-        matches: this.matches,
-        matchLogs: this.matchLogs,
+      const payload = sanitizeForFirestore({
         settings: this.settings,
+        tacticalBoard: this.tacticalBoard || undefined,
         updatedAt: ts
-      }, { merge: true });
-      this._pendingAddIds.clear();
+      });
+      await setDoc(doc(this._db, 'teams', FIRESTORE_TEAM_DOC), payload, { merge: true });
+      this.setCloudStatus({
+        state: 'connected',
+        code: 'ok',
+        dbVerified: true,
+        lastSyncAt: ts,
+        message: 'Base de datos compartida activa en tiempo real.'
+      });
     } catch (err) {
-      console.warn("[Firestore] Guardado local activo (nube no escribió):", err.code || err.message);
+      const info = this._classifyFirestoreError(err);
+      this.setCloudStatus(info);
+      console.warn("[Firestore] No se pudo guardar configuración del club:", info.message);
     }
   }
 
@@ -481,11 +958,14 @@ export class TeamStore {
   }
 
   addPlayer(data) {
+    const cleanUid = (data.uid || '').trim();
     const cleanEmail = (data.email || '').toLowerCase().trim();
     const cleanName = (data.name || '').toLowerCase().trim();
 
-    // Comprobar si ya existe un jugador con este email o nombre exacto
-    const existing = this.players.find(p => 
+    // Comprobar si ya existe un jugador con este UID, ID, email o nombre exacto
+    const existing = this.players.find(p =>
+      (data.id && p.id === data.id) ||
+      (cleanUid && (p.uid === cleanUid || p.id === `u_${cleanUid}`)) ||
       (cleanEmail && p.email && p.email.toLowerCase().trim() === cleanEmail) ||
       (cleanName && p.name && p.name.toLowerCase().trim() === cleanName)
     );
@@ -506,7 +986,8 @@ export class TeamStore {
     const calculatedRating = this.computePlayerRating(defaultStats);
 
     const newPlayer = {
-      id: 'p_' + Date.now(),
+      id: data.id || (cleanUid ? `u_${cleanUid}` : 'p_' + Date.now()),
+      uid: cleanUid,
       name: data.name || 'Nuevo Jugador',
       nickname: data.nickname || (data.name ? data.name.split(' ')[0] : 'Crack'),
       number: parseInt(data.number, 10) || (this.players.length + 1),
@@ -562,7 +1043,6 @@ export class TeamStore {
 
   _placeNewPlayerInLineups(playerId) {
     if (!Array.isArray(this.settings.startingLineupF7)) this.settings.startingLineupF7 = [];
-    if (!Array.isArray(this.settings.startingLineupFutsal)) this.settings.startingLineupFutsal = [];
 
     const placeInto = (arr, maxLen) => {
       if (arr.includes(playerId)) return;
@@ -575,13 +1055,11 @@ export class TeamStore {
     };
 
     placeInto(this.settings.startingLineupF7, 7);
-    placeInto(this.settings.startingLineupFutsal, 5);
 
     if (Array.isArray(this.settings.squads)) {
       this.settings.squads.forEach(sq => {
         if (!Array.isArray(sq.startingLineup)) sq.startingLineup = [];
-        const cap = sq.modality === 'futsal' ? 5 : 7;
-        placeInto(sq.startingLineup, cap);
+        placeInto(sq.startingLineup, 7);
       });
     }
 
@@ -645,11 +1123,7 @@ export class TeamStore {
         }
       });
     }
-    if (this._db) {
-      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
-        .then(({ doc, deleteDoc }) => deleteDoc(doc(this._db, 'players', id)))
-        .catch(() => {});
-    }
+    this.deletePlayerCloud(id);
     this.notify();
   }
 
@@ -663,37 +1137,29 @@ export class TeamStore {
     return this.settings;
   }
 
-  setModality(modality) {
-    if (modality === 'f7' || modality === 'futsal') {
-      this.settings.modality = modality;
-      this.notify();
-    }
+  setModality() {
+    this.settings.modality = 'f7';
+    this.notify();
   }
 
   setFormation(formation) {
-    if (this.settings.modality === 'f7') {
-      this.settings.activeFormationF7 = formation;
-    } else {
-      this.settings.activeFormationFutsal = formation;
-    }
+    this.settings.modality = 'f7';
+    this.settings.activeFormationF7 = formation;
     this._syncActiveSquadLineup();
     this.notify();
   }
 
   getActiveFormation() {
-    return this.settings.modality === 'f7' 
-      ? this.settings.activeFormationF7 
-      : this.settings.activeFormationFutsal;
+    return this.settings.activeFormationF7 || '1-3-2-1';
   }
 
   getModalityCapacity() {
-    return this.settings.modality === 'f7' ? 7 : 5;
+    return 7;
   }
 
   getStartingLineup() {
-    const isF7 = this.settings.modality === 'f7';
-    const cap = isF7 ? 7 : 5;
-    const raw = isF7 ? (this.settings.startingLineupF7 || []) : (this.settings.startingLineupFutsal || []);
+    const cap = 7;
+    const raw = this.settings.startingLineupF7 || [];
     const slots = [];
     for (let i = 0; i < cap; i++) {
       const id = raw[i];
@@ -709,10 +1175,9 @@ export class TeamStore {
   _syncActiveSquadLineup() {
     const sq = this.getActiveSquad();
     if (!sq) return;
-    const isF7 = this.settings.modality === 'f7';
-    sq.modality = this.settings.modality;
-    sq.formation = isF7 ? this.settings.activeFormationF7 : this.settings.activeFormationFutsal;
-    const rawLineup = isF7 ? (this.settings.startingLineupF7 || []) : (this.settings.startingLineupFutsal || []);
+    sq.modality = 'f7';
+    sq.formation = this.settings.activeFormationF7 || '1-3-2-1';
+    const rawLineup = this.settings.startingLineupF7 || [];
     sq.startingLineup = [...rawLineup];
     const starterSet = new Set(sq.startingLineup.filter(Boolean));
     sq.benchPlayers = this.players.filter(p => !starterSet.has(p.id)).map(p => p.id);
@@ -724,10 +1189,8 @@ export class TeamStore {
   }
 
   setStartingLineup(players) {
-    const isF7 = this.settings.modality === 'f7';
     const ids = players.map(p => (p ? (typeof p === 'string' ? p : p.id) : null));
-    if (isF7) this.settings.startingLineupF7 = ids;
-    else this.settings.startingLineupFutsal = ids;
+    this.settings.startingLineupF7 = ids;
     this._syncActiveSquadLineup();
     this.notify();
   }
@@ -735,17 +1198,15 @@ export class TeamStore {
   resetStartingLineup() {
     const sorted = this.getPlayers().map(p => p.id);
     this.settings.startingLineupF7 = sorted.slice(0, 7);
-    this.settings.startingLineupFutsal = sorted.slice(0, 5);
     this._syncActiveSquadLineup();
     this.notify();
   }
 
   swapStartingPlayer(slotIndex, newPlayerId) {
-    const isF7 = this.settings.modality === 'f7';
-    const cap = isF7 ? 7 : 5;
+    const cap = 7;
     if (slotIndex < 0 || slotIndex >= cap) return null;
 
-    const src = isF7 ? (this.settings.startingLineupF7 || []) : (this.settings.startingLineupFutsal || []);
+    const src = this.settings.startingLineupF7 || [];
     const lineup = Array.from({ length: cap }, (_, i) => src[i] || null);
     const oldPlayerId = lineup[slotIndex];
 
@@ -756,29 +1217,24 @@ export class TeamStore {
     }
     lineup[slotIndex] = newPlayerId || null;
 
-    if (isF7) this.settings.startingLineupF7 = lineup;
-    else this.settings.startingLineupFutsal = lineup;
-
+    this.settings.startingLineupF7 = lineup;
     this._syncActiveSquadLineup();
     this.notify();
     return { oldPlayerId, newPlayerId };
   }
 
   swapTwoStarters(idx1, idx2) {
-    const isF7 = this.settings.modality === 'f7';
-    const cap = isF7 ? 7 : 5;
+    const cap = 7;
     if (idx1 < 0 || idx1 >= cap || idx2 < 0 || idx2 >= cap) return false;
 
-    const src = isF7 ? (this.settings.startingLineupF7 || []) : (this.settings.startingLineupFutsal || []);
+    const src = this.settings.startingLineupF7 || [];
     const lineup = Array.from({ length: cap }, (_, i) => src[i] || null);
 
     const temp = lineup[idx1];
     lineup[idx1] = lineup[idx2];
     lineup[idx2] = temp;
 
-    if (isF7) this.settings.startingLineupF7 = lineup;
-    else this.settings.startingLineupFutsal = lineup;
-
+    this.settings.startingLineupF7 = lineup;
     this._syncActiveSquadLineup();
     this.notify();
     return true;
@@ -831,14 +1287,9 @@ export class TeamStore {
     if (!target) return false;
 
     this.settings.activeSquadId = target.id;
-    this.settings.modality = target.modality;
-    if (target.modality === 'f7') {
-      this.settings.activeFormationF7 = target.formation;
-      this.settings.startingLineupF7 = [...target.startingLineup];
-    } else {
-      this.settings.activeFormationFutsal = target.formation;
-      this.settings.startingLineupFutsal = [...target.startingLineup];
-    }
+    this.settings.modality = 'f7';
+    this.settings.activeFormationF7 = target.formation || '1-3-2-1';
+    this.settings.startingLineupF7 = [...(target.startingLineup || [])];
     if (Array.isArray(target.benchPlayers)) {
       this.settings.benchPlayers = [...target.benchPlayers];
     }
@@ -848,18 +1299,17 @@ export class TeamStore {
   }
 
   saveCurrentAsSquad(name) {
-    const isF7 = this.settings.modality === 'f7';
     const squads = this.getSquads();
     const newId = 'sq_' + Date.now();
-    const lineup = isF7 ? [...this.settings.startingLineupF7] : [...this.settings.startingLineupFutsal];
+    const lineup = [...(this.settings.startingLineupF7 || [])];
     const starterSet = new Set(lineup);
     const activeBench = this.players.filter(p => !starterSet.has(p.id)).map(p => p.id);
     const liveRating = this.calculateTeamChemistryAndRating().rating || 82;
     const newSquad = {
       id: newId,
       name: name || `Plantilla ${squads.length + 1}`,
-      modality: this.settings.modality,
-      formation: isF7 ? this.settings.activeFormationF7 : this.settings.activeFormationFutsal,
+      modality: 'f7',
+      formation: this.settings.activeFormationF7 || '1-3-2-1',
       startingLineup: lineup,
       benchPlayers: activeBench,
       rating: liveRating
@@ -932,6 +1382,7 @@ export class TeamStore {
       }
     };
     this.matches.push(newMatch);
+    this.saveMatchCloud(newMatch);
     this.notify();
     return newMatch;
   }
@@ -940,6 +1391,7 @@ export class TeamStore {
     const idx = this.matches.findIndex(m => m.id === id);
     if (idx !== -1) {
       this.matches[idx] = { ...this.matches[idx], ...updates };
+      this.saveMatchCloud(this.matches[idx]);
       this.notify();
       return this.matches[idx];
     }
@@ -948,6 +1400,7 @@ export class TeamStore {
 
   deleteMatch(id) {
     this.matches = this.matches.filter(m => m.id !== id);
+    this.deleteMatchCloud(id);
     this.notify();
   }
 
@@ -957,6 +1410,7 @@ export class TeamStore {
       if (!match.lineup) match.lineup = { titulares: [], suplentes: [], convocatoria: {} };
       if (!match.lineup.convocatoria) match.lineup.convocatoria = {};
       match.lineup.convocatoria[playerId] = status;
+      this.setAttendanceCloud(matchId, playerId, status);
       this.notify();
       return true;
     }
@@ -1006,12 +1460,14 @@ export class TeamStore {
       createdAt: Date.now()
     };
     this.matchLogs.push(newLog);
+    this.saveMatchLogCloud(newLog);
     this.notify();
     return newLog;
   }
 
   deleteMatchLog(logId) {
     this.matchLogs = (this.matchLogs || []).filter(l => l.id !== logId);
+    this.deleteMatchLogCloud(logId);
     this.notify();
   }
 

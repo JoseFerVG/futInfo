@@ -8,11 +8,22 @@ const AUTH_USER_KEY = 'futinfo_fifa_auth_user_v3';
 const LEGACY_ACCOUNTS_KEY = 'futinfo_fifa_accounts_v3';
 const ADMIN_EMAILS = ['josef.caniles.murcia@gmail.com'];
 
+/**
+ * Detecta navegadores integrados (WhatsApp, Instagram, Facebook, TikTok, etc.)
+ * donde Google bloquea OAuth (`disallowed_useragent`).
+ */
+export function isEmbeddedWebView() {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent || '';
+  return /WhatsApp|Instagram|FBAN|FBAV|FB_IAB|BytedanceWebview|Musical_ly|TikTok|Line\/|MicroMessenger|\bwv\b/i.test(ua);
+}
+
 class AuthService {
   constructor() {
     this.currentUser = null;
     this.subscribers = new Set();
     this._fbUnsub = null;
+    this._pendingRedirectOnboarding = false;
     this.init();
   }
 
@@ -38,7 +49,9 @@ class AuthService {
     const cleanEmail = (fbUser.email || '').toLowerCase().trim();
     const isAdmin = ADMIN_EMAILS.includes(cleanEmail);
     const existingPlayer = store.getPlayers().find(
-      p => p.email && p.email.toLowerCase().trim() === cleanEmail
+      p => (p.uid && p.uid === fbUser.uid) ||
+           p.id === `u_${fbUser.uid}` ||
+           (cleanEmail && p.email && p.email.toLowerCase().trim() === cleanEmail)
     );
 
     return {
@@ -54,30 +67,59 @@ class AuthService {
   }
 
   async bindFirebaseAuthListener() {
-    if (!isFirebaseConfigured() || !auth || this._fbUnsub) return;
+    if (!isFirebaseConfigured() || !auth || this._fbUnsub) return null;
     try {
-      const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+      const { onAuthStateChanged, getRedirectResult } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+
+      try {
+        const redir = await getRedirectResult(auth);
+        if (redir?.user) {
+          const userObj = this.buildUserFromFirebase(redir.user);
+          this.currentUser = userObj;
+          localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
+          store.syncPrivatePlayerData(redir.user, userObj.role === 'admin');
+          if (userObj.isNew || !userObj.playerId) {
+            this._pendingRedirectOnboarding = true;
+          }
+          this.notify();
+        }
+      } catch (redirErr) {
+        console.warn("Aviso en retorno de redirección Google:", redirErr?.code || redirErr?.message);
+      }
+
       this._fbUnsub = onAuthStateChanged(auth, (fbUser) => {
         if (fbUser) {
           const userObj = this.buildUserFromFirebase(fbUser);
           this.currentUser = userObj;
           localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
+          store.syncPrivatePlayerData(fbUser, userObj.role === 'admin');
         } else {
           this.currentUser = null;
           localStorage.removeItem(AUTH_USER_KEY);
+          store.syncPrivatePlayerData(null, false);
         }
         this.notify();
       });
+      return this._pendingRedirectOnboarding;
     } catch (err) {
       console.warn("No se pudo conectar el observador de sesión Firebase:", err);
+      return false;
     }
+  }
+
+  consumeRedirectOnboardingFlag() {
+    const val = this._pendingRedirectOnboarding;
+    this._pendingRedirectOnboarding = false;
+    return val;
   }
 
   refreshLinkedPlayer() {
     if (!this.currentUser) return;
     const cleanEmail = (this.currentUser.email || '').toLowerCase().trim();
+    const uid = this.currentUser.id || '';
     const existingPlayer = store.getPlayers().find(
       p => (this.currentUser.playerId && p.id === this.currentUser.playerId) ||
+           (uid && (p.uid === uid || p.id === `u_${uid}`)) ||
            (cleanEmail && p.email && p.email.toLowerCase().trim() === cleanEmail)
     );
     const nextPlayerId = existingPlayer ? existingPlayer.id : null;
@@ -114,44 +156,60 @@ class AuthService {
   }
 
   /**
-   * Inicio de Sesión y Registro con Google (Firebase Auth GoogleAuthProvider)
+   * Inicio de Sesión y Registro con Google (Popup en escritorio + Redirect fallback automático en móvil)
    */
   async signInWithGoogle() {
     if (!isFirebaseConfigured() || !auth) {
       throw new Error('Firebase Auth no está inicializado en este entorno.');
     }
+    if (isEmbeddedWebView()) {
+      throw new Error('Google bloquea el inicio de sesión dentro de WhatsApp, Instagram o TikTok. Copia el enlace y ábrelo en Chrome o Safari.');
+    }
+
+    const { GoogleAuthProvider, signInWithPopup, signInWithRedirect } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
 
     try {
-      const { GoogleAuthProvider, signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-
       const userCredential = await signInWithPopup(auth, provider);
       const userObj = this.buildUserFromFirebase(userCredential.user);
 
       this.currentUser = userObj;
       localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
+      store.syncPrivatePlayerData(userCredential.user, userObj.role === 'admin');
       this.notify();
-      return { success: true, user: userObj, isNew: userObj.isNew };
+      return { success: true, user: userObj, isNew: userObj.isNew, redirected: false };
     } catch (error) {
+      const code = error?.code || '';
+      if (
+        code === 'auth/popup-blocked' ||
+        code === 'auth/cancelled-popup-request' ||
+        code === 'auth/operation-not-supported-in-this-environment'
+      ) {
+        await signInWithRedirect(auth, provider);
+        return { success: true, redirected: true };
+      }
       console.warn("Error en Google Sign-In con Firebase:", error);
-      throw new Error(this.translateFirebaseError(error.code));
+      throw new Error(this.translateFirebaseError(code));
     }
   }
 
   /**
-   * Guardar o Actualizar la Carta FUT del usuario (Estricto: 1 carta por usuario)
+   * Guardar o Actualizar la Carta FUT del usuario en Cloud Firestore (1 carta por usuario)
    */
   async completePlayerCard(cardData) {
     if (!this.currentUser) throw new Error('Debes iniciar sesión con Google primero.');
 
     const cleanEmail = (this.currentUser.email || '').toLowerCase();
-    const existingPlayer = store.getPlayers().find(p => 
+    const uid = this.currentUser.id || '';
+    const existingPlayer = store.getPlayers().find(p =>
       (this.currentUser.playerId && p.id === this.currentUser.playerId) ||
-      (p.email && p.email.toLowerCase() === cleanEmail)
+      (uid && (p.uid === uid || p.id === `u_${uid}`)) ||
+      (p.email && cleanEmail && p.email.toLowerCase() === cleanEmail)
     );
 
     const avatarUrl = cardData.avatar || this.currentUser.photoURL || existingPlayer?.avatar || 'assets/club_logo.png';
+    const isBrandNew = !existingPlayer;
 
     let targetPlayer;
     if (existingPlayer) {
@@ -165,6 +223,7 @@ class AuthService {
       };
       // ACTUALIZAR CARTA EXISTENTE (conservar todos los campos de personalización y recalcular media)
       targetPlayer = store.updatePlayer(existingPlayer.id, {
+        uid: uid || existingPlayer.uid || '',
         name: this.currentUser.name || existingPlayer.name,
         nickname: cardData.nickname || existingPlayer.nickname,
         avatar: avatarUrl,
@@ -204,8 +263,10 @@ class AuthService {
         stats: nextStats
       });
     } else {
-      // CREAR PRIMERA Y ÚNICA CARTA
+      // CREAR PRIMERA Y ÚNICA CARTA (ID determinista u_<uid> para sincronizar sin conflictos)
       targetPlayer = store.addPlayer({
+        id: uid ? `u_${uid}` : undefined,
+        uid,
         name: this.currentUser.name,
         nickname: cardData.nickname || this.currentUser.name.split(' ')[0],
         email: this.currentUser.email,
@@ -241,20 +302,24 @@ class AuthService {
       });
     }
 
-    // Actualizar inmediatamente el usuario en memoria y en localStorage
+    // Si es una sesión real de Firebase, EXIGIR guardado confirmado en Cloud Firestore (no mentir con guardado solo local)
+    if (this.currentUser.isFirebase && isFirebaseConfigured() && targetPlayer) {
+      try {
+        await store.upsertPlayerCloud(targetPlayer, uid);
+      } catch (cloudErr) {
+        if (isBrandNew) {
+          store.deletePlayer(targetPlayer.id);
+        }
+        throw new Error(`NO se guardó en la base de datos compartida del club: ${cloudErr.message}`);
+      }
+    }
+
+    // Actualizar usuario solo cuando el guardado quedó confirmado
     this.currentUser.playerId = targetPlayer.id;
     this.currentUser.photoURL = avatarUrl;
     this.currentUser.isNew = false;
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(this.currentUser));
     this.notify();
-
-    // Guardar en Firestore de forma no bloqueante si está conectado
-    if (isFirebaseConfigured() && db && targetPlayer) {
-      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
-        .then(({ doc, setDoc }) => setDoc(doc(db, 'players', targetPlayer.id), targetPlayer))
-        .then(() => console.log("[Firestore] Jugador guardado en Cloud Firestore!"))
-        .catch(e => console.warn("Nota: Guardado local. Firestore:", e.message));
-    }
 
     return targetPlayer;
   }
@@ -303,9 +368,15 @@ class AuthService {
       case 'auth/popup-closed-by-user':
         return 'Se cerró la ventana de Google antes de completar el inicio de sesión.';
       case 'auth/popup-blocked':
-        return 'El navegador bloqueó la ventana emergente de Google. Permite las ventanas emergentes para continuar.';
+        return 'El navegador bloqueó la ventana emergente de Google. Prueba de nuevo o permite ventanas emergentes.';
       case 'auth/unauthorized-domain':
-        return 'Dominio web no añadido en Firebase Console (Authentication > Configuración > Dominios autorizados).';
+        return 'Dominio web no autorizado en Firebase Console (Authentication > Configuración > Dominios autorizados).';
+      case 'auth/web-storage-unsupported':
+        return 'Tu navegador tiene las cookies/almacenamiento bloqueados (modo incógnito estricto). Actívalas para entrar con Google.';
+      case 'auth/network-request-failed':
+        return 'Error de red conectando con Google. Comprueba tu conexión e inténtalo de nuevo.';
+      case 'auth/too-many-requests':
+        return 'Demasiados intentos seguidos. Espera unos segundos antes de volver a intentarlo.';
       case 'auth/email-already-in-use':
         return 'Este correo electrónico ya está registrado.';
       default:

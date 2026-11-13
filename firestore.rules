@@ -1,0 +1,617 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model — Furia del Rector FC (Project: futinfo-382e8)
+// ===============================================================
+//
+// Collection: teams/{teamId} (primary doc: furia_rector_live_v2)
+// Visibility: Public read (non-PII club configuration only).
+// Writes: Admin only.
+// Fields:
+//   - settings: map (required) - clubName/teamName, shortName, modality, formation,
+//     activeSquadId, startingLineupF7, benchPlayers, squads, specialists, tactics
+//   - clubName: string (optional, 1..80 chars)
+//   - formation: string (optional, 1..30 chars)
+//   - activeSquad: string | map (optional)
+//   - specialists: map (optional)
+//   - tacticalNotes: string | map (optional)
+//   - tacticalBoard: map (optional)
+//   - lineup: list | map (optional)
+//   - updatedAt: number | timestamp (optional)
+//   - updatedBy: string (optional, 1..128 chars)
+//   - schemaVersion: int | string (optional)
+//
+// Collection: players/{playerId}
+// Visibility: Public read (non-PII FUT card data only; PII strictly forbidden).
+// Forbidden PII keys: email, phone, studentId.
+// Fields:
+//   - id: string (required, immutable after create, must equal playerId)
+//   - uid: string (required, immutable after create for non-admin, must match auth.uid for player create)
+//   - name: string (required, 1..80 chars)
+//   - nickname: string (optional, 0..40 chars)
+//   - avatar: string (optional, assets/..., https://..., http://..., or safe raster data:image/...;base64, <= 250KB)
+//   - number: number (optional, 1..99)
+//   - rating: number (required, 40..99)
+//   - cardType: string (optional, enum: gold, totw, toty, tots, icon, special, silver, bronze, hero)
+//   - faculty: string (optional, 1..40 chars)
+//   - preferredFoot: string (optional, enum)
+//   - kitColor, kitSecondary: string (optional, 3..32 chars)
+//   - kitCollar, kitSleeves: string (optional, 1..24 chars)
+//   - playStyle, celebration: string (optional, 1..32 chars)
+//   - skillMoves, weakFoot: number (optional, 1..5)
+//   - chemStyle: string (optional, 1..24 chars)
+//   - rolesHierarchy: map (required, best + optional second/third/fourth/worst/priorityOrder)
+//   - stats: map (required, exact keys pac, sho, pas, dri, def, phy each number 1..99)
+//   - availability: string | map (optional)
+//   - matchesPlayed, minutesPlayed, goals, assists, yellowCards, redCards: number (optional, admin-managed; 0 on non-admin create, immutable on non-admin update)
+//   - createdAt: number | timestamp (optional, immutable on non-admin update)
+//   - updatedAt: number | timestamp (optional)
+//
+// Collection: playerPrivate/{playerId}
+// Visibility: Admin (get, list) or Document Owner (get; list only with uid == auth.uid query).
+// Fields:
+//   - id: string (required, immutable after create, must equal playerId)
+//   - uid: string (required, immutable after create for non-admin)
+//   - email: string (optional, valid email or empty, <= 160 chars)
+//   - phone: string (optional, <= 32 chars)
+//   - studentId: string (optional, <= 32 chars)
+//   - createdAt: number | timestamp (optional, immutable on non-admin update)
+//   - updatedAt: number | timestamp (optional)
+//
+// Collection: matches/{matchId}
+// Visibility: Public read.
+// Writes: Admin full CRUD; signed-in players may ONLY update their own attendance vote in lineup.convocatoria.
+// Fields:
+//   - id: string (required, immutable, must equal matchId)
+//   - rival: string (required, 1..100 chars)
+//   - tournament: string (optional, <= 100 chars)
+//   - modality: string (optional, f7 | futsal)
+//   - date: string (required, 4..32 chars)
+//   - time: string (optional, <= 16 chars)
+//   - field: string (optional, <= 120 chars)
+//   - status: string (required, proximo | finalizado | en_curso | cancelado | aplazado)
+//   - goalsFor, goalsAgainst: number | null (optional, 0..99)
+//   - scorers: string (optional, <= 500 chars)
+//   - mvp: string (optional, <= 100 chars)
+//   - notes: string (optional, <= 1000 chars)
+//   - lineup: map (required, keys: titulares, suplentes, convocatoria)
+//   - createdAt, updatedAt: number | timestamp (optional)
+//
+// Collection: matchLogs/{logId}
+// Visibility: Public read.
+// Writes: Admin only.
+// Fields:
+//   - id: string (required, immutable, must equal logId)
+//   - date: string (required, 4..32 chars)
+//   - opponent: string (required, 1..100 chars)
+//   - modality: string (optional, f7 | futsal)
+//   - duration: number (required, 1..240)
+//   - entries: list (required, max 60 entries)
+//   - matchId: string (optional, <= 128 chars)
+//   - notes: string (optional, <= 1000 chars)
+//   - createdAt, updatedAt: number | timestamp (optional)
+//
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isSignedIn() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    function isAuthenticated() {
+      return isSignedIn();
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        'email_verified' in request.auth.token &&
+        request.auth.token.email_verified == true &&
+        'email' in request.auth.token &&
+        request.auth.token.email is string &&
+        request.auth.token.email == 'josef.caniles.murcia@gmail.com';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isSignedIn() &&
+        resource != null &&
+        'uid' in resource.data &&
+        resource.data.uid == request.auth.uid;
+    }
+
+    function uidUnchanged() {
+      return !('uid' in request.resource.data) ||
+        request.resource.data.uid == request.auth.uid;
+    }
+
+    function uidNotModified() {
+      return !('uid' in request.resource.data) ||
+        (resource != null &&
+          'uid' in resource.data &&
+          request.resource.data.uid == resource.data.uid);
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    function isBoundedString(val, minLen, maxLen) {
+      return val is string && val.size() >= minLen && val.size() <= maxLen;
+    }
+
+    function isOptionalBoundedString(data, field, minLen, maxLen) {
+      return !(field in data) || isBoundedString(data[field], minLen, maxLen);
+    }
+
+    function isBoundedNumber(val, minVal, maxVal) {
+      return val is number && val >= minVal && val <= maxVal;
+    }
+
+    function isValidTimestampOrMillis(val) {
+      return val is timestamp || (val is number && val >= 0 && val <= 9999999999999);
+    }
+
+    function isValidEmail(email) {
+      return email is string &&
+        email.size() <= 160 &&
+        email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+
+    function isValidAvatarUrl(val) {
+      return val is string &&
+        val.size() <= 250000 &&
+        (
+          val == '' ||
+          val.matches('^https://.*') ||
+          val.matches('^http://.*') ||
+          (val.matches('^assets/[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*$') && !val.matches('.*\\.\\..*')) ||
+          (val.size() >= 23 && val[0:23] == 'data:image/jpeg;base64,') ||
+          (val.size() >= 23 && val[0:23] == 'data:image/webp;base64,') ||
+          (val.size() >= 22 && val[0:22] == 'data:image/png;base64,') ||
+          (val.size() >= 22 && val[0:22] == 'data:image/jpg;base64,') ||
+          (val.size() >= 22 && val[0:22] == 'data:image/gif;base64,')
+        );
+    }
+
+    function isValidRoleCode(code) {
+      return code is string &&
+        code in ['POR', 'DFC', 'LI', 'LD', 'MC', 'MCD', 'MCO', 'EI', 'ED', 'DC', 'CIE', 'PIV'];
+    }
+
+    function isValidRolesHierarchy(rh) {
+      return rh is map &&
+        rh.keys().hasAll(['best']) &&
+        rh.keys().hasOnly(['best', 'second', 'third', 'fourth', 'worst', 'priorityOrder']) &&
+        isValidRoleCode(rh.best) &&
+        (!('second' in rh) || rh.second == '' || isValidRoleCode(rh.second)) &&
+        (!('third' in rh) || rh.third == '' || isValidRoleCode(rh.third)) &&
+        (!('fourth' in rh) || rh.fourth == '' || isValidRoleCode(rh.fourth)) &&
+        (!('worst' in rh) || rh.worst == '' || isValidRoleCode(rh.worst)) &&
+        (!('priorityOrder' in rh) || (
+          rh.priorityOrder is list &&
+          rh.priorityOrder.size() >= 1 &&
+          rh.priorityOrder.size() <= 12 &&
+          rh.priorityOrder.hasOnly(['POR', 'DFC', 'LI', 'LD', 'MC', 'MCD', 'MCO', 'EI', 'ED', 'DC', 'CIE', 'PIV'])
+        ));
+    }
+
+    function isValidPlayerStats(st) {
+      return st is map &&
+        st.keys().hasAll(['pac', 'sho', 'pas', 'dri', 'def', 'phy']) &&
+        st.keys().hasOnly(['pac', 'sho', 'pas', 'dri', 'def', 'phy']) &&
+        isBoundedNumber(st.pac, 1, 99) &&
+        isBoundedNumber(st.sho, 1, 99) &&
+        isBoundedNumber(st.pas, 1, 99) &&
+        isBoundedNumber(st.dri, 1, 99) &&
+        isBoundedNumber(st.def, 1, 99) &&
+        isBoundedNumber(st.phy, 1, 99);
+    }
+
+    function isValidVoteStatus(val) {
+      return val is string && val in ['si', 'duda', 'no', 'asistira', 'no_puede'];
+    }
+
+    function isPlayerOwnedByAuth(playerId) {
+      return playerId is string &&
+        playerId.size() > 0 &&
+        playerId.size() <= 128 &&
+        exists(/databases/$(database)/documents/players/$(playerId)) &&
+        'uid' in get(/databases/$(database)/documents/players/$(playerId)).data &&
+        get(/databases/$(database)/documents/players/$(playerId)).data.uid == request.auth.uid;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    // --- Collection: teams/{teamId} ---
+    function isValidTeamSettings(s) {
+      return s is map &&
+        s.keys().size() <= 40 &&
+        !s.keys().hasAny(['players', 'email', 'phone', 'studentId']) &&
+        isOptionalBoundedString(s, 'teamName', 1, 80) &&
+        isOptionalBoundedString(s, 'clubName', 1, 80) &&
+        isOptionalBoundedString(s, 'shortName', 1, 10) &&
+        isOptionalBoundedString(s, 'tournament', 0, 100) &&
+        (!('modality' in s) || s.modality in ['f7', 'futsal']) &&
+        isOptionalBoundedString(s, 'crest', 1, 64) &&
+        isOptionalBoundedString(s, 'kitColor', 3, 32) &&
+        isOptionalBoundedString(s, 'kitSecondary', 3, 32) &&
+        isOptionalBoundedString(s, 'stadium', 0, 64) &&
+        isOptionalBoundedString(s, 'ball', 0, 64) &&
+        isOptionalBoundedString(s, 'slogan', 0, 160) &&
+        isOptionalBoundedString(s, 'foundedYear', 0, 16) &&
+        isOptionalBoundedString(s, 'activeFormationF7', 1, 30) &&
+        isOptionalBoundedString(s, 'activeSquadId', 1, 64) &&
+        (!('specialists' in s) || (s.specialists is map && s.specialists.keys().size() <= 16)) &&
+        (!('tactics' in s) || (s.tactics is map && s.tactics.keys().size() <= 20)) &&
+        (!('startingLineupF7' in s) || (s.startingLineupF7 is list && s.startingLineupF7.size() <= 25)) &&
+        (!('startingLineupFutsal' in s) || (s.startingLineupFutsal is list && s.startingLineupFutsal.size() <= 25)) &&
+        (!('benchPlayers' in s) || (s.benchPlayers is list && s.benchPlayers.size() <= 100)) &&
+        (!('squads' in s) || (s.squads is list && s.squads.size() <= 25));
+    }
+
+    function isValidTeamDoc(data) {
+      return data.keys().hasAll(['settings']) &&
+        data.keys().hasOnly([
+          'settings', 'clubName', 'formation', 'activeSquad',
+          'specialists', 'tacticalNotes', 'tacticalBoard', 'lineup',
+          'updatedAt', 'updatedBy', 'schemaVersion'
+        ]) &&
+        !data.keys().hasAny(['players', 'email', 'phone', 'studentId']) &&
+        isValidTeamSettings(data.settings) &&
+        isOptionalBoundedString(data, 'clubName', 1, 80) &&
+        isOptionalBoundedString(data, 'formation', 1, 30) &&
+        (!('activeSquad' in data) || isBoundedString(data.activeSquad, 1, 64) || (data.activeSquad is map && data.activeSquad.keys().size() <= 20)) &&
+        (!('specialists' in data) || (data.specialists is map && data.specialists.keys().size() <= 16)) &&
+        (!('tacticalNotes' in data) || isBoundedString(data.tacticalNotes, 0, 5000) || (data.tacticalNotes is map && data.tacticalNotes.keys().size() <= 20)) &&
+        (!('tacticalBoard' in data) || (data.tacticalBoard is map && data.tacticalBoard.keys().size() <= 25)) &&
+        (!('lineup' in data) || (data.lineup is list && data.lineup.size() <= 30) || (data.lineup is map && data.lineup.keys().size() <= 20)) &&
+        (!('updatedAt' in data) || isValidTimestampOrMillis(data.updatedAt)) &&
+        isOptionalBoundedString(data, 'updatedBy', 1, 128) &&
+        (!('schemaVersion' in data) || data.schemaVersion is int || isBoundedString(data.schemaVersion, 1, 16));
+    }
+
+    // --- Collection: players/{playerId} ---
+    function isValidPlayer(data, playerId) {
+      return !data.keys().hasAny(['email', 'phone', 'studentId']) &&
+        data.keys().hasAll(['id', 'uid', 'name', 'rating', 'stats', 'rolesHierarchy']) &&
+        data.keys().hasOnly([
+          'id', 'uid', 'name', 'nickname', 'avatar', 'number', 'rating',
+          'cardType', 'faculty', 'preferredFoot',
+          'kitColor', 'kitSecondary', 'kitCollar', 'kitSleeves',
+          'playStyle', 'celebration', 'skillMoves', 'weakFoot', 'chemStyle',
+          'rolesHierarchy', 'stats', 'availability',
+          'matchesPlayed', 'minutesPlayed', 'goals', 'assists', 'yellowCards', 'redCards',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isBoundedString(data.id, 1, 128) &&
+        data.id == playerId &&
+        data.uid is string && data.uid.size() <= 128 &&
+        isBoundedString(data.name, 1, 80) &&
+        isOptionalBoundedString(data, 'nickname', 0, 40) &&
+        (!('avatar' in data) || isValidAvatarUrl(data.avatar)) &&
+        (!('number' in data) || isBoundedNumber(data.number, 1, 99)) &&
+        isBoundedNumber(data.rating, 40, 99) &&
+        (!('cardType' in data) || (data.cardType is string && data.cardType in ['gold', 'totw', 'toty', 'tots', 'icon', 'special', 'silver', 'bronze', 'hero'])) &&
+        isOptionalBoundedString(data, 'faculty', 1, 40) &&
+        (!('preferredFoot' in data) || (data.preferredFoot is string && data.preferredFoot in ['Diestro', 'Zurdo', 'Ambidiestro', 'right', 'left', 'both'])) &&
+        isOptionalBoundedString(data, 'kitColor', 3, 32) &&
+        isOptionalBoundedString(data, 'kitSecondary', 3, 32) &&
+        isOptionalBoundedString(data, 'kitCollar', 1, 24) &&
+        isOptionalBoundedString(data, 'kitSleeves', 1, 24) &&
+        isOptionalBoundedString(data, 'playStyle', 1, 32) &&
+        isOptionalBoundedString(data, 'celebration', 1, 32) &&
+        (!('skillMoves' in data) || isBoundedNumber(data.skillMoves, 1, 5)) &&
+        (!('weakFoot' in data) || isBoundedNumber(data.weakFoot, 1, 5)) &&
+        isOptionalBoundedString(data, 'chemStyle', 1, 24) &&
+        isValidRolesHierarchy(data.rolesHierarchy) &&
+        isValidPlayerStats(data.stats) &&
+        (!('availability' in data) || (isBoundedString(data.availability, 0, 32) || (data.availability is map && data.availability.keys().size() <= 10))) &&
+        (!('matchesPlayed' in data) || isBoundedNumber(data.matchesPlayed, 0, 10000)) &&
+        (!('minutesPlayed' in data) || isBoundedNumber(data.minutesPlayed, 0, 1000000)) &&
+        (!('goals' in data) || isBoundedNumber(data.goals, 0, 10000)) &&
+        (!('assists' in data) || isBoundedNumber(data.assists, 0, 10000)) &&
+        (!('yellowCards' in data) || isBoundedNumber(data.yellowCards, 0, 1000)) &&
+        (!('redCards' in data) || isBoundedNumber(data.redCards, 0, 1000)) &&
+        (!('createdAt' in data) || isValidTimestampOrMillis(data.createdAt)) &&
+        (!('updatedAt' in data) || isValidTimestampOrMillis(data.updatedAt));
+    }
+
+    function arePlayerMatchRecordsZeroOrAbsent(data) {
+      return (!('matchesPlayed' in data) || data.matchesPlayed == 0) &&
+        (!('minutesPlayed' in data) || data.minutesPlayed == 0) &&
+        (!('goals' in data) || data.goals == 0) &&
+        (!('assists' in data) || data.assists == 0) &&
+        (!('yellowCards' in data) || data.yellowCards == 0) &&
+        (!('redCards' in data) || data.redCards == 0);
+    }
+
+    function isProtectedMatchRecordUnchanged(field) {
+      return (field in resource.data && field in request.resource.data && request.resource.data[field] == resource.data[field]) ||
+        (!(field in resource.data) && (!(field in request.resource.data) || request.resource.data[field] == 0));
+    }
+
+    function arePlayerMatchRecordsProtected() {
+      return isProtectedMatchRecordUnchanged('matchesPlayed') &&
+        isProtectedMatchRecordUnchanged('minutesPlayed') &&
+        isProtectedMatchRecordUnchanged('goals') &&
+        isProtectedMatchRecordUnchanged('assists') &&
+        isProtectedMatchRecordUnchanged('yellowCards') &&
+        isProtectedMatchRecordUnchanged('redCards');
+    }
+
+    // --- Collection: playerPrivate/{playerId} ---
+    function isValidPlayerPrivate(data, playerId) {
+      return data.keys().hasAll(['id', 'uid']) &&
+        data.keys().hasOnly(['id', 'uid', 'email', 'phone', 'studentId', 'createdAt', 'updatedAt']) &&
+        isBoundedString(data.id, 1, 128) &&
+        data.id == playerId &&
+        data.uid is string && data.uid.size() <= 128 &&
+        (!('email' in data) || data.email == '' || isValidEmail(data.email)) &&
+        isOptionalBoundedString(data, 'phone', 0, 32) &&
+        isOptionalBoundedString(data, 'studentId', 0, 32) &&
+        (!('createdAt' in data) || isValidTimestampOrMillis(data.createdAt)) &&
+        (!('updatedAt' in data) || isValidTimestampOrMillis(data.updatedAt));
+    }
+
+    // --- Collection: matches/{matchId} ---
+    function isValidMatchLineup(lineup) {
+      return lineup is map &&
+        lineup.keys().hasOnly(['titulares', 'suplentes', 'convocatoria']) &&
+        (!('titulares' in lineup) || (lineup.titulares is list && lineup.titulares.size() <= 20)) &&
+        (!('suplentes' in lineup) || (lineup.suplentes is list && lineup.suplentes.size() <= 40)) &&
+        (!('convocatoria' in lineup) || (lineup.convocatoria is map && lineup.convocatoria.keys().size() <= 100));
+    }
+
+    function isValidMatch(data, matchId) {
+      return data.keys().hasAll(['id', 'rival', 'date', 'status', 'lineup']) &&
+        data.keys().hasOnly([
+          'id', 'rival', 'tournament', 'modality', 'date', 'time', 'field',
+          'status', 'goalsFor', 'goalsAgainst', 'scorers', 'mvp', 'notes',
+          'lineup', 'createdAt', 'updatedAt'
+        ]) &&
+        isBoundedString(data.id, 1, 128) &&
+        data.id == matchId &&
+        isBoundedString(data.rival, 1, 100) &&
+        isOptionalBoundedString(data, 'tournament', 0, 100) &&
+        (!('modality' in data) || data.modality in ['f7', 'futsal']) &&
+        isBoundedString(data.date, 4, 32) &&
+        isOptionalBoundedString(data, 'time', 0, 16) &&
+        isOptionalBoundedString(data, 'field', 0, 120) &&
+        data.status in ['proximo', 'finalizado', 'en_curso', 'cancelado', 'aplazado'] &&
+        (!('goalsFor' in data) || data.goalsFor == null || isBoundedNumber(data.goalsFor, 0, 99)) &&
+        (!('goalsAgainst' in data) || data.goalsAgainst == null || isBoundedNumber(data.goalsAgainst, 0, 99)) &&
+        isOptionalBoundedString(data, 'scorers', 0, 500) &&
+        isOptionalBoundedString(data, 'mvp', 0, 100) &&
+        isOptionalBoundedString(data, 'notes', 0, 1000) &&
+        isValidMatchLineup(data.lineup) &&
+        (!('createdAt' in data) || isValidTimestampOrMillis(data.createdAt)) &&
+        (!('updatedAt' in data) || isValidTimestampOrMillis(data.updatedAt));
+    }
+
+    function canAttemptConvocatoriaVote() {
+      return isSignedIn() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lineup', 'updatedAt']) &&
+        'lineup' in resource.data &&
+        resource.data.lineup is map &&
+        'lineup' in request.resource.data &&
+        request.resource.data.lineup is map &&
+        request.resource.data.lineup.diff(resource.data.lineup).affectedKeys().hasOnly(['convocatoria']) &&
+        'convocatoria' in request.resource.data.lineup &&
+        request.resource.data.lineup.convocatoria is map &&
+        resource.data.lineup.get('convocatoria', {}) is map;
+    }
+
+    function isOwnConvocatoriaSingleVoteChange() {
+      let prevConv = resource.data.lineup.get('convocatoria', {});
+      let nextConv = request.resource.data.lineup.convocatoria;
+      let convDiff = nextConv.diff(prevConv).affectedKeys();
+      let added = nextConv.keys().removeAll(prevConv.keys());
+      let uid = request.auth.uid;
+      let uKey = 'u_' + uid;
+      return convDiff.size() == 1 && (
+        (
+          convDiff.hasOnly([uKey]) &&
+          uKey in nextConv &&
+          isValidVoteStatus(nextConv[uKey])
+        ) ||
+        (
+          convDiff.hasOnly([uid]) &&
+          uid in nextConv &&
+          isValidVoteStatus(nextConv[uid]) &&
+          isPlayerOwnedByAuth(uid)
+        ) ||
+        (
+          added.size() == 1 &&
+          convDiff.hasOnly(added) &&
+          added[0] in nextConv &&
+          isValidVoteStatus(nextConv[added[0]]) &&
+          isPlayerOwnedByAuth(added[0])
+        )
+      );
+    }
+
+    // --- Collection: matchLogs/{logId} ---
+    function isValidMatchLog(data, logId) {
+      return data.keys().hasAll(['id', 'date', 'opponent', 'duration', 'entries']) &&
+        data.keys().hasOnly([
+          'id', 'date', 'opponent', 'modality', 'duration', 'entries',
+          'matchId', 'notes', 'createdAt', 'updatedAt'
+        ]) &&
+        isBoundedString(data.id, 1, 128) &&
+        data.id == logId &&
+        isBoundedString(data.date, 4, 32) &&
+        isBoundedString(data.opponent, 1, 100) &&
+        (!('modality' in data) || data.modality in ['f7', 'futsal']) &&
+        isBoundedNumber(data.duration, 1, 240) &&
+        data.entries is list &&
+        data.entries.size() <= 60 &&
+        (data.entries.size() == 0 || data.entries[0] is map) &&
+        isOptionalBoundedString(data, 'matchId', 0, 128) &&
+        isOptionalBoundedString(data, 'notes', 0, 1000) &&
+        (!('createdAt' in data) || isValidTimestampOrMillis(data.createdAt)) &&
+        (!('updatedAt' in data) || isValidTimestampOrMillis(data.updatedAt));
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    // 1. Club configuration (non-PII): public read, admin write
+    match /teams/{teamId} {
+      allow read: if true;
+      allow create: if isAdmin() &&
+        teamId.size() > 0 && teamId.size() <= 80 &&
+        isValidTeamDoc(request.resource.data);
+      allow update: if isAdmin() &&
+        teamId.size() > 0 && teamId.size() <= 80 &&
+        isValidTeamDoc(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // 2. Public FUT player cards (non-PII only): public read, owner/admin write
+    match /players/{playerId} {
+      allow read: if true;
+
+      allow create: if isValidPlayer(request.resource.data, playerId) && (
+        isAdmin() ||
+        (
+          isSignedIn() &&
+          request.resource.data.uid == request.auth.uid &&
+          request.resource.data.uid.size() > 0 &&
+          (playerId == 'u_' + request.auth.uid || playerId == request.auth.uid) &&
+          arePlayerMatchRecordsZeroOrAbsent(request.resource.data)
+        )
+      );
+
+      allow update: if isValidPlayer(request.resource.data, playerId) && (
+        isAdmin() ||
+        (
+          isSignedIn() &&
+          resource != null &&
+          'uid' in resource.data &&
+          'id' in resource.data &&
+          resource.data.uid == request.auth.uid &&
+          request.resource.data.uid == resource.data.uid &&
+          request.resource.data.id == resource.data.id &&
+          (!('createdAt' in resource.data) || ('createdAt' in request.resource.data && request.resource.data.createdAt == resource.data.createdAt)) &&
+          arePlayerMatchRecordsProtected()
+        )
+      );
+
+      allow delete: if isAdmin() || (
+        isSignedIn() &&
+        resource != null &&
+        'uid' in resource.data &&
+        resource.data.uid == request.auth.uid
+      );
+    }
+
+    // 3. Private player registration & contact PII: strict owner & admin only
+    match /playerPrivate/{playerId} {
+      allow get: if isAdmin() || (
+        isSignedIn() && (
+          playerId == 'u_' + request.auth.uid ||
+          playerId == request.auth.uid ||
+          (resource != null && 'uid' in resource.data && resource.data.uid == request.auth.uid) ||
+          (
+            resource == null &&
+            exists(/databases/$(database)/documents/players/$(playerId)) &&
+            'uid' in get(/databases/$(database)/documents/players/$(playerId)).data &&
+            get(/databases/$(database)/documents/players/$(playerId)).data.uid == request.auth.uid
+          )
+        )
+      );
+
+      allow list: if isAdmin() || (
+        isSignedIn() &&
+        resource.data.uid == request.auth.uid
+      );
+
+      allow create: if isValidPlayerPrivate(request.resource.data, playerId) && (
+        isAdmin() ||
+        (
+          isSignedIn() &&
+          request.resource.data.uid == request.auth.uid &&
+          request.resource.data.uid.size() > 0 &&
+          (playerId == 'u_' + request.auth.uid || playerId == request.auth.uid)
+        )
+      );
+
+      allow update: if isValidPlayerPrivate(request.resource.data, playerId) && (
+        isAdmin() ||
+        (
+          isSignedIn() &&
+          resource != null &&
+          'uid' in resource.data &&
+          'id' in resource.data &&
+          resource.data.uid == request.auth.uid &&
+          request.resource.data.uid == resource.data.uid &&
+          request.resource.data.id == resource.data.id &&
+          (playerId == 'u_' + request.auth.uid || playerId == request.auth.uid) &&
+          (!('createdAt' in resource.data) || ('createdAt' in request.resource.data && request.resource.data.createdAt == resource.data.createdAt))
+        )
+      );
+
+      allow delete: if isAdmin() || (
+        isSignedIn() &&
+        resource != null &&
+        (
+          ('uid' in resource.data && resource.data.uid == request.auth.uid) ||
+          playerId == 'u_' + request.auth.uid ||
+          playerId == request.auth.uid
+        )
+      );
+    }
+
+    // 4. Matches & attendance voting: public read, admin write, self-vote in lineup.convocatoria
+    match /matches/{matchId} {
+      allow read: if true;
+
+      allow create: if isAdmin() && isValidMatch(request.resource.data, matchId);
+
+      allow update: if isValidMatch(request.resource.data, matchId) && (
+        isAdmin() ||
+        (
+          canAttemptConvocatoriaVote() &&
+          isOwnConvocatoriaSingleVoteChange()
+        )
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // 5. Historical match minutes logs: public read, admin write
+    match /matchLogs/{logId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidMatchLog(request.resource.data, logId);
+      allow update: if isAdmin() &&
+        isValidMatchLog(request.resource.data, logId) &&
+        request.resource.data.id == resource.data.id;
+      allow delete: if isAdmin();
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

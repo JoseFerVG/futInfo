@@ -1,11 +1,11 @@
 /**
- * Motor táctico de alineaciones, jerarquía de posiciones y reparto equitativo de minutos
- * Calcula el XI/quinteto óptimo mediante asignación bipartita exacta (algoritmo húngaro)
+ * Motor táctico de alineaciones (Fútbol 7), jerarquía de posiciones y reparto equitativo de minutos
+ * Calcula el siete titular óptimo mediante asignación bipartita exacta (algoritmo húngaro)
  * y genera ventanas de cambios minuto a minuto compensando el historial previo de partidos.
  */
 
 export const ALL_TACTICAL_ROLES = [
-  { code: 'POR', name: 'Portero (GK)', short: 'POR', modality: 'Ambas', category: 'GK' },
+  { code: 'POR', name: 'Portero (GK)', short: 'POR', modality: 'F7', category: 'GK' },
   { code: 'DFC', name: 'Defensa Central (CB)', short: 'DFC', modality: 'F7', category: 'DEF' },
   { code: 'LI', name: 'Lateral Izquierdo (LB)', short: 'LI', modality: 'F7', category: 'DEF' },
   { code: 'LD', name: 'Lateral Derecho (RB)', short: 'LD', modality: 'F7', category: 'DEF' },
@@ -14,12 +14,7 @@ export const ALL_TACTICAL_ROLES = [
   { code: 'MCO', name: 'Mediapunta (CAM)', short: 'MCO', modality: 'F7', category: 'MID' },
   { code: 'EI', name: 'Extremo Izquierdo (LW)', short: 'EI', modality: 'F7', category: 'FWD' },
   { code: 'ED', name: 'Extremo Derecho (RW)', short: 'ED', modality: 'F7', category: 'FWD' },
-  { code: 'DC', name: 'Delantero Centro (ST)', short: 'DC', modality: 'F7', category: 'FWD' },
-  { code: 'CIE', name: 'Cierre (Último Hombre)', short: 'CIE', modality: 'Sala', category: 'DEF' },
-  { code: 'ALI', name: 'Ala Izquierdo (Futsal)', short: 'ALI', modality: 'Sala', category: 'MID' },
-  { code: 'ALD', name: 'Ala Derecho (Futsal)', short: 'ALD', modality: 'Sala', category: 'MID' },
-  { code: 'PIV', name: 'Pívot (Boya Futsal)', short: 'PIV', modality: 'Sala', category: 'FWD' },
-  { code: 'UNI', name: 'Universal (Polivalente)', short: 'UNI', modality: 'Sala', category: 'MID' }
+  { code: 'DC', name: 'Delantero Centro (ST)', short: 'DC', modality: 'F7', category: 'FWD' }
 ];
 
 export const ROLE_META_MAP = ALL_TACTICAL_ROLES.reduce((acc, role) => {
@@ -29,20 +24,21 @@ export const ROLE_META_MAP = ALL_TACTICAL_ROLES.reduce((acc, role) => {
 
 export const ROLE_EQUIVALENTS = {
   POR: [],
-  DFC: ['CIE', 'MCD', 'LI', 'LD'],
-  LI: ['ALI', 'DFC', 'EI', 'MCD'],
-  LD: ['ALD', 'DFC', 'ED', 'MCD'],
-  MCD: ['MC', 'DFC', 'CIE', 'UNI'],
-  MC: ['MCO', 'MCD', 'UNI', 'ALI', 'ALD'],
-  MCO: ['MC', 'DC', 'EI', 'ED', 'UNI', 'PIV'],
-  EI: ['ALI', 'LI', 'ED', 'MCO', 'DC'],
-  ED: ['ALD', 'LD', 'EI', 'MCO', 'DC'],
-  DC: ['PIV', 'MCO', 'EI', 'ED'],
-  CIE: ['DFC', 'MCD', 'UNI'],
-  ALI: ['LI', 'EI', 'MC', 'ALD', 'UNI'],
-  ALD: ['LD', 'ED', 'MC', 'ALI', 'UNI'],
-  PIV: ['DC', 'MCO', 'UNI'],
-  UNI: ['MC', 'MCO', 'MCD', 'ALI', 'ALD', 'CIE']
+  DFC: ['MCD', 'LI', 'LD'],
+  LI: ['DFC', 'EI', 'MCD'],
+  LD: ['DFC', 'ED', 'MCD'],
+  MCD: ['MC', 'DFC'],
+  MC: ['MCO', 'MCD'],
+  MCO: ['MC', 'DC', 'EI', 'ED'],
+  EI: ['LI', 'ED', 'MCO', 'DC'],
+  ED: ['LD', 'EI', 'MCO', 'DC'],
+  DC: ['MCO', 'EI', 'ED'],
+  // Mapeo seguro retrocompatible de roles históricos si existieran
+  CIE: ['DFC', 'MCD'],
+  ALI: ['LI', 'EI', 'MC'],
+  ALD: ['LD', 'ED', 'MC'],
+  PIV: ['DC', 'MCO'],
+  UNI: ['MC', 'MCO', 'MCD']
 };
 
 export function getRoleLabel(code) {
