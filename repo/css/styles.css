@@ -4,7 +4,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Teko:wght@500;600;700&display=swap');
 
 :root {
-  color-scheme: dark;
   --fut-gold-1: #fce074;
   --fut-gold-2: #dfb443;
   --fut-gold-3: #c79624;
@@ -13,15 +12,21 @@
   --fut-cyan-glow: rgba(0, 240, 255, 0.6);
   --esports-carbon: #0f172a;
   --esports-border: #e2e8f0;
-  --fut-gold-1: #fce074;
-  --fut-gold-2: #dfb443;
-  --fut-gold-3: #c79624;
-  --fut-gold-dark: #3b2805;
-  --fut-cyan: #00f0ff;
-  --fut-cyan-glow: rgba(0, 240, 255, 0.6);
   --chem-green: #00e676;
   --chem-orange: #ff9100;
   --chem-red: #ff1744;
+}
+
+body:not(.theme-light) {
+  color-scheme: dark;
+  background-color: #0a0c10;
+  color: #f8fafc;
+}
+
+body.theme-light {
+  color-scheme: light;
+  background-color: #eef2f6;
+  color: #0f172a;
 }
 
 /* ==================== WEB INTERFACE GUIDELINES & ACCESSIBILITY ==================== */
@@ -623,8 +628,18 @@ dialog[open] {
 .fut-card-flag {
   font-size: 0.88em;
   line-height: 1.1;
-  margin-top: 1px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}
+
+.umu-faculty-crest {
+  width: 1.32em;
+  height: 1.5em;
+  display: block;
+  flex-shrink: 0;
 }
 
 .fut-card-club {
@@ -648,8 +663,8 @@ dialog[open] {
 .fut-card-kit-wrap {
   position: absolute;
   top: 0;
-  right: 6%;
-  width: 62%;
+  right: 5%;
+  width: 63%;
   height: 100%;
   display: flex;
   align-items: center;
@@ -669,34 +684,54 @@ dialog[open] {
 
 .fut-card-kit-silhouette {
   position: relative;
-  width: 86%;
-  height: 98%;
+  width: 88%;
+  height: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.65));
 }
 
+/* Foto real de cara posicionada detrás del cuello de la camiseta */
+.fut-card-face-photo {
+  position: absolute;
+  top: 0%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 58%;
+  height: 46%;
+  object-fit: cover;
+  object-position: center 18%;
+  border-radius: 50% 50% 34% 34%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(15, 23, 42, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+  z-index: 1;
+}
+
 .fut-card-kit-svg {
+  position: relative;
   width: 100%;
   height: 100%;
   color: #12161f;
   transition: transform 0.2s ease;
+  z-index: 2;
 }
 
 .fut-card-dorsal {
   position: absolute;
-  top: 60%;
+  top: 63%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-family: 'Barlow Condensed', 'Teko', sans-serif;
   font-weight: 900;
-  font-size: 1.55em;
+  font-size: 1.5em;
   letter-spacing: -0.5px;
   line-height: 1;
   color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.85);
   pointer-events: none;
+  z-index: 3;
 }
 
 /* Colores de silueta y dorsal según tipo de carta */
@@ -1287,30 +1322,44 @@ dialog[open] {
 
 /* Drag and Drop de Jugadores en el Campo y Banquillo */
 .fut-card[draggable="true"],
-.fut-card-slot[draggable="true"] {
+.fut-card-slot[draggable="true"],
+[data-bench-id][draggable="true"] {
   cursor: grab;
+  user-select: none;
+  -webkit-user-drag: element;
+}
+.fut-card-slot > *,
+[data-bench-id] > * {
+  pointer-events: none;
 }
 .fut-card[draggable="true"]:active,
-.fut-card-slot[draggable="true"]:active {
+.fut-card-slot[draggable="true"]:active,
+[data-bench-id][draggable="true"]:active {
   cursor: grabbing;
 }
 .is-dragging {
-  opacity: 0.45 !important;
-  transform: scale(0.95) !important;
-  filter: grayscale(40%) drop-shadow(0 0 12px rgba(251, 191, 36, 0.5)) !important;
+  opacity: 0.42 !important;
+  transform: translate(-50%, -50%) scale(0.92) !important;
+  filter: grayscale(35%) drop-shadow(0 0 16px rgba(251, 191, 36, 0.7)) !important;
+}
+[data-bench-id].is-dragging {
+  transform: scale(0.92) !important;
 }
 .slot-drop-active {
   outline: 3px solid #fbbf24 !important;
   outline-offset: 4px;
-  box-shadow: 0 0 25px rgba(251, 191, 36, 0.8) !important;
-  transform: scale(1.08) !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  z-index: 50 !important;
+  box-shadow: 0 0 28px rgba(251, 191, 36, 0.85) !important;
+  transform: translate(-50%, -50%) scale(calc(var(--depth-scale, 1) * var(--pitch-scale, 1) * 1.12)) !important;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+  z-index: 55 !important;
+}
+[data-bench-id].slot-drop-active {
+  transform: scale(1.06) !important;
 }
 .dock-drop-active {
-  background: rgba(251, 191, 36, 0.15) !important;
+  background: rgba(251, 191, 36, 0.16) !important;
   border-color: #fbbf24 !important;
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.4) inset !important;
+  box-shadow: 0 0 22px rgba(251, 191, 36, 0.45) inset !important;
 }
 
 /* Botones de Estilo Defensivo en Centro Táctico */

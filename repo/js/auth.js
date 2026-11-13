@@ -45,7 +45,7 @@ class AuthService {
       id: fbUser.uid,
       name: fbUser.displayName || (cleanEmail ? cleanEmail.split('@')[0] : 'Jugador FUT'),
       email: cleanEmail,
-      photoURL: fbUser.photoURL || existingPlayer?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanEmail || fbUser.uid)}`,
+      photoURL: fbUser.photoURL || existingPlayer?.avatar || 'assets/club_logo.png',
       role: isAdmin ? 'admin' : 'player',
       playerId: existingPlayer ? existingPlayer.id : null,
       isFirebase: true,
@@ -151,7 +151,7 @@ class AuthService {
       (p.email && p.email.toLowerCase() === cleanEmail)
     );
 
-    const avatarUrl = cardData.avatar || this.currentUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+    const avatarUrl = cardData.avatar || this.currentUser.photoURL || existingPlayer?.avatar || 'assets/club_logo.png';
 
     let targetPlayer;
     if (existingPlayer) {
