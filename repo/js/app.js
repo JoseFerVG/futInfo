@@ -355,9 +355,13 @@ class FutApp {
     // 0. Tema Claro / Oscuro
     this.initTheme();
 
-    // 1. Inicializar Firebase
+    // 1. Inicializar Firebase Auth & Firestore en Tiempo Real
     const fb = await initFirebaseServices();
     this.updateFirebaseBadge(fb.isConnected);
+    if (fb.isConnected) {
+      await authService.bindFirebaseAuthListener();
+      store.initCloudSync(fb.db);
+    }
 
     // 2. Auth listener
     authService.onAuthStateChanged((user) => {
@@ -368,6 +372,7 @@ class FutApp {
 
     // 3. Store listener
     store.subscribe(() => {
+      authService.refreshLinkedPlayer();
       this.renderAll();
     });
 
@@ -572,7 +577,7 @@ class FutApp {
             <span class="fut-card-pos">${displayRole}</span>
             <div class="fut-card-col-divider"></div>
             <span class="fut-card-flag" title="${fac.name}">${fac.icon}</span>
-            <span class="fut-card-club" title="${store.getSettings().teamName || 'Club'}"><i data-lucide="shield" class="w-[0.75em] h-[0.75em] inline"></i></span>
+            <span class="fut-card-club" title="${store.getSettings().teamName || 'Club'}"><img src="assets/club_logo.png" alt="Escudo" class="fut-card-crest-img"></span>
           </div>
           <div class="fut-card-kit-wrap">
             <div class="fut-card-kit-silhouette">
@@ -1464,11 +1469,12 @@ class FutApp {
     setupBackdropDismiss(confirmDialog);
 
     document.getElementById('btn-open-create-card')?.addEventListener('click', () => {
-      const user = authService.getCurrentUser() || {
-        name: 'Nuevo Jugador',
-        email: `fichaje_${Date.now()}@rector.es`,
-        photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
-      };
+      const user = authService.getCurrentUser();
+      if (!user) {
+        document.getElementById('login-dialog').showModal();
+        this.showToast('Conecta tu cuenta de Google para gestionar tu carta FUT', 'user-check');
+        return;
+      }
       this.openPlayerSetupModal(user);
     });
   }
@@ -1830,9 +1836,6 @@ class FutApp {
       const shortName = (document.getElementById('set-short-name')?.value || 'FUR').toUpperCase();
       const tournament = document.getElementById('set-tournament-name')?.value || 'Torneo del Rector 2026';
       const slogan = document.getElementById('set-club-slogan')?.value || '¡Hasta el último minuto!';
-      const crest = document.getElementById('set-club-crest')?.value || 'shield_gold';
-      const kitColor = document.getElementById('set-kit-primary')?.value || '#f8fafc';
-      const kitSecondary = document.getElementById('set-kit-secondary')?.value || '#f0be2a';
 
       const specialists = {
         captain: document.getElementById('club-spec-captain')?.value || document.getElementById('spec-captain')?.value || 'p4',
@@ -1846,9 +1849,9 @@ class FutApp {
         shortName,
         tournament,
         slogan,
-        crest,
-        kitColor,
-        kitSecondary,
+        crest: prev.crest || 'shield_gold',
+        kitColor: prev.kitColor || '#f8fafc',
+        kitSecondary: prev.kitSecondary || '#f0be2a',
         stadium: prev.stadium || 'campus_sur',
         ball: prev.ball || 'nike_flight',
         specialists
@@ -1861,17 +1864,6 @@ class FutApp {
       this.renderMatches();
       this.renderClubHub();
       this.showToast('Personalización del Club guardada con éxito', 'award');
-    });
-
-    // Escuchadores en tiempo real para el código de color de la equipación
-    document.getElementById('set-kit-primary')?.addEventListener('input', (e) => {
-      const hex = document.getElementById('kit-primary-hex');
-      if (hex) hex.textContent = e.target.value;
-    });
-
-    document.getElementById('set-kit-secondary')?.addEventListener('input', (e) => {
-      const hex = document.getElementById('kit-secondary-hex');
-      if (hex) hex.textContent = e.target.value;
     });
 
     // 6. Formulario Firebase
@@ -1903,11 +1895,11 @@ class FutApp {
     const dialog = document.getElementById('player-card-setup-dialog');
     if (!dialog) return;
 
-    user = user || authService.currentUser || {
-      uid: 'guest-' + Date.now(),
-      name: 'Nuevo Fichaje',
-      email: 'fichaje@rector.es'
-    };
+    user = user || authService.getCurrentUser();
+    if (!user) {
+      document.getElementById('login-dialog').showModal();
+      return;
+    }
 
     const existing = store.getPlayers().find(p => 
       (user?.playerId && p.id === user.playerId) || 
@@ -2410,6 +2402,11 @@ class FutApp {
   renderAuthBar(user) {
     const container = document.getElementById('auth-container');
     if (!container) return;
+
+    const createCardLbl = document.getElementById('btn-create-card-label');
+    if (createCardLbl) {
+      createCardLbl.textContent = user ? (user.playerId ? 'MI CARTA FUT' : 'CREAR MI CARTA') : 'UNIRME / MI CARTA';
+    }
 
     if (user) {
       const isMister = user.role === 'admin';
@@ -3121,8 +3118,10 @@ class FutApp {
     posStep.classList.add('hidden');
     cardStep.classList.add('hidden');
 
-    document.getElementById('walkout-crest-icon').innerHTML = fac.icon;
-    document.getElementById('walkout-crest-name').textContent = fac.name.toUpperCase();
+    document.getElementById('walkout-crest-icon').innerHTML = `
+      <img src="assets/club_logo.png" alt="Escudo Oficial" class="w-24 h-28 object-contain drop-shadow-[0_0_24px_rgba(240,190,42,0.8)]">
+    `;
+    document.getElementById('walkout-crest-name').textContent = `${(store.getSettings().teamName || 'CLUB').toUpperCase()} • ${fac.short}`;
     document.getElementById('walkout-pos-pill').textContent = player.rolesHierarchy ? player.rolesHierarchy.best : 'DC';
 
     overlay.classList.remove('hidden');
@@ -3226,38 +3225,34 @@ class FutApp {
 
     grid.innerHTML = players.map(p => {
       const fac = FACULTIES.find(f => f.id === p.faculty) || FACULTIES[0];
+      const best = p.rolesHierarchy?.best || 'MC';
+      const second = p.rolesHierarchy?.second || '';
+      const third = p.rolesHierarchy?.third || '';
 
       return `
-        <div class="fifa-tile p-5 flex flex-col justify-between hover:border-amber-400 hover:shadow-xl transition group relative overflow-hidden">
-          <div class="fifa-tile-accent-bar mb-2"></div>
-          <div class="flex items-center justify-center mb-4">
+        <article class="fifa-album-tile group">
+          <div class="fifa-album-top-bar"></div>
+          <div class="fifa-album-meta-row font-fifa">
+            <span class="fifa-album-dorsal">#${p.number || 10}</span>
+            <span class="fifa-album-faculty">${fac.short}</span>
+            ${p.goals > 0 ? `<span class="fifa-album-goals">${p.goals}G</span>` : ''}
+          </div>
+
+          <div class="fifa-album-stage" onclick="window.futApp.inspectPlayer('${p.id}')" title="Ver ficha técnica de ${p.nickname || p.name}">
             ${this.renderFutCard(p, { size: 'album' })}
           </div>
 
-          <div class="space-y-1.5 text-xs bg-slate-950/70 p-3  border border-white/10 mb-3">
-            <div class="flex items-center justify-between text-emerald-400 font-bold">
-              <span class="flex items-center gap-1.5 text-[11px]"><i data-lucide="award" class="w-3.5 h-3.5 text-emerald-400"></i> Principal:</span>
-              <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.best}</span>
-            </div>
-            <div class="flex items-center justify-between text-sky-400 font-bold">
-              <span class="flex items-center gap-1.5 text-[11px]"><i data-lucide="arrow-right-circle" class="w-3.5 h-3.5 text-sky-400"></i> Segunda:</span>
-              <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.second}</span>
-            </div>
-            <div class="flex items-center justify-between text-amber-400 font-bold">
-              <span class="flex items-center gap-1.5 text-[11px]"><i data-lucide="circle-dot" class="w-3.5 h-3.5 text-amber-400"></i> Alternativa:</span>
-              <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.third}</span>
-            </div>
-            <div class="flex items-center justify-between text-rose-400 font-bold">
-              <span class="flex items-center gap-1.5 text-[11px]"><i data-lucide="x-circle" class="w-3.5 h-3.5 text-rose-400"></i> Menos Favorable:</span>
-              <span class="font-black text-white font-fifa text-base">${p.rolesHierarchy.worst}</span>
-            </div>
+          <div class="fifa-album-pos-row font-fifa" aria-label="Posiciones">
+            <span class="fifa-album-pos-chip is-primary">★ ${best}</span>
+            ${second ? `<span class="fifa-album-pos-chip">${second}</span>` : ''}
+            ${third ? `<span class="fifa-album-pos-chip is-muted">${third}</span>` : ''}
           </div>
 
-          <button onclick="window.futApp.inspectPlayer('${p.id}')" class="w-full py-2.5  bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-amber-400 text-xs font-black uppercase tracking-wider text-amber-400 flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95 cursor-pointer">
-            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-            <span>Ver Ficha Técnica Completa</span>
+          <button type="button" onclick="window.futApp.inspectPlayer('${p.id}')" class="fifa-album-inspect-btn font-fifa">
+            <span>FICHA TÉCNICA</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
           </button>
-        </div>
+        </article>
       `;
     }).join('');
 
@@ -3315,7 +3310,7 @@ class FutApp {
 
           <div class="bg-slate-950/80 p-2 border border-slate-800 text-[10px] space-y-1">
             <div><span class="text-slate-500 uppercase font-fifa">Celebración:</span> <span class="text-white font-bold">${celebMap[p.celebration] || 'Estándar'}</span></div>
-            <div><span class="text-slate-500 uppercase font-fifa">Color Principal:</span> <span class="text-white font-bold">${kitDesc}</span></div>
+            <div><span class="text-slate-500 uppercase font-fifa">Edición:</span> <span class="text-white font-bold">${kitDesc}</span></div>
           </div>
         </div>
       </div>
@@ -3401,15 +3396,17 @@ class FutApp {
 
   // ==================== PARTIDOS & ASISTENCIA BROADCAST EA SPORTS ====================
   getClubCrestSvg(crestId, sizeClass = 'w-9 h-9') {
+    if (!crestId || crestId === 'club' || crestId === 'shield_gold') {
+      return `<img src="assets/club_logo.png" alt="Escudo Oficial" class="${sizeClass} object-contain drop-shadow">`;
+    }
     const palette = {
-      shield_gold: { bg: '#f0be2a', fg: '#0f172a', icon: 'shield' },
       crest_leones: { bg: '#ea580c', fg: '#ffffff', icon: 'crown' },
       crest_rayo: { bg: '#0ea5e9', fg: '#ffffff', icon: 'zap' },
       crest_lobos: { bg: '#64748b', fg: '#f8fafc', icon: 'compass' },
       crest_dragones: { bg: '#10b981', fg: '#064e3b', icon: 'flame' },
       crest_aguilas: { bg: '#eab308', fg: '#1e1b4b', icon: 'award' }
     };
-    const cfg = palette[crestId] || palette.shield_gold;
+    const cfg = palette[crestId] || palette.crest_lobos;
     return `
       <span class="${sizeClass} inline-flex items-center justify-center rounded-sm border border-white/20" style="background:${cfg.bg}; color:${cfg.fg};">
         <i data-lucide="${cfg.icon}" class="w-5 h-5"></i>
@@ -3429,7 +3426,7 @@ class FutApp {
     const liveHomeOvr = store.calculateTeamChemistryAndRating().rating || '--';
 
     const homeCrestEl = document.getElementById('featured-home-crest');
-    if (homeCrestEl) homeCrestEl.innerHTML = this.getClubCrestSvg(settings.crest || 'shield_gold', 'w-12 h-12');
+    if (homeCrestEl) homeCrestEl.innerHTML = this.getClubCrestSvg('club', 'w-14 h-14');
 
     const homeNameEl = document.getElementById('featured-home-name');
     if (homeNameEl) homeNameEl.textContent = settings.teamName || 'FURIA RECTOR FC';
@@ -3606,14 +3603,19 @@ class FutApp {
       return;
     }
 
+    if (!user.playerId) {
+      this.showToast('Crea primero tu carta FUT para votar tu convocatoria', 'sparkles');
+      this.openPlayerSetupModal(user);
+      return;
+    }
+
     const nextMatch = store.getNextMatch();
     if (!nextMatch) {
       this.showToast('No hay partido próximo programado.', 'alert-triangle');
       return;
     }
 
-    const playerId = user.playerId || (store.getPlayers()[0]?.id);
-    store.setAttendance(nextMatch.id, playerId, status);
+    store.setAttendance(nextMatch.id, user.playerId, status);
     futAudio.playSelect();
     const text = status === 'asistira' ? 'Asistencia confirmada' : (status === 'duda' ? 'Marcado como duda' : 'Baja confirmada');
     this.showToast(text, status === 'asistira' ? 'check-circle-2' : (status === 'duda' ? 'help-circle' : 'x-circle'));
@@ -3637,49 +3639,7 @@ class FutApp {
     const setSlogan = document.getElementById('set-club-slogan');
     if (setSlogan && document.activeElement !== setSlogan) setSlogan.value = settings.slogan || '¡Hasta el último minuto!';
 
-    // 2. Escudos Oficiales
-    const crestsGrid = document.getElementById('club-crests-grid');
-    const setCrest = document.getElementById('set-club-crest');
-    if (crestsGrid) {
-      const crests = [
-        { id: 'shield_gold', name: 'Furia Rector', subtitle: 'Imperial' },
-        { id: 'crest_leones', name: 'Leones UCM', subtitle: 'Politécnica' },
-        { id: 'crest_rayo', name: 'Rayo FC', subtitle: 'Medicina' },
-        { id: 'crest_lobos', name: 'Lobos Campus', subtitle: 'Ciencias' },
-        { id: 'crest_dragones', name: 'Dragones Tech', subtitle: 'Informática' },
-        { id: 'crest_aguilas', name: 'Águilas Ley', subtitle: 'Derecho' }
-      ];
-
-      const activeCrest = settings.crest || 'shield_gold';
-      if (setCrest) setCrest.value = activeCrest;
-
-      crestsGrid.innerHTML = crests.map(c => {
-        const isActive = c.id === activeCrest;
-        return `
-          <div class="fifa-crest-card ${isActive ? 'is-active-crest' : ''}" onclick="window.futApp.selectClubCrest('${c.id}')">
-            <span class="fifa-crest-icon">${this.getClubCrestSvg(c.id, 'w-10 h-10')}</span>
-            <span class="fifa-crest-name font-fifa">${c.name}</span>
-            <span class="fifa-crest-pill font-fifa">${isActive ? '★ ACTIVO' : c.subtitle}</span>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // 3. Equipación Oficial
-    const kitPrimary = document.getElementById('set-kit-primary');
-    const kitSecondary = document.getElementById('set-kit-secondary');
-    const hexPrimary = document.getElementById('kit-primary-hex');
-    const hexSecondary = document.getElementById('kit-secondary-hex');
-
-    const primaryColor = settings.kitColor || '#f8fafc';
-    const secondaryColor = settings.kitSecondary || '#f0be2a';
-
-    if (kitPrimary && document.activeElement !== kitPrimary) kitPrimary.value = primaryColor;
-    if (hexPrimary) hexPrimary.textContent = primaryColor;
-    if (kitSecondary && document.activeElement !== kitSecondary) kitSecondary.value = secondaryColor;
-    if (hexSecondary) hexSecondary.textContent = secondaryColor;
-
-    // 4. Especialistas a Balón Parado + 5. Balance Real
+    // 2. Especialistas a Balón Parado + 3. Balance Real
     this.renderSpecialists();
     this.renderClubPalmares();
     this.refreshIcons();
@@ -3691,13 +3651,6 @@ class FutApp {
 
     const stats = store.getStats();
     const diffStr = stats.diff > 0 ? `+${stats.diff}` : String(stats.diff);
-    const topScorer = stats.topScorers[0];
-    const topAssister = stats.topAssists[0];
-    const teamOvr = store.calculateTeamChemistryAndRating().rating || '--';
-
-    const leaders = [];
-    if (topScorer?.goals > 0) leaders.push(`PICHICHI: #${topScorer.number} ${topScorer.nickname || topScorer.name} (${topScorer.goals})`);
-    if (topAssister?.assists > 0) leaders.push(`ASISTENTE: #${topAssister.number} ${topAssister.nickname || topAssister.name} (${topAssister.assists})`);
 
     container.innerHTML = `
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -3726,23 +3679,7 @@ class FutApp {
           <span class="fifa-stat-badge-lbl font-fifa">DIFERENCIA</span>
         </div>
       </div>
-      <div class="mt-4 pt-4 border-t border-white/10 flex flex-wrap items-center gap-3">
-        <span class="text-xs font-fifa text-amber-400 uppercase tracking-wider font-bold">LÍDERES DE TEMPORADA (MED ${teamOvr}):</span>
-        ${leaders.length > 0
-          ? leaders.map(m => `<div class="fifa-trophy-pill font-fifa"><i data-lucide="award" class="w-3.5 h-3.5 text-amber-400 inline mr-1"></i>${m}</div>`).join('')
-          : '<span class="text-xs text-slate-400">Registra actas de partido en Jornadas para calcular goleadores y asistentes.</span>'}
-      </div>
     `;
-  }
-
-  selectClubCrest(crestId) {
-    const setCrest = document.getElementById('set-club-crest');
-    if (setCrest) setCrest.value = crestId;
-    store.updateSettings({ crest: crestId });
-    futAudio.playSelect();
-    this.renderClubHub();
-    this.renderMatches();
-    this.showToast('Escudo oficial actualizado', 'award');
   }
 
   renderSpecialists() {
@@ -3765,13 +3702,6 @@ class FutApp {
         el.innerHTML = optionsMarkup;
       });
     });
-  }
-
-  quickLogin(email, pass) {
-    authService.signIn(email, pass).then((res) => {
-      document.getElementById('login-dialog').close();
-      this.showToast(`Conectado como ${res.user.name}`, 'user-check');
-    }).catch(err => this.showToast(err.message || 'No se pudo iniciar sesión', 'alert-triangle'));
   }
 }
 

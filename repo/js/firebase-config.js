@@ -52,7 +52,7 @@ export async function initFirebaseServices() {
   const config = getActiveConfig();
   
   if (!isFirebaseConfigured(config)) {
-    console.info("[futInfo] Modo Local / Demo");
+    console.info("[futInfo] Modo Almacenamiento Local");
     return { isConnected: false, app: null, auth: null, db: null };
   }
 

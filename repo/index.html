@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#0a0c10">
   <title>futInfo - FIFA Ultimate Team | Torneo del Rector</title>
   <meta name="description" content="Plataforma de gestión de equipo estilo FIFA FUT para el Torneo del Rector (Fútbol 7 y Fútbol Sala) con Google Sign-In">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><path d='m4.93 4.93 4.24 4.24'/><path d='m14.83 9.17 4.24-4.24'/><path d='m14.83 14.83 4.24 4.24'/><path d='m9.17 14.83-4.24 4.24'/><circle cx='12' cy='12' r='4'/></svg>">
+  <link rel="icon" type="image/png" href="assets/club_logo.png">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -64,8 +64,9 @@
   <div class="hud-bg" aria-hidden="true"></div>
 
   <header class="hud-top">
-    <!-- Chyron izquierdo: Nombre oficial del Club sin divisas ni logos ajenos -->
+    <!-- Chyron izquierdo: Escudo Oficial y Nombre del Club -->
     <div class="hud-club">
+      <img src="assets/club_logo.png" alt="Escudo del Club" class="hud-club-logo">
       <span id="nav-team-name" class="hud-club-name font-fifa">FURIA RECTOR FC</span>
     </div>
 
@@ -263,33 +264,34 @@
 
     </section>
 
-    <!-- ==================== 2. VISTA ÁLBUM DE CARTAS ==================== -->
+    <!-- ==================== 2. VISTA ÁLBUM DE CARTAS (EA SPORTS FC GALLERY) ==================== -->
     <section id="view-album" class="tab-view hidden space-y-5">
-      <div class="fifa-tile p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden">
-        <div class="fifa-tile-accent-bar mb-1"></div>
-        <div class="relative z-10">
-          <span class="text-[10px] font-black uppercase tracking-widest text-amber-400 block font-fifa">COLECCIÓN DE CARTAS OFICIALES</span>
-          <h2 class="font-fifa text-3xl sm:text-4xl font-bold text-white uppercase tracking-wider leading-none flex items-center gap-2.5 mt-0.5">
-            <i data-lucide="sparkles" class="w-6 h-6 text-amber-400"></i>
-            <span>ÁLBUM DE CROMOS FIFA FUT</span>
-          </h2>
-          <p class="text-xs text-slate-400 mt-1 font-medium">Cartas activas de la plantilla con estadísticas oficiales y jerarquía táctica de posiciones.</p>
+      <header class="fifa-broadcast-head">
+        <div class="fifa-broadcast-title-group">
+          <div class="fifa-broadcast-live-chyron font-fifa">
+            <span class="fifa-live-dot"></span> EA SPORTS FC • CLUB FUT
+          </div>
+          <h2 class="fifa-broadcast-main-title font-fifa">PLANTILLA Y CROMOS FUT</h2>
         </div>
-        <button id="btn-open-create-card" class="relative z-10 px-5 py-2.5  bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-500/25 transition active:scale-95 cursor-pointer">
-          <i data-lucide="plus" class="w-4 h-4"></i>
-          <span>Mi Carta / Nuevo Fichaje</span>
-        </button>
-      </div>
 
-      <!-- BARRA DE BÚSQUEDA Y FILTRADO INSTANTÁNEO -->
-      <div class="hud-filter-bar flex flex-col md:flex-row gap-2.5 items-stretch md:items-center justify-between bg-slate-900/90 border border-slate-700/80 p-2.5 shadow-md">
+        <div class="flex items-center gap-3 flex-wrap">
+          <span id="album-count-badge" class="fifa-fixtures-count-pill font-fifa">0 CROMOS</span>
+          <button type="button" id="btn-open-create-card" class="fifa-broadcast-action-btn" title="Gestionar o crear tu carta FUT">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <span id="btn-create-card-label">MI CARTA FUT</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- BARRA DE BÚSQUEDA Y FILTRADO CONSOLA -->
+      <div class="hud-filter-bar fifa-album-filter-bar flex flex-col md:flex-row gap-2.5 items-stretch md:items-center justify-between p-2.5">
         <div class="relative flex-1 min-w-[200px]">
           <label for="album-search-input" class="sr-only">Buscar jugador por nombre o dorsal</label>
           <i data-lucide="search" class="w-4 h-4 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-          <input type="text" id="album-search-input" placeholder="Buscar jugador por nombre o dorsal..." autocomplete="off" class="w-full bg-slate-950/90 border border-slate-700/70 pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 font-bold focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition">
+          <input type="text" id="album-search-input" placeholder="Buscar jugador por nombre o dorsal..." autocomplete="off" class="w-full bg-slate-950/90 border border-slate-700/70 pl-9 pr-3 py-2 text-xs text-white placeholder-slate-400 font-bold focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition">
         </div>
 
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0" id="album-role-filters">
+        <div class="flex items-center flex-wrap gap-1.5" id="album-role-filters">
           <button type="button" class="hud-filter-pill active" data-role="all">TODOS</button>
           <button type="button" class="hud-filter-pill" data-role="DC">DELANTEROS</button>
           <button type="button" class="hud-filter-pill" data-role="MC">MEDIOS</button>
@@ -299,13 +301,12 @@
 
         <div class="flex items-center justify-between md:justify-end gap-3">
           <label for="album-sort-select" class="sr-only">Ordenar cromos</label>
-          <select id="album-sort-select" class="bg-slate-950/90 border border-slate-700/70 text-[11px] font-bold text-slate-300 py-1.5 px-2.5 uppercase tracking-wider focus:border-amber-400">
+          <select id="album-sort-select" class="bg-slate-950/90 border border-slate-700/70 text-[11px] font-bold text-slate-200 py-2 px-3 uppercase tracking-wider focus:border-amber-400">
             <option value="ovr-desc">VALORACIÓN (MÁS ALTA)</option>
             <option value="ovr-asc">VALORACIÓN (MÁS BAJA)</option>
             <option value="dorsal-asc">DORSAL (#1 - #99)</option>
             <option value="name-asc">NOMBRE (A - Z)</option>
           </select>
-          <span id="album-count-badge" class="text-[11px] font-bold text-amber-400 font-fifa tracking-wider uppercase whitespace-nowrap bg-amber-500/10 border border-amber-500/30 px-2 py-1">8 CROMOS</span>
         </div>
       </div>
 
@@ -461,7 +462,7 @@
         <div class="fifa-club-tile">
           <div class="fifa-club-tile-accent"></div>
           <div class="fifa-club-tile-header">
-            <i data-lucide="shield" class="w-5 h-5 text-amber-400"></i>
+            <img src="assets/club_logo.png" alt="Escudo del Club" class="w-9 h-9 object-contain flex-shrink-0 drop-shadow">
             <div>
               <h3 class="font-fifa text-2xl text-white font-bold">1. IDENTIDAD Y MARCADOR</h3>
               <p class="text-xs text-slate-400">Configura el nombre oficial, abreviatura de 3 letras y lema del club.</p>
@@ -487,67 +488,13 @@
           </div>
         </div>
 
-        <!-- 2. SELECTOR DE ESCUDO OFICIAL -->
-        <div class="fifa-club-tile">
-          <div class="fifa-club-tile-accent"></div>
-          <div class="fifa-club-tile-header">
-            <i data-lucide="award" class="w-5 h-5 text-amber-400"></i>
-            <div>
-              <h3 class="font-fifa text-2xl text-white font-bold">2. ESCUDO OFICIAL DEL CLUB</h3>
-              <p class="text-xs text-slate-400">Selecciona el blasón heráldico que representará al equipo en las retransmisiones.</p>
-            </div>
-          </div>
-          <input type="hidden" id="set-club-crest" name="crest" value="shield_gold">
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-4" id="club-crests-grid">
-            <!-- Renderizado dinámico de escudos interactivos -->
-          </div>
-        </div>
-
-        <!-- 3. COLORES OFICIALES DE PARTIDO -->
-        <div class="fifa-club-tile">
-          <div class="fifa-club-tile-accent"></div>
-          <div class="fifa-club-tile-header">
-            <i data-lucide="palette" class="w-5 h-5 text-amber-400"></i>
-            <div>
-              <h3 class="font-fifa text-2xl text-white font-bold">3. EQUIPACIÓN OFICIAL DE PARTIDO</h3>
-              <p class="text-xs text-slate-400">Personaliza los colores de la camiseta del club.</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 items-center">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label for="set-kit-primary" class="fifa-field-lbl font-fifa">Color Principal de Camiseta</label>
-                <div class="flex items-center gap-3">
-                  <input type="color" id="set-kit-primary" name="kitColor" value="#f8fafc" class="fifa-color-picker cursor-pointer">
-                  <span class="text-xs text-slate-300 font-bold" id="kit-primary-hex">#f8fafc</span>
-                </div>
-              </div>
-              <div>
-                <label for="set-kit-secondary" class="fifa-field-lbl font-fifa">Color Secundario (Ribetes / Dorsal)</label>
-                <div class="flex items-center gap-3">
-                  <input type="color" id="set-kit-secondary" name="kitSecondary" value="#f0be2a" class="fifa-color-picker cursor-pointer">
-                  <span class="text-xs text-slate-300 font-bold" id="kit-secondary-hex">#f0be2a</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Información técnica -->
-            <div class="fifa-kit-info-card">
-              <span class="font-fifa text-amber-400 text-sm font-bold block mb-1">APLICACIÓN AUTOMÁTICA</span>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                Los colores elegidos se reflejarán automáticamente en las cartas FUT de la plantilla, el álbum y la pizarra del campo.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. ESPECIALISTAS A BALÓN PARADO -->
+        <!-- 2. ESPECIALISTAS A BALÓN PARADO -->
         <div class="fifa-club-tile">
           <div class="fifa-club-tile-accent"></div>
           <div class="fifa-club-tile-header">
             <i data-lucide="crosshair" class="w-5 h-5 text-amber-400"></i>
             <div>
-              <h3 class="font-fifa text-2xl text-white font-bold">4. ESPECIALISTAS A BALÓN PARADO</h3>
+              <h3 class="font-fifa text-2xl text-white font-bold">2. ESPECIALISTAS A BALÓN PARADO</h3>
               <p class="text-xs text-slate-400">Asigna los roles clave para capitanía, lanzamientos de penalti, faltas y córners.</p>
             </div>
           </div>
@@ -571,13 +518,13 @@
           </div>
         </div>
 
-        <!-- 5. RÉCORD HISTÓRICO Y BALANCE -->
+        <!-- 3. RÉCORD HISTÓRICO Y BALANCE -->
         <div class="fifa-club-tile">
           <div class="fifa-club-tile-accent"></div>
           <div class="fifa-club-tile-header">
             <i data-lucide="bar-chart-3" class="w-5 h-5 text-amber-400"></i>
             <div>
-              <h3 class="font-fifa text-2xl text-white font-bold">5. BALANCE DE TEMPORADA</h3>
+              <h3 class="font-fifa text-2xl text-white font-bold">3. BALANCE DE TEMPORADA</h3>
               <p class="text-xs text-slate-400">Estadísticas reales calculadas a partir de los partidos y actas oficiales registradas.</p>
             </div>
           </div>
@@ -651,25 +598,11 @@
         <span>Continuar con Google</span>
       </button>
 
-      <div id="google-auth-error" class="hidden mt-3 text-xs text-rose-400 p-2.5  bg-rose-950/50 border border-rose-500/40"></div>
+      <div id="google-auth-error" class="hidden mt-3 text-xs text-rose-400 p-2.5 bg-rose-950/50 border border-rose-500/40"></div>
 
-      <div class="relative my-6">
-        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-800"></div></div>
-        <div class="relative flex justify-center text-[10px] uppercase font-black text-slate-400 bg-slate-950 px-3 tracking-wider">
-          Perfiles de Acceso Local
-        </div>
-      </div>
-
-      <div class="space-y-2">
-        <button type="button" onclick="window.futApp.quickLogin('mister@rector.es', 'rector2026')" class="w-full py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-amber-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer">
-          <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
-          <span>Míster / Cuerpo Técnico</span>
-        </button>
-        <button type="button" onclick="window.futApp.quickLogin('charly@rector.es', 'rector2026')" class="w-full py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-emerald-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer">
-          <i data-lucide="user" class="w-4 h-4 text-emerald-400"></i>
-          <span>Jugador de Plantilla (Charly #1)</span>
-        </button>
-      </div>
+      <p class="mt-4 text-[11px] text-slate-400 leading-relaxed text-center">
+        Tu perfil, dorsal, asistencia a convocatorias y estadísticas FUT se sincronizan en tiempo real con el club.
+      </p>
 
     </div>
   </dialog>

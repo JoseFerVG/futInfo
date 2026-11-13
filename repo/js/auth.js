@@ -5,48 +5,87 @@ import { auth, db, isFirebaseConfigured } from './firebase-config.js';
 import { store } from './store.js';
 
 const AUTH_USER_KEY = 'futinfo_fifa_auth_user_v3';
-const AUTH_ACCOUNTS_KEY = 'futinfo_fifa_accounts_v3';
-
-const DEFAULT_ACCOUNTS = [
-  {
-    id: 'usr_admin',
-    name: 'Míster José Fer',
-    email: 'mister@rector.es',
-    password: 'rector2026',
-    role: 'admin',
-    photoURL: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80',
-    playerId: null
-  },
-  {
-    id: 'usr_player_1',
-    name: 'Carlos Ruiz',
-    email: 'charly@rector.es',
-    password: 'rector2026',
-    role: 'player',
-    photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    playerId: 'p1'
-  }
-];
+const LEGACY_ACCOUNTS_KEY = 'futinfo_fifa_accounts_v3';
+const ADMIN_EMAILS = ['josef.caniles.murcia@gmail.com'];
 
 class AuthService {
   constructor() {
     this.currentUser = null;
     this.subscribers = new Set();
+    this._fbUnsub = null;
     this.init();
   }
 
   init() {
-    if (!localStorage.getItem(AUTH_ACCOUNTS_KEY)) {
-      localStorage.setItem(AUTH_ACCOUNTS_KEY, JSON.stringify(DEFAULT_ACCOUNTS));
-    }
+    localStorage.removeItem(LEGACY_ACCOUNTS_KEY);
 
     const saved = localStorage.getItem(AUTH_USER_KEY);
     if (saved) {
       try {
-        this.currentUser = JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.isFirebase) {
+          this.currentUser = parsed;
+        } else {
+          localStorage.removeItem(AUTH_USER_KEY);
+        }
       } catch (e) {
         localStorage.removeItem(AUTH_USER_KEY);
       }
+    }
+  }
+
+  buildUserFromFirebase(fbUser) {
+    const cleanEmail = (fbUser.email || '').toLowerCase().trim();
+    const isAdmin = ADMIN_EMAILS.includes(cleanEmail);
+    const existingPlayer = store.getPlayers().find(
+      p => p.email && p.email.toLowerCase().trim() === cleanEmail
+    );
+
+    return {
+      id: fbUser.uid,
+      name: fbUser.displayName || (cleanEmail ? cleanEmail.split('@')[0] : 'Jugador FUT'),
+      email: cleanEmail,
+      photoURL: fbUser.photoURL || existingPlayer?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanEmail || fbUser.uid)}`,
+      role: isAdmin ? 'admin' : 'player',
+      playerId: existingPlayer ? existingPlayer.id : null,
+      isFirebase: true,
+      isNew: !existingPlayer
+    };
+  }
+
+  async bindFirebaseAuthListener() {
+    if (!isFirebaseConfigured() || !auth || this._fbUnsub) return;
+    try {
+      const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+      this._fbUnsub = onAuthStateChanged(auth, (fbUser) => {
+        if (fbUser) {
+          const userObj = this.buildUserFromFirebase(fbUser);
+          this.currentUser = userObj;
+          localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
+        } else {
+          this.currentUser = null;
+          localStorage.removeItem(AUTH_USER_KEY);
+        }
+        this.notify();
+      });
+    } catch (err) {
+      console.warn("No se pudo conectar el observador de sesión Firebase:", err);
+    }
+  }
+
+  refreshLinkedPlayer() {
+    if (!this.currentUser) return;
+    const cleanEmail = (this.currentUser.email || '').toLowerCase().trim();
+    const existingPlayer = store.getPlayers().find(
+      p => (this.currentUser.playerId && p.id === this.currentUser.playerId) ||
+           (cleanEmail && p.email && p.email.toLowerCase().trim() === cleanEmail)
+    );
+    const nextPlayerId = existingPlayer ? existingPlayer.id : null;
+    if (nextPlayerId !== this.currentUser.playerId) {
+      this.currentUser.playerId = nextPlayerId;
+      this.currentUser.isNew = !existingPlayer;
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(this.currentUser));
+      this.notify();
     }
   }
 
@@ -78,76 +117,26 @@ class AuthService {
    * Inicio de Sesión y Registro con Google (Firebase Auth GoogleAuthProvider)
    */
   async signInWithGoogle() {
-    // Si Firebase está configurado, usamos el popup oficial de Google
-    if (isFirebaseConfigured() && auth) {
-      try {
-        const { GoogleAuthProvider, signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-        const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
-        
-        const userCredential = await signInWithPopup(auth, provider);
-        const fbUser = userCredential.user;
-
-        const cleanEmail = (fbUser.email || '').toLowerCase();
-        const isMister = cleanEmail.includes('mister') || cleanEmail.includes('admin') || cleanEmail.includes('josef');
-        const existingPlayer = store.getPlayers().find(p => p.email.toLowerCase() === cleanEmail);
-
-        const userObj = {
-          id: fbUser.uid,
-          name: fbUser.displayName || cleanEmail.split('@')[0],
-          email: cleanEmail,
-          photoURL: fbUser.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanEmail}`,
-          role: isMister ? 'admin' : 'player',
-          playerId: existingPlayer ? existingPlayer.id : null,
-          isFirebase: true,
-          isNew: !existingPlayer && !isMister
-        };
-
-        this.currentUser = userObj;
-        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
-        this.notify();
-        return { success: true, user: userObj, isNew: userObj.isNew };
-      } catch (error) {
-        console.warn("Error en Google Sign-In con Firebase:", error);
-
-        // Si el dominio aún no está autorizado en Firebase Console, avisamos amablemente
-        if (error.code === 'auth/unauthorized-domain') {
-          console.warn("Dominio no autorizado en Firebase Console. Usando modo de sesión directo.");
-          return this.simulateGoogleSignIn();
-        }
-
-        if (error.code === 'auth/popup-closed-by-user') {
-          throw new Error('Has cerrado la ventana de inicio de sesión de Google.');
-        }
-
-        // Si hay otro error (como que Google no esté habilitado todavía en la consola), fallback sin romper
-        return this.simulateGoogleSignIn();
-      }
+    if (!isFirebaseConfigured() || !auth) {
+      throw new Error('Firebase Auth no está inicializado en este entorno.');
     }
 
-    return this.simulateGoogleSignIn();
-  }
+    try {
+      const { GoogleAuthProvider, signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
 
-  simulateGoogleSignIn() {
-    const defaultEmail = 'josef.caniles.murcia@gmail.com';
-    const cleanEmail = defaultEmail.toLowerCase();
-    const existingPlayer = store.getPlayers().find(p => p.email && p.email.toLowerCase() === cleanEmail);
+      const userCredential = await signInWithPopup(auth, provider);
+      const userObj = this.buildUserFromFirebase(userCredential.user);
 
-    const userObj = {
-      id: 'google_user_josef',
-      name: 'Jose Fernando',
-      email: cleanEmail,
-      photoURL: existingPlayer?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-      role: 'admin',
-      playerId: existingPlayer ? existingPlayer.id : null,
-      isFirebase: false,
-      isNew: !existingPlayer
-    };
-
-    this.currentUser = userObj;
-    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
-    this.notify();
-    return { success: true, user: userObj, isNew: userObj.isNew };
+      this.currentUser = userObj;
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
+      this.notify();
+      return { success: true, user: userObj, isNew: userObj.isNew };
+    } catch (error) {
+      console.warn("Error en Google Sign-In con Firebase:", error);
+      throw new Error(this.translateFirebaseError(error.code));
+    }
   }
 
   /**
@@ -258,46 +247,11 @@ class AuthService {
   async signIn(email, password) {
     const cleanEmail = email.trim().toLowerCase();
 
-    // 1. Comprobar si es cuenta local / demo (ej. mister@rector.es o charly@rector.es)
-    const accounts = JSON.parse(localStorage.getItem(AUTH_ACCOUNTS_KEY) || '[]');
-    const localMatch = accounts.find(a => a.email.toLowerCase() === cleanEmail && a.password === password);
-
-    if (localMatch) {
-      const existingPlayer = store.getPlayers().find(p => p.id === localMatch.playerId || p.email.toLowerCase() === cleanEmail);
-      const userObj = {
-        id: localMatch.id,
-        name: localMatch.name,
-        email: localMatch.email,
-        photoURL: localMatch.photoURL || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-        role: localMatch.role || 'player',
-        playerId: existingPlayer ? existingPlayer.id : localMatch.playerId,
-        isFirebase: false
-      };
-      this.currentUser = userObj;
-      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
-      this.notify();
-      return { success: true, user: userObj };
-    }
-
-    // 2. Si no es cuenta local y Firebase está configurado, usar Firebase Auth
     if (isFirebaseConfigured() && auth) {
       try {
         const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
         const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, password);
-        const fbUser = userCredential.user;
-
-        const isMister = cleanEmail.includes('mister') || cleanEmail.includes('admin');
-        const existingPlayer = store.getPlayers().find(p => p.email.toLowerCase() === cleanEmail);
-
-        const userObj = {
-          id: fbUser.uid,
-          name: fbUser.displayName || cleanEmail.split('@')[0],
-          email: fbUser.email,
-          photoURL: fbUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-          role: isMister ? 'admin' : 'player',
-          playerId: existingPlayer ? existingPlayer.id : null,
-          isFirebase: true
-        };
+        const userObj = this.buildUserFromFirebase(userCredential.user);
 
         this.currentUser = userObj;
         localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
@@ -308,7 +262,7 @@ class AuthService {
       }
     }
 
-    throw new Error('Credenciales incorrectas. (Prueba con Google o mister@rector.es)');
+    throw new Error('Servicio de autenticación no disponible. Usa el acceso con Google.');
   }
 
   async signOut() {

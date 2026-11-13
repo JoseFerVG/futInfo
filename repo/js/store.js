@@ -410,6 +410,11 @@ export class TeamStore {
     this.matches = [];
     this.settings = { ...DEFAULT_SETTINGS };
     this.listeners = new Set();
+    this._db = null;
+    this._cloudUnsub = null;
+    this._cloudSaveTimer = null;
+    this._isApplyingRemote = false;
+    this._lastCloudTs = 0;
     this.init();
   }
 
@@ -495,12 +500,84 @@ export class TeamStore {
 
   notify() {
     this.saveLocal();
+    if (!this._isApplyingRemote) {
+      this.scheduleCloudSave();
+    }
     for (const listener of this.listeners) {
       try {
         listener(this);
       } catch (err) {
         console.error("Error en suscriptor store:", err);
       }
+    }
+  }
+
+  async initCloudSync(db) {
+    if (!db || this._cloudUnsub) return;
+    this._db = db;
+    try {
+      const { doc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const teamRef = doc(db, 'teams', 'furia_rector_v1');
+
+      this._cloudUnsub = onSnapshot(teamRef, (snap) => {
+        if (!snap.exists()) return;
+        const remote = snap.data();
+        const remoteTs = remote?.updatedAt || 0;
+        if (remoteTs && remoteTs <= this._lastCloudTs) return;
+
+        this._lastCloudTs = remoteTs;
+        this._isApplyingRemote = true;
+        try {
+          if (Array.isArray(remote.players) && remote.players.length > 0) {
+            this.players = this.deduplicatePlayers(remote.players);
+          }
+          if (Array.isArray(remote.matches)) {
+            this.matches = remote.matches;
+          }
+          if (remote.settings && typeof remote.settings === 'object') {
+            this.settings = { ...this.settings, ...remote.settings };
+          }
+          this.saveLocal();
+          for (const listener of this.listeners) {
+            try {
+              listener(this);
+            } catch (err) {
+              console.error("Error en suscriptor store tras sync:", err);
+            }
+          }
+        } finally {
+          this._isApplyingRemote = false;
+        }
+      }, (err) => {
+        console.warn("[Firestore] Canal tiempo real en modo lectura local:", err.code || err.message);
+      });
+    } catch (err) {
+      console.warn("[Firestore] No se pudo activar sync:", err);
+    }
+  }
+
+  scheduleCloudSave() {
+    if (!this._db) return;
+    clearTimeout(this._cloudSaveTimer);
+    this._cloudSaveTimer = setTimeout(() => {
+      this.pushCloudState();
+    }, 350);
+  }
+
+  async pushCloudState() {
+    if (!this._db) return;
+    try {
+      const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const ts = Date.now();
+      this._lastCloudTs = ts;
+      await setDoc(doc(this._db, 'teams', 'furia_rector_v1'), {
+        players: this.players,
+        matches: this.matches,
+        settings: this.settings,
+        updatedAt: ts
+      }, { merge: true });
+    } catch (err) {
+      console.warn("[Firestore] Guardado local activo (nube no escribió):", err.code || err.message);
     }
   }
 

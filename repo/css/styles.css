@@ -500,11 +500,15 @@ dialog[open] {
 /* Skins Oficiales EA SPORTS FC / FIFA Ultimate Team */
 .fut-card-gold {
   background-image: url('../assets/fifa_gold.png');
-  color: #38270c;
-  --card-text: #38270c;
-  --card-num: #221603;
-  --card-lbl: #59421b;
-  --card-divider: rgba(56, 39, 12, 0.35);
+  color: #1c1203;
+  --card-text: #1c1203;
+  --card-num: #1a1002;
+  --card-lbl: #473210;
+  --card-divider: rgba(56, 39, 12, 0.45);
+}
+
+.fut-card-gold .fut-card-name-plate {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .fut-card-totw {
@@ -625,9 +629,19 @@ dialog[open] {
 
 .fut-card-club {
   font-size: 0.82em;
-  line-height: 1.1;
+  line-height: 1;
   margin-top: 2px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+.fut-card-crest-img {
+  width: 1.15em;
+  height: 1.45em;
+  object-fit: contain;
+  display: block;
 }
 
 .fut-card-avatar-wrap,
