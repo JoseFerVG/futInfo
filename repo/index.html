@@ -89,6 +89,7 @@
 
   <nav class="hud-tabs" aria-label="Secciones">
     <button data-tab="pitch" class="tab-btn fifa-tab-btn active">PLANTILLAS</button>
+    <button data-tab="pizarra" class="tab-btn fifa-tab-btn">PIZARRA</button>
     <button data-tab="album" class="tab-btn fifa-tab-btn">ÁLBUM <span class="hud-tab-count" id="tab-player-count">0</span></button>
     <button data-tab="partidos" class="tab-btn fifa-tab-btn">JORNADAS</button>
     <button data-tab="ajustes" class="tab-btn fifa-tab-btn">MI CLUB</button>
@@ -301,6 +302,163 @@
 
     </section>
 
+    <!-- ==================== 1B. PIZARRA TÁCTICA Y ESTRATEGIA DE PARTIDO ==================== -->
+    <section id="view-pizarra" class="tab-view hidden space-y-4">
+      <header class="fifa-broadcast-head">
+        <div class="fifa-broadcast-title-group">
+          <div class="fifa-broadcast-live-chyron font-fifa">
+            <span class="fifa-live-dot"></span> PIZARRA DE VESTUARIO • PLAN DE PARTIDO
+          </div>
+          <h2 class="fifa-broadcast-main-title font-fifa">PIZARRA TÁCTICA Y ESTRATEGIAS</h2>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="pizarra-seg-group" role="group" aria-label="Tipo de terreno">
+            <button type="button" class="pizarra-ctrl-btn pizarra-mod-btn active" data-mod="f7">FÚTBOL 7</button>
+            <button type="button" class="pizarra-ctrl-btn pizarra-mod-btn" data-mod="futsal">FÚTBOL SALA</button>
+          </div>
+          <div class="pizarra-seg-group" role="group" aria-label="Encuadre de campo">
+            <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn active" data-zone="full">CAMPO COMPLETO</button>
+            <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn" data-zone="attack">ATAQUE / ABP</button>
+            <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn" data-zone="buildup">SALIDA PROPIA</button>
+          </div>
+          <button type="button" id="btn-pizarra-open-matchplan" class="fifa-broadcast-action-btn" title="Abrir planificador automático de titular y cambios">
+            <i data-lucide="calendar-check" class="w-4 h-4"></i>
+            <span>ROTACIONES PARTIDO</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- PRESETS TÁCTICOS CON 1 CLIC -->
+      <div class="pizarra-presets-bar" role="region" aria-label="Jugadas y esquemas rápidos">
+        <span class="pizarra-bar-label font-fifa flex items-center gap-1.5">
+          <i data-lucide="clipboard-list" class="w-4 h-4 text-amber-400"></i>
+          <span>FASES DEL PARTIDO:</span>
+        </span>
+        <button type="button" class="pizarra-preset-btn active" data-preset="salida">Salida Limpia</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="presion">Presión 3s Tras Pérdida</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="contra">Bloque Medio y Contra</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="corner_fav">Córner / Falta a Favor</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="defensa_abp">Defensa Balón Parado</button>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
+        <!-- COLUMNA PIZARRA INTERACTIVA -->
+        <div class="xl:col-span-7 space-y-2.5">
+          <div class="pizarra-toolbar">
+            <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn active" data-tool="move" title="Arrastrar jugadores y balón">
+              <i data-lucide="move" class="w-3.5 h-3.5"></i>
+              <span>MOVER FICHAS</span>
+            </button>
+            <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="pass" title="Dibujar flecha de pase (Oro)">
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+              <span>PASE</span>
+            </button>
+            <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="run" title="Dibujar desmarque sin balón (Verde)">
+              <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+              <span>DESMARQUE</span>
+            </button>
+            <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="shot" title="Dibujar disparo o línea de presión (Rojo)">
+              <i data-lucide="crosshair" class="w-3.5 h-3.5"></i>
+              <span>TIRO / PRESIÓN</span>
+            </button>
+            <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="zone" title="Resaltar zona táctica o superioridad">
+              <i data-lucide="square-dashed" class="w-3.5 h-3.5"></i>
+              <span>ZONA</span>
+            </button>
+
+            <span class="pizarra-toolbar-sep" aria-hidden="true"></span>
+
+            <button type="button" id="btn-pizarra-toggle-rivals" class="pizarra-ctrl-btn active" title="Mostrar u ocultar fichas rivales">
+              <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+              <span>RIVALES: ON</span>
+            </button>
+            <button type="button" id="btn-pizarra-sync-lineup" class="pizarra-ctrl-btn" title="Colocar nombres y dorsales del once actual">
+              <i data-lucide="users" class="w-3.5 h-3.5"></i>
+              <span>CARGAR ONCE</span>
+            </button>
+            <button type="button" id="btn-pizarra-undo" class="pizarra-ctrl-btn" title="Deshacer último trazo">
+              <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
+              <span>DESHACER</span>
+            </button>
+            <button type="button" id="btn-pizarra-clear-draw" class="pizarra-ctrl-btn" title="Borrar flechas y zonas dibujadas">
+              <i data-lucide="eraser" class="w-3.5 h-3.5"></i>
+              <span>LIMPIAR TRAZOS</span>
+            </button>
+            <button type="button" id="btn-pizarra-reset" class="pizarra-ctrl-btn" title="Restaurar fase seleccionada">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span>REINICIAR</span>
+            </button>
+            <button type="button" id="btn-pizarra-export-png" class="pizarra-ctrl-btn pizarra-ctrl-btn--gold" title="Descargar imagen PNG de la pizarra">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>PNG</span>
+            </button>
+          </div>
+
+          <div class="pizarra-canvas-wrap">
+            <svg id="pizarra-board-svg" class="pizarra-svg" viewBox="0 0 1000 620" role="img" aria-label="Pizarra táctica interactiva de partido"></svg>
+          </div>
+
+          <div class="pizarra-legend">
+            <span class="pizarra-legend-item"><i class="pz-dot pz-dot--home"></i> Nosotros (arrastrable)</span>
+            <span class="pizarra-legend-item"><i class="pz-dot pz-dot--away"></i> Rival</span>
+            <span class="pizarra-legend-item"><i class="pz-line pz-line--pass"></i> Pase / Conducción</span>
+            <span class="pizarra-legend-item"><i class="pz-line pz-line--run"></i> Desmarque</span>
+            <span class="pizarra-legend-item"><i class="pz-line pz-line--shot"></i> Tiro / Presión</span>
+            <span class="pizarra-legend-item"><i class="pz-dot pz-dot--zone"></i> Zona clave</span>
+          </div>
+        </div>
+
+        <!-- COLUMNA GUÍA DE CÓMO FUNCIONA EL PARTIDO -->
+        <div class="xl:col-span-5 space-y-3">
+          <div class="fifa-club-tile pizarra-guide-card">
+            <div class="fifa-club-tile-accent"></div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <h3 class="font-fifa text-xl font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                <i data-lucide="target" class="w-4 h-4 text-amber-400"></i>
+                <span>ESPECIALISTAS EN BALÓN PARADO</span>
+              </h3>
+            </div>
+            <div id="pizarra-specialists-summary" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+          </div>
+
+          <div class="fifa-club-tile pizarra-guide-card space-y-3">
+            <div class="fifa-club-tile-accent"></div>
+            <div>
+              <h3 class="font-fifa text-xl font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                <i data-lucide="book-open-check" class="w-4 h-4 text-amber-400"></i>
+                <span>CÓMO VA A FUNCIONAR EL PARTIDO</span>
+              </h3>
+              <p class="text-[11px] text-slate-400 mt-0.5">Edita las consignas antes del choque o selecciona una fase arriba; se guarda al instante.</p>
+            </div>
+
+            <div class="space-y-2.5">
+              <div>
+                <label for="pizarra-note-buildup" class="pizarra-note-lbl font-fifa">1. SALIDA DE BALÓN Y CONSTRUCCIÓN</label>
+                <textarea id="pizarra-note-buildup" rows="2" class="pizarra-textarea" placeholder="Cómo sacamos desde portero o centrales..."></textarea>
+              </div>
+              <div>
+                <label for="pizarra-note-attack" class="pizarra-note-lbl font-fifa">2. ATAQUE, ESPACIOS Y FINALIZACIÓN</label>
+                <textarea id="pizarra-note-attack" rows="2" class="pizarra-textarea" placeholder="Dónde buscar superioridades y quién llega al remate..."></textarea>
+              </div>
+              <div>
+                <label for="pizarra-note-defense" class="pizarra-note-lbl font-fifa">3. DEFENSA, PRESIÓN Y PÉRDIDA</label>
+                <textarea id="pizarra-note-defense" rows="2" class="pizarra-textarea" placeholder="Altura del bloque, marcas clave y qué hacer si perdemos..."></textarea>
+              </div>
+              <div>
+                <label for="pizarra-note-abp" class="pizarra-note-lbl font-fifa">4. CÓRNERS, FALTAS Y SAQUES</label>
+                <textarea id="pizarra-note-abp" rows="2" class="pizarra-textarea" placeholder="Señales a balón parado, bloqueos y vigilancias atrás..."></textarea>
+              </div>
+              <div>
+                <label for="pizarra-note-rotations" class="pizarra-note-lbl font-fifa">5. ROTACIONES, CAMBIOS Y TIEMPOS</label>
+                <textarea id="pizarra-note-rotations" rows="2" class="pizarra-textarea" placeholder="Bloques de cambio para repartir minutos con frescura..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ==================== 2. VISTA ÁLBUM DE CARTAS (EA SPORTS FC GALLERY) ==================== -->
     <section id="view-album" class="tab-view hidden space-y-5">
       <header class="fifa-broadcast-head">
@@ -360,7 +518,7 @@
         <button type="button" id="btn-reset-album-filters" class="mt-2 px-3 py-1.5 bg-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider">Restablecer Filtros</button>
       </div>
 
-      <div id="album-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div id="album-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
         <!-- Render dinámico -->
       </div>
     </section>
@@ -513,7 +671,7 @@
     <div class="p-6">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-2.5">
-          <span class="w-9 h-9  bg-amber-400 text-slate-950 font-fifa text-xl font-bold flex items-center justify-center shadow">FUT</span>
+          <img src="assets/club_logo.png" alt="Escudo del Club" class="w-9 h-9 object-contain flex-shrink-0 drop-shadow">
           <h2 id="login-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">Acceso al Club</h2>
         </div>
         <button type="button" id="btn-close-login" aria-label="Cerrar ventana de inicio de sesión" class="text-slate-400 hover:text-white p-1.5 focus-visible:ring-2 focus-visible:ring-amber-500  cursor-pointer">
@@ -550,7 +708,7 @@
       
       <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
         <div class="flex items-center gap-2.5">
-          <span class="w-9 h-9  bg-amber-400 text-slate-950 font-fifa text-xl font-bold flex items-center justify-center shadow">FUT</span>
+          <img src="assets/club_logo.png" alt="Escudo del Club" class="w-9 h-9 object-contain flex-shrink-0 drop-shadow">
           <div>
             <h3 id="setup-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider leading-none">Ficha Técnica de Jugador</h3>
             <p class="text-xs text-slate-400 font-medium mt-0.5">Personaliza tu foto detrás de la camiseta, skin de carta, carrera UMU y atributos.</p>
@@ -983,6 +1141,11 @@
           Guardar y Generar mi Carta FUT
         </button>
 
+        <button type="button" id="btn-setup-delete-card" class="hidden w-full py-2.5 px-4 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Borrar Mi Carta del Club</span>
+        </button>
+
         </div><!-- FIN COLUMNA DERECHA -->
 
       </form>
@@ -1245,7 +1408,7 @@
       <!-- Cabecera Oficial FIFA FUT: Escudo, Título y Cierre -->
       <div class="flex items-center justify-between border-b border-white/10 pb-3">
         <div class="flex items-center gap-3">
-          <span class="hud-crest font-fifa">FUT</span>
+          <img src="assets/club_logo.png" alt="Escudo del Club" class="w-9 h-9 object-contain flex-shrink-0 drop-shadow">
           <div>
             <div class="flex items-center gap-2">
               <span class="hud-tag font-fifa">ESQUEMAS TÁCTICOS</span>

@@ -881,6 +881,52 @@ dialog[open] {
   font-size: 19px;
 }
 
+@media (min-width: 1440px) {
+  .fut-card-size-bench {
+    width: 120px;
+    height: 192px;
+    font-size: 15px;
+  }
+  .fut-card-size-album {
+    width: 168px;
+    height: 268px;
+    font-size: 20.5px;
+  }
+  .fut-card-size-inspect {
+    width: 178px;
+    height: 284px;
+    font-size: 22px;
+  }
+  .fut-card-size-walkout {
+    width: 260px;
+    height: 416px;
+    font-size: 32.5px;
+  }
+}
+
+@media (min-width: 1800px) {
+  .fut-card-size-bench {
+    width: 136px;
+    height: 217px;
+    font-size: 17px;
+  }
+  .fut-card-size-album {
+    width: 194px;
+    height: 310px;
+    font-size: 23.6px;
+  }
+  .fut-card-size-inspect {
+    width: 200px;
+    height: 320px;
+    font-size: 24.5px;
+  }
+  .fut-card-size-walkout {
+    width: 296px;
+    height: 473px;
+    font-size: 37px;
+  }
+}
+
 /* ==================== PEDESTAL 3D HEXAGONAL FIFA 18 ==================== */
 .fut-pos-pedestal {
   margin-top: 3px;

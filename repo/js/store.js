@@ -645,6 +645,11 @@ export class TeamStore {
         }
       });
     }
+    if (this._db) {
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
+        .then(({ doc, deleteDoc }) => deleteDoc(doc(this._db, 'players', id)))
+        .catch(() => {});
+    }
     this.notify();
   }
 

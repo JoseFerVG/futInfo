@@ -418,7 +418,7 @@ body.hud-canvas {
 
 .hud-tabs .tab-btn {
   flex: 1 0 auto;
-  min-width: 110px;
+  min-width: 96px;
   height: 100%;
   display: flex;
   align-items: center;
@@ -488,7 +488,7 @@ body.hud-canvas {
   flex: 1;
   min-height: 0;
   width: 100%;
-  max-width: 1680px;
+  max-width: 1920px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
@@ -499,7 +499,7 @@ body.hud-canvas {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: minmax(520px, 1.15fr) minmax(360px, 0.85fr);
+  grid-template-columns: minmax(520px, 1.32fr) minmax(360px, 0.88fr);
   grid-template-rows: 1fr 1fr;
   column-gap: 14px;
   row-gap: 14px;
@@ -941,10 +941,10 @@ body.hud-canvas {
 /* Marco del césped 3D */
 .hud-pitch-frame {
   position: absolute !important;
-  left: 16px;
-  right: 16px;
-  top: 114px;
-  bottom: 56px;
+  left: 10px;
+  right: 10px;
+  top: 100px;
+  bottom: 52px;
   min-height: 0 !important;
   background: transparent !important;
   overflow: visible !important;
@@ -1986,10 +1986,12 @@ body.theme-light .sub-bench-card:hover [class*="bg-"] * {
   }
 
   .hud-tabs .tab-btn {
-    min-width: 82px;
-    padding: 0 8px;
-    font-size: 0.90rem !important;
-    gap: 4px;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 5px;
+    font-size: 0.78rem !important;
+    letter-spacing: 0.03em;
+    gap: 3px;
   }
 
   .hud-tab-count {
@@ -2629,22 +2631,25 @@ dialog.fifa-console-modal {
 
 /* ---------- 14. FIFA SQUAD HUB & VISUAL FORMATIONS ---------- */
 .fifa-modal-nav {
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  overflow-x: visible !important;
 }
 
 .fifa-modal-tab {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: 6px;
+  padding: 7px 12px;
   background: rgba(255, 255, 255, 0.04);
   color: #94a3b8;
   border: 0;
   border-bottom: 3px solid transparent;
   font-family: var(--hud-cond);
   font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: 0.06em;
+  font-size: 0.94rem;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
   transition: all var(--hud-snap);
@@ -4366,13 +4371,16 @@ body.theme-light .fifa-arena-stream {
 }
 
 body.theme-light .fifa-arena-badge,
-body.theme-light .fifa-save-club-btn,
 body.theme-light .hud-filter-pill.active,
 body.theme-light .hud-tab-count,
-body.theme-light .fifa-broadcast-action-btn,
 body.theme-light .fifa-formation-card.is-active .fifa-form-badge,
 body.theme-light .fifa-squad-btn.is-active-btn {
   color: #ffffff !important;
+}
+
+body.theme-light .fifa-save-club-btn,
+body.theme-light .fifa-broadcast-action-btn {
+  color: #0f172a !important;
 }
 
 body.theme-light .hud-body > .tab-view:not(#view-pitch) {
@@ -4697,12 +4705,12 @@ body.theme-light .fifa-coming-soon-desc {
 }
 
 /* Modal Pantalla Completa Plantilla Activa */
-dialog.fifa-fullscreen-pitch-modal {
-  width: min(96vw, 1380px);
-  max-width: 96vw;
-  height: min(94vh, 920px);
-  max-height: 94vh;
-  margin: auto;
+dialog.fifa-console-modal.fifa-fullscreen-pitch-modal {
+  width: min(96vw, 1680px) !important;
+  max-width: 96vw !important;
+  height: min(95vh, 1020px) !important;
+  max-height: 95vh !important;
+  margin: auto !important;
   border: 2px solid rgba(240, 190, 42, 0.65);
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.92);
   overflow: hidden;
@@ -4744,7 +4752,7 @@ dialog.fifa-fullscreen-pitch-modal::backdrop {
 .fifa-fs-pitch {
   width: 100%;
   height: 100% !important;
-  max-width: 1080px;
+  max-width: min(1480px, 100%) !important;
   --pitch-scale: 1;
 }
 
@@ -5208,6 +5216,7 @@ body.theme-light .fifa-album-inspect-btn:hover * {
 /* Evita cruces transitorios de contraste durante hover en botones críticos */
 .hud-canvas .hud-icon-btn,
 .hud-icon-btn,
+.hud-auth #btn-open-login,
 .hud-auth .hud-my-card-btn,
 .hud-auth #btn-logout,
 .fifa-album-inspect-btn,
@@ -7469,4 +7478,330 @@ body.theme-light .matchplan-mini-ovr {
     padding: 4px 8px;
     font-size: 10px;
   }
+}
+
+/* =====================================================================
+   PIZARRA TÁCTICA Y CONTRASTES FINALES (MODO OSCURO + MODO CLARO)
+   ===================================================================== */
+body.theme-light .hud-auth #btn-open-login {
+  background: #f59e0b !important;
+  background-color: #f59e0b !important;
+  color: #0f172a !important;
+  border: 1px solid #d97706 !important;
+  transition: none !important;
+}
+body.theme-light .hud-auth #btn-open-login * {
+  color: #0f172a !important;
+}
+body.theme-light .hud-auth #btn-open-login:hover {
+  background: #0f172a !important;
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+}
+body.theme-light .hud-auth #btn-open-login:hover * {
+  color: #ffffff !important;
+}
+
+body.theme-light dialog.fifa-console-modal .bg-cyan-950\/40 {
+  background-color: #ecfeff !important;
+  border-color: #06b6d4 !important;
+}
+body.theme-light dialog.fifa-console-modal .text-cyan-400 {
+  color: #0e7490 !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-rose-500\/20,
+body.theme-light #btn-setup-delete-card,
+body.theme-light #btn-inspect-delete-card {
+  background-color: #ffe4e6 !important;
+  color: #9f1239 !important;
+  border-color: #fda4af !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-rose-500\/20 *,
+body.theme-light #btn-setup-delete-card *,
+body.theme-light #btn-inspect-delete-card * {
+  color: #9f1239 !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-rose-500\/20:hover,
+body.theme-light #btn-setup-delete-card:hover,
+body.theme-light #btn-inspect-delete-card:hover {
+  background-color: #fecdd3 !important;
+  color: #881337 !important;
+  border-color: #f43f5e !important;
+}
+body.theme-light dialog.fifa-console-modal .bg-rose-500\/20:hover *,
+body.theme-light #btn-setup-delete-card:hover *,
+body.theme-light #btn-inspect-delete-card:hover * {
+  color: #881337 !important;
+}
+
+/* Barra de presets y herramientas de Pizarra */
+.pizarra-seg-group {
+  display: inline-flex;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(11, 14, 20, 0.85);
+}
+
+.pizarra-presets-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(13, 18, 28, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: 4px solid var(--hud-gold);
+}
+
+.pizarra-bar-label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #f8fafc;
+  margin-right: 4px;
+}
+
+.pizarra-preset-btn,
+.pizarra-ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  background: #141925;
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-family: var(--hud-cond);
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color var(--hud-snap), color var(--hud-snap), border-color var(--hud-snap);
+}
+
+.pizarra-preset-btn:hover,
+.pizarra-ctrl-btn:hover {
+  background: #1e293b;
+  color: #ffffff;
+  border-color: var(--hud-gold);
+}
+
+.pizarra-preset-btn.active,
+.pizarra-ctrl-btn.active,
+.pizarra-ctrl-btn--gold {
+  background: var(--hud-gold) !important;
+  color: #0f172a !important;
+  border-color: var(--hud-gold) !important;
+}
+
+.pizarra-preset-btn.active *,
+.pizarra-ctrl-btn.active *,
+.pizarra-ctrl-btn--gold * {
+  color: #0f172a !important;
+}
+
+.pizarra-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 10px;
+  background: rgba(13, 18, 28, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.pizarra-toolbar-sep {
+  width: 1px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.18);
+  margin: 0 3px;
+}
+
+.pizarra-canvas-wrap {
+  width: 100%;
+  aspect-ratio: 1000 / 620;
+  background: #1d3910;
+  border: 2px solid rgba(240, 190, 42, 0.45);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+  user-select: none;
+}
+
+.pizarra-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+.pizarra-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 12px;
+  background: rgba(13, 18, 28, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.pizarra-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pz-dot {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px !important;
+}
+.pz-dot--home { background: #f0be2a; border: 1.5px solid #0f172a; }
+.pz-dot--away { background: #e11d48; border: 1.5px solid #ffffff; }
+.pz-dot--zone { background: rgba(56, 189, 248, 0.45); border: 1.5px dashed #38bdf8; }
+
+.pz-line {
+  display: inline-block;
+  width: 18px;
+  height: 3px;
+}
+.pz-line--pass { background: #facc15; }
+.pz-line--run { border-top: 3px dashed #34d399; height: 0; }
+.pz-line--shot { background: #fb7185; }
+
+.pizarra-spec-chip {
+  padding: 6px 8px;
+  background: rgba(9, 12, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pizarra-spec-role {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--hud-gold);
+}
+.pizarra-spec-val {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pizarra-note-lbl {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--hud-gold);
+  margin-bottom: 3px;
+}
+
+.pizarra-textarea {
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 0.76rem;
+  line-height: 1.38;
+  font-weight: 500;
+  resize: vertical;
+  background: #090c12 !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+}
+
+.pizarra-textarea:focus {
+  border-color: var(--hud-gold) !important;
+  outline: none;
+}
+
+/* MODO CLARO PARA PIZARRA TÁCTICA */
+body.theme-light .pizarra-presets-bar,
+body.theme-light .pizarra-toolbar,
+body.theme-light .pizarra-legend,
+body.theme-light .pizarra-seg-group {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .pizarra-bar-label,
+body.theme-light .pizarra-legend {
+  color: #0f172a !important;
+}
+
+body.theme-light .pizarra-preset-btn,
+body.theme-light .pizarra-ctrl-btn {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+body.theme-light .pizarra-preset-btn *,
+body.theme-light .pizarra-ctrl-btn * {
+  color: #0f172a !important;
+}
+
+body.theme-light .pizarra-preset-btn:hover,
+body.theme-light .pizarra-ctrl-btn:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+  border-color: #b45309 !important;
+}
+body.theme-light .pizarra-preset-btn:hover *,
+body.theme-light .pizarra-ctrl-btn:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light .pizarra-preset-btn.active,
+body.theme-light .pizarra-ctrl-btn.active {
+  background: #b45309 !important;
+  color: #ffffff !important;
+  border-color: #92400e !important;
+}
+body.theme-light .pizarra-preset-btn.active *,
+body.theme-light .pizarra-ctrl-btn.active * {
+  color: #ffffff !important;
+}
+
+body.theme-light .pizarra-ctrl-btn--gold,
+body.theme-light .pizarra-ctrl-btn--gold:hover {
+  background: #fbbf24 !important;
+  color: #0f172a !important;
+  border-color: #d97706 !important;
+}
+body.theme-light .pizarra-ctrl-btn--gold *,
+body.theme-light .pizarra-ctrl-btn--gold:hover * {
+  color: #0f172a !important;
+}
+
+body.theme-light .pizarra-guide-card h3 {
+  color: #0f172a !important;
+}
+
+body.theme-light .pizarra-spec-chip {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+body.theme-light .pizarra-spec-role,
+body.theme-light .pizarra-note-lbl {
+  color: #92400e !important;
+}
+body.theme-light .pizarra-spec-val {
+  color: #0f172a !important;
+}
+
+body.theme-light .pizarra-textarea {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+body.theme-light .pizarra-toolbar-sep {
+  background: #cbd5e1 !important;
 }

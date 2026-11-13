@@ -20,6 +20,7 @@ import {
   saveFirebaseConfig, 
   getActiveConfig 
 } from './firebase-config.js';
+import { tacticalBoard } from './tactical-board.js';
 
 export const STATS_TEST_CONFIG = [
   {
@@ -402,13 +403,27 @@ class FutApp {
     // 4. Configurar eventos
     this.bindEvents();
     this.initDragAndDrop();
+    tacticalBoard.mount(this, getFormationConfig);
 
-    // Sprint 1: re-proyectar el césped 3D al cambiar entre móvil y escritorio
+    // Sprint 1+: re-proyectar y re-escalar cartas al cambiar tamaño del césped o pantalla
     let resizeTimer = null;
-    window.addEventListener('resize', () => {
+    const scheduleRescale = () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => this.renderPitch(), 150);
-    });
+      resizeTimer = setTimeout(() => {
+        this.renderPitch();
+        if (document.getElementById('pitch-fullscreen-dialog')?.open) {
+          this.renderFullscreenPitch();
+        }
+      }, 90);
+    };
+    window.addEventListener('resize', scheduleRescale);
+    if (typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(scheduleRescale);
+      const inlinePitch = document.getElementById('pitch-wrapper');
+      const fsPitch = document.getElementById('pitch-fs-field');
+      if (inlinePitch) ro.observe(inlinePitch);
+      if (fsPitch) ro.observe(fsPitch);
+    }
 
     // 5. Render inicial
     this.renderAll();
@@ -1262,6 +1277,12 @@ class FutApp {
       this.selectFormation(e.target.value);
     });
 
+    document.getElementById('btn-setup-delete-card')?.addEventListener('click', () => {
+      if (this._editingPlayerId) {
+        this.deletePlayer(this._editingPlayerId);
+      }
+    });
+
     // Pestañas
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1419,7 +1440,7 @@ class FutApp {
       }
 
       // 2. Control L1 / R1 de pestañas de consola (Teclas Q y E)
-      const tabs = ['pitch', 'album', 'partidos', 'ajustes'];
+      const tabs = ['pitch', 'pizarra', 'album', 'partidos', 'ajustes'];
       const currentIdx = tabs.indexOf(this.currentTab || 'pitch');
 
       if (e.key === 'q' || e.key === 'Q' || e.key === 'PageUp') {
@@ -2416,6 +2437,11 @@ class FutApp {
 
     const titleEl = document.getElementById('setup-title');
     const submitBtn = document.querySelector('#form-setup-card button[type="submit"]');
+    const deleteCardBtn = document.getElementById('btn-setup-delete-card');
+    this._editingPlayerId = existing ? existing.id : null;
+    if (deleteCardBtn) {
+      deleteCardBtn.classList.toggle('hidden', !existing);
+    }
 
     const setVal = (id, val) => {
       const el = document.getElementById(id);
@@ -2922,7 +2948,12 @@ class FutApp {
     document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
     document.getElementById(`view-${tabId}`)?.classList.remove('hidden');
 
-    this.renderAll();
+    if (tabId === 'pizarra') {
+      tacticalBoard.mount(this, getFormationConfig);
+      tacticalBoard.syncPlayersWithLineup(false);
+    } else {
+      this.renderAll();
+    }
     this.refreshIcons();
   }
 
@@ -3154,8 +3185,11 @@ class FutApp {
       || null;
     this.updatePlayerInspector(activePlayer);
 
-    // Renderizar Cartas sobre el Césped con Drag & Drop
+    // Renderizar Cartas sobre el Césped con Drag & Drop y Auto-Escala sin solapamiento
     slotsContainer.innerHTML = this._buildPitchSlotsHtml(formationConfig, startingPlayers, projected, settings);
+    const inlinePitchEl = document.getElementById('pitch-wrapper');
+    this.fitPitchCardScale(inlinePitchEl, projected, false);
+    requestAnimationFrame(() => this.fitPitchCardScale(inlinePitchEl, projected, false));
 
     // Banquillo (Deduplicación estricta para garantizar 0 duplicados)
     const startingIds = new Set(activeStarters.map(p => p.id));
@@ -3254,8 +3288,8 @@ class FutApp {
   openPitchFullscreenModal() {
     const dialog = document.getElementById('pitch-fullscreen-dialog');
     if (!dialog) return;
-    this.renderFullscreenPitch();
     if (!dialog.open) dialog.showModal();
+    this.renderFullscreenPitch();
     futAudio.playSelect();
     this.refreshIcons();
   }
@@ -3288,6 +3322,8 @@ class FutApp {
       <svg class="pitch-chemistry-svg" viewBox="0 0 100 100" preserveAspectRatio="none">${chemHtml}</svg>
       <div class="w-full h-full relative">${slotsHtml}</div>
     `;
+    this.fitPitchCardScale(field, projected, true);
+    requestAnimationFrame(() => this.fitPitchCardScale(field, projected, true));
 
     if (benchHost) {
       const startingIds = new Set(activeStarters.map(p => p.id));
@@ -3304,28 +3340,71 @@ class FutApp {
   }
 
   /**
+   * Calcula la escala óptima de las cartas en el césped en función del tamaño real
+   * del campo y de la distancia entre slots, evitando solapamientos en cualquier pantalla.
+   */
+  fitPitchCardScale(fieldEl, projected, isFullscreen = false) {
+    if (!fieldEl || !Array.isArray(projected) || projected.length === 0) return;
+    const rect = fieldEl.getBoundingClientRect();
+    const W = rect.width;
+    const H = rect.height;
+    if (W < 40 || H < 40) return;
+
+    const SLOT_W = 84;
+    const SLOT_H = 152;
+    const cap = isFullscreen ? 1.85 : 1.65;
+    let maxScale = cap;
+
+    for (let i = 0; i < projected.length; i++) {
+      const a = projected[i];
+      for (let j = i + 1; j < projected.length; j++) {
+        const b = projected[j];
+        const avgD = ((a.scale || 1) + (b.scale || 1)) * 0.5;
+        const dx = Math.abs(a.left - b.left) * W / 100;
+        const dy = Math.abs(a.top - b.top) * H / 100;
+        const limitPair = Math.max(dx / (SLOT_W * avgD), dy / (SLOT_H * avgD));
+        if (limitPair > 0.2) maxScale = Math.min(maxScale, limitPair);
+      }
+    }
+
+    for (const p of projected) {
+      const ds = p.scale || 1;
+      const cx = p.left * W / 100;
+      const cy = p.top * H / 100;
+      const limTop = (cy - 10) / (76 * ds);
+      const limBot = (H - cy - 4) / (78 * ds);
+      const limX = (Math.min(cx, W - cx) - 6) / (43 * ds);
+      maxScale = Math.min(maxScale, limTop, limBot, limX);
+    }
+
+    const finalScale = Math.max(0.38, Math.min(cap, maxScale));
+    fieldEl.style.setProperty('--pitch-scale', finalScale.toFixed(3));
+  }
+
+  /**
    * Sprint 1 — Proyección en perspectiva de un slot táctico.
-   * Convierte coordenadas "planas" (top/left 0-100 de la pizarra) en coordenadas
-   * de pantalla sobre el césped inclinado 24º: los jugadores del fondo se juntan
-   * hacia el centro y se encogen; el portero queda grande y cerca de cámara.
+   * Reparte las líneas verticalmente [15.0% .. 85.0%] de forma uniforme para evitar
+   * que los defensas solapen al portero y aprovechar la altura en pantallas grandes.
    */
   projectSlot(slot) {
-    // Escala en perspectiva sobre el trapecio 3D: delanteros al fondo (más pequeños), portero cerca
-    const t = Math.min(1, Math.max(0, (slot.top - 15) / 72));
+    const rawT = Math.min(1, Math.max(0, (slot.top - 18) / 68));
     const isMobile = window.matchMedia('(max-width: 640px)').matches;
-    const baseScale = isMobile ? 0.78 : 0.84;
-    const scale = +(baseScale + 0.16 * t).toFixed(3);
+    const baseScale = isMobile ? 0.88 : 0.90;
+    const scale = +(baseScale + 0.10 * rawT).toFixed(3);
 
-    // Mapeo vertical calibrado con margen superior/inferior limpio para no cortar dorsales ni pedestales
-    let mappedTop = 18.5 + t * 63;
-    if (slot.role === 'POR') mappedTop = 81.5;
-    else if (slot.role === 'DC' || slot.role === 'PIV') mappedTop = 18.5;
+    let mappedTop;
+    if (slot.role === 'POR') {
+      mappedTop = 85.0;
+    } else {
+      const outT = Math.min(1, Math.max(0, (slot.top - 18) / 54));
+      mappedTop = 15.0 + outT * 46.5;
+    }
 
     return {
       top: +mappedTop.toFixed(1),
       left: slot.left,
       scale,
-      z: 12 + Math.round(t * 20)
+      z: 12 + Math.round(rawT * 20)
     };
   }
 
@@ -4255,15 +4334,26 @@ class FutApp {
           <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
           <span>Ver Walkout FIFA</span>
         </button>
-        ${((authService.getCurrentUser()?.playerId === p.id) || (authService.getCurrentUser()?.email && p.email && authService.getCurrentUser().email.toLowerCase() === p.email.toLowerCase()))
-          ? `<button type="button" onclick="document.getElementById('player-inspect-dialog').close(); window.futApp.openPlayerSetupModal(window.futApp.authService.getCurrentUser());" class="px-3.5 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider transition cursor-pointer">
-               Editar Mi Carta / Skin
-             </button>`
-          : ''
-        }
-        <button type="button" onclick="window.futApp.deletePlayer('${p.id}')" class="admin-only px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-black border border-rose-500/40 transition cursor-pointer">
-          Eliminar de Plantilla
-        </button>
+        ${(() => {
+          const curUser = authService.getCurrentUser();
+          const isOwner = !!(curUser && ((curUser.playerId === p.id) || (curUser.email && p.email && curUser.email.toLowerCase().trim() === p.email.toLowerCase().trim())));
+          const canDelete = isOwner || authService.isAdmin();
+          return `
+            ${isOwner
+              ? `<button type="button" onclick="document.getElementById('player-inspect-dialog').close(); window.futApp.openPlayerSetupModal(window.futApp.authService.getCurrentUser());" class="px-3.5 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider transition cursor-pointer">
+                   Editar Mi Carta / Skin
+                 </button>`
+              : ''
+            }
+            ${canDelete
+              ? `<button type="button" id="btn-inspect-delete-card" onclick="window.futApp.deletePlayer('${p.id}')" class="px-3.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-black border border-rose-500/40 inline-flex items-center gap-1.5 transition cursor-pointer uppercase tracking-wider">
+                   <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                   <span>${isOwner ? 'Borrar Mi Carta' : 'Eliminar Carta'}</span>
+                 </button>`
+              : ''
+            }
+          `;
+        })()}
       </div>
     `;
 
@@ -4279,16 +4369,29 @@ class FutApp {
 
   deletePlayer(playerId) {
     const p = store.getPlayerById(playerId);
+    if (!p) return;
+    const curUser = authService.getCurrentUser();
+    const isOwner = !!(curUser && ((curUser.playerId === p.id) || (curUser.email && p.email && curUser.email.toLowerCase().trim() === p.email.toLowerCase().trim())));
+    if (!isOwner && !authService.isAdmin()) {
+      this.showToast('Solo puedes borrar tu propia carta', 'shield-alert');
+      return;
+    }
+
     this.openConfirmModal({
-      title: 'Eliminar Jugador',
-      message: `¿Seguro que deseas retirar la ficha de ${p?.name || 'este jugador'} de la plantilla?`,
-      confirmLabel: 'Eliminar',
+      title: isOwner ? 'Borrar Mi Carta' : 'Eliminar Jugador',
+      message: `¿Seguro que deseas borrar la carta de ${p.name || 'este jugador'}? Se eliminará de la plantilla, alineaciones y álbum.`,
+      confirmLabel: 'Borrar Carta',
       onConfirm: () => {
         store.deletePlayer(playerId);
+        authService.refreshLinkedPlayer();
+        this.renderAuthBar(authService.getCurrentUser());
         document.getElementById('player-inspect-dialog')?.close();
-        this.renderPitch();
-        this.renderAlbumCards();
-        this.showToast('Jugador eliminado', 'trash-2');
+        const setupDlg = document.getElementById('player-card-setup-dialog');
+        if (setupDlg?.open) setupDlg.close();
+        this._editingPlayerId = null;
+        this.renderAll();
+        tacticalBoard.syncPlayersWithLineup(false);
+        this.showToast('Carta eliminada correctamente', 'trash-2');
       }
     });
   }
