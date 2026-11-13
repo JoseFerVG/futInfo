@@ -495,6 +495,39 @@ body.hud-canvas {
   grid-column: 2;
   height: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 18px 10px 18px;
+}
+
+.hud-panel--bench .hud-bench-head-block {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  padding-right: 16px;
+}
+
+.hud-panel--bench .hud-title {
+  position: static !important;
+  font-size: 2.2rem;
+  line-height: 0.9;
+}
+
+.hud-panel--bench .hud-bignum {
+  position: static !important;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 2.15rem;
+  line-height: 0.9;
+}
+
+.hud-panel--bench .hud-bignum small {
+  margin-top: 0;
+  font-size: 0.92rem;
 }
 
 .hud-panel--tactics {
@@ -504,59 +537,28 @@ body.hud-canvas {
   position: relative;
 }
 
-/* ---------- 5. PANELES DE CONSOLA (ESTILO BROADCAST) ---------- */
-.hud-panel {
-  position: relative;
-  overflow: hidden;
-  color: var(--hud-text);
-  background:
-    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.02) 0 2px, transparent 2px 8px),
-    linear-gradient(135deg, rgba(24, 28, 38, 0.94) 0%, rgba(13, 16, 22, 0.96) 100%);
-  border-bottom: 3px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-  transition: all var(--hud-snap);
-  cursor: pointer;
-  isolation: isolate;
-}
-
-.hud-panel::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 4px;
+.hud-panel--tactics .hud-tactics-head-block {
   height: 100%;
-  background: rgba(255, 255, 255, 0.2);
-  z-index: 2;
-  transition: all var(--hud-snap);
+  width: 37%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px 8px 16px 22px;
+  pointer-events: none;
 }
 
-.hud-panel::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 28px;
-  height: 28px;
-  background: var(--hud-bg);
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
-  opacity: 0.85;
-  z-index: 3;
+.hud-panel--tactics .hud-title,
+.hud-panel--tactics .hud-bignum {
+  position: static !important;
 }
 
-.hud-panel-watermark {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+.hud-panel--tactics .hud-bignum {
+  font-size: clamp(2.1rem, 4.3vh, 3.25rem);
+  line-height: 0.88;
 }
 
-.hud-panel > *:not(.hud-panel-watermark):not(.hud-panel-hit) {
-  position: relative;
-  z-index: 4;
-}
-
-/* Foco de Joystick: Resalte Oficial EA Sports */
+/* ---------- 5. PANELES DE CONSOLA (ESTILO BROADCAST) ---------- */
+/* Foco de Consola: Resalte Oficial EA Sports */
 .hud-panel {
   position: relative;
   overflow: hidden;
@@ -649,9 +651,10 @@ body.hud-canvas {
 }
 
 .fifa-panel-gold-strip {
-  position: absolute;
+  position: absolute !important;
   top: 0;
   left: 0;
+  right: 0;
   width: 100%;
   height: 4px;
   background: linear-gradient(90deg, var(--hud-gold-2) 0%, var(--hud-gold) 65%, transparent 100%);
@@ -887,48 +890,6 @@ body.hud-canvas {
   color: #1e293b !important;
 }
 
-.hud-action-right {
-  display: flex;
-  align-items: center;
-}
-
-.hud-action-prompt {
-  font: 900 0.88rem / 1 var(--hud-cond);
-  letter-spacing: 0.08em;
-  color: var(--hud-gold);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: color var(--hud-snap);
-}
-
-.hud-squad-action-tile:hover .hud-action-prompt {
-  color: #0b0e14 !important;
-}
-
-.fifa-btn-chip {
-  background: var(--hud-gold);
-  color: #0b0e14;
-  padding: 2px 7px;
-  font-weight: 900;
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
-  border-radius: 2px;
-  border: 1px solid rgba(0, 0, 0, 0.3);
-  transition: all var(--hud-snap);
-}
-
-.hud-squad-action-tile:hover .fifa-btn-chip {
-  background: #0b0e14 !important;
-  color: #f0ba28 !important;
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.fifa-arrow {
-  font-size: 0.75rem;
-  line-height: 1;
-}
-
 .hud-swap-banner {
   position: absolute !important;
   left: 50%;
@@ -1024,11 +985,6 @@ body.hud-canvas {
   z-index: 4;
   overflow: visible;
 }
-  height: 100%;
-  pointer-events: none;
-  z-index: 4;
-  overflow: visible;
-}
 
 #pitch-slots-container {
   position: absolute;
@@ -1091,10 +1047,44 @@ body.hud-canvas {
   background: var(--hud-ink) !important;
   color: var(--hud-gold) !important;
   border: 0 !important;
+  border-bottom: 2px solid transparent !important;
   font-family: var(--hud-cond) !important;
   font-weight: 900;
   transform: skewX(-12deg);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.fut-pos-pedestal.is-fit-best {
+  border-bottom-color: #22c55e !important;
+  color: #4ade80 !important;
+}
+
+.fut-pos-pedestal.is-fit-alt {
+  border-bottom-color: #f59e0b !important;
+  color: #fbbf24 !important;
+}
+
+.fut-pos-pedestal.is-fit-poor {
+  border-bottom-color: #ef4444 !important;
+  color: #f87171 !important;
+}
+
+.fut-cap-tag {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  z-index: 12;
+  background: var(--hud-gold);
+  color: #0b0e14;
+  font-family: var(--hud-cond);
+  font-weight: 900;
+  font-size: 0.64rem;
+  line-height: 1;
+  padding: 2px 5px;
+  border: 1px solid #0b0e14;
+  transform: skewX(-10deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.75);
+  pointer-events: none;
 }
 
 /* Tooltips Contextuales HUD (Patrón Apple / Linear de información instantánea) */
@@ -1262,11 +1252,10 @@ body.hud-canvas {
 
 /* ---------- 7. BANQUILLO ---------- */
 .hud-bench-dock {
-  position: absolute !important;
-  left: 32%;
-  right: 14px;
-  top: 14px;
-  bottom: 14px;
+  position: relative !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
   background: transparent !important;
   border: 0 !important;
   padding: 0 !important;
@@ -1278,23 +1267,24 @@ body.hud-canvas {
 .hud-bench-dock .fifa-bench-cards-strip {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   overflow-x: auto;
   overflow-y: visible;
-  padding: 8px 4px;
+  padding: 10px 8px 14px 8px;
   width: 100%;
+  min-height: 178px;
   scrollbar-width: thin;
   scrollbar-color: var(--hud-gold) transparent;
 }
 
 .hud-bench-dock [data-bench-id] {
-  transform: scale(1.05);
-  transform-origin: center;
+  transform: none;
+  transform-origin: center bottom;
   transition: transform var(--hud-snap) !important;
 }
 
 .hud-bench-dock [data-bench-id]:hover {
-  transform: translateY(-8px) scale(1.16) !important;
+  transform: translateY(-6px) scale(1.04) !important;
   z-index: 30;
 }
 
@@ -1453,91 +1443,6 @@ body.hud-canvas {
   outline: 2px solid var(--hud-gold);
 }
 
-/* ---------- 9. FRANJA TÉCNICA INFERIOR (PROMPTS & CONTROLLER GLYPHS) ---------- */
-.hud-prompts {
-  width: 100%;
-  max-width: 1680px;
-  margin: 8px auto 0 auto;
-  height: 28px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  z-index: 20;
-  font: 700 0.92rem / 1 var(--hud-cond);
-  color: #e2e8f0;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.hud-prompt {
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-}
-
-/* Botones Oficiales Estilo PlayStation / Xbox */
-.ps-btn {
-  display: inline-grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50% !important;
-  font-style: normal;
-  font-weight: 900;
-  font-size: 0.68rem;
-  line-height: 1;
-  margin-right: 6px;
-  transform: none !important;
-  flex-shrink: 0;
-}
-
-.ps-x {
-  background: #091729;
-  color: #38bdf8;
-  border: 1.5px solid #38bdf8;
-  box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
-}
-
-.ps-circle {
-  background: #260a12;
-  color: #f43f5e;
-  border: 1.5px solid #f43f5e;
-  box-shadow: 0 0 8px rgba(244, 63, 94, 0.6);
-}
-
-.ps-triangle {
-  background: #061f14;
-  color: #10b981;
-  border: 1.5px solid #10b981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
-}
-
-.ps-square {
-  background: #240a20;
-  color: #ec4899;
-  border: 1.5px solid #ec4899;
-  box-shadow: 0 0 8px rgba(236, 72, 153, 0.6);
-}
-
-.ps-pill {
-  display: inline-block;
-  margin-right: 6px;
-  padding: 2px 7px;
-  font-style: normal;
-  font-weight: 900;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  background: var(--hud-gold);
-  color: var(--hud-ink);
-  transform: skewX(-12deg);
-}
-
-.hud-prompt span {
-  letter-spacing: 0.05em;
-  color: #ffffff;
-}
-
 /* ---------- 10. VISTAS SECUNDARIAS (ÁLBUM, JORNADAS, MI CLUB) ---------- */
 .hud-body > .tab-view:not(#view-pitch) {
   height: 100%;
@@ -1660,7 +1565,8 @@ body.hud-canvas {
   border: 0 !important;
   border-top: 5px solid var(--hud-gold) !important;
   clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%);
-  max-height: 88vh;
+  max-height: min(88vh, 88dvh);
+  color-scheme: dark;
 }
 
 .hud-canvas dialog::backdrop {
@@ -1762,9 +1668,6 @@ body.hud-canvas {
     height: 250px !important;
     position: relative;
   }
-  .hud-prompts {
-    display: none !important;
-  }
 }
 
 /* 13.2 DISPOSITIVOS MÓVILES (Ancho menor a 768px) */
@@ -1857,7 +1760,7 @@ body.hud-canvas {
   .hud-panel--squad {
     width: 100% !important;
     max-width: 100% !important;
-    height: clamp(430px, 72vh, 530px) !important;
+    height: clamp(390px, 60vh, 460px) !important;
     position: relative;
     flex-shrink: 0;
   }
@@ -1962,32 +1865,135 @@ body.hud-canvas {
   .hud-panel--bench {
     width: 100% !important;
     height: auto !important;
-    min-height: 185px !important;
+    min-height: 220px !important;
     position: relative !important;
-    padding-top: 50px !important;
-    padding-bottom: 12px !important;
+    padding: 14px 14px 10px 14px !important;
+  }
+
+  .hud-panel--bench .hud-title {
+    font-size: 1.75rem !important;
+  }
+
+  .hud-panel--bench .hud-bignum {
+    font-size: 1.7rem !important;
   }
 
   .fifa-bench-dock.hud-bench-dock {
     position: relative !important;
-    left: 0 !important;
-    right: 0 !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    margin: 8px 12px 0 12px !important;
-    height: 116px !important;
+    margin: 6px 0 0 0 !important;
+    width: 100% !important;
+    min-height: 152px !important;
     overflow-x: auto !important;
-    overflow-y: hidden !important;
-    scrollbar-width: thin !important;
+    overflow-y: visible !important;
+  }
+
+  .hud-bench-dock .fifa-bench-cards-strip {
+    min-height: 148px;
+    padding: 6px 4px 10px 4px;
+    gap: 12px;
+  }
+
+  /* Matchday / Jornadas responsive en móvil */
+  .fifa-broadcast-main-title {
+    font-size: 1.45rem !important;
+  }
+
+  .fifa-arena-top-banner {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+
+  .fifa-arena-vs-stage {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    padding: 18px 14px !important;
+  }
+
+  .fifa-arena-club {
+    gap: 12px !important;
+    min-width: 0;
+  }
+
+  .fifa-arena-crest-box {
+    width: 56px !important;
+    height: 64px !important;
+  }
+
+  .fifa-arena-club-title {
+    font-size: 1.45rem !important;
+    word-break: break-word;
+  }
+
+  .fifa-arena-vs-center {
+    flex-direction: row !important;
+    justify-content: center;
+    gap: 12px !important;
+    padding: 4px 0 !important;
+  }
+
+  .fifa-arena-vote-bar {
+    padding: 12px 14px !important;
+  }
+
+  .fifa-arena-convocatoria-panel {
+    padding: 16px 14px !important;
+  }
+
+  .fifa-convocatoria-title {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
   }
 
   .hud-panel--tactics {
     width: 100% !important;
     height: auto !important;
-    min-height: 180px !important;
+    min-height: 0 !important;
     position: relative !important;
-    padding-top: 50px !important;
-    padding-bottom: 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 14px !important;
+  }
+
+  .hud-panel--tactics .hud-tactics-head-block {
+    width: 100% !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    padding: 0 18px 0 0 !important;
+  }
+
+  .hud-panel--tactics .hud-title {
+    font-size: 1.55rem !important;
+    line-height: 0.92 !important;
+  }
+
+  .hud-panel--tactics .hud-bignum {
+    font-size: 1.45rem !important;
+    line-height: 0.92 !important;
+    flex-direction: row !important;
+    align-items: baseline !important;
+    gap: 6px !important;
+    text-align: right;
+  }
+
+  .hud-panel--tactics .hud-bignum small {
+    margin-top: 0 !important;
+    font-size: 0.82rem !important;
+  }
+
+  .hud-panel--tactics .hud-tactics-mini-pitch {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: 112px !important;
   }
 
   .hud-specs {
@@ -1995,7 +2001,8 @@ body.hud-canvas {
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
-    margin: 8px 12px 0 12px !important;
+    width: 100% !important;
+    margin: 2px 0 0 0 !important;
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 8px 10px !important;
@@ -2003,10 +2010,6 @@ body.hud-canvas {
 
   .hud-specs label {
     height: 42px !important;
-  }
-
-  .hud-prompts {
-    display: none !important;
   }
 }
 
@@ -2136,16 +2139,18 @@ dialog.fifa-console-modal {
   max-width: 840px !important;
   max-height: min(88vh, 88dvh) !important;
   margin: auto !important;
-  padding: 22px !important;
+  padding: 0 !important;
   box-sizing: border-box !important;
   overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-gutter: stable;
   -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 640px) {
   dialog.fifa-console-modal {
     width: 96vw !important;
-    padding: 12px 8px !important;
+    padding: 0 !important;
     max-height: 92dvh !important;
   }
 
@@ -2211,6 +2216,8 @@ dialog.fifa-console-modal {
 
 .fifa-formation-card {
   position: relative;
+  min-width: 0;
+  overflow: hidden;
   background: #0e1219;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-left: 4px solid rgba(255, 255, 255, 0.25);
@@ -2240,14 +2247,18 @@ dialog.fifa-console-modal {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
   margin-bottom: 4px;
 }
 
 .fifa-form-code {
-  font-size: 1.6rem;
+  font-size: 1.42rem;
   font-weight: 900;
   line-height: 1;
   color: #ffffff;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .fifa-formation-card.is-active .fifa-form-code {
@@ -2257,12 +2268,17 @@ dialog.fifa-console-modal {
 .fifa-form-badge {
   font-family: var(--hud-cond);
   font-weight: 800;
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   text-transform: uppercase;
   padding: 2px 5px;
   background: rgba(255, 255, 255, 0.08);
   color: #94a3b8;
   letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .fifa-formation-card.is-active .fifa-form-badge {
@@ -2349,33 +2365,6 @@ dialog.fifa-console-modal {
   border-bottom: 0;
   pointer-events: none;
   z-index: 1;
-}
-
-.fifa-console-btn-exit {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  background: #0d1118;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #cbd5e1;
-  font-family: var(--hud-cond);
-  font-weight: 800;
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all var(--hud-snap);
-}
-
-.fifa-console-btn-exit:hover {
-  background: #ffffff;
-  color: #0b0e14;
-  border-color: #ffffff;
-}
-
-.fifa-console-btn-exit:hover .ps-circle {
-  border-color: #0b0e14;
 }
 
 .mini-pitch-dot {
@@ -2646,45 +2635,138 @@ body.theme-light .hud-insp-name {
   color: #0f172a;
 }
 
+body.theme-light .hud-insp-ovr {
+  color: #b45309;
+}
+
+body.theme-light .hud-insp-trait-badge {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #f59e0b;
+}
+
+body.theme-light .hud-insp-stars-badge {
+  background: #e2e8f0;
+  color: #1e293b;
+  border-color: #cbd5e1;
+}
+
 body.theme-light .hud-insp-stats em {
   color: #0f172a;
 }
 
-body.theme-light .hud-prompts {
-  background: #ffffff;
+body.theme-light .hud-squad-action-tile {
+  background: linear-gradient(90deg, #ffffff 0%, #f8fafc 100%);
+  border-color: rgba(180, 83, 9, 0.45);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+}
+
+body.theme-light .hud-action-title {
   color: #0f172a;
-  border-top: 1px solid #cbd5e1;
 }
 
-body.theme-light .hud-prompt em {
-  background: #0f172a;
-  color: #ffffff;
+body.theme-light .hud-action-sub {
+  color: #475569;
 }
 
-body.theme-light .hud-prompt span {
+body.theme-light .hud-squad-action-tile:hover {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+  border-color: #b45309;
+}
+
+body.theme-light .hud-filter-bar {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+body.theme-light .hud-filter-pill {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
   color: #334155;
+}
+
+body.theme-light .hud-filter-pill:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+body.theme-light #album-search-input,
+body.theme-light #album-sort-select,
+body.theme-light .hud-specs select {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light #fut-sub-drawer {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .sub-bench-card {
+  background: #f8fafc !important;
+  border-left-color: #cbd5e1 !important;
+  color: #0f172a !important;
 }
 
 body.theme-light dialog.fifa-console-modal {
   background: #ffffff !important;
   color: #0f172a !important;
   border-color: #cbd5e1 !important;
+  color-scheme: light;
 }
 
 body.theme-light dialog.fifa-console-modal .bg-slate-900,
+body.theme-light dialog.fifa-console-modal .bg-slate-900\/95,
 body.theme-light dialog.fifa-console-modal .bg-slate-900\/90,
 body.theme-light dialog.fifa-console-modal .bg-slate-900\/80,
 body.theme-light dialog.fifa-console-modal .bg-slate-950,
-body.theme-light dialog.fifa-console-modal .bg-slate-950\/90 {
+body.theme-light dialog.fifa-console-modal .bg-slate-950\/95,
+body.theme-light dialog.fifa-console-modal .bg-slate-950\/90,
+body.theme-light dialog.fifa-console-modal .bg-slate-950\/80 {
   background: #f8fafc !important;
-  border-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
   color: #0f172a !important;
 }
 
+body.theme-light dialog.fifa-console-modal input,
+body.theme-light dialog.fifa-console-modal select,
+body.theme-light dialog.fifa-console-modal textarea {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light dialog.fifa-console-modal .text-white:not(.fut-card *),
 body.theme-light dialog.fifa-console-modal h2,
 body.theme-light dialog.fifa-console-modal h3,
 body.theme-light dialog.fifa-console-modal h4,
 body.theme-light dialog.fifa-console-modal h5 {
+  color: #0f172a !important;
+}
+
+body.theme-light dialog.fifa-console-modal .text-slate-200:not(.fut-card *),
+body.theme-light dialog.fifa-console-modal .text-slate-300:not(.fut-card *),
+body.theme-light dialog.fifa-console-modal .text-slate-400:not(.fut-card *) {
+  color: #475569 !important;
+}
+
+body.theme-light .fifa-formation-card,
+body.theme-light .fifa-modal-tab {
+  background: #f8fafc !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light .fifa-modal-tab.active {
+  background: #fffbeb !important;
+  color: #b45309 !important;
+  border-bottom-color: #d97706 !important;
+}
+
+body.theme-light .fifa-form-code,
+body.theme-light .fifa-form-name {
   color: #0f172a !important;
 }
 
@@ -2695,8 +2777,19 @@ body.theme-light .fifa-tile {
 }
 
 body.theme-light .fifa-tile h2,
-body.theme-light .fifa-tile h3 {
+body.theme-light .fifa-tile h3,
+body.theme-light .fifa-tile .text-white,
+body.theme-light .fifa-club-tile .text-white {
   color: #0f172a !important;
+}
+
+body.theme-light .fifa-tile .text-slate-300,
+body.theme-light .fifa-tile .text-slate-400,
+body.theme-light .fifa-club-tile .text-slate-300,
+body.theme-light .fifa-club-tile .text-slate-400,
+body.theme-light .fifa-club-tile .text-slate-500,
+body.theme-light .fifa-matchday-arena-card .text-slate-300 {
+  color: #475569 !important;
 }
 
 /* =====================================================================
@@ -3369,38 +3462,6 @@ body.theme-light .fifa-tile h3 {
   border: none;
 }
 
-.fifa-kit-preview-box {
-  background: radial-gradient(circle at center, #1e293b 0%, #090c12 100%);
-  border: 1.5px solid rgba(240, 190, 42, 0.4);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
-}
-
-.fifa-kit-preview-title {
-  font: 900 0.75rem / 1 var(--hud-cond);
-  color: var(--hud-gold);
-  letter-spacing: 0.1em;
-}
-
-.fifa-kit-preview-silhouette {
-  width: 90px;
-  height: 110px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.fifa-kit-preview-dorsal {
-  font: 900 0.85rem / 1 var(--hud-cond);
-  color: #ffffff;
-  letter-spacing: 0.1em;
-}
-
 .fifa-kit-info-card {
   background: rgba(0, 0, 0, 0.4);
   border-left: 3px solid var(--hud-gold);
@@ -3557,6 +3618,310 @@ body.theme-light .fifa-fixture-tile {
 body.theme-light .fifa-fixture-team-name,
 body.theme-light .fifa-crest-name,
 body.theme-light .fifa-option-name,
-body.theme-light .fifa-stat-badge-num {
+body.theme-light .fifa-stat-badge-num,
+body.theme-light .fifa-vote-heading,
+body.theme-light .fifa-arena-venue {
   color: #0f172a !important;
+}
+
+body.theme-light .fifa-field-lbl,
+body.theme-light .fifa-fixture-meta,
+body.theme-light .fifa-arena-ovr-pill,
+body.theme-light .fifa-convocatoria-sub,
+body.theme-light .fifa-fixtures-sub {
+  color: #475569 !important;
+}
+
+body.theme-light .fifa-arena-stream {
+  color: #0369a1 !important;
+}
+
+body.theme-light .fifa-arena-badge,
+body.theme-light .fifa-crest-pill,
+body.theme-light .fifa-save-club-btn,
+body.theme-light .hud-filter-pill.active,
+body.theme-light .hud-tab-count,
+body.theme-light .fifa-broadcast-action-btn,
+body.theme-light .fifa-squad-btn.is-active-btn,
+body.theme-light .fifa-formation-card.is-active .fifa-form-badge {
+  color: #ffffff !important;
+}
+
+body.theme-light .hud-body > .tab-view:not(#view-pitch) {
+  background:
+    repeating-linear-gradient(-45deg, rgba(15, 23, 42, 0.025) 0 2px, transparent 2px 10px),
+    linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  border-left-color: #d97706 !important;
+  border-bottom-color: #cbd5e1 !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+  scrollbar-color: #b45309 #e2e8f0 !important;
+}
+
+body.theme-light .hud-body > .tab-view:not(#view-pitch) .text-slate-500,
+body.theme-light .hud-body > .tab-view:not(#view-pitch) .text-slate-400 {
+  color: #475569 !important;
+}
+
+body.theme-light .fifa-broadcast-live-chyron {
+  color: #047857 !important;
+  text-shadow: none !important;
+}
+
+body.theme-light .fifa-live-dot {
+  background: #059669 !important;
+  box-shadow: 0 0 8px rgba(5, 150, 105, 0.45) !important;
+}
+
+body.theme-light .fifa-broadcast-main-title {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+
+body.theme-light .hud-auth > div,
+body.theme-light .hud-auth button {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light .hud-auth button:hover {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+}
+
+body.theme-light .hud-insp-dorsal {
+  color: #facc15 !important;
+}
+
+body.theme-light .fifa-arena-crest-box {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+  border-color: #d97706 !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12) !important;
+}
+
+body.theme-light .fifa-arena-vs-diamond {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #d97706 !important;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.2) !important;
+}
+
+body.theme-light .fifa-arena-kickoff-time {
+  color: #b45309 !important;
+}
+
+body.theme-light .fifa-arena-status-pill {
+  color: #065f46 !important;
+  background: #d1fae5 !important;
+  border-color: #10b981 !important;
+}
+
+body.theme-light .fifa-vote-yes {
+  background: #ecfdf5 !important;
+  color: #047857 !important;
+  border-color: #10b981 !important;
+}
+
+body.theme-light .fifa-vote-maybe {
+  background: #fffbeb !important;
+  color: #b45309 !important;
+  border-color: #f59e0b !important;
+}
+
+body.theme-light .fifa-vote-no {
+  background: #fff1f2 !important;
+  color: #be123c !important;
+  border-color: #f43f5e !important;
+}
+
+body.theme-light .fifa-roster-col--confirmed .fifa-roster-col-title {
+  color: #047857 !important;
+}
+
+body.theme-light .fifa-roster-col--doubts .fifa-roster-col-title {
+  color: #b45309 !important;
+}
+
+body.theme-light .fifa-roster-col--absent .fifa-roster-col-title {
+  color: #be123c !important;
+}
+
+body.theme-light .fifa-roster-count {
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-player-chip {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-chip-dorsal {
+  color: #b45309 !important;
+}
+
+body.theme-light .fifa-chip-role,
+body.theme-light .fifa-stat-badge-lbl {
+  color: #475569 !important;
+}
+
+body.theme-light .fifa-fixtures-count-pill,
+body.theme-light .fifa-trophy-pill {
+  background: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+body.theme-light .fifa-fixture-jornada-pill {
+  background: #e2e8f0 !important;
+  color: #92400e !important;
+  border-color: #f59e0b !important;
+}
+
+body.theme-light .fifa-fixture-score-box {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light .fifa-kit-info-card {
+  background: #f8fafc !important;
+  border-left-color: #d97706 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-kit-info-card .text-amber-400,
+body.theme-light .fifa-club-tile .text-amber-400,
+body.theme-light dialog.fifa-console-modal .text-amber-400:not(.fut-card *) {
+  color: #b45309 !important;
+}
+
+body.theme-light dialog.fifa-console-modal .text-cyan-400:not(.fut-card *),
+body.theme-light #club-palmares-content .text-cyan-400 {
+  color: #0369a1 !important;
+}
+
+body.theme-light dialog.fifa-console-modal .text-emerald-400:not(.fut-card *),
+body.theme-light #club-palmares-content .text-emerald-400 {
+  color: #047857 !important;
+}
+
+body.theme-light dialog.fifa-console-modal .text-rose-400:not(.fut-card *),
+body.theme-light #club-palmares-content .text-rose-400 {
+  color: #be123c !important;
+}
+
+body.theme-light dialog.fifa-console-modal .bg-emerald-950\/40 {
+  background: #ecfdf5 !important;
+}
+
+body.theme-light dialog.fifa-console-modal .bg-sky-950\/40 {
+  background: #f0f9ff !important;
+}
+
+body.theme-light dialog.fifa-console-modal .bg-amber-950\/40 {
+  background: #fffbeb !important;
+}
+
+body.theme-light dialog.fifa-console-modal .bg-rose-950\/40 {
+  background: #fff1f2 !important;
+}
+
+body.theme-light #album-cards-grid .bg-slate-950\/70,
+body.theme-light #album-cards-grid .bg-slate-900\/80,
+body.theme-light #album-cards-grid .bg-slate-950\/90 {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light #album-cards-grid button.bg-slate-800 {
+  background: #0f172a !important;
+  border-color: #0f172a !important;
+  color: #facc15 !important;
+}
+
+body.theme-light #album-cards-grid button.bg-slate-800:hover {
+  background: #1e293b !important;
+  color: #ffffff !important;
+}
+
+body.theme-light #album-cards-grid .text-white:not(.fut-card *),
+body.theme-light #album-cards-grid .text-slate-200:not(.fut-card *) {
+  color: #0f172a !important;
+}
+
+body.theme-light #album-cards-grid .text-slate-400:not(.fut-card *) {
+  color: #475569 !important;
+}
+
+body.theme-light #album-cards-grid .text-emerald-400:not(.fut-card *) {
+  color: #047857 !important;
+}
+
+body.theme-light #album-cards-grid .text-sky-400:not(.fut-card *) {
+  color: #0369a1 !important;
+}
+
+body.theme-light #album-cards-grid .text-amber-400:not(.fut-card *) {
+  color: #b45309 !important;
+}
+
+body.theme-light #album-cards-grid .text-rose-400:not(.fut-card *) {
+  color: #be123c !important;
+}
+
+body.theme-light .fifa-squad-card,
+body.theme-light .fifa-form-btn {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-squad-name,
+body.theme-light .fifa-squad-ovr {
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-squad-meta-row {
+  color: #334155 !important;
+}
+
+body.theme-light .fifa-squad-btn {
+  background: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .fifa-squad-btn:hover {
+  background: #0f172a !important;
+  border-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+body.theme-light .fifa-squad-btn.is-active-btn {
+  background: #b45309 !important;
+  border-color: #92400e !important;
+  color: #ffffff !important;
+}
+
+body.theme-light .tactics-style-btn {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .tactics-style-btn.active {
+  background: #b45309 !important;
+  border-color: #92400e !important;
+  color: #ffffff !important;
+}
+
+body.theme-light .tactics-style-btn.active span {
+  color: #ffffff !important;
+}
+
+body.theme-light .tactics-style-btn.active span:last-child {
+  color: #fef3c7 !important;
 }

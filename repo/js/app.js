@@ -464,16 +464,16 @@ class FutApp {
 
   getPlayStyleIcon(ps) {
     const map = {
-      finesse: '🎯',
-      power_shot: '💥',
-      rapid: '⚡',
-      incisive: '🪄',
-      anticipate: '🛡️',
-      acrobatic: '🧤',
-      leader: '👑',
-      trivela: '🌀'
+      finesse: '<i data-lucide="crosshair" class="w-[0.75em] h-[0.75em] inline"></i>',
+      power_shot: '<i data-lucide="flame" class="w-[0.75em] h-[0.75em] inline"></i>',
+      rapid: '<i data-lucide="zap" class="w-[0.75em] h-[0.75em] inline"></i>',
+      incisive: '<i data-lucide="wand-2" class="w-[0.75em] h-[0.75em] inline"></i>',
+      anticipate: '<i data-lucide="shield" class="w-[0.75em] h-[0.75em] inline"></i>',
+      acrobatic: '<i data-lucide="hand" class="w-[0.75em] h-[0.75em] inline"></i>',
+      leader: '<i data-lucide="crown" class="w-[0.75em] h-[0.75em] inline"></i>',
+      trivela: '<i data-lucide="sparkles" class="w-[0.75em] h-[0.75em] inline"></i>'
     };
-    return map[ps] || '⭐';
+    return map[ps] || '<i data-lucide="star" class="w-[0.75em] h-[0.75em] inline"></i>';
   }
 
   getPlayStyleLabel(ps) {
@@ -490,10 +490,57 @@ class FutApp {
     return map[ps] || 'Estándar';
   }
 
+  getKitColorName(hex) {
+    const map = {
+      '#f0be2a': 'Oro Clásico',
+      '#0ea5e9': 'Azul Eléctrico',
+      '#dc2626': 'Rojo Carmesí',
+      '#f8fafc': 'Blanco Real',
+      '#059669': 'Verde Esmeralda',
+      '#111827': 'Negro Carbón',
+      '#7c3aed': 'Púrpura Real',
+      '#1d1810': 'Obsidiana',
+      '#ffffff': 'Blanco Puro',
+      '#00f0ff': 'Cian Brillante'
+    };
+    return map[(hex || '').toLowerCase()] || 'Personalizado';
+  }
+
+  resolvePlayerKit(player) {
+    const settings = store.getSettings();
+    const hasCustomKit = player?.kitColor && player.kitColor !== 'club';
+    return {
+      primary: hasCustomKit ? player.kitColor : (settings.kitColor || '#f0be2a'),
+      secondary: hasCustomKit ? (player.kitSecondary || settings.kitSecondary || '#111827') : (settings.kitSecondary || '#111827'),
+      collar: player?.kitCollar || 'round',
+      sleeves: player?.kitSleeves || 'short'
+    };
+  }
+
+  renderKitSvg({ primary = '#f0be2a', secondary = '#111827', collar = 'round', sleeves = 'short', cssClass = 'fut-card-kit-svg' } = {}) {
+    const torsoPath = sleeves === 'long'
+      ? 'M14 42 L25 35 C29 38 34 39.5 40 39.5 C46 39.5 51 38 55 35 L66 42 L77 69 L66 72 L60 58 L60 95 L20 95 L20 58 L14 72 L3 69 Z'
+      : 'M14 42 L25 35 C29 38 34 39.5 40 39.5 C46 39.5 51 38 55 35 L66 42 L74 61 L62 65 L60 95 L20 95 L18 65 L6 61 Z';
+    const collarMarkup = collar === 'vneck'
+      ? `<path d="M31 35 L40 47 L49 35" stroke="${secondary}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`
+      : (collar === 'polo'
+        ? `<path d="M31 34 L37 42 L40 39 L43 42 L49 34" fill="${secondary}" opacity="0.9"/>`
+        : `<path d="M33 36 C36 42 44 42 47 36" stroke="${secondary}" stroke-width="2.4" stroke-linecap="round"/>`);
+
+    return `
+      <svg viewBox="0 0 80 95" fill="none" xmlns="http://www.w3.org/2000/svg" class="${cssClass}">
+        <path d="M40 7 C33 7 28 12.5 28 19.5 C28 25.5 33 30.5 40 30.5 C47 30.5 52 25.5 52 19.5 C52 12.5 47 7 40 7 Z" fill="${secondary}" opacity="0.88"/>
+        <path d="M36 29 L44 29 L45 35 L35 35 Z" fill="${secondary}" opacity="0.85"/>
+        <path d="${torsoPath}" fill="${primary}" opacity="0.96"/>
+        ${collarMarkup}
+      </svg>
+    `;
+  }
+
   renderFutCard(player, options = {}) {
     if (!player) return '';
     const {
-      size = 'pitch', // 'pitch', 'bench', 'album', 'walkout', 'inspect'
+      size = 'pitch',
       role = null,
       extraClass = '',
       customStyle = ''
@@ -506,8 +553,8 @@ class FutApp {
     const stats = player.stats || { pac: 80, sho: 80, pas: 80, dri: 80, def: 65, phy: 75 };
     const chemStyle = player.chemStyle || 'HUN';
     const playStyle = player.playStyle || 'finesse';
-    const kitColor = player.kitColor || '#1d1810';
-    const kitSecondary = player.kitSecondary || '#f0be2a';
+    const kit = this.resolvePlayerKit(player);
+    const isLightKit = ['#f8fafc', '#ffffff'].includes((kit.primary || '').toLowerCase());
 
     let sizeClass = 'fut-card-size-pitch';
     if (size === 'album') sizeClass = 'fut-card-size-album';
@@ -525,17 +572,12 @@ class FutApp {
             <span class="fut-card-pos">${displayRole}</span>
             <div class="fut-card-col-divider"></div>
             <span class="fut-card-flag" title="${fac.name}">${fac.icon}</span>
-            <span class="fut-card-club" title="Universidad">🛡️</span>
+            <span class="fut-card-club" title="${store.getSettings().teamName || 'Club'}"><i data-lucide="shield" class="w-[0.75em] h-[0.75em] inline"></i></span>
           </div>
           <div class="fut-card-kit-wrap">
             <div class="fut-card-kit-silhouette">
-              <svg viewBox="0 0 80 95" fill="none" xmlns="http://www.w3.org/2000/svg" class="fut-card-kit-svg">
-                <path d="M40 7 C33 7 28 12.5 28 19.5 C28 25.5 33 30.5 40 30.5 C47 30.5 52 25.5 52 19.5 C52 12.5 47 7 40 7 Z" fill="${kitSecondary}" opacity="0.88"/>
-                <path d="M36 29 L44 29 L45 35 L35 35 Z" fill="${kitSecondary}" opacity="0.85"/>
-                <path d="M14 42 L25 35 C29 38 34 39.5 40 39.5 C46 39.5 51 38 55 35 L66 42 L74 61 L62 65 L60 95 L20 95 L18 65 L6 61 Z" fill="${kitColor}" opacity="0.96"/>
-                <path d="M33 36 L40 44 L47 36" stroke="${kitSecondary}" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-              </svg>
-              <span class="fut-card-dorsal font-fifa" style="color: ${kitColor === '#f8fafc' || kitColor === '#ffffff' ? '#111827' : '#ffffff'};">#${player.number || 10}</span>
+              ${this.renderKitSvg(kit)}
+              <span class="fut-card-dorsal font-fifa" style="color: ${isLightKit ? '#111827' : '#ffffff'}; text-shadow: ${isLightKit ? '0 1px 2px rgba(255,255,255,0.6)' : '0 2px 4px rgba(0,0,0,0.9)'};">#${player.number || 10}</span>
             </div>
           </div>
         </div>
@@ -576,19 +618,16 @@ class FutApp {
           </div>
         </div>
 
-        <div class="fut-card-bottom-badge flex items-center gap-1">
-          <span class="fut-chem-pill">${chemStyle}</span>
-          <span class="text-[0.62em]" title="${this.getPlayStyleLabel(playStyle)}">${this.getPlayStyleIcon(playStyle)}</span>
-        </div>
+        <div class="fut-card-bottom-badge"></div>
       </div>
     `;
   }
 
   updateFirebaseBadge(isConnected) {
-    // Top-left header mantiene exclusivamente el nombre oficial del club FURIA RECTOR FC
+    // Top-left header mantiene exclusivamente el nombre oficial del club
   }
 
-  // ==================== INSPECTOR DE JUGADOR ACTIVO (CAPTURA 1 COURTOIS & CAPTURA 5 ROBBEN) ====================
+  // ==================== INSPECTOR DE JUGADOR ACTIVO ====================
   updatePlayerInspector(player) {
     if (!player) {
       const starting = store.getStartingLineup();
@@ -596,28 +635,23 @@ class FutApp {
     }
     if (!player) return;
 
-    const imgEl = document.getElementById('inspector-player-avatar');
+    const kitWrap = document.getElementById('inspector-player-kit');
     const dorsalEl = document.getElementById('inspector-player-dorsal');
     const posEl = document.getElementById('inspector-player-pos');
     const nameEl = document.getElementById('inspector-player-name');
     const ratingEl = document.getElementById('inspector-player-rating');
-    const psEl = document.getElementById('inspector-player-playstyle');
-    const chemEl = document.getElementById('inspector-player-chem');
     const starsEl = document.getElementById('inspector-player-stars');
-    
-    if (imgEl) imgEl.src = player.avatar;
+
+    const kit = this.resolvePlayerKit(player);
+    if (kitWrap) kitWrap.style.color = kit.primary;
     if (dorsalEl) dorsalEl.textContent = `#${player.number || 10}`;
     if (posEl) posEl.textContent = player.rolesHierarchy?.best || player.roleBest || 'DC';
     if (nameEl) nameEl.textContent = player.nickname || player.name;
     if (ratingEl) ratingEl.textContent = player.rating;
 
-    const ps = player.playStyle || 'finesse';
-    const chem = player.chemStyle || 'HUN';
     const sm = player.skillMoves || 4;
     const wf = player.weakFoot || 4;
 
-    if (psEl) psEl.textContent = `${this.getPlayStyleIcon(ps)} ${this.getPlayStyleLabel(ps).toUpperCase()}`;
-    if (chemEl) chemEl.textContent = `QUÍMICA: ${chem}`;
     if (starsEl) starsEl.textContent = `FIL: ${sm}★ | PIE: ${wf}★`;
 
     const stats = player.stats || { pac: 80, sho: 80, pas: 80, dri: 80, def: 65, phy: 75 };
@@ -647,7 +681,7 @@ class FutApp {
     const modBadge = document.getElementById('modal-active-modality-badge');
     const settings = store.getSettings();
     if (modBadge) {
-      modBadge.textContent = settings.modality === 'f7' ? 'FUT 7 DRAFT' : 'FUTSAL 5v5';
+      modBadge.textContent = settings.modality === 'f7' ? 'FÚTBOL 7' : 'FÚTBOL SALA';
     }
 
     this.renderFormationsVisualGrid();
@@ -716,7 +750,7 @@ class FutApp {
             </div>
           </div>
           <button type="button" class="fifa-form-btn ${isActive ? 'is-active-btn' : ''}">
-            ${isActive ? '★ ESQUEMA ACTIVO' : '<span class="inline-flex items-center justify-center gap-1"><em class="ps-btn ps-x">✕</em> APLICAR</span>'}
+            ${isActive ? '★ ESQUEMA ACTIVO' : 'APLICAR ESQUEMA'}
           </button>
         </div>
       `;
@@ -753,21 +787,30 @@ class FutApp {
     grid.innerHTML = squads.map(s => {
       const isActive = s.id === activeId;
       const modLabel = s.modality === 'f7' ? 'FÚTBOL 7' : 'FÚTBOL SALA';
+      const starters = (s.startingLineup || []).map(id => store.getPlayerById(id)).filter(Boolean);
+      const liveOvr = starters.length > 0
+        ? Math.round(starters.reduce((acc, p) => acc + (p.rating || 75), 0) / starters.length)
+        : (s.rating || 80);
       const startersCount = s.startingLineup?.length || (s.modality === 'f7' ? 7 : 5);
       const benchCount = s.benchPlayers?.length || 0;
+      const startersLabel = startersCount === 1 ? 'Titular' : 'Titulares';
+      const benchLabel = benchCount === 1 ? 'Suplente' : 'Suplentes';
 
       return `
         <div class="fifa-squad-card ${isActive ? 'is-active' : ''}" data-squad-id="${s.id}">
-          <div class="flex items-start justify-between">
+          <div class="flex items-start justify-between gap-2">
             <div>
               <span class="fifa-squad-modality font-fifa">${modLabel}</span>
               <h3 class="fifa-squad-name font-fifa">${s.name}</h3>
             </div>
-            <div class="fifa-squad-ovr font-fifa">${s.rating || 84} <small>OVR</small></div>
+            <div class="flex items-center gap-2">
+              <div class="fifa-squad-ovr font-fifa">${liveOvr} <small>MED</small></div>
+              ${squads.length > 1 ? `<button type="button" class="btn-delete-squad p-1 text-slate-400 hover:text-rose-400 border border-white/10 hover:border-rose-400/50 transition cursor-pointer" data-delete-squad="${s.id}" title="Eliminar plantilla"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
+            </div>
           </div>
           <div class="fifa-squad-meta-row">
             <span><i data-lucide="shield" class="w-3 h-3 inline text-amber-400"></i> Esquema: <b>${s.formation}</b></span>
-            <span><i data-lucide="users" class="w-3 h-3 inline text-cyan-400"></i> ${startersCount} Titulares · ${benchCount} Suplentes</span>
+            <span><i data-lucide="users" class="w-3 h-3 inline text-cyan-400"></i> ${startersCount} ${startersLabel} · ${benchCount} ${benchLabel}</span>
           </div>
           <button type="button" class="fifa-squad-btn ${isActive ? 'is-active-btn' : ''}">
             ${isActive ? '★ PLANTILLA ACTIVA' : 'ACTIVAR PLANTILLA'}
@@ -776,8 +819,29 @@ class FutApp {
       `;
     }).join('');
 
+    grid.querySelectorAll('.btn-delete-squad').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const squadId = btn.dataset.deleteSquad;
+        const target = squads.find(sq => sq.id === squadId);
+        this.openConfirmModal({
+          title: 'Eliminar Plantilla',
+          message: `¿Seguro que quieres eliminar la plantilla "${target?.name || ''}"?`,
+          confirmLabel: 'Eliminar',
+          onConfirm: () => {
+            if (store.deleteSquad(squadId)) {
+              this.renderSquadsVisualGrid();
+              this.renderPitch();
+              this.showToast('Plantilla eliminada', 'trash-2');
+            }
+          }
+        });
+      });
+    });
+
     grid.querySelectorAll('.fifa-squad-card').forEach(card => {
       card.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-delete-squad')) return;
         e.stopPropagation();
         const squadId = card.dataset.squadId;
         this.selectSquad(squadId);
@@ -798,17 +862,17 @@ class FutApp {
     this.renderSquadsVisualGrid();
     this.renderFormationsVisualGrid();
     futAudio.playSuccess();
-    this.showToast(`¡Plantilla activa: ${currentSquad.name}!`, 'sparkles');
+    this.showToast(`Plantilla activa: ${currentSquad.name}`, 'sparkles');
   }
 
   saveCurrentSquadPrompt() {
-    const name = prompt('Nombre para la nueva plantilla guardada:', `Plantilla Furia ${Date.now().toString().slice(-4)}`);
-    if (!name || !name.trim()) return;
-
-    const squad = store.saveCurrentAsSquad(name.trim());
-    this.renderSquadsVisualGrid();
-    futAudio.playSuccess();
-    this.showToast(`¡Nueva plantilla "${squad.name}" guardada y activada!`, 'sparkles');
+    const dlg = document.getElementById('squad-create-dialog');
+    const inp = document.getElementById('squad-create-name');
+    if (!dlg || !inp) return;
+    const isF7 = store.getSettings().modality === 'f7';
+    inp.value = `${isF7 ? 'Once F7' : 'Quinteto Sala'} · ${store.getActiveFormation()}`;
+    dlg.showModal();
+    inp.select();
   }
 
   cancelSelection() {
@@ -977,12 +1041,25 @@ class FutApp {
       });
     }
 
-    // Especialistas a balón parado
-    ['captain', 'penalties', 'freekicks', 'corners'].forEach(role => {
-      document.getElementById(`spec-${role}`)?.addEventListener('change', (e) => {
-        store.setSpecialist(role, e.target.value);
-        futAudio.playSuccess();
-        this.showToast('Especialista actualizado', 'crown');
+    // Especialistas a balón parado (Panel C y Mi Club sincronizados)
+    const specKeyMap = {
+      captain: 'captain',
+      penalties: 'penalties',
+      freekicks: 'freeKicks',
+      corners: 'corners'
+    };
+    Object.keys(specKeyMap).forEach(role => {
+      document.querySelectorAll(`[data-spec="${role}"]`).forEach(sel => {
+        sel.addEventListener('change', (e) => {
+          const val = e.target.value;
+          store.setSpecialist(specKeyMap[role], val);
+          document.querySelectorAll(`[data-spec="${role}"]`).forEach(other => {
+            if (other !== e.target) other.value = val;
+          });
+          this.renderPitch();
+          futAudio.playSuccess();
+          this.showToast('Especialista actualizado', 'crown');
+        });
       });
     });
 
@@ -1291,11 +1368,37 @@ class FutApp {
     if (chanceSel) chanceSel.value = tactics.chanceCreation || 'forward_runs';
   }
 
+  openConfirmModal({ title = 'Confirmar Acción', message = '', confirmLabel = 'Confirmar', onConfirm = null } = {}) {
+    const dlg = document.getElementById('confirm-action-dialog');
+    if (!dlg) return;
+    const titleEl = document.getElementById('confirm-action-title');
+    const msgEl = document.getElementById('confirm-action-message');
+    const acceptBtn = document.getElementById('btn-accept-confirm-action');
+    if (titleEl) titleEl.textContent = title;
+    if (msgEl) msgEl.textContent = message;
+    if (acceptBtn) {
+      acceptBtn.textContent = confirmLabel;
+      this._pendingConfirmCallback = onConfirm;
+    }
+    dlg.showModal();
+  }
+
   setupModals() {
     const setupBackdropDismiss = (dialog) => {
       if (!dialog) return;
+      let pointerStartedOutside = false;
+      const isPointInsideDialog = (e) => {
+        const rect = dialog.getBoundingClientRect();
+        return e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+      };
+      dialog.addEventListener('pointerdown', (e) => {
+        pointerStartedOutside = !isPointInsideDialog(e);
+      });
       dialog.addEventListener('click', (e) => {
-        if (e.target === dialog) dialog.close();
+        if (pointerStartedOutside && !isPointInsideDialog(e)) {
+          dialog.close();
+        }
+        pointerStartedOutside = false;
       });
     };
 
@@ -1330,6 +1433,35 @@ class FutApp {
     // Modal Centro Táctico
     const squadDialog = document.getElementById('squad-actions-dialog');
     setupBackdropDismiss(squadDialog);
+
+    // Modal Crear Plantilla
+    const squadCreateDialog = document.getElementById('squad-create-dialog');
+    document.getElementById('btn-close-squad-create')?.addEventListener('click', () => squadCreateDialog.close());
+    document.getElementById('btn-cancel-squad-create')?.addEventListener('click', () => squadCreateDialog.close());
+    setupBackdropDismiss(squadCreateDialog);
+    document.getElementById('form-squad-create')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const inp = document.getElementById('squad-create-name');
+      const name = inp?.value?.trim();
+      if (!name) return;
+      const squad = store.saveCurrentAsSquad(name);
+      squadCreateDialog.close();
+      this.renderSquadsVisualGrid();
+      futAudio.playSuccess();
+      this.showToast(`Plantilla "${squad.name}" guardada y activada`, 'sparkles');
+    });
+
+    // Modal Confirmación
+    const confirmDialog = document.getElementById('confirm-action-dialog');
+    document.getElementById('btn-close-confirm-action')?.addEventListener('click', () => confirmDialog.close());
+    document.getElementById('btn-cancel-confirm-action')?.addEventListener('click', () => confirmDialog.close());
+    document.getElementById('btn-accept-confirm-action')?.addEventListener('click', () => {
+      const cb = this._pendingConfirmCallback;
+      this._pendingConfirmCallback = null;
+      confirmDialog.close();
+      if (typeof cb === 'function') cb();
+    });
+    setupBackdropDismiss(confirmDialog);
 
     document.getElementById('btn-open-create-card')?.addEventListener('click', () => {
       const user = authService.getCurrentUser() || {
@@ -1599,9 +1731,10 @@ class FutApp {
       });
     });
 
-    // 2. Ficha de Jugador FIFA (Personalización completa: kit, playstyles, filigranas, roles, atributos)
+    // 2. Ficha de Jugador FIFA (Personalización de perfil, habilidades, roles y atributos)
     document.getElementById('form-setup-card')?.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const clubSettings = store.getSettings();
 
       const cardData = {
         avatar: document.getElementById('setup-avatar-url')?.value || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
@@ -1610,15 +1743,13 @@ class FutApp {
         faculty: document.getElementById('setup-faculty').value,
         preferredFoot: document.getElementById('setup-foot').value,
         cardType: document.getElementById('setup-card-type')?.value || 'gold',
-        kitColor: document.getElementById('setup-kit-primary')?.value || '#f0be2a',
-        kitSecondary: document.getElementById('setup-kit-secondary')?.value || '#111827',
-        kitCollar: document.getElementById('setup-kit-collar')?.value || 'round',
-        kitSleeves: document.getElementById('setup-kit-sleeves')?.value || 'short',
-        playStyle: document.getElementById('setup-playstyle')?.value || 'finesse',
+        kitColor: clubSettings.kitColor || '#f0be2a',
+        kitSecondary: clubSettings.kitSecondary || '#111827',
+        kitCollar: 'round',
+        kitSleeves: 'short',
         celebration: document.getElementById('setup-celebration')?.value || 'siuuu',
         skillMoves: parseInt(document.getElementById('setup-skill-moves')?.value, 10) || 4,
         weakFoot: parseInt(document.getElementById('setup-weak-foot')?.value, 10) || 4,
-        chemStyle: document.getElementById('setup-chem-style')?.value || 'HUN',
         roleBest: document.getElementById('setup-role-best').value,
         roleSecond: document.getElementById('setup-role-second').value,
         roleThird: document.getElementById('setup-role-third').value,
@@ -1640,7 +1771,7 @@ class FutApp {
           this.triggerWalkout(newPlayer);
         }
       } catch (err) {
-        alert(err.message);
+        this.showToast(err.message || 'No se pudo guardar la carta', 'alert-triangle');
       }
     });
 
@@ -1694,6 +1825,7 @@ class FutApp {
     // 5. Configuración y Personalización Integral del Club
     document.getElementById('form-team-settings')?.addEventListener('submit', (e) => {
       e.preventDefault();
+      const prev = store.getSettings();
       const teamName = document.getElementById('set-team-name')?.value || 'Furia Rector FC';
       const shortName = (document.getElementById('set-short-name')?.value || 'FUR').toUpperCase();
       const tournament = document.getElementById('set-tournament-name')?.value || 'Torneo del Rector 2026';
@@ -1701,14 +1833,12 @@ class FutApp {
       const crest = document.getElementById('set-club-crest')?.value || 'shield_gold';
       const kitColor = document.getElementById('set-kit-primary')?.value || '#f8fafc';
       const kitSecondary = document.getElementById('set-kit-secondary')?.value || '#f0be2a';
-      const stadium = document.getElementById('set-club-stadium')?.value || 'campus_sur';
-      const ball = document.getElementById('set-club-ball')?.value || 'nike_flight';
 
       const specialists = {
-        captain: document.getElementById('spec-captain')?.value || 'p4',
-        penalties: document.getElementById('spec-penalties')?.value || 'p6',
-        freeKicks: document.getElementById('spec-freekicks')?.value || 'p5',
-        corners: document.getElementById('spec-corners')?.value || 'p4'
+        captain: document.getElementById('club-spec-captain')?.value || document.getElementById('spec-captain')?.value || 'p4',
+        penalties: document.getElementById('club-spec-penalties')?.value || document.getElementById('spec-penalties')?.value || 'p6',
+        freeKicks: document.getElementById('club-spec-freekicks')?.value || document.getElementById('spec-freekicks')?.value || 'p5',
+        corners: document.getElementById('club-spec-corners')?.value || document.getElementById('spec-corners')?.value || 'p4'
       };
 
       store.updateSettings({
@@ -1719,8 +1849,8 @@ class FutApp {
         crest,
         kitColor,
         kitSecondary,
-        stadium,
-        ball,
+        stadium: prev.stadium || 'campus_sur',
+        ball: prev.ball || 'nike_flight',
         specialists
       });
 
@@ -1733,19 +1863,15 @@ class FutApp {
       this.showToast('Personalización del Club guardada con éxito', 'award');
     });
 
-    // Escuchadores en tiempo real para la paleta de colores de la equipación
+    // Escuchadores en tiempo real para el código de color de la equipación
     document.getElementById('set-kit-primary')?.addEventListener('input', (e) => {
       const hex = document.getElementById('kit-primary-hex');
       if (hex) hex.textContent = e.target.value;
-      const sec = document.getElementById('set-kit-secondary')?.value || '#f0be2a';
-      this.updateKitPreview(e.target.value, sec);
     });
 
     document.getElementById('set-kit-secondary')?.addEventListener('input', (e) => {
       const hex = document.getElementById('kit-secondary-hex');
       if (hex) hex.textContent = e.target.value;
-      const prim = document.getElementById('set-kit-primary')?.value || '#f8fafc';
-      this.updateKitPreview(prim, e.target.value);
     });
 
     // 6. Formulario Firebase
@@ -1761,10 +1887,15 @@ class FutApp {
     });
 
     document.getElementById('btn-reset-data')?.addEventListener('click', () => {
-      if (confirm('¿Restablecer datos de prueba?')) {
-        store.resetToDefault();
-        this.showToast('Datos de prueba restablecidos', 'repeat');
-      }
+      this.openConfirmModal({
+        title: 'Restablecer Datos del Club',
+        message: 'Se restaurará la plantilla y el calendario iniciales. ¿Deseas continuar?',
+        confirmLabel: 'Restablecer',
+        onConfirm: () => {
+          store.resetToDefault();
+          this.showToast('Datos restablecidos', 'repeat');
+        }
+      });
     });
   }
 
@@ -1786,48 +1917,30 @@ class FutApp {
     const titleEl = document.getElementById('setup-title');
     const submitBtn = document.querySelector('#form-setup-card button[type="submit"]');
 
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    };
+
+    const statusBadge = document.getElementById('setup-status-badge');
+
     if (existing) {
       if (titleEl) titleEl.textContent = 'Editar mi Carta FUT Oficial';
       if (submitBtn) submitBtn.textContent = 'Guardar Cambios de mi Carta';
-      document.getElementById('setup-nickname').value = existing.nickname || (user.name ? user.name.split(' ')[0] : 'Crack');
-      document.getElementById('setup-number').value = existing.number || 10;
-      document.getElementById('setup-faculty').value = existing.faculty || 'inf';
-      document.getElementById('setup-foot').value = existing.preferredFoot || 'Diestro';
-      if (document.getElementById('setup-card-type')) {
-        document.getElementById('setup-card-type').value = existing.cardType || 'gold';
-      }
-      if (document.getElementById('setup-kit-primary')) {
-        document.getElementById('setup-kit-primary').value = existing.kitColor || '#f0be2a';
-      }
-      if (document.getElementById('setup-kit-secondary')) {
-        document.getElementById('setup-kit-secondary').value = existing.kitSecondary || '#111827';
-      }
-      if (document.getElementById('setup-kit-collar')) {
-        document.getElementById('setup-kit-collar').value = existing.kitCollar || 'round';
-      }
-      if (document.getElementById('setup-kit-sleeves')) {
-        document.getElementById('setup-kit-sleeves').value = existing.kitSleeves || 'short';
-      }
-      if (document.getElementById('setup-playstyle')) {
-        document.getElementById('setup-playstyle').value = existing.playStyle || 'finesse';
-      }
-      if (document.getElementById('setup-celebration')) {
-        document.getElementById('setup-celebration').value = existing.celebration || 'siuuu';
-      }
-      if (document.getElementById('setup-skill-moves')) {
-        document.getElementById('setup-skill-moves').value = existing.skillMoves || 4;
-      }
-      if (document.getElementById('setup-weak-foot')) {
-        document.getElementById('setup-weak-foot').value = existing.weakFoot || 4;
-      }
-      if (document.getElementById('setup-chem-style')) {
-        document.getElementById('setup-chem-style').value = existing.chemStyle || 'HUN';
-      }
+      if (statusBadge) statusBadge.textContent = 'EDITANDO FICHA';
+      setVal('setup-nickname', existing.nickname || (user.name ? user.name.split(' ')[0] : 'Crack'));
+      setVal('setup-number', existing.number || 10);
+      setVal('setup-faculty', existing.faculty || 'inf');
+      setVal('setup-foot', existing.preferredFoot || 'Diestro');
+      setVal('setup-card-type', existing.cardType || 'gold');
+      setVal('setup-celebration', existing.celebration || 'siuuu');
+      setVal('setup-skill-moves', existing.skillMoves || 4);
+      setVal('setup-weak-foot', existing.weakFoot || 4);
       if (existing.rolesHierarchy) {
-        document.getElementById('setup-role-best').value = existing.rolesHierarchy.best || 'DC';
-        document.getElementById('setup-role-second').value = existing.rolesHierarchy.second || 'MC';
-        document.getElementById('setup-role-third').value = existing.rolesHierarchy.third || 'DFC';
-        document.getElementById('setup-role-worst').value = existing.rolesHierarchy.worst || 'POR';
+        setVal('setup-role-best', existing.rolesHierarchy.best || 'DC');
+        setVal('setup-role-second', existing.rolesHierarchy.second || 'MC');
+        setVal('setup-role-third', existing.rolesHierarchy.third || 'DFC');
+        setVal('setup-role-worst', existing.rolesHierarchy.worst || 'POR');
       }
       this.setupStatsTestForUser(existing);
       const avatarUrl = existing.avatar || user.photoURL;
@@ -1838,10 +1951,19 @@ class FutApp {
     } else {
       if (titleEl) titleEl.textContent = 'Crea tu Carta FIFA Ultimate Team';
       if (submitBtn) submitBtn.textContent = 'Guardar y Generar mi Carta FUT';
-      document.getElementById('setup-nickname').value = user.name ? user.name.split(' ')[0] : 'Crack';
-      if (document.getElementById('setup-card-type')) {
-        document.getElementById('setup-card-type').value = 'gold';
-      }
+      if (statusBadge) statusBadge.textContent = 'NUEVO FICHAJE';
+      setVal('setup-nickname', user.name ? user.name.split(' ')[0] : 'Crack');
+      setVal('setup-number', 10);
+      setVal('setup-faculty', 'inf');
+      setVal('setup-foot', 'Diestro');
+      setVal('setup-card-type', 'gold');
+      setVal('setup-celebration', 'siuuu');
+      setVal('setup-skill-moves', 4);
+      setVal('setup-weak-foot', 4);
+      setVal('setup-role-best', 'DC');
+      setVal('setup-role-second', 'MC');
+      setVal('setup-role-third', 'DFC');
+      setVal('setup-role-worst', 'POR');
       this.setupStatsTestForUser(null);
       const avatarUrl = user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
       const imgEl = document.getElementById('setup-user-avatar');
@@ -2049,7 +2171,7 @@ class FutApp {
             <span class="text-[11px] font-black ${tier.textClass} uppercase tracking-wide block">
               ${activeTierObj.label} · ${val} Puntos
             </span>
-            <p class="text-xs text-slate-700 font-medium leading-relaxed">
+            <p class="text-xs text-slate-200 font-medium leading-relaxed">
               ${activeTierObj.desc}
             </p>
           </div>
@@ -2256,10 +2378,15 @@ class FutApp {
   }
 
   deleteMatch(id) {
-    if (confirm('¿Eliminar este partido del calendario?')) {
-      store.deleteMatch(id);
-      this.showToast('Partido eliminado', 'trash-2');
-    }
+    this.openConfirmModal({
+      title: 'Eliminar Partido',
+      message: '¿Seguro que deseas eliminar este partido del calendario?',
+      confirmLabel: 'Eliminar',
+      onConfirm: () => {
+        store.deleteMatch(id);
+        this.showToast('Partido eliminado', 'trash-2');
+      }
+    });
   }
 
   switchTab(tabId) {
@@ -2414,15 +2541,16 @@ class FutApp {
     const startersEl = document.getElementById('hud-team-starters');
     if (startersEl) startersEl.textContent = startingPlayers.length;
     
-    const starsEl = document.querySelector('.fut-stars');
+    const starsEl = document.getElementById('hud-team-stars') || document.querySelector('.fut-stars');
     if (starsEl) {
       const r = chemRatingData.rating;
-      starsEl.textContent = r >= 85 ? '★★★★★' : (r >= 80 ? '★★★★½' : '★★★★☆');
+      starsEl.textContent = r >= 86 ? '★★★★★' : (r >= 82 ? '★★★★½' : (r >= 78 ? '★★★★' : '★★★½'));
     }
 
     const modBadge = document.getElementById('current-modality-badge');
     if (modBadge) {
-      modBadge.textContent = isF7 ? 'FUT 7 DRAFT' : 'FUTSAL DRAFT';
+      const modPrefix = isF7 ? 'FÚTBOL 7' : 'FÚTBOL SALA';
+      modBadge.textContent = `${modPrefix} · ${formationConfig.short || activeFormation}`;
     }
 
     const projected = formationConfig.slots.map(s => this.projectSlot(s));
@@ -2504,6 +2632,15 @@ class FutApp {
         `;
       }
 
+      const isCaptain = settings.specialists?.captain === player.id;
+      const rh = player.rolesHierarchy || {};
+      const fitClass = rh.best === slot.role
+        ? 'is-fit-best'
+        : ((rh.second === slot.role || rh.third === slot.role) ? 'is-fit-alt' : 'is-fit-poor');
+      const fitTitle = fitClass === 'is-fit-best'
+        ? `Posición ideal (${slot.role})`
+        : (fitClass === 'is-fit-alt' ? `Posición secundaria (${slot.role})` : `Fuera de posición natural (prefiere ${rh.best || 'DC'})`);
+
       return `
         <div class="fut-card-slot ${isSelected ? 'swap-active is-selected-cursor' : ''}" 
              style="${slotStyle}"
@@ -2515,7 +2652,8 @@ class FutApp {
           ${isSelected ? `<div class="fifa-player-cursor font-fifa" title="Jugador Activo">▼</div>` : ''}
           ${this.renderFutCard(player, { size: 'pitch', role: slot.role })}
 
-          <div class="fut-pos-pedestal">
+          <div class="fut-pos-pedestal ${fitClass}" title="${fitTitle}">
+            ${isCaptain ? '<span class="fut-cap-tag" title="Capitán">C</span>' : ''}
             <span>${slot.role}</span>
           </div>
 
@@ -2542,6 +2680,8 @@ class FutApp {
 
     const sideBenchCount = document.getElementById('side-bench-count');
     if (sideBenchCount) sideBenchCount.textContent = bench.length;
+    const sideBenchLabel = document.getElementById('side-bench-label');
+    if (sideBenchLabel) sideBenchLabel.textContent = bench.length === 1 ? 'SUPLENTE' : 'SUPLENTES';
 
     if (bench.length === 0) {
       benchContainer.innerHTML = `
@@ -2576,10 +2716,10 @@ class FutApp {
     const baseScale = isMobile ? 0.78 : 0.84;
     const scale = +(baseScale + 0.16 * t).toFixed(3);
 
-    // Mapeo vertical calibrado con 4 franjas limpias para que NUNCA exista solapamiento
-    let mappedTop = 13 + t * 70;
-    if (slot.role === 'POR') mappedTop = 83.5;
-    else if (slot.role === 'DC' || slot.role === 'PIV') mappedTop = 14.0;
+    // Mapeo vertical calibrado con margen superior/inferior limpio para no cortar dorsales ni pedestales
+    let mappedTop = 18.5 + t * 63;
+    if (slot.role === 'POR') mappedTop = 81.5;
+    else if (slot.role === 'DC' || slot.role === 'PIV') mappedTop = 18.5;
 
     return {
       top: +mappedTop.toFixed(1),
@@ -2661,6 +2801,22 @@ class FutApp {
         [0, 2],
         [1, 2], [2, 3],
         [1, 4], [2, 4], [3, 4]
+      ],
+      '1-4-0': [
+        [0, 2], [0, 3],
+        [1, 2], [2, 3], [3, 4]
+      ],
+      '1-2-1-1': [
+        [0, 1], [0, 2],
+        [1, 2],
+        [1, 3], [2, 3],
+        [3, 4]
+      ],
+      '1-1-1-2': [
+        [0, 1],
+        [1, 2],
+        [2, 3], [2, 4],
+        [3, 4]
       ]
     };
 
@@ -2780,6 +2936,8 @@ class FutApp {
 
     const sideBenchCount = document.getElementById('side-bench-count');
     if (sideBenchCount) sideBenchCount.textContent = bench.length;
+    const sideBenchLabel = document.getElementById('side-bench-label');
+    if (sideBenchLabel) sideBenchLabel.textContent = bench.length === 1 ? 'SUPLENTE' : 'SUPLENTES';
 
     if (bench.length === 0) {
       list.innerHTML = `<div class="text-xs text-slate-400 col-span-full py-4 text-center font-bold">No hay suplentes disponibles en el banquillo. ¡Añade más fichajes al club!</div>`;
@@ -2963,7 +3121,7 @@ class FutApp {
     posStep.classList.add('hidden');
     cardStep.classList.add('hidden');
 
-    document.getElementById('walkout-crest-icon').textContent = fac.icon;
+    document.getElementById('walkout-crest-icon').innerHTML = fac.icon;
     document.getElementById('walkout-crest-name').textContent = fac.name.toUpperCase();
     document.getElementById('walkout-pos-pill').textContent = player.rolesHierarchy ? player.rolesHierarchy.best : 'DC';
 
@@ -3115,12 +3273,21 @@ class FutApp {
     const content = document.getElementById('inspect-card-content');
     if (!content) return;
 
-    const ps = p.playStyle || 'finesse';
-    const chem = p.chemStyle || 'HUN';
     const sm = p.skillMoves || 4;
     const wf = p.weakFoot || 4;
-    const celeb = p.celebration || 'siuuu';
-    const kitColor = p.kitColor || '#f0be2a';
+    const celebMap = {
+      siuuu: 'SIUUU',
+      calma: 'Calma',
+      samba: 'Samba Brasileña',
+      corazon: 'Corazón',
+      robot: 'El Robot',
+      desliz: 'Deslizamiento',
+      cielo: 'Señalar al cielo',
+      dormido: 'Night Night'
+    };
+    const kit = this.resolvePlayerKit(p);
+    const kitDesc = `${this.getKitColorName(kit.primary)} · Dorsal #${p.number || 10}`;
+    const starBar = (n) => `<span class="text-amber-400">${'★'.repeat(n)}</span><span class="text-slate-600">${'★'.repeat(Math.max(0, 5 - n))}</span>`;
 
     content.innerHTML = `
       <div class="flex flex-col sm:flex-row items-center gap-5 bg-slate-900/90 p-4 border border-slate-700/80">
@@ -3130,35 +3297,25 @@ class FutApp {
         <div class="flex-1 space-y-2 text-center sm:text-left w-full">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <h4 class="font-fifa text-3xl font-bold text-white uppercase tracking-wider">${p.name}</h4>
-            <span class="text-xs px-2.5 py-0.5 bg-amber-400 text-slate-950 font-fifa text-base font-black shadow-sm">${p.rating} OVR</span>
+            <span class="text-xs px-2.5 py-0.5 bg-amber-400 text-slate-950 font-fifa text-base font-black shadow-sm">${p.rating} MED</span>
           </div>
-          <p class="text-xs text-slate-400 font-bold">"${p.nickname}" • Dorsal #${p.number} • ${p.preferredFoot}</p>
-          <p class="text-xs text-cyan-400 font-bold">${fac.icon} ${fac.name}</p>
-          
-          <!-- Badges de Personalización FIFA FC 25 -->
-          <div class="flex flex-wrap items-center gap-1.5 pt-1">
-            <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-amber-400/20 text-amber-300 border border-amber-400/40 font-fifa">
-              ${this.getPlayStyleIcon(ps)} PLAYSTYLE: ${this.getPlayStyleLabel(ps)}
-            </span>
-            <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-sky-500/20 text-sky-300 border border-sky-500/40 font-fifa">
-              QUÍMICA: ${chem}
-            </span>
-          </div>
+          <p class="text-xs text-slate-400 font-bold">"${p.nickname}" · Dorsal #${p.number} · ${p.preferredFoot}</p>
+          <p class="text-xs text-cyan-400 font-bold inline-flex items-center gap-1.5">${fac.icon} <span>${fac.name}</span></p>
 
           <div class="grid grid-cols-2 gap-2 pt-1 text-[11px] font-bold text-slate-300">
             <div class="bg-slate-950/80 p-1.5 border border-slate-800">
-              <span class="text-[9px] uppercase text-slate-500 block">Filigranas / Regate:</span>
-              <span class="font-fifa text-amber-400 text-sm">${sm} ★★★★★</span>
+              <span class="text-[9px] uppercase text-slate-500 block">Filigranas / Regate</span>
+              <span class="font-fifa text-amber-400 text-sm">${sm} ${starBar(sm)}</span>
             </div>
             <div class="bg-slate-950/80 p-1.5 border border-slate-800">
-              <span class="text-[9px] uppercase text-slate-500 block">Pierna Mala:</span>
-              <span class="font-fifa text-amber-400 text-sm">${wf} ★★★★★</span>
+              <span class="text-[9px] uppercase text-slate-500 block">Pierna Mala</span>
+              <span class="font-fifa text-amber-400 text-sm">${wf} ${starBar(wf)}</span>
             </div>
           </div>
 
-          <div class="bg-slate-950/80 p-2 border border-slate-800 text-[10px] space-y-0.5">
-            <div><span class="text-slate-500 uppercase font-fifa">Celebración:</span> <span class="text-white font-bold">${celeb.toUpperCase()}</span></div>
-            <div><span class="text-slate-500 uppercase font-fifa">Equipación Club:</span> <span class="inline-block w-3 h-3 align-middle border border-white" style="background-color: ${kitColor};"></span> <span class="text-white font-bold">${kitColor} (${p.kitCollar || 'Redondo'})</span></div>
+          <div class="bg-slate-950/80 p-2 border border-slate-800 text-[10px] space-y-1">
+            <div><span class="text-slate-500 uppercase font-fifa">Celebración:</span> <span class="text-white font-bold">${celebMap[p.celebration] || 'Estándar'}</span></div>
+            <div><span class="text-slate-500 uppercase font-fifa">Color Principal:</span> <span class="text-white font-bold">${kitDesc}</span></div>
           </div>
         </div>
       </div>
@@ -3213,11 +3370,18 @@ class FutApp {
 
   deletePlayer(playerId) {
     const p = store.getPlayerById(playerId);
-    if (confirm(`¿Eliminar al jugador ${p?.name || ''} de la plantilla?`)) {
-      store.deletePlayer(playerId);
-      document.getElementById('player-inspect-dialog')?.close();
-      this.showToast('Jugador eliminado', 'trash-2');
-    }
+    this.openConfirmModal({
+      title: 'Eliminar Jugador',
+      message: `¿Seguro que deseas retirar la ficha de ${p?.name || 'este jugador'} de la plantilla?`,
+      confirmLabel: 'Eliminar',
+      onConfirm: () => {
+        store.deletePlayer(playerId);
+        document.getElementById('player-inspect-dialog')?.close();
+        this.renderPitch();
+        this.renderAlbumCards();
+        this.showToast('Jugador eliminado', 'trash-2');
+      }
+    });
   }
 
   renderStatBar(label, value) {
@@ -3236,6 +3400,23 @@ class FutApp {
   }
 
   // ==================== PARTIDOS & ASISTENCIA BROADCAST EA SPORTS ====================
+  getClubCrestSvg(crestId, sizeClass = 'w-9 h-9') {
+    const palette = {
+      shield_gold: { bg: '#f0be2a', fg: '#0f172a', icon: 'shield' },
+      crest_leones: { bg: '#ea580c', fg: '#ffffff', icon: 'crown' },
+      crest_rayo: { bg: '#0ea5e9', fg: '#ffffff', icon: 'zap' },
+      crest_lobos: { bg: '#64748b', fg: '#f8fafc', icon: 'compass' },
+      crest_dragones: { bg: '#10b981', fg: '#064e3b', icon: 'flame' },
+      crest_aguilas: { bg: '#eab308', fg: '#1e1b4b', icon: 'award' }
+    };
+    const cfg = palette[crestId] || palette.shield_gold;
+    return `
+      <span class="${sizeClass} inline-flex items-center justify-center rounded-sm border border-white/20" style="background:${cfg.bg}; color:${cfg.fg};">
+        <i data-lucide="${cfg.icon}" class="w-5 h-5"></i>
+      </span>
+    `;
+  }
+
   renderMatches() {
     const container = document.getElementById('matches-container');
     const details = document.getElementById('next-match-details');
@@ -3245,38 +3426,41 @@ class FutApp {
     const nextMatch = store.getNextMatch();
     const settings = store.getSettings();
     const players = store.getPlayers();
+    const liveHomeOvr = store.calculateTeamChemistryAndRating().rating || '--';
 
-    const crestMap = {
-      shield_gold: '🛡️',
-      crest_leones: '🦁',
-      crest_rayo: '⚡',
-      crest_lobos: '🐺',
-      crest_dragones: '🐉',
-      crest_aguilas: '🦅'
-    };
-
-    const homeCrest = crestMap[settings.crest] || '🛡️';
     const homeCrestEl = document.getElementById('featured-home-crest');
-    if (homeCrestEl) homeCrestEl.textContent = homeCrest;
+    if (homeCrestEl) homeCrestEl.innerHTML = this.getClubCrestSvg(settings.crest || 'shield_gold', 'w-12 h-12');
 
     const homeNameEl = document.getElementById('featured-home-name');
     if (homeNameEl) homeNameEl.textContent = settings.teamName || 'FURIA RECTOR FC';
 
+    const homeOvrEl = document.getElementById('featured-home-ovr');
+    if (homeOvrEl) homeOvrEl.textContent = liveHomeOvr;
+
+    const tournamentEl = document.getElementById('featured-match-tournament');
     const awayNameEl = document.getElementById('featured-away-name');
     const awayCrestEl = document.getElementById('featured-away-crest');
+    const awayMetaEl = document.getElementById('featured-away-meta-lbl');
     const timeChipEl = document.getElementById('next-match-time-chip');
     const statusBadgeEl = document.getElementById('featured-match-status-badge');
 
     if (nextMatch) {
+      if (tournamentEl) tournamentEl.textContent = (nextMatch.tournament || settings.tournament || 'TORNEO DEL RECTOR').toUpperCase();
       if (awayNameEl) awayNameEl.textContent = nextMatch.rival;
-      if (awayCrestEl) awayCrestEl.textContent = nextMatch.rival?.includes('Ingenier') ? '🦁' : (nextMatch.rival?.includes('Medicin') ? '⚡' : '🐺');
+      if (awayCrestEl) {
+        const rivalKey = nextMatch.rival?.toLowerCase().includes('medicin')
+          ? 'crest_rayo'
+          : (nextMatch.rival?.toLowerCase().includes('ingenier') ? 'crest_leones' : 'crest_lobos');
+        awayCrestEl.innerHTML = this.getClubCrestSvg(rivalKey, 'w-12 h-12');
+      }
+      if (awayMetaEl) awayMetaEl.textContent = nextMatch.modality === 'f7' ? 'FÚTBOL 7' : 'FÚTBOL SALA';
       if (timeChipEl) timeChipEl.textContent = `${nextMatch.time} H`;
       if (details) {
         details.innerHTML = `
-          <span>📅 ${nextMatch.date} a las ${nextMatch.time}h</span>
-          <span class="mx-1.5 opacity-60">•</span>
-          <span>📍 ${nextMatch.field}</span>
-          <span class="mx-1.5 opacity-60">•</span>
+          <span class="inline-flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-400"></i> ${nextMatch.date} · ${nextMatch.time}h</span>
+          <span class="mx-1.5 opacity-50">•</span>
+          <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-400"></i> ${nextMatch.field}</span>
+          <span class="mx-1.5 opacity-50">•</span>
           <span class="text-amber-400 font-bold">${nextMatch.modality === 'f7' ? 'FÚTBOL 7' : 'FÚTBOL SALA'}</span>
         `;
       }
@@ -3284,17 +3468,15 @@ class FutApp {
         statusBadgeEl.textContent = nextMatch.status === 'finalizado' ? 'PARTIDO FINALIZADO' : 'CONVOCATORIA OFICIAL ABIERTA';
       }
 
-      // Comprobar voto de asistencia del usuario
       const user = authService.getCurrentUser();
-      const userId = user ? (user.playerId || user.uid) : 'p4';
-      const userVote = nextMatch.lineup?.convocatoria ? nextMatch.lineup.convocatoria[userId] : null;
+      const userId = user ? (user.playerId || user.uid) : null;
+      const userVote = (userId && nextMatch.lineup?.convocatoria) ? nextMatch.lineup.convocatoria[userId] : null;
 
       document.querySelectorAll('.fifa-console-vote-btn').forEach(btn => btn.classList.remove('is-voted'));
       if (userVote === 'asistira') document.querySelector('.fifa-vote-yes')?.classList.add('is-voted');
       else if (userVote === 'duda') document.querySelector('.fifa-vote-maybe')?.classList.add('is-voted');
       else if (userVote === 'no_puede') document.querySelector('.fifa-vote-no')?.classList.add('is-voted');
 
-      // Desglose de Convocatoria en 3 Columnas Broadcast
       if (breakdown) {
         const convocatoria = (nextMatch.lineup && nextMatch.lineup.convocatoria) ? nextMatch.lineup.convocatoria : {};
         const confirmed = [];
@@ -3358,17 +3540,24 @@ class FutApp {
         `;
       }
     } else {
-      if (details) details.textContent = 'No hay partidos programados en el calendario';
+      if (tournamentEl) tournamentEl.textContent = (settings.tournament || 'TORNEO DEL RECTOR').toUpperCase();
+      if (awayNameEl) awayNameEl.textContent = 'POR PROGRAMAR';
+      if (awayMetaEl) awayMetaEl.textContent = 'SIN RIVAL ASIGNADO';
+      if (timeChipEl) timeChipEl.textContent = '--:--';
+      if (statusBadgeEl) statusBadgeEl.textContent = 'SIN PARTIDOS PRÓXIMOS';
+      if (details) details.textContent = 'No hay partidos próximos programados en el calendario';
+      if (breakdown) breakdown.innerHTML = '<div class="col-span-3 text-center py-6 text-xs text-slate-400">Programa un nuevo encuentro para abrir la convocatoria oficial del equipo.</div>';
     }
 
-    // Render Calendario de Jornadas
+    // Render Calendario de Jornadas (orden cronológico correcto para numerar jornadas)
     const matches = store.getMatches();
     container.innerHTML = matches.map((m, idx) => {
       const isFinished = m.status === 'finalizado';
+      const jornadaNum = matches.length - idx;
       return `
         <div class="fifa-fixture-tile">
           <div class="fifa-fixture-left">
-            <span class="fifa-fixture-jornada-pill font-fifa">JORNADA ${idx + 1}</span>
+            <span class="fifa-fixture-jornada-pill font-fifa">JORNADA ${jornadaNum}</span>
             <div>
               <div class="fifa-fixture-teams-row">
                 <span class="fifa-fixture-team-name font-fifa">${settings.teamName}</span>
@@ -3379,11 +3568,11 @@ class FutApp {
                 <span class="fifa-fixture-team-name font-fifa">${m.rival}</span>
               </div>
               <div class="fifa-fixture-meta font-fifa">
-                <span>📅 ${m.date} - ${m.time}h</span>
-                <span>📍 ${m.field}</span>
+                <span class="inline-flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3 text-slate-400"></i> ${m.date} · ${m.time}h</span>
+                <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> ${m.field}</span>
                 <span class="text-amber-400">${m.modality === 'f7' ? 'Fútbol 7' : 'Fútbol Sala'}</span>
-                ${m.scorers ? `<span class="text-emerald-400">⚽ ${m.scorers}</span>` : ''}
-                ${isFinished && m.mvp ? `<span class="text-amber-300">★ MVP: ${m.mvp}</span>` : ''}
+                ${m.scorers ? `<span class="text-emerald-400 inline-flex items-center gap-1"><i data-lucide="goal" class="w-3 h-3"></i> ${m.scorers}</span>` : ''}
+                ${isFinished && m.mvp ? `<span class="text-amber-300 inline-flex items-center gap-1"><i data-lucide="star" class="w-3 h-3"></i> MVP: ${m.mvp}</span>` : ''}
               </div>
             </div>
           </div>
@@ -3407,9 +3596,7 @@ class FutApp {
       `;
     }).join('');
 
-    if (window.lucide) {
-      window.lucide.createIcons();
-    }
+    this.refreshIcons();
   }
 
   voteAttendance(status) {
@@ -3428,7 +3615,7 @@ class FutApp {
     const playerId = user.playerId || (store.getPlayers()[0]?.id);
     store.setAttendance(nextMatch.id, playerId, status);
     futAudio.playSelect();
-    const text = status === 'asistira' ? 'Asistencia confirmada ✓' : (status === 'duda' ? 'Marcado como duda ?' : 'Baja confirmada ✕');
+    const text = status === 'asistira' ? 'Asistencia confirmada' : (status === 'duda' ? 'Marcado como duda' : 'Baja confirmada');
     this.showToast(text, status === 'asistira' ? 'check-circle-2' : (status === 'duda' ? 'help-circle' : 'x-circle'));
     this.renderMatches();
   }
@@ -3455,12 +3642,12 @@ class FutApp {
     const setCrest = document.getElementById('set-club-crest');
     if (crestsGrid) {
       const crests = [
-        { id: 'shield_gold', icon: '🛡️', name: 'Furia Rector', subtitle: 'Imperial' },
-        { id: 'crest_leones', icon: '🦁', name: 'Leones UCM', subtitle: 'Politécnica' },
-        { id: 'crest_rayo', icon: '⚡', name: 'Rayo FC', subtitle: 'Medicina' },
-        { id: 'crest_lobos', icon: '🐺', name: 'Lobos Campus', subtitle: 'Ciencias' },
-        { id: 'crest_dragones', icon: '🐉', name: 'Dragones Tech', subtitle: 'Informática' },
-        { id: 'crest_aguilas', icon: '🦅', name: 'Águilas Ley', subtitle: 'Derecho' }
+        { id: 'shield_gold', name: 'Furia Rector', subtitle: 'Imperial' },
+        { id: 'crest_leones', name: 'Leones UCM', subtitle: 'Politécnica' },
+        { id: 'crest_rayo', name: 'Rayo FC', subtitle: 'Medicina' },
+        { id: 'crest_lobos', name: 'Lobos Campus', subtitle: 'Ciencias' },
+        { id: 'crest_dragones', name: 'Dragones Tech', subtitle: 'Informática' },
+        { id: 'crest_aguilas', name: 'Águilas Ley', subtitle: 'Derecho' }
       ];
 
       const activeCrest = settings.crest || 'shield_gold';
@@ -3470,7 +3657,7 @@ class FutApp {
         const isActive = c.id === activeCrest;
         return `
           <div class="fifa-crest-card ${isActive ? 'is-active-crest' : ''}" onclick="window.futApp.selectClubCrest('${c.id}')">
-            <span class="fifa-crest-icon">${c.icon}</span>
+            <span class="fifa-crest-icon">${this.getClubCrestSvg(c.id, 'w-10 h-10')}</span>
             <span class="fifa-crest-name font-fifa">${c.name}</span>
             <span class="fifa-crest-pill font-fifa">${isActive ? '★ ACTIVO' : c.subtitle}</span>
           </div>
@@ -3492,84 +3679,59 @@ class FutApp {
     if (kitSecondary && document.activeElement !== kitSecondary) kitSecondary.value = secondaryColor;
     if (hexSecondary) hexSecondary.textContent = secondaryColor;
 
-    this.updateKitPreview(primaryColor, secondaryColor);
-
-    // 4. Estadios Oficiales
-    const stadiumsList = document.getElementById('club-stadiums-list');
-    const setStadium = document.getElementById('set-club-stadium');
-    if (stadiumsList) {
-      const stadiums = [
-        { id: 'campus_sur', icon: '🏟️', name: 'Estadio Campus Sur', desc: 'Césped Natural Híbrido • Capacidad: 3.500 • Focos LED TV', tag: 'SEDE PRINCIPAL' },
-        { id: 'pabellon_rector', icon: '🏟️', name: 'Pabellón Rector Central', desc: 'Parquet Técnico Pro • Capacidad: 1.800 • Climatizado', tag: 'FUTSAL PRO' },
-        { id: 'arena_poli', icon: '🏟️', name: 'Arena Polideportiva Universitaria', desc: 'Grada Completa 360° • Capacidad: 5.000 • Tifos Ultras', tag: 'ALTO IMPACTO' },
-        { id: 'sintetico_4g', icon: '🏟️', name: 'Campo Césped Sintético 4G', desc: 'Superficie Rápida • Capacidad: 1.200 • Velocidad', tag: 'ALTA VELOCIDAD' }
-      ];
-
-      const activeStadium = settings.stadium || 'campus_sur';
-      if (setStadium) setStadium.value = activeStadium;
-
-      stadiumsList.innerHTML = stadiums.map(s => {
-        const isActive = s.id === activeStadium;
-        return `
-          <div class="fifa-option-item ${isActive ? 'is-active-option' : ''}" onclick="window.futApp.selectClubStadium('${s.id}')">
-            <div class="fifa-option-left">
-              <span class="fifa-option-icon">${s.icon}</span>
-              <div>
-                <span class="fifa-option-name font-fifa">${s.name}</span>
-                <p class="fifa-option-desc font-fifa">${s.desc}</p>
-              </div>
-            </div>
-            <span class="fifa-option-tag font-fifa">${isActive ? '★ LOCAL' : s.tag}</span>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // 5. Balones Oficiales
-    const ballsList = document.getElementById('club-balls-list');
-    const setBall = document.getElementById('set-club-ball');
-    if (ballsList) {
-      const balls = [
-        { id: 'nike_flight', icon: '⚽', name: 'Nike Flight Elite Pro', desc: 'Ranuras moldeadas Aerowsculpt para trayectoria precisa', tag: 'OFICIAL MATCH' },
-        { id: 'adidas_oceaunz', icon: '⚽', name: 'Adidas Oceaunz Pro Competición', desc: 'Superficie termosellada sin costuras con textura Speedshell', tag: 'FIFA QUALITY PRO' },
-        { id: 'puma_orbita', icon: '⚽', name: 'Puma Orbita Serie A FIFA', desc: 'Configuración única de 12 paneles para aerodinámica pura', tag: 'PROFESIONAL' }
-      ];
-
-      const activeBall = settings.ball || 'nike_flight';
-      if (setBall) setBall.value = activeBall;
-
-      ballsList.innerHTML = balls.map(b => {
-        const isActive = b.id === activeBall;
-        return `
-          <div class="fifa-option-item ${isActive ? 'is-active-option' : ''}" onclick="window.futApp.selectClubBall('${b.id}')">
-            <div class="fifa-option-left">
-              <span class="fifa-option-icon">${b.icon}</span>
-              <div>
-                <span class="fifa-option-name font-fifa">${b.name}</span>
-                <p class="fifa-option-desc font-fifa">${b.desc}</p>
-              </div>
-            </div>
-            <span class="fifa-option-tag font-fifa">${isActive ? '★ OFICIAL' : b.tag}</span>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // 6. Especialistas a Balón Parado
+    // 4. Especialistas a Balón Parado + 5. Balance Real
     this.renderSpecialists();
+    this.renderClubPalmares();
+    this.refreshIcons();
   }
 
-  updateKitPreview(primary, secondary) {
-    const previewContainer = document.getElementById('club-kit-preview-silhouette');
-    if (!previewContainer) return;
+  renderClubPalmares() {
+    const container = document.getElementById('club-palmares-content');
+    if (!container) return;
 
-    previewContainer.innerHTML = `
-      <svg viewBox="0 0 80 95" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full filter drop-shadow(0 4px 8px rgba(0,0,0,0.6))">
-        <path d="M40 7 C33 7 28 12.5 28 19.5 C28 25.5 33 30.5 40 30.5 C47 30.5 52 25.5 52 19.5 C52 12.5 47 7 40 7 Z" fill="${secondary}" opacity="0.9"/>
-        <path d="M36 29 L44 29 L45 35 L35 35 Z" fill="${secondary}" opacity="0.85"/>
-        <path d="M14 42 L25 35 C29 38 34 39.5 40 39.5 C46 39.5 51 38 55 35 L66 42 L74 61 L62 65 L60 95 L20 95 L18 65 L6 61 Z" fill="${primary}" opacity="0.98"/>
-        <path d="M33 36 L40 44 L47 36" stroke="${secondary}" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
-      </svg>
+    const stats = store.getStats();
+    const diffStr = stats.diff > 0 ? `+${stats.diff}` : String(stats.diff);
+    const topScorer = stats.topScorers[0];
+    const topAssister = stats.topAssists[0];
+    const teamOvr = store.calculateTeamChemistryAndRating().rating || '--';
+
+    const leaders = [];
+    if (topScorer?.goals > 0) leaders.push(`PICHICHI: #${topScorer.number} ${topScorer.nickname || topScorer.name} (${topScorer.goals})`);
+    if (topAssister?.assists > 0) leaders.push(`ASISTENTE: #${topAssister.number} ${topAssister.nickname || topAssister.name} (${topAssister.assists})`);
+
+    container.innerHTML = `
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div class="fifa-stat-badge">
+          <span class="fifa-stat-badge-num font-fifa">${stats.played}</span>
+          <span class="fifa-stat-badge-lbl font-fifa">PARTIDOS ACTA</span>
+        </div>
+        <div class="fifa-stat-badge">
+          <span class="fifa-stat-badge-num font-fifa text-emerald-400">${stats.won}</span>
+          <span class="fifa-stat-badge-lbl font-fifa">VICTORIAS</span>
+        </div>
+        <div class="fifa-stat-badge">
+          <span class="fifa-stat-badge-num font-fifa text-amber-400">${stats.drawn}</span>
+          <span class="fifa-stat-badge-lbl font-fifa">EMPATES</span>
+        </div>
+        <div class="fifa-stat-badge">
+          <span class="fifa-stat-badge-num font-fifa text-rose-400">${stats.lost}</span>
+          <span class="fifa-stat-badge-lbl font-fifa">DERROTAS</span>
+        </div>
+        <div class="fifa-stat-badge">
+          <span class="fifa-stat-badge-num font-fifa text-cyan-400">${stats.totalGF}</span>
+          <span class="fifa-stat-badge-lbl font-fifa">GOLES A FAVOR</span>
+        </div>
+        <div class="fifa-stat-badge">
+          <span class="fifa-stat-badge-num font-fifa text-purple-400">${diffStr}</span>
+          <span class="fifa-stat-badge-lbl font-fifa">DIFERENCIA</span>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-white/10 flex flex-wrap items-center gap-3">
+        <span class="text-xs font-fifa text-amber-400 uppercase tracking-wider font-bold">LÍDERES DE TEMPORADA (MED ${teamOvr}):</span>
+        ${leaders.length > 0
+          ? leaders.map(m => `<div class="fifa-trophy-pill font-fifa"><i data-lucide="award" class="w-3.5 h-3.5 text-amber-400 inline mr-1"></i>${m}</div>`).join('')
+          : '<span class="text-xs text-slate-400">Registra actas de partido en Jornadas para calcular goleadores y asistentes.</span>'}
+      </div>
     `;
   }
 
@@ -3583,24 +3745,6 @@ class FutApp {
     this.showToast('Escudo oficial actualizado', 'award');
   }
 
-  selectClubStadium(stadiumId) {
-    const setStadium = document.getElementById('set-club-stadium');
-    if (setStadium) setStadium.value = stadiumId;
-    store.updateSettings({ stadium: stadiumId });
-    futAudio.playSelect();
-    this.renderClubHub();
-    this.showToast('Estadio local asignado', 'map-pin');
-  }
-
-  selectClubBall(ballId) {
-    const setBall = document.getElementById('set-club-ball');
-    if (setBall) setBall.value = ballId;
-    store.updateSettings({ ball: ballId });
-    futAudio.playSelect();
-    this.renderClubHub();
-    this.showToast('Balón oficial seleccionado', 'circle-dot');
-  }
-
   renderSpecialists() {
     const settings = store.getSettings();
     const players = store.getPlayers();
@@ -3612,13 +3756,14 @@ class FutApp {
     ];
 
     specs.forEach(spec => {
-      const el = document.getElementById(`spec-${spec.id}`);
-      if (el) {
-        const current = settings.specialists ? settings.specialists[spec.key] : null;
-        el.innerHTML = players.map(p => `
-          <option value="${p.id}" ${p.id === current ? 'selected' : ''}>#${p.number || 10} ${p.nickname || p.name} (${p.rolesHierarchy?.best || 'MC'})</option>
-        `).join('');
-      }
+      const current = settings.specialists ? settings.specialists[spec.key] : null;
+      const optionsMarkup = players.map(p => `
+        <option value="${p.id}" ${p.id === current ? 'selected' : ''}>#${p.number || 10} ${p.nickname || p.name} (${p.rolesHierarchy?.best || 'MC'})</option>
+      `).join('');
+
+      document.querySelectorAll(`[data-spec="${spec.id}"]`).forEach(el => {
+        el.innerHTML = optionsMarkup;
+      });
     });
   }
 
@@ -3626,7 +3771,7 @@ class FutApp {
     authService.signIn(email, pass).then((res) => {
       document.getElementById('login-dialog').close();
       this.showToast(`Conectado como ${res.user.name}`, 'user-check');
-    }).catch(err => alert(err.message));
+    }).catch(err => this.showToast(err.message || 'No se pudo iniciar sesión', 'alert-triangle'));
   }
 }
 

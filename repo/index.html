@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full bg-slate-100 text-slate-900">
+<html lang="es" class="h-full bg-[#0a0c10] text-slate-100">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f8fafc">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0a0c10">
   <title>futInfo - FIFA Ultimate Team | Torneo del Rector</title>
   <meta name="description" content="Plataforma de gestión de equipo estilo FIFA FUT para el Torneo del Rector (Fútbol 7 y Fútbol Sala) con Google Sign-In">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><path d='m4.93 4.93 4.24 4.24'/><path d='m14.83 9.17 4.24-4.24'/><path d='m14.83 14.83 4.24 4.24'/><path d='m9.17 14.83-4.24 4.24'/><circle cx='12' cy='12' r='4'/></svg>">
@@ -103,35 +103,35 @@
         <!-- Cabecera Oficial FIFA FUT: Banner Oro Sólido, Tipografía Condensada Negra y OVR Pill -->
         <header class="hud-squad-head cursor-pointer group" id="hud-active-squad-head" role="button" tabindex="0" title="Pulsar para abrir Gestión de Plantilla y Formaciones">
           <div class="hud-squad-head-left">
-            <h2 class="hud-squad-head-title font-fifa">ACTIVE SQUAD</h2>
+            <h2 class="hud-squad-head-title font-fifa">PLANTILLA ACTIVA</h2>
             <div class="hud-squad-head-sub">
               <span id="hud-team-name-top" class="hud-squad-club font-fifa">FURIA RECTOR FC</span>
-              <span class="fut-stars hud-stars">★★★★★</span>
+              <span id="hud-team-stars" class="fut-stars hud-stars">★★★★½</span>
             </div>
           </div>
           <div class="hud-squad-head-right">
-            <span id="current-modality-badge" class="hud-modality-pill font-fifa">FUT 7 DRAFT</span>
+            <span id="current-modality-badge" class="hud-modality-pill font-fifa">FÚTBOL 7 · 1-2-3-1</span>
             <div class="hud-rating-pill font-fifa" title="Valoración General de la Plantilla">
-              <span class="hud-rating-pill-lbl font-fifa">OVR</span>
-              <span id="header-team-rating" class="hud-rating-pill-val font-fifa">84</span>
+              <span class="hud-rating-pill-lbl font-fifa">MED</span>
+              <span id="header-team-rating" class="hud-rating-pill-val font-fifa">83</span>
             </div>
           </div>
         </header>
 
-        <!-- Barra de Acción EA Sports: Cambiar Plantilla / Formación con máxima visibilidad e interactividad -->
+        <!-- Barra de Acción: Cambiar Plantilla / Formación -->
         <div class="hud-squad-action-bar">
-          <button type="button" id="btn-open-squad-modal" class="hud-squad-action-tile" title="Abrir Centro Táctico y Formaciones (Tecla S)">
+          <button type="button" id="btn-open-squad-modal" class="hud-squad-action-tile" title="Abrir Centro Táctico y Formaciones">
             <div class="hud-action-left">
               <span class="hud-action-icon-pill">
                 <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
               </span>
               <div class="hud-action-text-group">
-                <span class="hud-action-title font-fifa">CAMBIAR PLANTILLA &amp; FORMACIÓN</span>
-                <span class="hud-action-sub">GESTIONAR ESQUEMA TÁCTICO, ROLES Y JUGADORES</span>
+                <span class="hud-action-title font-fifa">CAMBIAR PLANTILLA Y FORMACIÓN</span>
+                <span class="hud-action-sub">GESTIONAR ESQUEMA TÁCTICO, ROLES Y ALINEACIÓN</span>
               </div>
             </div>
             <div class="hud-action-right">
-              <span class="hud-action-prompt font-fifa"><kbd class="fifa-btn-chip">S</kbd> GESTIONAR <span class="fifa-arrow">►</span></span>
+              <span class="hud-action-prompt font-fifa">GESTIONAR <i data-lucide="chevron-right" class="w-3.5 h-3.5 inline"></i></span>
             </div>
           </button>
         </div>
@@ -210,8 +210,6 @@
           <span id="inspector-player-name" class="hud-insp-name">Pablo García</span>
           <span id="inspector-player-rating" class="hud-insp-ovr">84</span>
           <div class="hud-insp-traits hidden md:flex items-center gap-1.5 ml-1">
-            <span id="inspector-player-playstyle" class="hud-insp-trait-badge" title="PlayStyle Oficial">🎯 TIRO CALIDAD</span>
-            <span id="inspector-player-chem" class="hud-insp-trait-badge" title="Estilo de Química">HUN</span>
             <span id="inspector-player-stars" class="hud-insp-stars-badge" title="Filigranas y Pierna Mala">4★ / 4★</span>
           </div>
           <div id="inspector-stats-grid" class="hud-insp-stats">
@@ -230,7 +228,7 @@
         <div class="fifa-panel-gold-strip"></div>
         <div class="hud-bench-head-block">
           <h3 class="hud-title font-fifa">BANQUILLO</h3>
-          <div class="hud-bignum"><span id="side-bench-count">7</span><small>SUPLENTES</small></div>
+          <div class="hud-bignum"><span id="side-bench-count">7</span><small id="side-bench-label">SUPLENTES</small></div>
         </div>
         <div class="fifa-bench-dock hud-bench-dock">
           <div id="pitch-bench-container" class="fifa-bench-cards-strip"></div>
@@ -256,10 +254,10 @@
         </div>
 
         <div class="hud-specs">
-          <label for="spec-captain"><b>CAP</b><select id="spec-captain" name="captain"></select></label>
-          <label for="spec-penalties"><b>PEN</b><select id="spec-penalties" name="penalties"></select></label>
-          <label for="spec-freekicks"><b>FAL</b><select id="spec-freekicks" name="freekicks"></select></label>
-          <label for="spec-corners"><b>COR</b><select id="spec-corners" name="corners"></select></label>
+          <label for="spec-captain"><b>CAP</b><select id="spec-captain" name="captain" data-spec="captain"></select></label>
+          <label for="spec-penalties"><b>PEN</b><select id="spec-penalties" name="penalties" data-spec="penalties"></select></label>
+          <label for="spec-freekicks"><b>FAL</b><select id="spec-freekicks" name="freekicks" data-spec="freekicks"></select></label>
+          <label for="spec-corners"><b>COR</b><select id="spec-corners" name="corners" data-spec="corners"></select></label>
         </div>
       </article>
 
@@ -283,12 +281,12 @@
         </button>
       </div>
 
-      <!-- BARRA DE BÚSQUEDA Y FILTRADO INSTANTÁNEO (PATRÓN LINEAR / EA SPORTS FC) -->
+      <!-- BARRA DE BÚSQUEDA Y FILTRADO INSTANTÁNEO -->
       <div class="hud-filter-bar flex flex-col md:flex-row gap-2.5 items-stretch md:items-center justify-between bg-slate-900/90 border border-slate-700/80 p-2.5 shadow-md">
         <div class="relative flex-1 min-w-[200px]">
+          <label for="album-search-input" class="sr-only">Buscar jugador por nombre o dorsal</label>
           <i data-lucide="search" class="w-4 h-4 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-          <input type="text" id="album-search-input" placeholder="Buscar jugador por nombre o dorsal... (Presiona /)" autocomplete="off" class="w-full bg-slate-950/90 border border-slate-700/70 pl-9 pr-8 py-2 text-xs text-white placeholder-slate-500 font-bold focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition">
-          <kbd class="hidden sm:inline-block absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 border border-slate-700 font-mono">/</kbd>
+          <input type="text" id="album-search-input" placeholder="Buscar jugador por nombre o dorsal..." autocomplete="off" class="w-full bg-slate-950/90 border border-slate-700/70 pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 font-bold focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition">
         </div>
 
         <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0" id="album-role-filters">
@@ -300,6 +298,7 @@
         </div>
 
         <div class="flex items-center justify-between md:justify-end gap-3">
+          <label for="album-sort-select" class="sr-only">Ordenar cromos</label>
           <select id="album-sort-select" class="bg-slate-950/90 border border-slate-700/70 text-[11px] font-bold text-slate-300 py-1.5 px-2.5 uppercase tracking-wider focus:border-amber-400">
             <option value="ovr-desc">VALORACIÓN (MÁS ALTA)</option>
             <option value="ovr-asc">VALORACIÓN (MÁS BAJA)</option>
@@ -341,7 +340,7 @@
         </div>
       </header>
 
-      <!-- TARJETA OFICIAL DEL PARTIDO DE LA JORNADA (EA SPORTS FC BATTLE ARENA) -->
+      <!-- TARJETA OFICIAL DEL PARTIDO DE LA JORNADA -->
       <article class="fifa-matchday-arena-card">
         <!-- Barra de Metadatos del Encuentro -->
         <div class="fifa-arena-top-banner">
@@ -349,7 +348,7 @@
           <div id="next-match-details" class="fifa-arena-venue font-fifa">
             <!-- Fecha y Cancha dinámicos -->
           </div>
-          <span class="fifa-arena-stream font-fifa">STREAM EA FC 26</span>
+          <span id="featured-match-tournament" class="fifa-arena-stream font-fifa">TORNEO DEL RECTOR</span>
         </div>
 
         <!-- Escenario de Choque Local vs Visitante -->
@@ -357,19 +356,21 @@
           <!-- Club Local -->
           <div class="fifa-arena-club fifa-arena-club--home">
             <div class="fifa-arena-crest-box">
-              <span class="fifa-arena-crest-glyph font-fifa" id="featured-home-crest">🛡️</span>
+              <span class="fifa-arena-crest-glyph font-fifa" id="featured-home-crest">
+                <i data-lucide="shield" class="w-8 h-8 text-amber-400"></i>
+              </span>
             </div>
             <div class="fifa-arena-club-info">
               <span class="fifa-arena-tag font-fifa">LOCAL</span>
               <h3 class="fifa-arena-club-title font-fifa" id="featured-home-name">FURIA RECTOR FC</h3>
-              <div class="fifa-arena-ovr-pill font-fifa">VAL <span class="fifa-ovr-num">84</span></div>
+              <div class="fifa-arena-ovr-pill font-fifa">MED <span id="featured-home-ovr" class="fifa-ovr-num">--</span></div>
             </div>
           </div>
 
           <!-- Centro VS y Marcador / Hora -->
           <div class="fifa-arena-vs-center">
             <div class="fifa-arena-vs-diamond font-fifa">VS</div>
-            <div class="fifa-arena-kickoff-time font-fifa" id="next-match-time-chip">20:00 H</div>
+            <div class="fifa-arena-kickoff-time font-fifa" id="next-match-time-chip">--:--</div>
             <span class="fifa-arena-status-pill font-fifa" id="featured-match-status-badge">CONVOCATORIA ABIERTA</span>
           </div>
 
@@ -377,42 +378,44 @@
           <div class="fifa-arena-club fifa-arena-club--away">
             <div class="fifa-arena-club-info text-right">
               <span class="fifa-arena-tag font-fifa">VISITANTE</span>
-              <h3 class="fifa-arena-club-title font-fifa" id="featured-away-name">INGENIEROS UNITED</h3>
-              <div class="fifa-arena-ovr-pill font-fifa">VAL <span class="fifa-ovr-num">81</span></div>
+              <h3 class="fifa-arena-club-title font-fifa" id="featured-away-name">POR CONFIRMAR</h3>
+              <div class="fifa-arena-ovr-pill font-fifa" id="featured-away-ovr-pill"><span id="featured-away-meta-lbl">RIVAL DE GRUPO</span></div>
             </div>
             <div class="fifa-arena-crest-box">
-              <span class="fifa-arena-crest-glyph font-fifa" id="featured-away-crest">🦁</span>
+              <span class="fifa-arena-crest-glyph font-fifa" id="featured-away-crest">
+                <i data-lucide="swords" class="w-8 h-8 text-cyan-400"></i>
+              </span>
             </div>
           </div>
         </div>
 
-        <!-- Barra de Botones de Consola: Confirmación de Asistencia -->
+        <!-- Barra de Botones: Confirmación de Asistencia -->
         <div class="fifa-arena-vote-bar">
           <div class="fifa-vote-heading font-fifa">
-            <i data-lucide="gamepad-2" class="w-4 h-4 text-amber-400"></i>
-            <span>VOTA TU DISPONIBILIDAD:</span>
+            <i data-lucide="calendar-check-2" class="w-4 h-4 text-amber-400"></i>
+            <span>CONFIRMA TU ASISTENCIA:</span>
           </div>
           <div class="fifa-vote-buttons">
             <button type="button" onclick="window.futApp.voteAttendance('asistira')" class="fifa-console-vote-btn fifa-vote-yes" title="Confirmar asistencia">
-              <em class="ps-btn ps-x">✕</em>
+              <i data-lucide="check" class="w-4 h-4"></i>
               <span class="font-fifa">CONFIRMAR ASISTENCIA</span>
             </button>
             <button type="button" onclick="window.futApp.voteAttendance('duda')" class="fifa-console-vote-btn fifa-vote-maybe" title="Duda de asistencia">
-              <em class="ps-btn ps-square">■</em>
+              <i data-lucide="help-circle" class="w-4 h-4"></i>
               <span class="font-fifa">EN DUDA</span>
             </button>
             <button type="button" onclick="window.futApp.voteAttendance('no_puede')" class="fifa-console-vote-btn fifa-vote-no" title="Baja para este encuentro">
-              <em class="ps-btn ps-circle">◯</em>
+              <i data-lucide="x" class="w-4 h-4"></i>
               <span class="font-fifa">DECLINAR / BAJA</span>
             </button>
           </div>
         </div>
 
-        <!-- Desglose de Convocatoria en 3 Columnas Broadcast -->
+        <!-- Desglose de Convocatoria en 3 Columnas -->
         <div class="fifa-arena-convocatoria-panel">
           <div class="fifa-convocatoria-title font-fifa">
             <span>DESGLOSE TÁCTICO DE CONVOCADOS</span>
-            <span class="fifa-convocatoria-sub font-fifa">SISTEMA OFICIAL EA SPORTS FC</span>
+            <span id="featured-convocatoria-summary" class="fifa-convocatoria-sub font-fifa">LISTA OFICIAL DEL PARTIDO</span>
           </div>
           <div id="attendance-breakdown" class="fifa-convocatoria-columns">
             <!-- Render dinámico desde JS -->
@@ -500,18 +503,18 @@
           </div>
         </div>
 
-        <!-- 3. EQUIPACIÓN OFICIAL Y PREVISUALIZACIÓN -->
+        <!-- 3. COLORES OFICIALES DE PARTIDO -->
         <div class="fifa-club-tile">
           <div class="fifa-club-tile-accent"></div>
           <div class="fifa-club-tile-header">
-            <i data-lucide="shirt" class="w-5 h-5 text-amber-400"></i>
+            <i data-lucide="palette" class="w-5 h-5 text-amber-400"></i>
             <div>
               <h3 class="font-fifa text-2xl text-white font-bold">3. EQUIPACIÓN OFICIAL DE PARTIDO</h3>
-              <p class="text-xs text-slate-400">Personaliza los colores de la primera camiseta y los ribetes técnicos.</p>
+              <p class="text-xs text-slate-400">Personaliza los colores de la camiseta del club.</p>
             </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 items-center">
-            <div class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 items-center">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label for="set-kit-primary" class="fifa-field-lbl font-fifa">Color Principal de Camiseta</label>
                 <div class="flex items-center gap-3">
@@ -528,133 +531,58 @@
               </div>
             </div>
 
-            <!-- Mini Preview en vivo de la equipación -->
-            <div class="fifa-kit-preview-box">
-              <span class="fifa-kit-preview-title font-fifa">VISTA PREVIA EQUIPACIÓN</span>
-              <div class="fifa-kit-preview-silhouette" id="club-kit-preview-silhouette">
-                <!-- SVG dinámico de la camiseta -->
-              </div>
-              <span class="fifa-kit-preview-dorsal font-fifa">DORSAL #10</span>
-            </div>
-
             <!-- Información técnica -->
             <div class="fifa-kit-info-card">
-              <span class="font-fifa text-amber-400 text-sm font-bold block mb-1">ESPECIFICACIÓN FIFA QUALITY</span>
+              <span class="font-fifa text-amber-400 text-sm font-bold block mb-1">APLICACIÓN AUTOMÁTICA</span>
               <p class="text-xs text-slate-300 leading-relaxed">
-                El diseño elegido se reflejará automáticamente en todas las cartas FUT de la plantilla, el álbum de cromos y la pizarra del campo de juego.
+                Los colores elegidos se reflejarán automáticamente en las cartas FUT de la plantilla, el álbum y la pizarra del campo.
               </p>
             </div>
           </div>
         </div>
 
-        <!-- 4. ESTADIO Y BALÓN OFICIAL -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Estadio Oficial -->
-          <div class="fifa-club-tile">
-            <div class="fifa-club-tile-accent"></div>
-            <div class="fifa-club-tile-header">
-              <i data-lucide="map-pin" class="w-5 h-5 text-amber-400"></i>
-              <div>
-                <h3 class="font-fifa text-2xl text-white font-bold">4. ESTADIO OFICIAL LOCAL</h3>
-                <p class="text-xs text-slate-400">Sede donde disputa sus encuentros el club.</p>
-              </div>
-            </div>
-            <input type="hidden" id="set-club-stadium" name="stadium" value="campus_sur">
-            <div class="space-y-2 mt-4" id="club-stadiums-list">
-              <!-- Renderizado de estadios con capacidad y césped -->
-            </div>
-          </div>
-
-          <!-- Balón Oficial -->
-          <div class="fifa-club-tile">
-            <div class="fifa-club-tile-accent"></div>
-            <div class="fifa-club-tile-header">
-              <i data-lucide="circle-dot" class="w-5 h-5 text-amber-400"></i>
-              <div>
-                <h3 class="font-fifa text-2xl text-white font-bold">5. BALÓN OFICIAL DE PARTIDO</h3>
-                <p class="text-xs text-slate-400">Balón de competición oficial homologado.</p>
-              </div>
-            </div>
-            <input type="hidden" id="set-club-ball" name="ball" value="nike_flight">
-            <div class="space-y-2 mt-4" id="club-balls-list">
-              <!-- Renderizado de balones oficiales -->
-            </div>
-          </div>
-        </div>
-
-        <!-- 6. ESPECIALISTAS A BALÓN PARADO -->
+        <!-- 4. ESPECIALISTAS A BALÓN PARADO -->
         <div class="fifa-club-tile">
           <div class="fifa-club-tile-accent"></div>
           <div class="fifa-club-tile-header">
             <i data-lucide="crosshair" class="w-5 h-5 text-amber-400"></i>
             <div>
-              <h3 class="font-fifa text-2xl text-white font-bold">6. ESPECIALISTAS A BALÓN PARADO</h3>
+              <h3 class="font-fifa text-2xl text-white font-bold">4. ESPECIALISTAS A BALÓN PARADO</h3>
               <p class="text-xs text-slate-400">Asigna los roles clave para capitanía, lanzamientos de penalti, faltas y córners.</p>
             </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
             <div>
-              <label for="spec-captain" class="fifa-field-lbl font-fifa">👑 Capitán del Equipo</label>
-              <select id="spec-captain" name="captain" class="fifa-select font-fifa"></select>
+              <label for="club-spec-captain" class="fifa-field-lbl font-fifa flex items-center gap-1.5"><i data-lucide="crown" class="w-3.5 h-3.5 text-amber-400"></i> Capitán del Equipo</label>
+              <select id="club-spec-captain" name="captain" data-spec="captain" class="fifa-select font-fifa"></select>
             </div>
             <div>
-              <label for="spec-penalties" class="fifa-field-lbl font-fifa">🎯 Penaltis</label>
-              <select id="spec-penalties" name="penalties" class="fifa-select font-fifa"></select>
+              <label for="club-spec-penalties" class="fifa-field-lbl font-fifa flex items-center gap-1.5"><i data-lucide="target" class="w-3.5 h-3.5 text-amber-400"></i> Penaltis</label>
+              <select id="club-spec-penalties" name="penalties" data-spec="penalties" class="fifa-select font-fifa"></select>
             </div>
             <div>
-              <label for="spec-freekicks" class="fifa-field-lbl font-fifa">🚀 Faltas Directas</label>
-              <select id="spec-freekicks" name="freekicks" class="fifa-select font-fifa"></select>
+              <label for="club-spec-freekicks" class="fifa-field-lbl font-fifa flex items-center gap-1.5"><i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> Faltas Directas</label>
+              <select id="club-spec-freekicks" name="freekicks" data-spec="freekicks" class="fifa-select font-fifa"></select>
             </div>
             <div>
-              <label for="spec-corners" class="fifa-field-lbl font-fifa">🚩 Córners</label>
-              <select id="spec-corners" name="corners" class="fifa-select font-fifa"></select>
+              <label for="club-spec-corners" class="fifa-field-lbl font-fifa flex items-center gap-1.5"><i data-lucide="flag" class="w-3.5 h-3.5 text-amber-400"></i> Córners</label>
+              <select id="club-spec-corners" name="corners" data-spec="corners" class="fifa-select font-fifa"></select>
             </div>
           </div>
         </div>
 
-        <!-- 7. RÉCORD HISTÓRICO Y VITRINA DE TROFEOS -->
+        <!-- 5. RÉCORD HISTÓRICO Y BALANCE -->
         <div class="fifa-club-tile">
           <div class="fifa-club-tile-accent"></div>
           <div class="fifa-club-tile-header">
-            <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i>
+            <i data-lucide="bar-chart-3" class="w-5 h-5 text-amber-400"></i>
             <div>
-              <h3 class="font-fifa text-2xl text-white font-bold">7. PALMARÉS Y ESTADÍSTICAS HISTÓRICAS</h3>
-              <p class="text-xs text-slate-400">Récord competitivo oficial de Furia Rector FC en todas las ediciones.</p>
+              <h3 class="font-fifa text-2xl text-white font-bold">5. BALANCE DE TEMPORADA</h3>
+              <p class="text-xs text-slate-400">Estadísticas reales calculadas a partir de los partidos y actas oficiales registradas.</p>
             </div>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-4">
-            <div class="fifa-stat-badge">
-              <span class="fifa-stat-badge-num font-fifa">16</span>
-              <span class="fifa-stat-badge-lbl font-fifa">PARTIDOS JUGADOS</span>
-            </div>
-            <div class="fifa-stat-badge">
-              <span class="fifa-stat-badge-num font-fifa text-emerald-400">12</span>
-              <span class="fifa-stat-badge-lbl font-fifa">VICTORIAS</span>
-            </div>
-            <div class="fifa-stat-badge">
-              <span class="fifa-stat-badge-num font-fifa text-amber-400">3</span>
-              <span class="fifa-stat-badge-lbl font-fifa">EMPATES</span>
-            </div>
-            <div class="fifa-stat-badge">
-              <span class="fifa-stat-badge-num font-fifa text-rose-400">1</span>
-              <span class="fifa-stat-badge-lbl font-fifa">DERROTAS</span>
-            </div>
-            <div class="fifa-stat-badge">
-              <span class="fifa-stat-badge-num font-fifa text-cyan-400">48</span>
-              <span class="fifa-stat-badge-lbl font-fifa">GOLES A FAVOR</span>
-            </div>
-            <div class="fifa-stat-badge">
-              <span class="fifa-stat-badge-num font-fifa text-purple-400">+29</span>
-              <span class="fifa-stat-badge-lbl font-fifa">DIFERENCIA GOLES</span>
-            </div>
-          </div>
-
-          <!-- Vitrina de Trofeos -->
-          <div class="mt-4 pt-4 border-t border-white/10 flex flex-wrap items-center gap-3">
-            <span class="text-xs font-fifa text-amber-400 uppercase tracking-wider font-bold">SALA DE TROFEOS:</span>
-            <div class="fifa-trophy-pill font-fifa">🏆 CAMPEÓN OTOÑO 2025</div>
-            <div class="fifa-trophy-pill font-fifa">🥈 SUBCAMPEÓN COPA RECTOR</div>
-            <div class="fifa-trophy-pill font-fifa">🎖️ MEJOR ATAQUE F7</div>
+          <div id="club-palmares-content" class="mt-4">
+            <!-- Renderizado dinámicamente desde store.getStats() -->
           </div>
         </div>
 
@@ -694,23 +622,10 @@
 
   </main>
 
-  <!-- FRANJA TÉCNICA INFERIOR DE CONSOLA EA SPORTS (CONTROLLER & KEYBOARD PROMPTS) -->
-  <footer class="hud-prompts" aria-label="Indicadores de consola">
-    <span class="hud-prompt"><em class="ps-btn ps-x">✕</em><span>SELECCIONAR</span></span>
-    <span class="hud-prompt"><em class="ps-btn ps-circle">◯</em><span>VOLVER</span></span>
-    <span class="hud-prompt"><em class="ps-btn ps-triangle">▲</em><span>ACCIONES</span></span>
-    <span class="hud-prompt"><em class="ps-btn ps-square">■</em><span>SUSTITUIR</span></span>
-    <span class="hud-prompt"><em class="ps-btn ps-pill">Q / E</em><span>PESTAÑAS</span></span>
-    <span class="hud-prompt"><em class="ps-btn ps-pill">↑ ↓ ← →</em><span>CURSOR</span></span>
-    <span class="hud-prompt"><em class="ps-btn ps-pill">S</em><span>ESQUEMA</span></span>
-    <span class="hud-prompt"><em class="ps-btn ps-pill">M</em><span>MODO DÍA/NOCHE</span></span>
-    <span class="hud-prompt"><em class="ps-btn ps-pill">DRAG &amp; DROP</em><span>INTERCAMBIAR</span></span>
-  </footer>
-
   <!-- ==================== MODALES NATIVOS <dialog> ACCESIBLES ==================== -->
 
-  <!-- 1. MODAL LOGIN PRINCIPAL (CON GOOGLE SIGN-IN LIGHT ESPORTS) -->
-  <dialog id="login-dialog" aria-labelledby="login-title" class="fifa-console-modal max-w-md w-full  bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
+  <!-- 1. MODAL LOGIN PRINCIPAL (CON GOOGLE SIGN-IN) -->
+  <dialog id="login-dialog" closedby="any" aria-labelledby="login-title" class="fifa-console-modal max-w-md w-full bg-slate-950/95 text-white p-0 backdrop-blur-xl">
     <div class="p-6">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-2.5">
@@ -740,19 +655,19 @@
 
       <div class="relative my-6">
         <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-800"></div></div>
-        <div class="relative flex justify-center text-[10px] uppercase font-black text-slate-500 bg-slate-950 px-3 tracking-wider">
-          O acceso rápido de prueba
+        <div class="relative flex justify-center text-[10px] uppercase font-black text-slate-400 bg-slate-950 px-3 tracking-wider">
+          Perfiles de Acceso Local
         </div>
       </div>
 
       <div class="space-y-2">
-        <button type="button" onclick="window.futApp.quickLogin('mister@rector.es', 'rector2026')" class="w-full py-2.5 px-3  bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-amber-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer">
+        <button type="button" onclick="window.futApp.quickLogin('mister@rector.es', 'rector2026')" class="w-full py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-amber-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer">
           <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
-          <span>Entrar como Míster (Admin)</span>
+          <span>Míster / Cuerpo Técnico</span>
         </button>
-        <button type="button" onclick="window.futApp.quickLogin('charly@rector.es', 'rector2026')" class="w-full py-2.5 px-3  bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-emerald-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer">
+        <button type="button" onclick="window.futApp.quickLogin('charly@rector.es', 'rector2026')" class="w-full py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-emerald-400 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer">
           <i data-lucide="user" class="w-4 h-4 text-emerald-400"></i>
-          <span>Entrar como Jugador (Carlos Ruiz)</span>
+          <span>Jugador de Plantilla (Charly #1)</span>
         </button>
       </div>
 
@@ -760,7 +675,7 @@
   </dialog>
 
   <!-- 2. MODAL RELLENAR FICHA DE PERSONAJE FIFA (ROLES DE MEJOR A PEOR) -->
-  <dialog id="player-card-setup-dialog" aria-labelledby="setup-title" class="fifa-console-modal max-w-xl w-full  bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
+  <dialog id="player-card-setup-dialog" closedby="any" aria-labelledby="setup-title" class="fifa-console-modal max-w-xl w-full bg-slate-950/95 text-white p-0 backdrop-blur-xl">
     <div class="p-6">
       
       <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
@@ -776,145 +691,61 @@
         </button>
       </div>
 
-      <form id="form-setup-card" class="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
+      <form id="form-setup-card" class="space-y-4">
         
         <!-- Identificación del Jugador -->
         <div class="p-3 bg-slate-900/90 border border-slate-800 flex items-center justify-between">
           <div>
-            <div id="setup-user-name" class="font-fifa text-xl font-bold text-white uppercase">Usuario</div>
-            <div id="setup-user-email" class="text-xs text-slate-400 font-mono">correo@gmail.com</div>
+            <div id="setup-user-name" class="font-fifa text-xl font-bold text-white uppercase">Nuevo Jugador</div>
+            <div id="setup-user-email" class="text-xs text-slate-400 font-mono">fichaje@club.local</div>
           </div>
-          <span class="text-[10px] font-fifa text-amber-400 uppercase tracking-wider bg-amber-400/10 px-2 py-1 border border-amber-400/30">CARTA ACTIVA EA SPORTS</span>
+          <span id="setup-status-badge" class="text-[10px] font-fifa text-amber-400 uppercase tracking-wider bg-amber-400/10 px-2 py-1 border border-amber-400/30">FICHA OFICIAL FUT</span>
         </div>
 
-        <!-- PERSONALIZADOR DE EQUIPACIÓN OFICIAL Y DORSAL -->
+        <!-- PERFIL DE JUGADOR Y HABILIDADES -->
         <div class="p-4 bg-slate-900/90 border border-slate-800 space-y-3">
           <div class="flex items-center justify-between border-b border-white/10 pb-2">
             <span class="text-xs font-black text-amber-400 uppercase tracking-wide font-fifa text-base flex items-center gap-1.5">
-              <i data-lucide="shirt" class="w-4 h-4 text-amber-400"></i>
-              <span>KIT STUDIO — PERSONALIZACIÓN DE EQUIPACIÓN</span>
+              <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+              <span>PERFIL Y HABILIDADES</span>
             </span>
-            <span class="text-[10px] uppercase font-fifa text-slate-400">EA SPORTS KIT CREATOR</span>
+            <span class="text-[10px] uppercase font-fifa text-slate-400">FICHA DEL JUGADOR</span>
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label for="setup-kit-primary" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Color Camiseta *</label>
-              <select id="setup-kit-primary" name="kitColor" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
-                <option value="#f0be2a" selected>Oro FUT (#f0be2a)</option>
-                <option value="#0ea5e9">Azul Eléctrico (#0ea5e9)</option>
-                <option value="#dc2626">Rojo Furia (#dc2626)</option>
-                <option value="#f8fafc">Blanco Real (#f8fafc)</option>
-                <option value="#059669">Verde Esmeralda (#059669)</option>
-                <option value="#111827">Negro Carbón (#111827)</option>
-                <option value="#7c3aed">Púrpura Real (#7c3aed)</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="setup-kit-secondary" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Detalles / Cuello</label>
-              <select id="setup-kit-secondary" name="kitSecondary" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
-                <option value="#111827" selected>Negro Carbón</option>
-                <option value="#f0be2a">Oro FUT</option>
-                <option value="#ffffff">Blanco Puro</option>
-                <option value="#00f0ff">Cian Neón</option>
-                <option value="#dc2626">Rojo Intenso</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="setup-kit-collar" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Estilo Cuello</label>
-              <select id="setup-kit-collar" name="kitCollar" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
-                <option value="round" selected>Redondo Clásico</option>
-                <option value="vneck">Pico (V-Neck Pro)</option>
-                <option value="polo">Cuello Polo Vintage</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="setup-kit-sleeves" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Mangas</label>
-              <select id="setup-kit-sleeves" name="kitSleeves" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
-                <option value="short" selected>Manga Corta Pro</option>
-                <option value="long">Manga Larga + Térmica</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- PLAYSTYLES, HABILIDADES & CELEBRACIÓN -->
-        <div class="p-4 bg-slate-900/90 border border-slate-800 space-y-3">
-          <div class="flex items-center justify-between border-b border-white/10 pb-2">
-            <span class="text-xs font-black text-amber-400 uppercase tracking-wide font-fifa text-base flex items-center gap-1.5">
-              <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
-              <span>PLAYSTYLES OFICIALES &amp; HABILIDADES</span>
-            </span>
-            <span class="text-[10px] uppercase font-fifa text-slate-400">EA FC 25 ENGINE</span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label for="setup-playstyle" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">PlayStyle Característico *</label>
-              <select id="setup-playstyle" name="playStyle" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
-                <option value="finesse" selected>🎯 Tiro con Calidad (Finesse Shot)</option>
-                <option value="power_shot">💥 Zapatazo / Cañonero (Power Shot)</option>
-                <option value="rapid">⚡ Paso Rápido / Sprint (Rapid)</option>
-                <option value="incisive">🪄 Pase Incisivo al Hueco (Incisive Pass)</option>
-                <option value="anticipate">🛡️ Anticipación / Muralla (Anticipate)</option>
-                <option value="acrobatic">🧤 Reflejos Felinos (Acrobatic GK)</option>
-                <option value="leader">👑 Don de Mando / Capitán (Leader)</option>
-                <option value="trivela">🌀 Trivela / Empeine Exterior</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="setup-celebration" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Celebración de Gol Favorita</label>
+              <label for="setup-celebration" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Celebración Favorita</label>
               <select id="setup-celebration" name="celebration" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
-                <option value="siuuu" selected>SIUUU (Salto y giro en el aire)</option>
-                <option value="calma">Calma (Palmas hacia el suelo)</option>
+                <option value="siuuu" selected>SIUUU (Salto y giro)</option>
+                <option value="calma">Calma (Palmas al suelo)</option>
                 <option value="samba">Samba Brasileña</option>
                 <option value="corazon">Corazón con los dedos</option>
                 <option value="robot">El Robot Mecánico</option>
-                <option value="desliz">Deslizamiento sobre rodillas</option>
-                <option value="cielo">Doble dedo señalando al cielo</option>
+                <option value="desliz">Deslizamiento de rodillas</option>
+                <option value="cielo">Doble dedo al cielo</option>
                 <option value="dormido">Night Night (Dormido)</option>
               </select>
             </div>
-          </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
             <div>
               <label for="setup-skill-moves" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Filigranas / Regate</label>
               <select id="setup-skill-moves" name="skillMoves" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
-                <option value="5">★★★★★ 5 Estrellas (Mago)</option>
-                <option value="4" selected>★★★★☆ 4 Estrellas (Regateador)</option>
-                <option value="3">★★★☆☆ 3 Estrellas (Competente)</option>
-                <option value="2">★★☆☆☆ 2 Estrellas (Básico)</option>
-                <option value="1">★☆☆☆☆ 1 Estrella (Sobrio)</option>
+                <option value="5">5★ — Mago</option>
+                <option value="4" selected>4★ — Regateador</option>
+                <option value="3">3★ — Competente</option>
+                <option value="2">2★ — Básico</option>
+                <option value="1">1★ — Sobrio</option>
               </select>
             </div>
 
             <div>
               <label for="setup-weak-foot" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Pierna Mala</label>
               <select id="setup-weak-foot" name="weakFoot" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
-                <option value="5">★★★★★ 5 Estrellas (Ambidiestro)</option>
-                <option value="4" selected>★★★★☆ 4 Estrellas (Solvente)</option>
-                <option value="3">★★★☆☆ 3 Estrellas (Aceptable)</option>
-                <option value="2">★★☆☆☆ 2 Estrellas (Solo apoyo)</option>
-                <option value="1">★☆☆☆☆ 1 Estrella (De palo)</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="setup-chem-style" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Estilo de Química (FUT)</label>
-              <select id="setup-chem-style" name="chemStyle" class="w-full bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500 cursor-pointer">
-                <option value="HUN" selected>Cazador / Hunter (PAC + SHO)</option>
-                <option value="SHA">Sombra / Shadow (PAC + DEF)</option>
-                <option value="HAW">Halcón / Hawk (PAC + SHO + PHY)</option>
-                <option value="ANC">Ancla / Anchor (DEF + PHY + PAC)</option>
-                <option value="ENG">Motor / Engine (DRI + PAS + PAC)</option>
-                <option value="CAT">Catalizador (PAS + PAC)</option>
-                <option value="BAS">Básico / Balance General</option>
-                <option value="WAL">Muro / Wall (Especial POR)</option>
+                <option value="5">5★ — Ambidiestro</option>
+                <option value="4" selected>4★ — Solvente</option>
+                <option value="3">3★ — Aceptable</option>
+                <option value="2">2★ — Solo apoyo</option>
+                <option value="1">1★ — De palo</option>
               </select>
             </div>
           </div>
@@ -1235,7 +1066,7 @@
   </dialog>
 
   <!-- 3. MODAL INSPECCIONAR CARTA DE JUGADOR -->
-  <dialog id="player-inspect-dialog" aria-labelledby="inspect-dialog-title" class="fifa-console-modal max-w-md w-full  bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
+  <dialog id="player-inspect-dialog" closedby="any" aria-labelledby="inspect-dialog-title" class="fifa-console-modal max-w-2xl w-full bg-slate-950/95 text-white p-0 backdrop-blur-xl">
     <div class="p-6">
       <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
         <h3 id="inspect-dialog-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider flex items-center gap-2">
@@ -1253,7 +1084,7 @@
   </dialog>
 
   <!-- 4. MODAL PROGRAMAR / EDITAR PARTIDO -->
-  <dialog id="match-dialog" aria-labelledby="match-dialog-title" class="fifa-console-modal max-w-lg w-full  bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
+  <dialog id="match-dialog" closedby="any" aria-labelledby="match-dialog-title" class="fifa-console-modal max-w-lg w-full bg-slate-950/95 text-white p-0 backdrop-blur-xl">
     <div class="p-6">
       <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
         <h2 id="match-dialog-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">Programar Partido</h2>
@@ -1314,7 +1145,7 @@
   </dialog>
 
   <!-- 5. MODAL REGISTRAR RESULTADO DE PARTIDO (ACTA) -->
-  <dialog id="match-result-dialog" aria-labelledby="result-dialog-title" class="fifa-console-modal max-w-md w-full  bg-slate-950/95 text-white border border-slate-700/80 shadow-2xl p-0 backdrop-blur-xl">
+  <dialog id="match-result-dialog" closedby="any" aria-labelledby="result-dialog-title" class="fifa-console-modal max-w-md w-full bg-slate-950/95 text-white p-0 backdrop-blur-xl">
     <div class="p-6">
       <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
         <h2 id="result-dialog-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">Acta del Partido</h2>
@@ -1395,25 +1226,24 @@
     </div>
   </div>
 
-  <!-- 6. MODAL CENTRO TÁCTICO & ESQUEMAS FIFA FC -->
-  <dialog id="squad-actions-dialog" aria-labelledby="squad-actions-title" class="fifa-console-modal max-w-4xl w-[94vw] text-white p-0 backdrop-blur-xl">
-    <div class="p-5 sm:p-6 max-h-[88vh] overflow-y-auto space-y-4">
+  <!-- 6. MODAL CENTRO TÁCTICO & ESQUEMAS -->
+  <dialog id="squad-actions-dialog" closedby="any" aria-labelledby="squad-actions-title" class="fifa-console-modal max-w-4xl w-[94vw] text-white p-0 backdrop-blur-xl">
+    <div class="p-5 sm:p-6 space-y-4">
       
-      <!-- Cabecera Oficial FIFA FUT: Escudo, Título y Salida con botón de mando -->
+      <!-- Cabecera Oficial FIFA FUT: Escudo, Título y Cierre -->
       <div class="flex items-center justify-between border-b border-white/10 pb-3">
         <div class="flex items-center gap-3">
           <span class="hud-crest font-fifa">FUT</span>
           <div>
             <div class="flex items-center gap-2">
               <span class="hud-tag font-fifa">ESQUEMAS TÁCTICOS</span>
-              <span id="modal-active-modality-badge" class="hud-modality-pill font-fifa">FUT 7 DRAFT</span>
+              <span id="modal-active-modality-badge" class="hud-modality-pill font-fifa">FÚTBOL 7</span>
             </div>
             <h2 id="squad-actions-title" class="font-fifa text-2xl sm:text-3xl font-black text-white uppercase tracking-wider leading-none mt-1">FORMACIONES Y PLAN TÁCTICO</h2>
           </div>
         </div>
-        <button type="button" onclick="document.getElementById('squad-actions-dialog').close()" class="fifa-console-btn-exit" title="Cerrar (Escape)">
-          <em class="ps-btn ps-circle">◯</em>
-          <span class="font-fifa">VOLVER</span>
+        <button type="button" onclick="document.getElementById('squad-actions-dialog').close()" class="text-slate-400 hover:text-white p-1.5 border border-white/10 hover:border-amber-400 transition cursor-pointer" title="Cerrar">
+          <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
@@ -1510,8 +1340,8 @@
 
           <!-- Estilo Defensivo: 4 Botones Tácticos -->
           <div class="space-y-1.5">
-            <label class="block text-[11px] font-black text-slate-300 uppercase tracking-wider">Estilo Defensivo</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="tactics-defensive-styles">
+            <span id="tactics-defensive-label" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider">Estilo Defensivo</span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="tactics-defensive-styles" role="group" aria-labelledby="tactics-defensive-label">
               <button type="button" data-style="balanced" class="tactics-style-btn active p-2.5 border border-amber-500 bg-amber-500/10 text-white font-bold text-xs text-center transition cursor-pointer">
                 <span class="block font-fifa text-sm uppercase">Equilibrado</span>
                 <span class="block text-[9px] text-slate-400 mt-0.5">Mantiene posiciones</span>
@@ -1613,6 +1443,42 @@
     </div>
   </dialog>
 
+  <!-- 7. MODAL CREAR NUEVA PLANTILLA -->
+  <dialog id="squad-create-dialog" closedby="any" aria-labelledby="squad-create-title" class="fifa-console-modal max-w-md w-full bg-slate-950/95 text-white p-0 backdrop-blur-xl">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+        <h3 id="squad-create-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">Nueva Plantilla</h3>
+        <button type="button" id="btn-close-squad-create" aria-label="Cerrar" class="text-slate-400 hover:text-white p-1.5 cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="form-squad-create" class="space-y-4">
+        <div>
+          <label for="squad-create-name" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1">Nombre de la Plantilla *</label>
+          <input type="text" id="squad-create-name" name="squadName" required maxlength="36" placeholder="Ej: Once Ofensivo Copa" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-2 border-t border-white/10">
+          <button type="button" id="btn-cancel-squad-create" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition cursor-pointer">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider transition cursor-pointer">Guardar Plantilla</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- 8. MODAL CONFIRMACIÓN DE ACCIÓN -->
+  <dialog id="confirm-action-dialog" closedby="any" aria-labelledby="confirm-action-title" class="fifa-console-modal max-w-md w-full bg-slate-950/95 text-white p-0 backdrop-blur-xl">
+    <div class="p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 id="confirm-action-title" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">Confirmar Acción</h3>
+        <button type="button" id="btn-close-confirm-action" aria-label="Cerrar" class="text-slate-400 hover:text-white p-1.5 cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <p id="confirm-action-message" class="text-xs text-slate-300 leading-relaxed"></p>
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-white/10">
+        <button type="button" id="btn-cancel-confirm-action" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition cursor-pointer">Cancelar</button>
+        <button type="button" id="btn-accept-confirm-action" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs uppercase tracking-wider transition cursor-pointer">Confirmar</button>
+      </div>
     </div>
   </dialog>
 

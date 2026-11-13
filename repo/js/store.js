@@ -541,14 +541,7 @@ export class TeamStore {
       phy: parseInt(data.phy, 10) || 76
     };
 
-    const calculatedRating = Math.round(
-      (defaultStats.pac * 0.15) +
-      (defaultStats.sho * 0.2) +
-      (defaultStats.pas * 0.2) +
-      (defaultStats.dri * 0.2) +
-      (defaultStats.def * 0.15) +
-      (defaultStats.phy * 0.1)
-    );
+    const calculatedRating = this.computePlayerRating(defaultStats);
 
     const newPlayer = {
       id: 'p_' + Date.now(),
@@ -590,10 +583,24 @@ export class TeamStore {
     return newPlayer;
   }
 
+  computePlayerRating(stats = {}) {
+    const pac = parseInt(stats.pac, 10) || 80;
+    const sho = parseInt(stats.sho, 10) || 75;
+    const pas = parseInt(stats.pas, 10) || 78;
+    const dri = parseInt(stats.dri, 10) || 80;
+    const def = parseInt(stats.def, 10) || 70;
+    const phy = parseInt(stats.phy, 10) || 76;
+    return Math.round((pac * 0.15) + (sho * 0.2) + (pas * 0.2) + (dri * 0.2) + (def * 0.15) + (phy * 0.1));
+  }
+
   updatePlayer(id, updates) {
     const idx = this.players.findIndex(p => p.id === id);
     if (idx !== -1) {
-      this.players[idx] = { ...this.players[idx], ...updates };
+      const next = { ...this.players[idx], ...updates };
+      if (updates.stats && updates.rating === undefined) {
+        next.rating = this.computePlayerRating(next.stats);
+      }
+      this.players[idx] = next;
       this.notify();
       return this.players[idx];
     }
@@ -602,6 +609,29 @@ export class TeamStore {
 
   deletePlayer(id) {
     this.players = this.players.filter(p => p.id !== id);
+    if (Array.isArray(this.settings.startingLineupF7)) {
+      this.settings.startingLineupF7 = this.settings.startingLineupF7.filter(pid => pid !== id);
+    }
+    if (Array.isArray(this.settings.startingLineupFutsal)) {
+      this.settings.startingLineupFutsal = this.settings.startingLineupFutsal.filter(pid => pid !== id);
+    }
+    if (Array.isArray(this.settings.benchPlayers)) {
+      this.settings.benchPlayers = this.settings.benchPlayers.filter(pid => pid !== id);
+    }
+    if (Array.isArray(this.settings.squads)) {
+      this.settings.squads.forEach(sq => {
+        if (Array.isArray(sq.startingLineup)) sq.startingLineup = sq.startingLineup.filter(pid => pid !== id);
+        if (Array.isArray(sq.benchPlayers)) sq.benchPlayers = sq.benchPlayers.filter(pid => pid !== id);
+      });
+    }
+    const fallbackId = this.players[0]?.id || '';
+    if (this.settings.specialists) {
+      ['captain', 'penalties', 'freekicks', 'corners'].forEach(role => {
+        if (this.settings.specialists[role] === id) {
+          this.settings.specialists[role] = fallbackId;
+        }
+      });
+    }
     this.notify();
   }
 
@@ -760,20 +790,36 @@ export class TeamStore {
     const isF7 = this.settings.modality === 'f7';
     const squads = this.getSquads();
     const newId = 'sq_' + Date.now();
+    const lineup = isF7 ? [...this.settings.startingLineupF7] : [...this.settings.startingLineupFutsal];
+    const starterSet = new Set(lineup);
+    const activeBench = this.players.filter(p => !starterSet.has(p.id)).map(p => p.id);
+    const liveRating = this.calculateTeamChemistryAndRating().rating || 82;
     const newSquad = {
       id: newId,
       name: name || `Plantilla ${squads.length + 1}`,
       modality: this.settings.modality,
       formation: isF7 ? this.settings.activeFormationF7 : this.settings.activeFormationFutsal,
-      startingLineup: isF7 ? [...this.settings.startingLineupF7] : [...this.settings.startingLineupFutsal],
-      benchPlayers: [...(this.settings.benchPlayers || ['p7'])],
-      rating: 84
+      startingLineup: lineup,
+      benchPlayers: activeBench,
+      rating: liveRating
     };
     squads.push(newSquad);
     this.settings.activeSquadId = newId;
     this.saveLocal();
     this.notify();
     return newSquad;
+  }
+
+  deleteSquad(squadId) {
+    const squads = this.getSquads();
+    if (squads.length <= 1) return false;
+    this.settings.squads = squads.filter(s => s.id !== squadId);
+    if (this.settings.activeSquadId === squadId) {
+      this.settings.activeSquadId = this.settings.squads[0]?.id || 'sq_furia_f7';
+    }
+    this.saveLocal();
+    this.notify();
+    return true;
   }
 
   calculateTeamChemistryAndRating(slotRoles) {

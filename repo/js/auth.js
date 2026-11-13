@@ -166,29 +166,40 @@ class AuthService {
 
     let targetPlayer;
     if (existingPlayer) {
-      // ACTUALIZAR CARTA EXISTENTE (evita duplicados)
+      const nextStats = {
+        pac: parseInt(cardData.pac, 10) || existingPlayer.stats?.pac || 80,
+        sho: parseInt(cardData.sho, 10) || existingPlayer.stats?.sho || 80,
+        pas: parseInt(cardData.pas, 10) || existingPlayer.stats?.pas || 80,
+        dri: parseInt(cardData.dri, 10) || existingPlayer.stats?.dri || 80,
+        def: parseInt(cardData.def, 10) || existingPlayer.stats?.def || 65,
+        phy: parseInt(cardData.phy, 10) || existingPlayer.stats?.phy || 75
+      };
+      // ACTUALIZAR CARTA EXISTENTE (conservar todos los campos de personalización y recalcular media)
       targetPlayer = store.updatePlayer(existingPlayer.id, {
         name: this.currentUser.name || existingPlayer.name,
         nickname: cardData.nickname || existingPlayer.nickname,
         avatar: avatarUrl,
         number: parseInt(cardData.number, 10) || existingPlayer.number,
+        rating: parseInt(cardData.rating, 10) || store.computePlayerRating(nextStats),
         cardType: cardData.cardType || existingPlayer.cardType || 'gold',
         faculty: cardData.faculty || existingPlayer.faculty,
         preferredFoot: cardData.preferredFoot || existingPlayer.preferredFoot,
+        kitColor: cardData.kitColor || existingPlayer.kitColor || '#f0be2a',
+        kitSecondary: cardData.kitSecondary || existingPlayer.kitSecondary || '#111827',
+        kitCollar: cardData.kitCollar || existingPlayer.kitCollar || 'round',
+        kitSleeves: cardData.kitSleeves || existingPlayer.kitSleeves || 'short',
+        playStyle: cardData.playStyle || existingPlayer.playStyle || 'finesse',
+        celebration: cardData.celebration || existingPlayer.celebration || 'siuuu',
+        skillMoves: parseInt(cardData.skillMoves, 10) || existingPlayer.skillMoves || 4,
+        weakFoot: parseInt(cardData.weakFoot, 10) || existingPlayer.weakFoot || 4,
+        chemStyle: cardData.chemStyle || existingPlayer.chemStyle || 'HUN',
         rolesHierarchy: {
           best: cardData.roleBest || existingPlayer.rolesHierarchy?.best || 'DC',
           second: cardData.roleSecond || existingPlayer.rolesHierarchy?.second || 'MC',
           third: cardData.roleThird || existingPlayer.rolesHierarchy?.third || 'DFC',
           worst: cardData.roleWorst || existingPlayer.rolesHierarchy?.worst || 'POR'
         },
-        stats: {
-          pac: parseInt(cardData.pac, 10) || existingPlayer.stats?.pac || 80,
-          sho: parseInt(cardData.sho, 10) || existingPlayer.stats?.sho || 80,
-          pas: parseInt(cardData.pas, 10) || existingPlayer.stats?.pas || 80,
-          dri: parseInt(cardData.dri, 10) || existingPlayer.stats?.dri || 80,
-          def: parseInt(cardData.def, 10) || existingPlayer.stats?.def || 65,
-          phy: parseInt(cardData.phy, 10) || existingPlayer.stats?.phy || 75
-        }
+        stats: nextStats
       });
     } else {
       // CREAR PRIMERA Y ÚNICA CARTA
@@ -198,10 +209,19 @@ class AuthService {
         email: this.currentUser.email,
         avatar: avatarUrl,
         number: parseInt(cardData.number, 10) || 7,
-        rating: parseInt(cardData.rating, 10) || 82,
+        rating: parseInt(cardData.rating, 10) || undefined,
         cardType: cardData.cardType || 'gold',
         faculty: cardData.faculty || 'inf',
         preferredFoot: cardData.preferredFoot || 'Diestro',
+        kitColor: cardData.kitColor || '#f0be2a',
+        kitSecondary: cardData.kitSecondary || '#111827',
+        kitCollar: cardData.kitCollar || 'round',
+        kitSleeves: cardData.kitSleeves || 'short',
+        playStyle: cardData.playStyle || 'finesse',
+        celebration: cardData.celebration || 'siuuu',
+        skillMoves: parseInt(cardData.skillMoves, 10) || 4,
+        weakFoot: parseInt(cardData.weakFoot, 10) || 4,
+        chemStyle: cardData.chemStyle || 'HUN',
         studentId: cardData.studentId || '',
         phone: cardData.phone || '',
         roleBest: cardData.roleBest || 'DC',
