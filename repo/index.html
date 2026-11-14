@@ -73,7 +73,7 @@
 
     <!-- Chyron derecho: estado BD + badge FS + tema claro/oscuro + audio + sesión -->
     <div class="hud-status">
-      <button type="button" id="hud-cloud-status-btn" class="hud-cloud-pill font-fifa" title="Estado de sincronización con base de datos compartida en la nube">
+      <button type="button" id="hud-cloud-status-btn" class="hud-cloud-pill font-fifa hidden" title="Estado de sincronización con base de datos compartida en la nube">
         <i data-lucide="cloud" id="hud-cloud-status-icon" class="w-3.5 h-3.5"></i>
         <span id="hud-cloud-status-label">BD</span>
       </button>
@@ -742,8 +742,8 @@
 
       <form id="form-team-settings" class="space-y-6">
 
-        <!-- 0. ESTADO REAL BASE DE DATOS MULTI-DISPOSITIVO -->
-        <div id="club-cloud-status-card" class="fifa-club-tile">
+        <!-- 0. ESTADO REAL BASE DE DATOS MULTI-DISPOSITIVO (solo visible si hay incidencia) -->
+        <div id="club-cloud-status-card" class="fifa-club-tile hidden">
           <div class="fifa-club-tile-accent"></div>
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">

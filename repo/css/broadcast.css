@@ -340,6 +340,10 @@ body.hud-canvas {
   cursor: pointer;
   transition: transform var(--hud-snap), filter var(--hud-snap);
 }
+.hud-cloud-pill.hidden,
+.fifa-club-tile.hidden {
+  display: none !important;
+}
 .hud-cloud-pill:hover {
   filter: brightness(1.1);
 }

@@ -692,12 +692,14 @@ class FutApp {
 
     const pillBtn = document.getElementById('hud-cloud-status-btn');
     const pillLbl = document.getElementById('hud-cloud-status-label');
+    const clubCard = document.getElementById('club-cloud-status-card');
     const clubPill = document.getElementById('club-cloud-pill');
     const clubDetail = document.getElementById('club-cloud-detail');
     const dlgBadge = document.getElementById('cloud-dialog-badge');
     const dlgMsg = document.getElementById('cloud-dialog-message');
     const dlgSteps = document.getElementById('cloud-dialog-fix-steps');
     const setupBanner = document.getElementById('setup-cloud-status-banner');
+    const hideHealthyStatus = status.state === 'connected' || status.state === 'initializing';
 
     let badgeText = 'SIN BD';
     let pillClass = 'is-error';
@@ -721,10 +723,14 @@ class FutApp {
     if (pillBtn) {
       pillBtn.classList.remove('is-online', 'is-warn', 'is-error', 'is-pending');
       pillBtn.classList.add(pillClass);
+      pillBtn.classList.toggle('hidden', hideHealthyStatus);
       pillBtn.title = status.message || badgeText;
     }
     if (pillLbl) pillLbl.textContent = badgeText;
 
+    if (clubCard) {
+      clubCard.classList.toggle('hidden', hideHealthyStatus);
+    }
     if (clubPill) {
       clubPill.textContent = badgeText;
       clubPill.className = status.state === 'connected'
