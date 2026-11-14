@@ -129,135 +129,106 @@ export const STATS_TEST_CONFIG = [
 ];
 
 export const TACTICAL_FORMATIONS = {
-  f7: {
-    '1-3-2-1': {
-      id: '1-3-2-1',
-      name: '1-3-2-1 (Árbol de Navidad)',
-      short: '1-3-2-1',
-      styleTag: 'Equilibrado / Control Central',
-      desc: 'Línea de 3 atrás muy sólida con 2 mediocentros de apoyo y un ariete en punta.',
-      advice: 'Ideal si tienes dos mediocentros de calidad que sepan combinar y distribuir rápido. Protege los costados con laterales de largo recorrido.',
+  futsal: {
+    '1-1-2-1': {
+      id: '1-1-2-1',
+      name: '1-1-2-1 (Rombo Clásico)',
+      short: '1-1-2-1',
+      styleTag: 'Equilibrado / Control Pista',
+      desc: 'Cierre de referencia atrás, 2 alas abriendo pista y 1 pívot fijando arriba.',
+      advice: 'El sistema más equilibrado de Fútbol Sala. Si tapan pase al pívot, juega pared con el ala contrario y busca el segundo palo.',
       slots: [
         { role: 'POR', top: 85, left: 50 },
-        { role: 'LI', top: 64, left: 22 },
-        { role: 'DFC', top: 68, left: 50 },
-        { role: 'LD', top: 64, left: 78 },
-        { role: 'MC', top: 43, left: 36 },
-        { role: 'MC', top: 43, left: 64 },
-        { role: 'DC', top: 20, left: 50 }
+        { role: 'CIE', top: 67, left: 50 },
+        { role: 'ALI', top: 44, left: 22 },
+        { role: 'ALD', top: 44, left: 78 },
+        { role: 'PIV', top: 20, left: 50 }
       ]
     },
-    '1-2-3-1': {
-      id: '1-2-3-1',
-      name: '1-2-3-1 (Amplitud y Extremos)',
-      short: '1-2-3-1',
-      styleTag: 'Ofensivo / Desborde por Bandas',
-      desc: '2 centrales puros, 3 centrocampistas abiertos (extremos) y 1 punta de referencia.',
-      advice: 'Desborda por las bandas con extremos rápidos (EI/ED). Los dos centrales deben ser veloces en el 1 vs 1 ante contras rivales.',
+    '1-3-1': {
+      id: '1-3-1',
+      name: '1-3-1 (Abanico con Pívot)',
+      short: '1-3-1',
+      styleTag: 'Ofensivo / Juego Directo al Pívot',
+      desc: 'Cierre y 2 alas escalonados en salida para conectar con un pívot dominante arriba.',
+      advice: 'Atrae la presión con balón entre cierre y alas para filtrar pase tenso al pívot (PIV) y doblar por fuera.',
       slots: [
         { role: 'POR', top: 85, left: 50 },
-        { role: 'DFC', top: 68, left: 33 },
-        { role: 'DFC', top: 68, left: 67 },
-        { role: 'EI', top: 45, left: 18 },
-        { role: 'MC', top: 43, left: 50 },
-        { role: 'ED', top: 45, left: 82 },
-        { role: 'DC', top: 20, left: 50 }
+        { role: 'ALI', top: 56, left: 21 },
+        { role: 'CIE', top: 64, left: 50 },
+        { role: 'ALD', top: 56, left: 79 },
+        { role: 'PIV', top: 20, left: 50 }
       ]
     },
-    '1-3-1-2': {
-      id: '1-3-1-2',
-      name: '1-3-1-2 (Doble Punta Letal)',
-      short: '1-3-1-2',
-      styleTag: 'Ataque Directo / Presión Alta',
-      desc: '3 defensas, 1 mediapunta organizador y 2 delanteros centro sincronizados.',
-      advice: 'Perfecta si tienes dos delanteros definidores (DC). El MCO debe tener gran visión para filtrar balones entre centrales rivales.',
+    '1-2-2': {
+      id: '1-2-2',
+      name: '1-2-2 (Cuadrado Equilibrado)',
+      short: '1-2-2',
+      styleTag: 'Defensa Zonal / Transición Rápida',
+      desc: 'Primera línea de 2 atrás y 2 atacantes arriba para robar en zona media y correr.',
+      advice: 'Sólido para defender en media pista cerrando líneas interiores. Al recuperar, dos jugadores ya están altos para finalizar rápido.',
       slots: [
         { role: 'POR', top: 85, left: 50 },
-        { role: 'LI', top: 66, left: 22 },
-        { role: 'DFC', top: 70, left: 50 },
-        { role: 'LD', top: 66, left: 78 },
-        { role: 'MCO', top: 45, left: 50 },
-        { role: 'DC', top: 20, left: 35 },
-        { role: 'DC', top: 20, left: 65 }
+        { role: 'CIE', top: 66, left: 32 },
+        { role: 'ALA', top: 66, left: 68 },
+        { role: 'ALI', top: 24, left: 28 },
+        { role: 'PIV', top: 24, left: 72 }
       ]
     },
-    '1-2-2-2': {
-      id: '1-2-2-2',
-      name: '1-2-2-2 (Cuadrado Mágico / Box)',
-      short: '1-2-2-2',
-      styleTag: 'Transición Rápida y Presión',
-      desc: '2 defensas de cierre, 2 mediocentros dinámicos y 2 puntas en constante presión.',
-      advice: 'Favorece el juego vertical e intercepciones en mitad de campo. Requiere mucha intensidad de los 2 MC para bascular y no partirse.',
+    '1-4-0': {
+      id: '1-4-0',
+      name: '1-4-0 (Juego de Cuatro)',
+      short: '1-4-0',
+      styleTag: 'Posesión / Rotación Continua',
+      desc: 'Cuatro jugadores en línea móvil generando espacios a la espalda con paralelas y diagonales.',
+      advice: 'Sin pívot fijo: pasa y corta al espacio (puerta atrás). Requiere máxima movilidad y comunicación constante de todo el cuarteto.',
       slots: [
         { role: 'POR', top: 85, left: 50 },
-        { role: 'DFC', top: 70, left: 35 },
-        { role: 'DFC', top: 70, left: 65 },
-        { role: 'MC', top: 46, left: 33 },
-        { role: 'MC', top: 46, left: 67 },
-        { role: 'DC', top: 21, left: 35 },
-        { role: 'DC', top: 21, left: 65 }
+        { role: 'ALI', top: 48, left: 19 },
+        { role: 'CIE', top: 58, left: 39 },
+        { role: 'ALA', top: 58, left: 61 },
+        { role: 'ALD', top: 48, left: 81 }
       ]
     },
-    '1-3-3-0': {
-      id: '1-3-3-0',
-      name: '1-3-3-0 (Falso 9 / Tiqui-Taca)',
-      short: '1-3-3-0',
-      styleTag: 'Posesión y Sobrecarga Central',
-      desc: '3 defensores con 3 mediocentros combinativos que llegan desde segunda línea sin ariete estático.',
-      advice: 'Desespera al rival con posesión continua. Los mediocentros deben incorporarse por sorpresa para rematar desde la frontal.',
+    '1-1-1-2': {
+      id: '1-1-1-2',
+      name: '1-1-1-2 (Doble Pívot Ofensivo)',
+      short: '1-1-1-2',
+      styleTag: 'Ataque Directo / Remate en Área',
+      desc: 'Cierre organizador, ala de apoyo y dos atacantes cargando el área rival de 6 metros.',
+      advice: 'Ideal para remontar o castigar defensas cerradas buscando segundo palo y rebotes rápidos frente a portería.',
       slots: [
         { role: 'POR', top: 85, left: 50 },
-        { role: 'LI', top: 66, left: 22 },
-        { role: 'DFC', top: 70, left: 50 },
-        { role: 'LD', top: 66, left: 78 },
-        { role: 'MC', top: 40, left: 24 },
-        { role: 'MCO', top: 32, left: 50 },
-        { role: 'MC', top: 40, left: 76 }
+        { role: 'CIE', top: 68, left: 50 },
+        { role: 'ALA', top: 46, left: 50 },
+        { role: 'PIV', top: 21, left: 32 },
+        { role: 'PIV', top: 21, left: 68 }
       ]
     },
-    '1-4-1-1': {
-      id: '1-4-1-1',
-      name: '1-4-1-1 (Cerrojo Defensivo / Contra)',
-      short: '1-4-1-1',
-      styleTag: 'Bloque Bajo y Contragolpe',
-      desc: 'Línea de 4 defensores para asegurar el resultado, 1 pivote defensivo y 1 delantero rápido.',
-      advice: 'Ideal ante rivales con delantera temible o para aguantar marcadores. Mantén el bloque bajo y busca el balón largo a la contra.',
+    '5v4': {
+      id: '5v4',
+      name: '5v4 (Portero-Jugador)',
+      short: '5v4',
+      styleTag: 'Superioridad 5 vs 4 / Asedio Final',
+      desc: 'El portero con peto cruza medio campo para crear superioridad de 5 atacantes contra 4 defensores.',
+      advice: 'Circula con paciencia buscando el 2 contra 1 en esquina para pase tenso al segundo palo. Prohibido perder balones por el centro.',
       slots: [
-        { role: 'POR', top: 85, left: 50 },
-        { role: 'LI', top: 68, left: 16 },
-        { role: 'DFC', top: 72, left: 38 },
-        { role: 'DFC', top: 72, left: 62 },
-        { role: 'LD', top: 68, left: 84 },
-        { role: 'MC', top: 45, left: 50 },
-        { role: 'DC', top: 20, left: 50 }
-      ]
-    },
-    '1-1-4-1': {
-      id: '1-1-4-1',
-      name: '1-1-4-1 (Ultra Ofensiva / Asedio)',
-      short: '1-1-4-1',
-      styleTag: 'Presión Total / Remontada',
-      desc: '1 solo defensa central, 4 centrocampistas volcados en ataque y 1 delantero centro.',
-      advice: 'Úsala para remontar en los minutos finales. Asedio constante en campo rival, pero ten cuidado con las pérdidas a la contra.',
-      slots: [
-        { role: 'POR', top: 85, left: 50 },
-        { role: 'DFC', top: 72, left: 50 },
-        { role: 'LI', top: 44, left: 18 },
-        { role: 'MC', top: 42, left: 39 },
-        { role: 'MC', top: 42, left: 61 },
-        { role: 'LD', top: 44, left: 82 },
-        { role: 'DC', top: 20, left: 50 }
+        { role: 'POR', top: 58, left: 50 },
+        { role: 'ALI', top: 39, left: 19 },
+        { role: 'CIE', top: 42, left: 39 },
+        { role: 'ALD', top: 39, left: 81 },
+        { role: 'PIV', top: 19, left: 62 }
       ]
     }
   }
 };
 
-export function getFormationConfig(modality = 'f7', formationId) {
-  const modCatalog = TACTICAL_FORMATIONS.f7;
+export function getFormationConfig(modality = 'futsal', formationId) {
+  const modCatalog = TACTICAL_FORMATIONS.futsal;
   if (formationId && modCatalog[formationId]) {
     return modCatalog[formationId];
   }
-  return modCatalog['1-3-2-1'] || Object.values(modCatalog)[0];
+  return modCatalog['1-1-2-1'] || Object.values(modCatalog)[0];
 }
 
 class FutApp {
@@ -269,7 +240,7 @@ class FutApp {
     this._lastClosedPopover = null;
     this._justDraggedUntil = 0;
     this.albumSquadFilter = 'all';
-    this._lastRoleValues = { best: 'DC', second: 'MC', third: 'DFC', fourth: 'MCO', worst: 'POR' };
+    this._lastRoleValues = { best: 'PIV', second: 'ALI', third: 'ALD', fourth: 'CIE', worst: 'POR' };
     this._matchPlanState = {
       selectedIds: null,
       strategy: 'balanced',
@@ -628,7 +599,7 @@ class FutApp {
 
     const fac = FACULTIES.find(f => f.id === player.faculty) || FACULTIES[0];
     const cardClass = this.getCardClass(player.cardType);
-    const displayRole = role || (player.rolesHierarchy ? player.rolesHierarchy.best : (player.roleBest || 'DC'));
+    const displayRole = role || (player.rolesHierarchy ? player.rolesHierarchy.best : (player.roleBest || 'PIV'));
     const displayName = (player.nickname || player.name.split(' ')[0] || 'CRACK').toUpperCase();
     const stats = player.stats || { pac: 80, sho: 80, pas: 80, dri: 80, def: 65, phy: 75 };
     const kit = this.resolvePlayerKit(player);
@@ -852,7 +823,7 @@ class FutApp {
       }
     }
     if (dorsalEl) dorsalEl.textContent = `#${player.number || 10}`;
-    if (posEl) posEl.textContent = player.rolesHierarchy?.best || player.roleBest || 'DC';
+    if (posEl) posEl.textContent = player.rolesHierarchy?.best || player.roleBest || 'PIV';
     if (nameEl) nameEl.textContent = player.nickname || player.name;
     if (ratingEl) ratingEl.textContent = player.rating;
 
@@ -888,7 +859,7 @@ class FutApp {
 
     const modBadge = document.getElementById('modal-active-modality-badge');
     if (modBadge) {
-      modBadge.textContent = 'FÚTBOL 7';
+      modBadge.textContent = 'FÚTBOL SALA';
     }
 
     this.renderFormationsVisualGrid();
@@ -935,7 +906,7 @@ class FutApp {
     const grid = document.getElementById('fifa-formations-grid');
     if (!grid) return;
 
-    const list = Object.values(TACTICAL_FORMATIONS.f7);
+    const list = Object.values(TACTICAL_FORMATIONS.futsal);
     const current = store.getActiveFormation();
 
     grid.innerHTML = list.map(f => {
@@ -999,18 +970,18 @@ class FutApp {
 
     grid.innerHTML = squads.map(s => {
       const isActive = s.id === activeId;
-      const modLabel = 'FÚTBOL 7';
+      const modLabel = 'FÚTBOL SALA';
       const starters = (s.startingLineup || []).map(id => store.getPlayerById(id)).filter(Boolean);
       const liveOvr = starters.length > 0
         ? Math.round(starters.reduce((acc, p) => acc + (p.rating || 75), 0) / starters.length)
         : (s.rating || 80);
-      const startersCount = s.startingLineup?.length || 7;
+      const startersCount = s.startingLineup?.length || 5;
       const benchCount = s.benchPlayers?.length || 0;
       const startersLabel = startersCount === 1 ? 'Titular' : 'Titulares';
       const benchLabel = benchCount === 1 ? 'Suplente' : 'Suplentes';
 
       const startersHtml = starters.length > 0
-        ? starters.slice(0, 7).map(p => `<span class="fifa-squad-member-chip">#${p.number || 10} ${(p.nickname || p.name || '').split(' ')[0]}</span>`).join('')
+        ? starters.slice(0, 5).map(p => `<span class="fifa-squad-member-chip">#${p.number || 10} ${(p.nickname || p.name || '').split(' ')[0]}</span>`).join('')
         : '<span class="fifa-squad-member-empty">Sin titulares aún · Crea cartas con Google</span>';
 
       return `
@@ -1087,7 +1058,7 @@ class FutApp {
     const dlg = document.getElementById('squad-create-dialog');
     const inp = document.getElementById('squad-create-name');
     if (!dlg || !inp) return;
-    inp.value = `Once F7 · ${store.getActiveFormation()}`;
+    inp.value = `Quinteto FS · ${store.getActiveFormation()}`;
     dlg.showModal();
     inp.select();
   }
@@ -1147,7 +1118,7 @@ class FutApp {
     this.renderSquadsVisualGrid();
     this.renderAlbumCards();
     futAudio.playSuccess();
-    this.showToast('Once óptimo calculado por media, stats y prioridad de roles', 'sparkles');
+    this.showToast('Quinteto óptimo calculado por media, stats y prioridad de roles', 'sparkles');
   }
 
   resetSquadPositions() {
@@ -1630,7 +1601,7 @@ class FutApp {
   updateModalityButtons(mod) {
     const label = document.getElementById('current-modality-label');
     if (label) {
-      label.textContent = 'Fútbol 7';
+      label.textContent = 'Fútbol Sala';
     }
   }
 
@@ -1639,7 +1610,7 @@ class FutApp {
     const inlineSel = document.getElementById('inline-formation-select');
     const chipsWrap = document.getElementById('side-formation-chips');
 
-    const list = Object.values(TACTICAL_FORMATIONS.f7);
+    const list = Object.values(TACTICAL_FORMATIONS.futsal);
     const current = store.getActiveFormation();
 
     if (sel) {
@@ -1683,7 +1654,7 @@ class FutApp {
     const squads = store.getSquads();
     const activeId = store.getActiveSquadId();
     sel.innerHTML = squads.map(s => {
-      return `<option value="${s.id}" ${s.id === activeId ? 'selected' : ''}>[F7] ${s.name}</option>`;
+      return `<option value="${s.id}" ${s.id === activeId ? 'selected' : ''}>[FS] ${s.name}</option>`;
     }).join('');
     sel.value = activeId;
   }
@@ -2257,13 +2228,13 @@ class FutApp {
         roleBest: document.getElementById('setup-role-best').value,
         roleSecond: document.getElementById('setup-role-second').value,
         roleThird: document.getElementById('setup-role-third').value,
-        roleFourth: document.getElementById('setup-role-fourth')?.value || 'MCO',
+        roleFourth: document.getElementById('setup-role-fourth')?.value || 'CIE',
         roleWorst: document.getElementById('setup-role-worst').value,
         priorityOrder: [
           document.getElementById('setup-role-best').value,
           document.getElementById('setup-role-second').value,
           document.getElementById('setup-role-third').value,
-          document.getElementById('setup-role-fourth')?.value || 'MCO'
+          document.getElementById('setup-role-fourth')?.value || 'CIE'
         ],
         pac: document.getElementById('setup-pac').value,
         sho: document.getElementById('setup-sho').value,
@@ -2450,7 +2421,7 @@ class FutApp {
       kitColor: settings.kitColor || '#f8fafc',
       kitSecondary: settings.kitSecondary || '#f0be2a',
       rolesHierarchy: {
-        best: document.getElementById('setup-role-best')?.value || 'DC'
+        best: document.getElementById('setup-role-best')?.value || 'PIV'
       },
       stats
     };
@@ -2544,12 +2515,12 @@ class FutApp {
       setVal('setup-celebration', 'siuuu');
       setVal('setup-skill-moves', 4);
       setVal('setup-weak-foot', 4);
-      setVal('setup-role-best', 'DC');
-      setVal('setup-role-second', 'MC');
-      setVal('setup-role-third', 'DFC');
-      setVal('setup-role-fourth', 'MCO');
+      setVal('setup-role-best', 'PIV');
+      setVal('setup-role-second', 'ALI');
+      setVal('setup-role-third', 'ALD');
+      setVal('setup-role-fourth', 'CIE');
       setVal('setup-role-worst', 'POR');
-      this._lastRoleValues = { best: 'DC', second: 'MC', third: 'DFC', fourth: 'MCO', worst: 'POR' };
+      this._lastRoleValues = { best: 'PIV', second: 'ALI', third: 'ALD', fourth: 'CIE', worst: 'POR' };
       this.setupStatsTestForUser(null);
       const avatarUrl = user.photoURL || 'assets/club_logo.png';
       const imgEl = document.getElementById('setup-user-avatar');
@@ -2938,7 +2909,7 @@ class FutApp {
       if (m) {
         document.getElementById('match-id').value = m.id;
         document.getElementById('match-rival').value = m.rival;
-        document.getElementById('match-modality').value = 'f7';
+        document.getElementById('match-modality').value = 'futsal';
         document.getElementById('match-tournament').value = m.tournament || settings.tournament;
         document.getElementById('match-date').value = m.date;
         document.getElementById('match-time').value = m.time;
@@ -2947,7 +2918,7 @@ class FutApp {
       }
     } else {
       document.getElementById('match-id').value = '';
-      document.getElementById('match-modality').value = 'f7';
+      document.getElementById('match-modality').value = 'futsal';
       document.getElementById('match-tournament').value = settings.tournament;
       document.getElementById('match-date').value = new Date().toISOString().split('T')[0];
     }
@@ -3170,7 +3141,7 @@ class FutApp {
 
     const modBadge = document.getElementById('current-modality-badge');
     if (modBadge) {
-      modBadge.textContent = `FÚTBOL 7 · ${formationConfig.short || activeFormation}`;
+      modBadge.textContent = `FÚTBOL SALA · ${formationConfig.short || activeFormation}`;
     }
 
     const projected = formationConfig.slots.map(s => this.projectSlot(s));
@@ -3274,7 +3245,7 @@ class FutApp {
              draggable="true"
              onclick="window.futApp.selectBench('${p.id}', this)"
              onmouseenter="window.futApp.updatePlayerInspector(window.futApp.store.getPlayerById('${p.id}'))"
-             title="${p.name} (${p.rolesHierarchy ? p.rolesHierarchy.best : p.roleBest || 'DC'})">
+             title="${p.name} (${p.rolesHierarchy ? p.rolesHierarchy.best : p.roleBest || 'PIV'})">
           ${this.renderFutCard(p, { size: 'bench' })}
         </div>
       `).join('');
@@ -3314,7 +3285,7 @@ class FutApp {
         : ((rh.second === slot.role || rh.third === slot.role) ? 'is-fit-alt' : 'is-fit-poor');
       const fitTitle = fitClass === 'is-fit-best'
         ? `Posición ideal (${slot.role})`
-        : (fitClass === 'is-fit-alt' ? `Posición secundaria (${slot.role})` : `Fuera de posición natural (prefiere ${rh.best || 'DC'})`);
+        : (fitClass === 'is-fit-alt' ? `Posición secundaria (${slot.role})` : `Fuera de posición natural (prefiere ${rh.best || 'PIV'})`);
 
       return `
         <div class="fut-card-slot ${(isSelected || isSwapSource) ? 'swap-active is-selected-cursor' : ''} ${isSwapCandidate ? 'is-swap-candidate' : ''}" 
@@ -3361,7 +3332,7 @@ class FutApp {
     const projected = formationConfig.slots.map(s => this.projectSlot(s));
     const ratingVal = store.calculateTeamChemistryAndRating().rating;
 
-    if (badgeEl) badgeEl.textContent = `FÚTBOL 7 · ${formationConfig.short || activeFormation}`;
+    if (badgeEl) badgeEl.textContent = `FÚTBOL SALA · ${formationConfig.short || activeFormation}`;
     if (ratingEl) ratingEl.textContent = ratingVal > 0 ? ratingVal : '--';
 
     const calMarkings = document.getElementById('pitch-cal-markings-svg')?.outerHTML.replace('id="pitch-cal-markings-svg"', '') || '';
@@ -3444,11 +3415,11 @@ class FutApp {
     const scale = +(baseScale + 0.10 * rawT).toFixed(3);
 
     let mappedTop;
-    if (slot.role === 'POR') {
+    if (slot.role === 'POR' && slot.top >= 75) {
       mappedTop = 85.0;
     } else {
       const outT = Math.min(1, Math.max(0, (slot.top - 18) / 54));
-      mappedTop = 15.0 + outT * 46.5;
+      mappedTop = 15.0 + outT * 48.0;
     }
 
     return {
@@ -3460,61 +3431,31 @@ class FutApp {
   }
 
   /**
-   * Enlaces tácticos de química oficial FIFA FUT entre posiciones
+   * Enlaces tácticos de química oficial FIFA FUT entre posiciones de Fútbol Sala
    */
   getFormationChemistryLinks(modality, formationId, slotsCount) {
-    const f7Links = {
-      '1-3-2-1': [
-        [0, 1], [0, 2], [0, 3],
-        [1, 2], [2, 3],
-        [1, 4], [2, 4], [2, 5], [3, 5],
-        [4, 5],
-        [4, 6], [5, 6]
+    const futsalLinks = {
+      '1-1-2-1': [
+        [0, 1], [1, 2], [1, 3], [2, 3], [2, 4], [3, 4]
       ],
-      '1-2-3-1': [
-        [0, 1], [0, 2],
-        [1, 2],
-        [1, 3], [1, 4],
-        [2, 4], [2, 5],
-        [3, 4], [4, 5],
-        [3, 6], [4, 6], [5, 6]
+      '1-3-1': [
+        [0, 2], [1, 2], [2, 3], [1, 4], [2, 4], [3, 4]
       ],
-      '1-3-1-2': [
-        [0, 1], [0, 2], [0, 3],
-        [1, 2], [2, 3],
-        [1, 4], [2, 4], [3, 4],
-        [4, 5], [4, 6],
-        [5, 6]
+      '1-2-2': [
+        [0, 1], [0, 2], [1, 2], [1, 3], [2, 4], [3, 4]
       ],
-      '1-2-2-2': [
-        [0, 1], [0, 2],
-        [1, 2],
-        [1, 3], [2, 4],
-        [3, 4],
-        [3, 5], [4, 6],
-        [5, 6]
+      '1-4-0': [
+        [0, 2], [0, 3], [1, 2], [2, 3], [3, 4], [1, 4]
       ],
-      '1-3-3-0': [
-        [0, 1], [0, 2], [0, 3],
-        [1, 2], [2, 3],
-        [1, 4], [2, 5], [3, 6],
-        [4, 5], [5, 6]
+      '1-1-1-2': [
+        [0, 1], [1, 2], [2, 3], [2, 4], [3, 4]
       ],
-      '1-4-1-1': [
-        [0, 2], [0, 3],
-        [1, 2], [2, 3], [3, 4],
-        [2, 5], [3, 5],
-        [5, 6]
-      ],
-      '1-1-4-1': [
-        [0, 1],
-        [1, 2], [1, 3], [1, 4], [1, 5],
-        [2, 3], [3, 4], [4, 5],
-        [3, 6], [4, 6]
+      '5v4': [
+        [0, 2], [0, 4], [1, 2], [2, 4], [3, 4]
       ]
     };
 
-    if (f7Links[formationId]) return f7Links[formationId];
+    if (futsalLinks[formationId]) return futsalLinks[formationId];
 
     const fallback = [];
     for (let i = 0; i < slotsCount - 1; i++) {
@@ -3527,7 +3468,7 @@ class FutApp {
     const settings = store.getSettings();
     const activeFormation = store.getActiveFormation();
     const conf = getFormationConfig(settings.modality, activeFormation);
-    return conf?.slots[index]?.role || 'MC';
+    return conf?.slots[index]?.role || 'ALA';
   }
 
   _canEditCard(player) {
@@ -3694,7 +3635,7 @@ class FutApp {
     });
   }
 
-  openCardActionMenu({ mode = 'starter', index = null, playerId, role = 'MC', anchorEl = null }) {
+  openCardActionMenu({ mode = 'starter', index = null, playerId, role = 'ALA', anchorEl = null }) {
     const popover = document.getElementById('card-action-popover');
     const player = store.getPlayerById(playerId);
     if (!popover || !player) return;
@@ -3733,7 +3674,7 @@ class FutApp {
     const rh = player.rolesHierarchy || {};
     const chain = getPlayerPriorityChain(player);
     if (slotPill) {
-      slotPill.textContent = mode === 'bench' ? 'BANQUILLO' : (role || 'MC');
+      slotPill.textContent = mode === 'bench' ? 'BANQUILLO' : (role || 'ALA');
     }
     if (fitBadge) {
       fitBadge.className = 'cap-fit-badge';
@@ -4297,7 +4238,7 @@ class FutApp {
    */
   populateWalkoutTelemetry(player, skinMeta) {
     const fac = FACULTIES.find(f => f.id === player.faculty) || FACULTIES[0];
-    const bestRole = player.rolesHierarchy?.best || player.roleBest || 'DC';
+    const bestRole = player.rolesHierarchy?.best || player.roleBest || 'PIV';
     const stats = player.stats || { pac: 80, sho: 80, pas: 80, dri: 80, def: 65, phy: 75 };
     const dorsal = player.number || 10;
     const sm = player.skillMoves || 4;
@@ -4515,14 +4456,14 @@ class FutApp {
       });
     }
 
-    // 2. Filtrado por Línea / Posición
+    // 2. Filtrado por Línea / Posición de Fútbol Sala
     const roleFilter = this.albumRoleFilter || 'all';
     if (roleFilter !== 'all') {
       players = players.filter(p => {
         const bestRole = p.rolesHierarchy?.best || p.position || '';
-        if (roleFilter === 'DC') return ['DC', 'SD', 'EI', 'ED', 'PIV'].includes(bestRole);
-        if (roleFilter === 'MC') return ['MC', 'MCO', 'MCD', 'MI', 'MD', 'ALA', 'ALI', 'ALD'].includes(bestRole);
-        if (roleFilter === 'DFC') return ['DFC', 'LI', 'LD', 'CIE'].includes(bestRole);
+        if (roleFilter === 'PIV' || roleFilter === 'DC') return ['PIV', 'DC', 'SD'].includes(bestRole);
+        if (roleFilter === 'ALA' || roleFilter === 'MC') return ['ALA', 'ALI', 'ALD', 'MC', 'MCO', 'EI', 'ED', 'MI', 'MD'].includes(bestRole);
+        if (roleFilter === 'CIE' || roleFilter === 'DFC') return ['CIE', 'DFC', 'LI', 'LD', 'MCD'].includes(bestRole);
         if (roleFilter === 'POR') return bestRole === 'POR';
         return true;
       });
@@ -4839,7 +4780,7 @@ class FutApp {
           : (nextMatch.rival?.toLowerCase().includes('ingenier') ? 'crest_leones' : 'crest_lobos');
         awayCrestEl.innerHTML = this.getClubCrestSvg(rivalKey, 'w-12 h-12');
       }
-      if (awayMetaEl) awayMetaEl.textContent = 'FÚTBOL 7';
+      if (awayMetaEl) awayMetaEl.textContent = 'FÚTBOL SALA';
       if (timeChipEl) timeChipEl.textContent = `${nextMatch.time} H`;
       if (details) {
         details.innerHTML = `
@@ -4847,7 +4788,7 @@ class FutApp {
           <span class="mx-1.5 opacity-50">•</span>
           <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-400"></i> ${nextMatch.field}</span>
           <span class="mx-1.5 opacity-50">•</span>
-          <span class="text-amber-400 font-bold">FÚTBOL 7</span>
+          <span class="text-amber-400 font-bold">FÚTBOL SALA</span>
         `;
       }
       if (statusBadgeEl) {
@@ -4882,7 +4823,7 @@ class FutApp {
             <div class="fifa-player-chip" title="${p.name} (${p.faculty})">
               <span class="fifa-chip-dorsal font-fifa">#${p.number}</span>
               <span class="font-fifa">${p.nickname || p.name}</span>
-              <span class="fifa-chip-role font-fifa">${p.rolesHierarchy?.best || 'MC'}</span>
+              <span class="fifa-chip-role font-fifa">${p.rolesHierarchy?.best || 'ALA'}</span>
             </div>
           `).join('');
         };
@@ -4956,7 +4897,7 @@ class FutApp {
               <div class="fifa-fixture-meta font-fifa">
                 <span class="inline-flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3 text-slate-400"></i> ${m.date} · ${m.time}h</span>
                 <span class="inline-flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> ${m.field}</span>
-                <span class="text-amber-400">Fútbol 7</span>
+                <span class="text-amber-400">Fútbol Sala</span>
                 ${m.scorers ? `<span class="text-emerald-400 inline-flex items-center gap-1"><i data-lucide="goal" class="w-3 h-3"></i> ${m.scorers}</span>` : ''}
                 ${isFinished && m.mvp ? `<span class="text-amber-300 inline-flex items-center gap-1"><i data-lucide="star" class="w-3 h-3"></i> MVP: ${m.mvp}</span>` : ''}
               </div>
@@ -5080,7 +5021,7 @@ class FutApp {
       const optionsMarkup = players.length === 0
         ? '<option value="">Sin jugadores</option>'
         : players.map(p => `
-            <option value="${p.id}" ${p.id === current ? 'selected' : ''}>#${p.number || 10} ${p.nickname || p.name} (${p.rolesHierarchy?.best || 'MC'})</option>
+            <option value="${p.id}" ${p.id === current ? 'selected' : ''}>#${p.number || 10} ${p.nickname || p.name} (${p.rolesHierarchy?.best || 'ALA'})</option>
           `).join('');
 
       document.querySelectorAll(`[data-spec="${spec.id}"]`).forEach(el => {
@@ -5092,10 +5033,10 @@ class FutApp {
   // ==================== PRIORIDAD DE POSICIONES SIN DUPLICADOS ====================
   populateRolePrioritySelects() {
     const ids = [
-      { id: 'setup-role-best', key: 'best', def: 'DC' },
-      { id: 'setup-role-second', key: 'second', def: 'MC' },
-      { id: 'setup-role-third', key: 'third', def: 'DFC' },
-      { id: 'setup-role-fourth', key: 'fourth', def: 'MCO' },
+      { id: 'setup-role-best', key: 'best', def: 'PIV' },
+      { id: 'setup-role-second', key: 'second', def: 'ALI' },
+      { id: 'setup-role-third', key: 'third', def: 'ALD' },
+      { id: 'setup-role-fourth', key: 'fourth', def: 'CIE' },
       { id: 'setup-role-worst', key: 'worst', def: 'POR' }
     ];
     const optionsMarkup = ALL_TACTICAL_ROLES
@@ -5145,10 +5086,10 @@ class FutApp {
   updateRolePriorityPreview() {
     const preview = document.getElementById('setup-role-priority-preview');
     if (!preview) return;
-    const b = document.getElementById('setup-role-best')?.value || 'DC';
-    const s = document.getElementById('setup-role-second')?.value || 'MC';
-    const t = document.getElementById('setup-role-third')?.value || 'DFC';
-    const f = document.getElementById('setup-role-fourth')?.value || 'MCO';
+    const b = document.getElementById('setup-role-best')?.value || 'PIV';
+    const s = document.getElementById('setup-role-second')?.value || 'ALI';
+    const t = document.getElementById('setup-role-third')?.value || 'ALD';
+    const f = document.getElementById('setup-role-fourth')?.value || 'CIE';
     const w = document.getElementById('setup-role-worst')?.value || 'POR';
 
     preview.innerHTML = `
@@ -5176,7 +5117,7 @@ class FutApp {
     if (!convGrid || !outWrap) return;
 
     const settings = store.getSettings();
-    const modality = 'f7';
+    const modality = 'futsal';
     const activeFormation = store.getActiveFormation();
     const formationConfig = getFormationConfig(modality, activeFormation);
     const activeSquad = store.getActiveSquad();
@@ -5186,10 +5127,10 @@ class FutApp {
 
     if (this._matchPlanState.modalityKey !== modality) {
       this._matchPlanState.modalityKey = modality;
-      this._matchPlanState.duration = 50;
+      this._matchPlanState.duration = 40;
       if (durInput) durInput.value = this._matchPlanState.duration;
     } else if (!this._matchPlanState.duration) {
-      this._matchPlanState.duration = 50;
+      this._matchPlanState.duration = 40;
       if (durInput) durInput.value = this._matchPlanState.duration;
     }
 
@@ -5206,7 +5147,7 @@ class FutApp {
     const selectedSet = this._matchPlanState.selectedIds;
 
     if (ctxEl) {
-      ctxEl.textContent = `Plantilla "${activeSquad?.name || 'Principal'}" · FÚTBOL 7 · Esquema ${formationConfig.short || activeFormation} · ${matchLogs.length} partido(s) previo(s) guardado(s).`;
+      ctxEl.textContent = `Quinteto "${activeSquad?.name || 'Principal'}" · FÚTBOL SALA · Esquema ${formationConfig.short || activeFormation} · ${matchLogs.length} partido(s) previo(s) guardado(s).`;
     }
     if (countEl) {
       countEl.textContent = `${selectedSet.size} / ${players.length} CONVOCADOS`;
@@ -5480,7 +5421,7 @@ class FutApp {
       return `
         <div class="matchplan-history-item">
           <div class="min-w-0">
-            <div class="font-fifa text-sm font-black uppercase text-white">${log.opponent || 'Partido'} · ${log.duration}' (F7)</div>
+            <div class="font-fifa text-sm font-black uppercase text-white">${log.opponent || 'Partido'} · ${log.duration}' (FS)</div>
             <div class="text-[11px] text-slate-400 truncate">${log.date || ''} · ${topEntries || `${(log.entries || []).length} jugadores`}</div>
           </div>
           <button type="button" class="matchplan-del-log-btn" data-delete-matchlog="${log.id}" title="Eliminar acta">

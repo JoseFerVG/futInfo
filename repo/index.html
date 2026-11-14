@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="dark light">
   <meta name="theme-color" content="#0a0c10">
   <title>futInfo - FIFA Ultimate Team</title>
-  <meta name="description" content="Plataforma de gestión de equipo de Fútbol 7 estilo FIFA Ultimate Team con Google Sign-In">
+  <meta name="description" content="Plataforma de gestión de equipo de Fútbol Sala estilo FIFA Ultimate Team con Google Sign-In">
   <link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
   <link rel="apple-touch-icon" sizes="256x256" href="assets/favicon.png">
 
@@ -71,13 +71,13 @@
       <span id="nav-team-name" class="hud-club-name font-fifa">FURIA RECTOR FC</span>
     </div>
 
-    <!-- Chyron derecho: estado BD + badge F7 + tema claro/oscuro + audio + sesión -->
+    <!-- Chyron derecho: estado BD + badge FS + tema claro/oscuro + audio + sesión -->
     <div class="hud-status">
       <button type="button" id="hud-cloud-status-btn" class="hud-cloud-pill font-fifa" title="Estado de sincronización con base de datos compartida en la nube">
         <i data-lucide="cloud" id="hud-cloud-status-icon" class="w-3.5 h-3.5"></i>
         <span id="hud-cloud-status-label">BD</span>
       </button>
-      <span class="hud-modality-pill font-fifa hidden sm:inline-flex" aria-label="Modalidad del club">FÚTBOL 7</span>
+      <span class="hud-modality-pill font-fifa hidden sm:inline-flex" aria-label="Modalidad del club">FÚTBOL SALA</span>
       <button id="btn-toggle-theme" aria-label="Alternar modo claro / oscuro" title="Modo Claro / Oscuro" class="hud-icon-btn">
         <i data-lucide="sun" id="theme-toggle-icon" class="w-4 h-4"></i>
       </button>
@@ -117,7 +117,7 @@
             </div>
           </div>
           <div class="hud-squad-head-right">
-            <span id="current-modality-badge" class="hud-modality-pill font-fifa">FÚTBOL 7 · 1-3-2-1</span>
+            <span id="current-modality-badge" class="hud-modality-pill font-fifa">FÚTBOL SALA · 1-1-2-1</span>
             <div class="hud-rating-pill font-fifa" title="Valoración General de la Plantilla">
               <span class="hud-rating-pill-lbl font-fifa">MED</span>
               <span id="header-team-rating" class="hud-rating-pill-val font-fifa">--</span>
@@ -155,7 +155,7 @@
             <span>TÁCTICA</span>
           </button>
 
-          <button type="button" id="btn-open-matchplan" class="hud-dock-matchplan-btn font-fifa" title="Convocar jugadores, calcular mejor XI, cambios y reparto justo de minutos">
+          <button type="button" id="btn-open-matchplan" class="hud-dock-matchplan-btn font-fifa" title="Convocar jugadores, calcular mejor quinteto, cambios y reparto justo de minutos">
             <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
             <span>PLAN PARTIDO</span>
           </button>
@@ -170,42 +170,37 @@
             <span id="hud-team-rating" hidden>0</span>
             <span id="hud-team-starters" hidden>0</span>
 
-            <!-- Marcas de Cal Oficiales FIFA: Media Cancha Defensiva (Centro Arriba, Área y Portería Abajo) -->
+            <!-- Marcas Oficiales de Pista de Fútbol Sala: Media Cancha Defensiva (Centro Arriba, Área 6m y Portería Abajo) -->
             <svg id="pitch-cal-markings-svg" class="pitch-cal-markings-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
               <!-- 1. Línea de Medio Campo en el Borde Superior -->
-              <line x1="0" y1="0.5" x2="100" y2="0.5" stroke="rgba(255, 255, 255, 0.88)" stroke-width="1.4" vector-effect="non-scaling-stroke" />
+              <line x1="0" y1="0.5" x2="100" y2="0.5" stroke="rgba(255, 255, 255, 0.9)" stroke-width="1.5" vector-effect="non-scaling-stroke" />
 
-              <!-- 2. Círculo Central en la parte superior curvando hacia abajo -->
-              <path d="M 28,0.5 A 22,17 0 0,0 72,0.5" fill="none" stroke="rgba(255, 255, 255, 0.85)" stroke-width="1.4" vector-effect="non-scaling-stroke" />
+              <!-- 2. Círculo Central (radio 3m) curvando hacia abajo -->
+              <path d="M 29,0.5 A 21,16 0 0,0 71,0.5" fill="none" stroke="rgba(255, 255, 255, 0.88)" stroke-width="1.4" vector-effect="non-scaling-stroke" />
 
               <!-- 3. Punto de Saque de Centro (Arriba en el centro) -->
               <circle cx="50" cy="0.5" r="1.5" fill="#ffffff" />
 
               <!-- 4. Líneas de Banda Laterales -->
-              <line x1="0.5" y1="0" x2="0.5" y2="100" stroke="rgba(255, 255, 255, 0.75)" stroke-width="1.3" vector-effect="non-scaling-stroke" />
-              <line x1="99.5" y1="0" x2="99.5" y2="100" stroke="rgba(255, 255, 255, 0.75)" stroke-width="1.3" vector-effect="non-scaling-stroke" />
+              <line x1="0.5" y1="0" x2="0.5" y2="100" stroke="rgba(255, 255, 255, 0.82)" stroke-width="1.4" vector-effect="non-scaling-stroke" />
+              <line x1="99.5" y1="0" x2="99.5" y2="100" stroke="rgba(255, 255, 255, 0.82)" stroke-width="1.4" vector-effect="non-scaling-stroke" />
 
               <!-- 5. Línea de Fondo / Meta (Inferior) -->
-              <line x1="0" y1="99.5" x2="100" y2="99.5" stroke="rgba(255, 255, 255, 0.95)" stroke-width="1.6" vector-effect="non-scaling-stroke" />
+              <line x1="0" y1="99.5" x2="100" y2="99.5" stroke="rgba(255, 255, 255, 0.96)" stroke-width="1.6" vector-effect="non-scaling-stroke" />
 
               <!-- 6. Arcos de Córner en las esquinas inferiores -->
-              <path d="M 0,94 A 6,6 0 0,0 6,100" fill="none" stroke="rgba(255, 255, 255, 0.8)" stroke-width="1.2" vector-effect="non-scaling-stroke" />
-              <path d="M 94,100 A 6,6 0 0,0 100,94" fill="none" stroke="rgba(255, 255, 255, 0.8)" stroke-width="1.2" vector-effect="non-scaling-stroke" />
+              <path d="M 0,94 A 6,6 0 0,0 6,100" fill="none" stroke="rgba(255, 255, 255, 0.82)" stroke-width="1.2" vector-effect="non-scaling-stroke" />
+              <path d="M 94,100 A 6,6 0 0,0 100,94" fill="none" stroke="rgba(255, 255, 255, 0.82)" stroke-width="1.2" vector-effect="non-scaling-stroke" />
 
-              <!-- 7. Área de Penalti / Área Grande (Inferior donde defiende el equipo) -->
-              <path d="M 18,100 L 18,70 L 82,70 L 82,100" fill="none" stroke="rgba(255, 255, 255, 0.88)" stroke-width="1.4" vector-effect="non-scaling-stroke" />
+              <!-- 7. Área Semicircular de 6 metros (Fútbol Sala) -->
+              <path d="M 20,100 L 20,86 C 20,66 80,66 80,86 L 80,100" fill="rgba(255, 255, 255, 0.06)" stroke="rgba(255, 255, 255, 0.92)" stroke-width="1.5" vector-effect="non-scaling-stroke" />
 
-              <!-- 8. Semicírculo del Área de Penalti (Corona) -->
-              <path d="M 38,70 A 12,8 0 0,1 62,70" fill="none" stroke="rgba(255, 255, 255, 0.82)" stroke-width="1.3" vector-effect="non-scaling-stroke" />
+              <!-- 8. Punto de Penalti (6 metros) y Doble Penalti (10 metros) -->
+              <circle cx="50" cy="79" r="1.4" fill="#ffffff" />
+              <circle cx="50" cy="58" r="1.3" fill="#facc15" />
 
-              <!-- 9. Punto de Penalti -->
-              <circle cx="50" cy="83" r="1.4" fill="#ffffff" />
-
-              <!-- 10. Área Pequeña / 6 Yardas (Frente a la portería) -->
-              <path d="M 33,100 L 33,87 L 67,87 L 67,100" fill="none" stroke="rgba(255, 255, 255, 0.88)" stroke-width="1.4" vector-effect="non-scaling-stroke" />
-
-              <!-- 11. Portería / Redes (Al fondo en el límite inferior) -->
-              <rect x="36" y="99" width="28" height="3" fill="rgba(255, 255, 255, 0.2)" stroke="#ffffff" stroke-width="1.2" vector-effect="non-scaling-stroke" />
+              <!-- 9. Portería reglamentaria 3x2m -->
+              <rect x="38" y="99" width="24" height="3" fill="rgba(255, 255, 255, 0.24)" stroke="#ffffff" stroke-width="1.3" vector-effect="non-scaling-stroke" />
             </svg>
 
             <!-- Capa Dinámica SVG de Enlaces de Química FIFA FUT (Líneas entre jugadores) -->
@@ -269,7 +264,7 @@
           <div id="side-formation-chips" class="hud-formation-chips" role="group" aria-label="Cambio rápido de formación"></div>
 
           <div class="hud-tactics-foot-meta">
-            <div class="hud-bignum"><span id="side-formation-tag">1-3-2-1</span><small>FORMACIÓN</small></div>
+            <div class="hud-bignum"><span id="side-formation-tag">1-1-2-1</span><small>FORMACIÓN</small></div>
             <button type="button" id="btn-open-tactics-style" class="hud-tactics-style-summary font-fifa" title="Ajustar estilo defensivo y ofensivo">
               <span id="side-tactics-summary">EQUILIBRADO · PROF. 6</span>
               <i data-lucide="chevron-right" class="w-3 h-3"></i>
@@ -301,14 +296,14 @@
       <header class="fifa-broadcast-head">
         <div class="fifa-broadcast-title-group">
           <div class="fifa-broadcast-live-chyron font-fifa">
-            <span class="fifa-live-dot"></span> PIZARRA DE VESTUARIO • FÚTBOL 7
+            <span class="fifa-live-dot"></span> PIZARRA DE VESTUARIO • FÚTBOL SALA
           </div>
           <h2 class="fifa-broadcast-main-title font-fifa">PIZARRA TÁCTICA Y PLAN DE PARTIDO</h2>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
-          <div class="pizarra-seg-group" role="group" aria-label="Encuadre de campo">
-            <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn active" data-zone="full" aria-pressed="true">CAMPO COMPLETO</button>
+          <div class="pizarra-seg-group" role="group" aria-label="Encuadre de pista">
+            <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn active" data-zone="full" aria-pressed="true">PISTA COMPLETA</button>
             <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn" data-zone="attack" aria-pressed="false">ATAQUE / ABP</button>
             <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn" data-zone="buildup" aria-pressed="false">SALIDA PROPIA</button>
           </div>
@@ -323,19 +318,19 @@
         </div>
       </header>
 
-      <!-- 7 FASES REALES DE FÚTBOL 7 -->
-      <div class="pizarra-presets-bar" role="region" aria-label="Fases y jugadas de Fútbol 7">
+      <!-- 7 FASES REALES DE FÚTBOL SALA -->
+      <div class="pizarra-presets-bar" role="region" aria-label="Fases y jugadas de Fútbol Sala">
         <span class="pizarra-bar-label font-fifa flex items-center gap-1.5">
           <i data-lucide="clipboard-list" class="w-4 h-4 text-amber-400"></i>
           <span>FASES DEL PARTIDO:</span>
         </span>
-        <button type="button" class="pizarra-preset-btn active" data-preset="salida" aria-pressed="true">Salida de Puerta</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="ataque" aria-pressed="false">Ataque Posicional</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="presion" aria-pressed="false">Presión 3s</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="contra" aria-pressed="false">Bloque y Contra</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="corner_fav" aria-pressed="false">Córner a Favor</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="falta_abp" aria-pressed="false">Falta ABP</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="defensa_abp" aria-pressed="false">Defensa Balón Parado</button>
+        <button type="button" class="pizarra-preset-btn active" data-preset="salida" aria-pressed="true">Salida 4-0 / Triángulo</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="ataque" aria-pressed="false">Ataque con Pívot (3-1)</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="presion" aria-pressed="false">Presión Alta y Robo</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="contra" aria-pressed="false">Bloque 2-2 y Contra</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="corner_fav" aria-pressed="false">Córner Pista (2º Palo)</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="falta_abp" aria-pressed="false">Falta / Doble Penalti</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="defensa_abp" aria-pressed="false">Portero-Jugador / ABP</button>
       </div>
 
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
@@ -386,11 +381,12 @@
               </button>
               <label for="pizarra-rival-formation" class="sr-only">Esquema del rival</label>
               <select id="pizarra-rival-formation" class="pizarra-rival-select font-fifa" title="Dibujo táctico del rival">
-                <option value="1-3-2-1">Rival 1-3-2-1</option>
-                <option value="1-2-3-1">Rival 1-2-3-1</option>
-                <option value="1-3-1-2">Rival 1-3-1-2</option>
+                <option value="1-1-2-1">Rival 1-1-2-1</option>
+                <option value="1-3-1">Rival 1-3-1</option>
+                <option value="1-2-2">Rival 1-2-2</option>
+                <option value="1-4-0">Rival 1-4-0</option>
               </select>
-              <button type="button" id="btn-pizarra-toggle-lanes" class="pizarra-ctrl-btn active" aria-pressed="true" title="Mostrar carriles tácticos en el césped">
+              <button type="button" id="btn-pizarra-toggle-lanes" class="pizarra-ctrl-btn active" aria-pressed="true" title="Mostrar carriles tácticos en la pista">
                 <i data-lucide="columns-3" class="w-3.5 h-3.5"></i>
                 <span>CARRILES</span>
               </button>
@@ -398,9 +394,9 @@
                 <i data-lucide="list-ordered" class="w-3.5 h-3.5"></i>
                 <span>1·2·3</span>
               </button>
-              <button type="button" id="btn-pizarra-sync-lineup" class="pizarra-ctrl-btn" title="Cargar nombres y dorsales del siete titular actual">
+              <button type="button" id="btn-pizarra-sync-lineup" class="pizarra-ctrl-btn" title="Cargar nombres y dorsales del quinteto titular actual">
                 <i data-lucide="users" class="w-3.5 h-3.5"></i>
-                <span>CARGAR ONCE</span>
+                <span>CARGAR QUINTETO</span>
               </button>
               <button type="button" id="btn-pizarra-ball-to-selected" class="pizarra-ctrl-btn" title="Colocar balón junto al jugador seleccionado">
                 <i data-lucide="circle-dot" class="w-3.5 h-3.5"></i>
@@ -431,11 +427,11 @@
 
           <div class="pizarra-phase-banner">
             <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400 flex-shrink-0"></i>
-            <span id="pizarra-phase-summary" class="text-xs font-semibold">Centrales abiertos al vértice, laterales altos y apoyo interior del mediocentro.</span>
+            <span id="pizarra-phase-summary" class="text-xs font-semibold">Cierre y ala abiertos en paralelo con desmarque de ruptura o pared interior en 40x20m.</span>
           </div>
 
           <div class="pizarra-canvas-wrap">
-            <svg id="pizarra-board-svg" class="pizarra-svg" viewBox="0 0 1000 620" role="img" aria-label="Pizarra táctica interactiva de Fútbol 7"></svg>
+            <svg id="pizarra-board-svg" class="pizarra-svg" viewBox="0 0 1000 620" role="img" aria-label="Pizarra táctica interactiva de Fútbol Sala"></svg>
           </div>
 
           <div class="pizarra-roster-card">
@@ -482,23 +478,23 @@
             <div class="space-y-2.5">
               <div class="pizarra-note-block pizarra-note-block--gold">
                 <label for="pizarra-note-buildup" class="pizarra-note-lbl font-fifa">1. SALIDA DE BALÓN Y CONSTRUCCIÓN</label>
-                <textarea id="pizarra-note-buildup" rows="2" class="pizarra-textarea" placeholder="Cómo sacamos desde portero o centrales..."></textarea>
+                <textarea id="pizarra-note-buildup" rows="2" class="pizarra-textarea" placeholder="Cómo sacamos desde portero o cierre en 4-0 / 3-1..."></textarea>
               </div>
               <div class="pizarra-note-block pizarra-note-block--emerald">
-                <label for="pizarra-note-attack" class="pizarra-note-lbl font-fifa">2. ATAQUE, ESPACIOS Y FINALIZACIÓN</label>
-                <textarea id="pizarra-note-attack" rows="2" class="pizarra-textarea" placeholder="Dónde buscar superioridades y quién llega al remate..."></textarea>
+                <label for="pizarra-note-attack" class="pizarra-note-lbl font-fifa">2. ATAQUE, PÍVOT Y SEGUNDO PALO</label>
+                <textarea id="pizarra-note-attack" rows="2" class="pizarra-textarea" placeholder="Dónde buscar superioridades, pared y cierre al 2º palo..."></textarea>
               </div>
               <div class="pizarra-note-block pizarra-note-block--rose">
                 <label for="pizarra-note-defense" class="pizarra-note-lbl font-fifa">3. DEFENSA, PRESIÓN Y PÉRDIDA</label>
-                <textarea id="pizarra-note-defense" rows="2" class="pizarra-textarea" placeholder="Altura del bloque, marcas clave y qué hacer si perdemos..."></textarea>
+                <textarea id="pizarra-note-defense" rows="2" class="pizarra-textarea" placeholder="Altura del bloque, marcas clave y repliegue inmediato..."></textarea>
               </div>
               <div class="pizarra-note-block pizarra-note-block--sky">
-                <label for="pizarra-note-abp" class="pizarra-note-lbl font-fifa">4. CÓRNERS, FALTAS Y SAQUES</label>
-                <textarea id="pizarra-note-abp" rows="2" class="pizarra-textarea" placeholder="Señales a balón parado, bloqueos y vigilancias atrás..."></textarea>
+                <label for="pizarra-note-abp" class="pizarra-note-lbl font-fifa">4. CÓRNERS, FALTAS Y 4 SEGUNDOS</label>
+                <textarea id="pizarra-note-abp" rows="2" class="pizarra-textarea" placeholder="Señales a balón parado, bloqueos y doble penalti 10m..."></textarea>
               </div>
               <div class="pizarra-note-block pizarra-note-block--amber">
-                <label for="pizarra-note-rotations" class="pizarra-note-lbl font-fifa">5. ROTACIONES, CAMBIOS Y TIEMPOS</label>
-                <textarea id="pizarra-note-rotations" rows="2" class="pizarra-textarea" placeholder="Bloques de cambio para repartir minutos con frescura..."></textarea>
+                <label for="pizarra-note-rotations" class="pizarra-note-lbl font-fifa">5. ROTACIONES, CUARTETOS Y TIEMPOS</label>
+                <textarea id="pizarra-note-rotations" rows="2" class="pizarra-textarea" placeholder="Cambios continuos de cuarteto cada 4-5 minutos..."></textarea>
               </div>
             </div>
 
@@ -549,9 +545,9 @@
 
         <div class="flex items-center flex-wrap gap-1.5" id="album-role-filters">
           <button type="button" class="hud-filter-pill active" data-role="all">TODOS</button>
-          <button type="button" class="hud-filter-pill" data-role="DC">DELANTEROS</button>
-          <button type="button" class="hud-filter-pill" data-role="MC">MEDIOS</button>
-          <button type="button" class="hud-filter-pill" data-role="DFC">DEFENSAS</button>
+          <button type="button" class="hud-filter-pill" data-role="PIV">PÍVOTS</button>
+          <button type="button" class="hud-filter-pill" data-role="ALA">ALAS</button>
+          <button type="button" class="hud-filter-pill" data-role="CIE">CIERRES</button>
           <button type="button" class="hud-filter-pill" data-role="POR">PORTEROS</button>
         </div>
 
@@ -760,7 +756,7 @@
             <h3 id="cap-player-name" class="cap-name font-fifa">JUGADOR</h3>
           </div>
           <div class="cap-sub-row">
-            <span id="cap-slot-pill" class="cap-slot-pill font-fifa">MCO</span>
+            <span id="cap-slot-pill" class="cap-slot-pill font-fifa">ALA</span>
             <span id="cap-fit-badge" class="cap-fit-badge">Posición ideal</span>
           </div>
         </div>
@@ -784,8 +780,8 @@
       <button type="button" id="btn-cap-move" class="cap-action-btn cap-action-btn--gold">
         <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
         <div class="cap-btn-text">
-          <span class="cap-btn-title font-fifa">INTERCAMBIAR EN CAMPO</span>
-          <span class="cap-btn-desc">Pulsa otro compañero del siete</span>
+          <span class="cap-btn-title font-fifa">INTERCAMBIAR EN PISTA</span>
+          <span class="cap-btn-desc">Pulsa otro compañero del quinteto</span>
         </div>
       </button>
 
@@ -1090,7 +1086,7 @@
                 <span>1º Prioridad Máxima</span>
               </label>
               <select id="setup-role-best" name="roleBest" class="setup-role-priority-select w-full bg-emerald-950/40 border border-emerald-500/50 px-2 py-1.5 text-xs text-emerald-300 font-bold" data-priority-rank="1">
-                <option value="DC">Delantero Centro (DC)</option>
+                <option value="PIV">Pívot (PIV)</option>
               </select>
             </div>
 
@@ -1100,7 +1096,7 @@
                 <span>2º Segunda Opción</span>
               </label>
               <select id="setup-role-second" name="roleSecond" class="setup-role-priority-select w-full bg-sky-950/40 border border-sky-500/50 px-2 py-1.5 text-xs text-sky-300 font-bold" data-priority-rank="2">
-                <option value="MC">Mediocentro (MC)</option>
+                <option value="ALI">Ala Izquierdo (ALI)</option>
               </select>
             </div>
 
@@ -1110,7 +1106,7 @@
                 <span>3º Tercera Opción</span>
               </label>
               <select id="setup-role-third" name="roleThird" class="setup-role-priority-select w-full bg-cyan-950/40 border border-cyan-500/50 px-2 py-1.5 text-xs text-cyan-300 font-bold" data-priority-rank="3">
-                <option value="DFC">Defensa Central (DFC)</option>
+                <option value="ALD">Ala Derecho (ALD)</option>
               </select>
             </div>
 
@@ -1120,7 +1116,7 @@
                 <span>4º Cuarta / Reserva</span>
               </label>
               <select id="setup-role-fourth" name="roleFourth" class="setup-role-priority-select w-full bg-amber-950/40 border border-amber-500/50 px-2 py-1.5 text-xs text-amber-300 font-bold" data-priority-rank="4">
-                <option value="MCO">Mediapunta (MCO)</option>
+                <option value="CIE">Cierre (CIE)</option>
               </select>
             </div>
 
@@ -1130,20 +1126,20 @@
                 <span>Evitar (Peor Posición — No asignar salvo urgencia)</span>
               </label>
               <select id="setup-role-worst" name="roleWorst" class="setup-role-priority-select w-full bg-rose-950/40 border border-rose-500/50 px-2 py-1.5 text-xs text-rose-300 font-bold" data-priority-rank="avoid">
-                <option value="POR">Portero (GK)</option>
+                <option value="POR">Portero (POR)</option>
               </select>
             </div>
           </div>
 
           <div id="setup-role-priority-preview" class="role-priority-preview">
             <span class="role-priority-lbl font-fifa">CADENA TÁCTICA:</span>
-            <span class="role-priority-chip is-r1 font-fifa">1º DC</span>
+            <span class="role-priority-chip is-r1 font-fifa">1º PIV</span>
             <i data-lucide="arrow-right" class="w-3 h-3 text-slate-400"></i>
-            <span class="role-priority-chip is-r2 font-fifa">2º MC</span>
+            <span class="role-priority-chip is-r2 font-fifa">2º ALI</span>
             <i data-lucide="arrow-right" class="w-3 h-3 text-slate-400"></i>
-            <span class="role-priority-chip is-r3 font-fifa">3º DFC</span>
+            <span class="role-priority-chip is-r3 font-fifa">3º ALD</span>
             <i data-lucide="arrow-right" class="w-3 h-3 text-slate-400"></i>
-            <span class="role-priority-chip is-r4 font-fifa">4º MCO</span>
+            <span class="role-priority-chip is-r4 font-fifa">4º CIE</span>
             <span class="role-priority-chip is-avoid font-fifa">EVITAR: POR</span>
           </div>
         </div>
@@ -1395,7 +1391,7 @@
           <div>
             <label for="match-modality" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Modalidad</label>
             <select id="match-modality" name="modality" class="w-full bg-slate-900 border border-slate-700  px-2 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
-              <option value="f7">Fútbol 7</option>
+              <option value="futsal">Fútbol Sala (5v5)</option>
             </select>
           </div>
           <div>
@@ -1416,8 +1412,8 @@
         </div>
 
         <div>
-          <label for="match-field" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Instalación / Pista Deportiva</label>
-          <input type="text" id="match-field" name="field" placeholder="Ej: Campo Césped 2 · Campus Espinardo…" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+          <label for="match-field" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Pabellón / Pista Deportiva</label>
+          <input type="text" id="match-field" name="field" placeholder="Ej: Pabellón Príncipe Felipe · Pista Azul…" class="w-full bg-slate-900 border border-slate-700  px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
         </div>
 
         <div>
@@ -1529,10 +1525,10 @@
       <div id="walkout-pos-step" class="walkout-step walkout-teaser-step hidden">
         <div id="walkout-tier-banner" class="walkout-tier-banner">WALKOUT · EDICIÓN ORO RARE</div>
         <div class="walkout-pos-showcase">
-          <div id="walkout-pos-pill" class="walkout-pos-pill font-fifa">DC</div>
+          <div id="walkout-pos-pill" class="walkout-pos-pill font-fifa">PIV</div>
           <div id="walkout-dorsal-pill" class="walkout-dorsal-pill font-fifa">#10</div>
         </div>
-        <div id="walkout-pos-subline" class="walkout-pos-subline">PREPARANDO SALIDA AL CÉSPED...</div>
+        <div id="walkout-pos-subline" class="walkout-pos-subline">PREPARANDO SALIDA A LA PISTA...</div>
       </div>
 
       <!-- Paso 3: Carta 3D Interactiva + Chyron Broadcast EA FC -->
@@ -1614,7 +1610,7 @@
           <div>
             <div class="flex items-center gap-2">
               <span class="hud-tag font-fifa">ESQUEMAS TÁCTICOS</span>
-              <span id="modal-active-modality-badge" class="hud-modality-pill font-fifa">FÚTBOL 7</span>
+              <span id="modal-active-modality-badge" class="hud-modality-pill font-fifa">FÚTBOL SALA</span>
             </div>
             <h2 id="squad-actions-title" class="font-fifa text-2xl sm:text-3xl font-black text-white uppercase tracking-wider leading-none mt-1">FORMACIONES Y PLAN TÁCTICO</h2>
           </div>
@@ -1653,7 +1649,7 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-slate-900/90 border-l-4 border-amber-400">
           <div>
             <span class="text-[11px] font-black uppercase text-amber-400 tracking-wider block font-fifa">ESQUEMAS TÁCTICOS OFICIALES EA SPORTS</span>
-            <span class="text-xs text-slate-300 font-medium">Selecciona cualquier formación para reubicar al instante los jugadores en el césped.</span>
+            <span class="text-xs text-slate-300 font-medium">Selecciona cualquier formación para reubicar al instante los jugadores en la pista.</span>
           </div>
           <!-- Selector accesible sincronizado oculto -->
           <select id="select-active-formation" name="formation" aria-label="Formación táctica" class="hidden">
@@ -1671,16 +1667,16 @@
                 <i data-lucide="shield" class="w-4 h-4 text-slate-950"></i>
               </span>
               <h4 id="tactics-formation-name" class="font-fifa text-2xl font-bold text-white uppercase tracking-wider">
-                1-3-2-1 (Árbol de Navidad)
+                1-1-2-1 (Rombo Clásico)
               </h4>
             </div>
             <span id="tactics-style-tag" class="hud-modality-pill font-fifa">
-              Equilibrado / Control Central
+              Equilibrado / Rombo Futsal
             </span>
           </div>
 
           <p id="tactics-formation-desc" class="text-xs text-slate-300 font-medium leading-relaxed">
-            Línea de 3 atrás muy sólida con 2 mediocentros de apoyo y un ariete en punta.
+            Cierre fijo atrás, dos alas con recorrido para dar amplitud y pívot de referencia ofensiva.
           </p>
 
           <!-- Caja de Consejo Táctico con resplandor dorado -->
@@ -1688,7 +1684,7 @@
             <i data-lucide="lightbulb" class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5"></i>
             <div>
               <span class="font-fifa font-bold text-amber-300 uppercase tracking-wider block text-[11px] mb-0.5">INSTRUCCIÓN TÁCTICA DEL ENTRENADOR</span>
-              <span id="tactics-advice-text">Ideal si tienes dos mediocentros de calidad que sepan combinar y distribuir rápido. Protege los costados con laterales de largo recorrido.</span>
+              <span id="tactics-advice-text">Ideal para dominar la pista desde la salida limpia del cierre hacia alas dinámicas y descarga constante sobre el pívot.</span>
             </div>
           </div>
         </div>
@@ -1699,7 +1695,7 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-slate-900/80 border-l-4 border-amber-400">
           <div>
             <span class="text-[10px] font-black uppercase text-amber-400 tracking-wider block">PLANTILLAS DEL CLUB GUARDADAS</span>
-            <span class="text-xs text-slate-300 font-medium">Cambia entre tus siete titulares guardados y esquemas de Fútbol 7 con 1 clic</span>
+            <span class="text-xs text-slate-300 font-medium">Cambia entre tus quintetos titulares guardados y esquemas de Fútbol Sala con 1 clic</span>
           </div>
           <button type="button" onclick="window.futApp.saveCurrentSquadPrompt()" class="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-fifa text-sm font-black flex items-center gap-1.5 transition cursor-pointer shadow">
             <i data-lucide="plus" class="w-4 h-4"></i>
@@ -1808,7 +1804,7 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span class="text-[11px] font-black uppercase text-amber-400 tracking-wider block font-fifa">CONVOCATORIA, MEJOR ALINEACIÓN Y ROTACIÓN EQUITATIVA</span>
-              <span id="matchplan-squad-context" class="text-xs text-slate-300 font-medium">Selecciona quién va hoy al partido para calcular el mejor once, ventanas de cambios por minuto y compensación de historial.</span>
+              <span id="matchplan-squad-context" class="text-xs text-slate-300 font-medium">Selecciona quién va hoy al partido para calcular el mejor quinteto, ventanas de cambios por minuto y compensación de historial.</span>
             </div>
             <div class="flex items-center flex-wrap gap-1.5">
               <button type="button" id="btn-convoke-all" class="matchplan-ctrl-btn">Todos</button>
@@ -1820,7 +1816,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
             <div>
               <label for="matchplan-duration" class="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">Duración Partido (min)</label>
-              <input type="number" id="matchplan-duration" min="10" max="120" value="50" class="w-full bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white font-bold">
+              <input type="number" id="matchplan-duration" min="10" max="120" value="40" class="w-full bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white font-bold">
             </div>
             <div>
               <label for="matchplan-strategy" class="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">Criterio de Reparto</label>
@@ -1883,7 +1879,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <button type="button" onclick="window.futApp.autoOptimizeSquad()" class="p-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg active:scale-95 cursor-pointer border-l-4 border-slate-950">
               <i data-lucide="sparkles" class="w-4 h-4"></i>
-              <span>Auto-Alinear Mejor Once Táctico</span>
+              <span>Auto-Alinear Mejor Quinteto Táctico</span>
             </button>
             <button type="button" onclick="window.futApp.resetSquadPositions()" class="p-3 bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition border border-slate-700 active:scale-95 cursor-pointer">
               <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
@@ -1908,7 +1904,7 @@
       <form id="form-squad-create" class="space-y-4">
         <div>
           <label for="squad-create-name" class="block text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1">Nombre de la Plantilla *</label>
-          <input type="text" id="squad-create-name" name="squadName" required maxlength="36" placeholder="Ej: Once Ofensivo Copa" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
+          <input type="text" id="squad-create-name" name="squadName" required maxlength="36" placeholder="Ej: Quinteto Ofensivo Copa" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white font-bold focus:ring-2 focus:ring-amber-500">
         </div>
         <div class="flex items-center justify-end gap-3 pt-2 border-t border-white/10">
           <button type="button" id="btn-cancel-squad-create" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition cursor-pointer">Cancelar</button>
@@ -1944,7 +1940,7 @@
           <div>
             <h2 id="pitch-fullscreen-title" class="font-fifa text-2xl sm:text-3xl font-black uppercase tracking-wider text-white leading-none">PLANTILLA ACTIVA · VISTA COMPLETA</h2>
             <div class="flex items-center gap-2 mt-1">
-              <span id="fs-modality-badge" class="hud-modality-pill font-fifa">FÚTBOL 7 · 1-3-2-1</span>
+              <span id="fs-modality-badge" class="hud-modality-pill font-fifa">FÚTBOL SALA · 1-1-2-1</span>
               <span class="text-xs font-fifa font-bold text-amber-400 tracking-wider">MED <strong id="fs-team-rating" class="text-white">--</strong></span>
             </div>
           </div>

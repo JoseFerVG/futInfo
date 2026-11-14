@@ -1,12 +1,13 @@
 /**
  * Capa de Datos (Store) - Estilo FIFA Ultimate Team (FUT)
- * Torneo del Rector: Fútbol 7 (Sincronización real multi-dispositivo en Cloud Firestore)
+ * Torneo del Rector: Fútbol Sala (Sincronización real multi-dispositivo en Cloud Firestore)
  */
 import {
   sanitizeForFirestore,
   probeFirestoreHealth,
   auth as fbAuth
 } from './firebase-config.js';
+import { normalizeFutsalHierarchy } from './lineup-planner.js';
 
 const ADMIN_EMAIL = 'josef.caniles.murcia@gmail.com';
 
@@ -194,18 +195,16 @@ export const FACULTIES = [
   }
 ];
 
-export const ROLES_F7 = [
+export const ROLES_FUTSAL = [
   { code: 'POR', name: 'Portero (GK)', category: 'GK' },
-  { code: 'DFC', name: 'Defensa Central (CB)', category: 'DEF' },
-  { code: 'LI', name: 'Lateral Izquierdo (LB)', category: 'DEF' },
-  { code: 'LD', name: 'Lateral Derecho (RB)', category: 'DEF' },
-  { code: 'MC', name: 'Mediocentro (CM)', category: 'MID' },
-  { code: 'MCD', name: 'Pivote Defensivo (CDM)', category: 'MID' },
-  { code: 'MCO', name: 'Mediapunta (CAM)', category: 'MID' },
-  { code: 'EI', name: 'Extremo Izquierdo (LW)', category: 'FWD' },
-  { code: 'ED', name: 'Extremo Derecho (RW)', category: 'FWD' },
-  { code: 'DC', name: 'Delantero Centro (ST)', category: 'FWD' }
+  { code: 'CIE', name: 'Cierre (Líbero)', category: 'DEF' },
+  { code: 'ALI', name: 'Ala Izquierdo', category: 'WING' },
+  { code: 'ALD', name: 'Ala Derecho', category: 'WING' },
+  { code: 'ALA', name: 'Ala Polivalente (Universal)', category: 'WING' },
+  { code: 'PIV', name: 'Pívot (Ataque)', category: 'FWD' }
 ];
+
+const VALID_FUTSAL_FORMATIONS = new Set(['1-1-2-1', '1-3-1', '1-2-2', '1-4-0', '1-1-1-2', '5v4']);
 
 // Jugadores iniciales vacíos — se completa exclusivamente con usuarios reales autenticados con Google
 const DEFAULT_PLAYERS = [];
@@ -214,7 +213,7 @@ const DEFAULT_SETTINGS = {
   teamName: 'Furia Rector FC',
   shortName: 'FUR',
   tournament: '',
-  modality: 'f7',
+  modality: 'futsal',
   crest: 'shield_gold',
   kitColor: '#f8fafc',
   kitSecondary: '#f0be2a',
@@ -234,27 +233,27 @@ const DEFAULT_SETTINGS = {
     defensiveDepth: 6,
     buildUpPlay: 'balanced',
     chanceCreation: 'forward_runs',
-    playersInBox: 5
+    playersInBox: 4
   },
-  activeFormationF7: '1-3-2-1',
-  startingLineupF7: [],
+  activeFormationFutsal: '1-1-2-1',
+  startingLineupFutsal: [],
   benchPlayers: [],
-  activeSquadId: 'sq_furia_f7',
+  activeSquadId: 'sq_furia_futsal',
   squads: [
     {
-      id: 'sq_furia_f7',
-      name: 'Furia Rector Titular',
-      modality: 'f7',
-      formation: '1-3-2-1',
+      id: 'sq_furia_futsal',
+      name: 'Furia Rector Quinteto',
+      modality: 'futsal',
+      formation: '1-1-2-1',
       startingLineup: [],
       benchPlayers: [],
       rating: 0
     },
     {
-      id: 'sq_rotaciones_f7',
-      name: 'Furia Rotaciones B',
-      modality: 'f7',
-      formation: '1-2-3-1',
+      id: 'sq_rotaciones_futsal',
+      name: 'Furia Rotaciones 4-0',
+      modality: 'futsal',
+      formation: '1-4-0',
       startingLineup: [],
       benchPlayers: [],
       rating: 0
@@ -315,29 +314,60 @@ export class TeamStore {
       ? { ...JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), ...JSON.parse(savedSettings) }
       : JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
 
-    this._enforceF7Settings();
+    this._enforceFutsalSettings();
     this.saveLocal();
   }
 
-  _enforceF7Settings() {
-    this.settings.modality = 'f7';
-    if (!this.settings.activeFormationF7) {
-      this.settings.activeFormationF7 = DEFAULT_SETTINGS.activeFormationF7;
+  _enforceFutsalSettings() {
+    this.settings.modality = 'futsal';
+    const rawForm = this.settings.activeFormationFutsal || this.settings.activeFormationF7;
+    this.settings.activeFormationFutsal = VALID_FUTSAL_FORMATIONS.has(rawForm)
+      ? rawForm
+      : DEFAULT_SETTINGS.activeFormationFutsal;
+
+    if (!Array.isArray(this.settings.startingLineupFutsal) || this.settings.startingLineupFutsal.length === 0) {
+      if (Array.isArray(this.settings.startingLineupF7) && this.settings.startingLineupF7.length > 0) {
+        this.settings.startingLineupFutsal = this.settings.startingLineupF7.slice(0, 5);
+      } else {
+        this.settings.startingLineupFutsal = [];
+      }
+    } else {
+      this.settings.startingLineupFutsal = this.settings.startingLineupFutsal.slice(0, 5);
     }
-    if (!Array.isArray(this.settings.startingLineupF7)) {
-      this.settings.startingLineupF7 = [];
-    }
+
+    delete this.settings.activeFormationF7;
+    delete this.settings.startingLineupF7;
+
     const rawSquads = Array.isArray(this.settings.squads) ? this.settings.squads : [];
-    const f7Squads = rawSquads.filter(sq => sq && sq.modality !== 'futsal').map(sq => ({
-      ...sq,
-      modality: 'f7',
-      formation: sq.formation || '1-3-2-1'
-    }));
-    this.settings.squads = f7Squads.length > 0
-      ? f7Squads
+    const futsalSquads = rawSquads.filter(Boolean).map((sq, idx) => {
+      const nextId = sq.id === 'sq_furia_f7'
+        ? 'sq_furia_futsal'
+        : (sq.id === 'sq_rotaciones_f7' ? 'sq_rotaciones_futsal' : (sq.id || `sq_futsal_${idx}`));
+      const nextName = sq.name === 'Furia Rector Titular'
+        ? 'Furia Rector Quinteto'
+        : (sq.name === 'Furia Rotaciones B' ? 'Furia Rotaciones 4-0' : (sq.name || `Quinteto ${idx + 1}`));
+      const form = VALID_FUTSAL_FORMATIONS.has(sq.formation)
+        ? sq.formation
+        : (idx === 1 ? '1-4-0' : '1-1-2-1');
+      return {
+        ...sq,
+        id: nextId,
+        name: nextName,
+        modality: 'futsal',
+        formation: form,
+        startingLineup: Array.isArray(sq.startingLineup) ? sq.startingLineup.slice(0, 5) : []
+      };
+    });
+    this.settings.squads = futsalSquads.length > 0
+      ? futsalSquads
       : JSON.parse(JSON.stringify(DEFAULT_SETTINGS.squads));
+    if (this.settings.activeSquadId === 'sq_furia_f7') {
+      this.settings.activeSquadId = 'sq_furia_futsal';
+    } else if (this.settings.activeSquadId === 'sq_rotaciones_f7') {
+      this.settings.activeSquadId = 'sq_rotaciones_futsal';
+    }
     if (!this.settings.squads.some(sq => sq.id === this.settings.activeSquadId)) {
-      this.settings.activeSquadId = this.settings.squads[0]?.id || 'sq_furia_f7';
+      this.settings.activeSquadId = this.settings.squads[0]?.id || 'sq_furia_futsal';
     }
   }
 
@@ -367,9 +397,10 @@ export class TeamStore {
       if (!p.kitSecondary) p.kitSecondary = '#f0be2a';
       if (!p.kitCollar) p.kitCollar = 'round';
       if (!p.kitSleeves) p.kitSleeves = 'short';
+      p.rolesHierarchy = normalizeFutsalHierarchy(p.rolesHierarchy || {}, p);
       if (!p.playStyle) {
-        const best = p.rolesHierarchy?.best || p.roleBest || 'MC';
-        p.playStyle = best === 'POR' ? 'acrobatic' : (['DFC', 'LI', 'LD', 'CIE'].includes(best) ? 'anticipate' : (['DC', 'PIV'].includes(best) ? 'finesse' : 'incisive'));
+        const best = p.rolesHierarchy.best || 'ALA';
+        p.playStyle = best === 'POR' ? 'acrobatic' : (best === 'CIE' ? 'anticipate' : (best === 'PIV' ? 'finesse' : 'incisive'));
       }
       if (!p.skillMoves) p.skillMoves = 4;
       if (!p.weakFoot) p.weakFoot = 4;
@@ -603,7 +634,7 @@ export class TeamStore {
           }
           if (remote.settings && typeof remote.settings === 'object') {
             this.settings = { ...this.settings, ...remote.settings };
-            this._enforceF7Settings();
+            this._enforceFutsalSettings();
           }
           if (remote.tacticalBoard && typeof remote.tacticalBoard === 'object') {
             this.tacticalBoard = remote.tacticalBoard;
@@ -735,16 +766,7 @@ export class TeamStore {
       celebration: String(player.celebration || 'siuuu').slice(0, 24),
       avatar: String(player.avatar || 'assets/club_logo.png').slice(0, 240000),
       preferredFoot: String(player.preferredFoot || 'Diestro').slice(0, 24),
-      rolesHierarchy: {
-        best: player.rolesHierarchy?.best || 'DC',
-        second: player.rolesHierarchy?.second || 'MC',
-        third: player.rolesHierarchy?.third || 'DFC',
-        fourth: player.rolesHierarchy?.fourth || 'MCO',
-        worst: player.rolesHierarchy?.worst || 'POR',
-        priorityOrder: Array.isArray(player.rolesHierarchy?.priorityOrder)
-          ? player.rolesHierarchy.priorityOrder.slice(0, 8)
-          : ['DC', 'MC', 'DFC', 'MCO']
-      },
+      rolesHierarchy: normalizeFutsalHierarchy(player.rolesHierarchy || {}, player),
       stats: {
         pac: Math.max(1, Math.min(99, parseInt(player.stats?.pac, 10) || 80)),
         sho: Math.max(1, Math.min(99, parseInt(player.stats?.sho, 10) || 75)),
@@ -1008,25 +1030,16 @@ export class TeamStore {
       studentId: data.studentId || '',
       phone: data.phone || '',
       email: data.email || '',
-      rolesHierarchy: (() => {
-        const best = data.roleBest || 'DC';
-        const second = data.roleSecond || 'MC';
-        const third = data.roleThird || 'DFC';
-        const fourth = data.roleFourth || 'MCO';
-        const worst = data.roleWorst || 'POR';
-        const rawOrder = Array.isArray(data.priorityOrder) && data.priorityOrder.length > 0
+      rolesHierarchy: normalizeFutsalHierarchy({
+        best: data.roleBest || 'PIV',
+        second: data.roleSecond || 'ALI',
+        third: data.roleThird || 'ALD',
+        fourth: data.roleFourth || 'CIE',
+        worst: data.roleWorst || 'POR',
+        priorityOrder: Array.isArray(data.priorityOrder) && data.priorityOrder.length > 0
           ? data.priorityOrder
-          : [best, second, third, fourth];
-        const priorityOrder = rawOrder.filter((v, idx, arr) => v && arr.indexOf(v) === idx);
-        return {
-          best: priorityOrder[0] || best,
-          second: priorityOrder[1] || second,
-          third: priorityOrder[2] || third,
-          fourth: priorityOrder[3] || fourth,
-          worst,
-          priorityOrder
-        };
-      })(),
+          : [data.roleBest || 'PIV', data.roleSecond || 'ALI', data.roleThird || 'ALD', data.roleFourth || 'CIE']
+      }),
       stats: defaultStats,
       goals: parseInt(data.goals, 10) || 0,
       assists: parseInt(data.assists, 10) || 0,
@@ -1042,7 +1055,7 @@ export class TeamStore {
   }
 
   _placeNewPlayerInLineups(playerId) {
-    if (!Array.isArray(this.settings.startingLineupF7)) this.settings.startingLineupF7 = [];
+    if (!Array.isArray(this.settings.startingLineupFutsal)) this.settings.startingLineupFutsal = [];
 
     const placeInto = (arr, maxLen) => {
       if (arr.includes(playerId)) return;
@@ -1054,12 +1067,12 @@ export class TeamStore {
       }
     };
 
-    placeInto(this.settings.startingLineupF7, 7);
+    placeInto(this.settings.startingLineupFutsal, 5);
 
     if (Array.isArray(this.settings.squads)) {
       this.settings.squads.forEach(sq => {
         if (!Array.isArray(sq.startingLineup)) sq.startingLineup = [];
-        placeInto(sq.startingLineup, 7);
+        placeInto(sq.startingLineup, 5);
       });
     }
 
@@ -1138,28 +1151,29 @@ export class TeamStore {
   }
 
   setModality() {
-    this.settings.modality = 'f7';
+    this.settings.modality = 'futsal';
     this.notify();
   }
 
   setFormation(formation) {
-    this.settings.modality = 'f7';
-    this.settings.activeFormationF7 = formation;
+    this.settings.modality = 'futsal';
+    this.settings.activeFormationFutsal = VALID_FUTSAL_FORMATIONS.has(formation) ? formation : '1-1-2-1';
     this._syncActiveSquadLineup();
     this.notify();
   }
 
   getActiveFormation() {
-    return this.settings.activeFormationF7 || '1-3-2-1';
+    const f = this.settings.activeFormationFutsal;
+    return VALID_FUTSAL_FORMATIONS.has(f) ? f : '1-1-2-1';
   }
 
   getModalityCapacity() {
-    return 7;
+    return 5;
   }
 
   getStartingLineup() {
-    const cap = 7;
-    const raw = this.settings.startingLineupF7 || [];
+    const cap = 5;
+    const raw = this.settings.startingLineupFutsal || [];
     const slots = [];
     for (let i = 0; i < cap; i++) {
       const id = raw[i];
@@ -1175,9 +1189,9 @@ export class TeamStore {
   _syncActiveSquadLineup() {
     const sq = this.getActiveSquad();
     if (!sq) return;
-    sq.modality = 'f7';
-    sq.formation = this.settings.activeFormationF7 || '1-3-2-1';
-    const rawLineup = this.settings.startingLineupF7 || [];
+    sq.modality = 'futsal';
+    sq.formation = this.getActiveFormation();
+    const rawLineup = (this.settings.startingLineupFutsal || []).slice(0, 5);
     sq.startingLineup = [...rawLineup];
     const starterSet = new Set(sq.startingLineup.filter(Boolean));
     sq.benchPlayers = this.players.filter(p => !starterSet.has(p.id)).map(p => p.id);
@@ -1189,24 +1203,24 @@ export class TeamStore {
   }
 
   setStartingLineup(players) {
-    const ids = players.map(p => (p ? (typeof p === 'string' ? p : p.id) : null));
-    this.settings.startingLineupF7 = ids;
+    const ids = players.slice(0, 5).map(p => (p ? (typeof p === 'string' ? p : p.id) : null));
+    this.settings.startingLineupFutsal = ids;
     this._syncActiveSquadLineup();
     this.notify();
   }
 
   resetStartingLineup() {
     const sorted = this.getPlayers().map(p => p.id);
-    this.settings.startingLineupF7 = sorted.slice(0, 7);
+    this.settings.startingLineupFutsal = sorted.slice(0, 5);
     this._syncActiveSquadLineup();
     this.notify();
   }
 
   swapStartingPlayer(slotIndex, newPlayerId) {
-    const cap = 7;
+    const cap = 5;
     if (slotIndex < 0 || slotIndex >= cap) return null;
 
-    const src = this.settings.startingLineupF7 || [];
+    const src = this.settings.startingLineupFutsal || [];
     const lineup = Array.from({ length: cap }, (_, i) => src[i] || null);
     const oldPlayerId = lineup[slotIndex];
 
@@ -1217,24 +1231,24 @@ export class TeamStore {
     }
     lineup[slotIndex] = newPlayerId || null;
 
-    this.settings.startingLineupF7 = lineup;
+    this.settings.startingLineupFutsal = lineup;
     this._syncActiveSquadLineup();
     this.notify();
     return { oldPlayerId, newPlayerId };
   }
 
   swapTwoStarters(idx1, idx2) {
-    const cap = 7;
+    const cap = 5;
     if (idx1 < 0 || idx1 >= cap || idx2 < 0 || idx2 >= cap) return false;
 
-    const src = this.settings.startingLineupF7 || [];
+    const src = this.settings.startingLineupFutsal || [];
     const lineup = Array.from({ length: cap }, (_, i) => src[i] || null);
 
     const temp = lineup[idx1];
     lineup[idx1] = lineup[idx2];
     lineup[idx2] = temp;
 
-    this.settings.startingLineupF7 = lineup;
+    this.settings.startingLineupFutsal = lineup;
     this._syncActiveSquadLineup();
     this.notify();
     return true;
@@ -1272,7 +1286,7 @@ export class TeamStore {
   }
 
   getActiveSquadId() {
-    return this.settings.activeSquadId || (this.settings.squads && this.settings.squads[0]?.id) || 'sq_furia_f7';
+    return this.settings.activeSquadId || (this.settings.squads && this.settings.squads[0]?.id) || 'sq_furia_futsal';
   }
 
   getActiveSquad() {
@@ -1287,9 +1301,9 @@ export class TeamStore {
     if (!target) return false;
 
     this.settings.activeSquadId = target.id;
-    this.settings.modality = 'f7';
-    this.settings.activeFormationF7 = target.formation || '1-3-2-1';
-    this.settings.startingLineupF7 = [...(target.startingLineup || [])];
+    this.settings.modality = 'futsal';
+    this.settings.activeFormationFutsal = VALID_FUTSAL_FORMATIONS.has(target.formation) ? target.formation : '1-1-2-1';
+    this.settings.startingLineupFutsal = [...(target.startingLineup || [])].slice(0, 5);
     if (Array.isArray(target.benchPlayers)) {
       this.settings.benchPlayers = [...target.benchPlayers];
     }
@@ -1301,15 +1315,15 @@ export class TeamStore {
   saveCurrentAsSquad(name) {
     const squads = this.getSquads();
     const newId = 'sq_' + Date.now();
-    const lineup = [...(this.settings.startingLineupF7 || [])];
+    const lineup = [...(this.settings.startingLineupFutsal || [])].slice(0, 5);
     const starterSet = new Set(lineup);
     const activeBench = this.players.filter(p => !starterSet.has(p.id)).map(p => p.id);
     const liveRating = this.calculateTeamChemistryAndRating().rating || 82;
     const newSquad = {
       id: newId,
-      name: name || `Plantilla ${squads.length + 1}`,
-      modality: 'f7',
-      formation: this.settings.activeFormationF7 || '1-3-2-1',
+      name: name || `Quinteto ${squads.length + 1}`,
+      modality: 'futsal',
+      formation: this.getActiveFormation(),
       startingLineup: lineup,
       benchPlayers: activeBench,
       rating: liveRating
@@ -1326,7 +1340,7 @@ export class TeamStore {
     if (squads.length <= 1) return false;
     this.settings.squads = squads.filter(s => s.id !== squadId);
     if (this.settings.activeSquadId === squadId) {
-      this.settings.activeSquadId = this.settings.squads[0]?.id || 'sq_furia_f7';
+      this.settings.activeSquadId = this.settings.squads[0]?.id || 'sq_furia_futsal';
     }
     this.saveLocal();
     this.notify();
@@ -1454,8 +1468,8 @@ export class TeamStore {
       id: 'ml_' + Date.now(),
       date: date || new Date().toISOString().slice(0, 10),
       opponent: (opponent || 'Partido Oficial').trim(),
-      modality: modality || this.settings.modality || 'f7',
-      duration: Math.max(10, parseInt(duration, 10) || 50),
+      modality: modality || this.settings.modality || 'futsal',
+      duration: Math.max(10, parseInt(duration, 10) || 40),
       entries: Array.isArray(entries) ? entries : [],
       createdAt: Date.now()
     };

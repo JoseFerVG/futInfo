@@ -1,20 +1,16 @@
 /**
- * Motor táctico de alineaciones (Fútbol 7), jerarquía de posiciones y reparto equitativo de minutos
- * Calcula el siete titular óptimo mediante asignación bipartita exacta (algoritmo húngaro)
+ * Motor táctico de alineaciones (Fútbol Sala), jerarquía de posiciones y reparto equitativo de minutos
+ * Calcula el quinteto titular óptimo mediante asignación bipartita exacta (algoritmo húngaro)
  * y genera ventanas de cambios minuto a minuto compensando el historial previo de partidos.
  */
 
 export const ALL_TACTICAL_ROLES = [
-  { code: 'POR', name: 'Portero (GK)', short: 'POR', modality: 'F7', category: 'GK' },
-  { code: 'DFC', name: 'Defensa Central (CB)', short: 'DFC', modality: 'F7', category: 'DEF' },
-  { code: 'LI', name: 'Lateral Izquierdo (LB)', short: 'LI', modality: 'F7', category: 'DEF' },
-  { code: 'LD', name: 'Lateral Derecho (RB)', short: 'LD', modality: 'F7', category: 'DEF' },
-  { code: 'MCD', name: 'Pivote Defensivo (CDM)', short: 'MCD', modality: 'F7', category: 'MID' },
-  { code: 'MC', name: 'Mediocentro (CM)', short: 'MC', modality: 'F7', category: 'MID' },
-  { code: 'MCO', name: 'Mediapunta (CAM)', short: 'MCO', modality: 'F7', category: 'MID' },
-  { code: 'EI', name: 'Extremo Izquierdo (LW)', short: 'EI', modality: 'F7', category: 'FWD' },
-  { code: 'ED', name: 'Extremo Derecho (RW)', short: 'ED', modality: 'F7', category: 'FWD' },
-  { code: 'DC', name: 'Delantero Centro (ST)', short: 'DC', modality: 'F7', category: 'FWD' }
+  { code: 'POR', name: 'Portero (GK)', short: 'POR', modality: 'FUTSAL', category: 'GK' },
+  { code: 'CIE', name: 'Cierre (Líbero)', short: 'CIE', modality: 'FUTSAL', category: 'DEF' },
+  { code: 'ALI', name: 'Ala Izquierdo', short: 'ALI', modality: 'FUTSAL', category: 'WING' },
+  { code: 'ALD', name: 'Ala Derecho', short: 'ALD', modality: 'FUTSAL', category: 'WING' },
+  { code: 'ALA', name: 'Ala Polivalente (Universal)', short: 'ALA', modality: 'FUTSAL', category: 'WING' },
+  { code: 'PIV', name: 'Pívot (Ataque)', short: 'PIV', modality: 'FUTSAL', category: 'FWD' }
 ];
 
 export const ROLE_META_MAP = ALL_TACTICAL_ROLES.reduce((acc, role) => {
@@ -22,72 +18,98 @@ export const ROLE_META_MAP = ALL_TACTICAL_ROLES.reduce((acc, role) => {
   return acc;
 }, {});
 
-export const ROLE_EQUIVALENTS = {
-  POR: [],
-  DFC: ['MCD', 'LI', 'LD'],
-  LI: ['DFC', 'EI', 'MCD'],
-  LD: ['DFC', 'ED', 'MCD'],
-  MCD: ['MC', 'DFC'],
-  MC: ['MCO', 'MCD'],
-  MCO: ['MC', 'DC', 'EI', 'ED'],
-  EI: ['LI', 'ED', 'MCO', 'DC'],
-  ED: ['LD', 'EI', 'MCO', 'DC'],
-  DC: ['MCO', 'EI', 'ED'],
-  // Mapeo seguro retrocompatible de roles históricos si existieran
-  CIE: ['DFC', 'MCD'],
-  ALI: ['LI', 'EI', 'MC'],
-  ALD: ['LD', 'ED', 'MC'],
-  PIV: ['DC', 'MCO'],
-  UNI: ['MC', 'MCO', 'MCD']
+const LEGACY_TO_FUTSAL_ROLE = {
+  POR: 'POR',
+  CIE: 'CIE',
+  DFC: 'CIE',
+  MCD: 'CIE',
+  ALI: 'ALI',
+  LI: 'ALI',
+  EI: 'ALI',
+  ALD: 'ALD',
+  LD: 'ALD',
+  ED: 'ALD',
+  ALA: 'ALA',
+  MC: 'ALA',
+  MCO: 'ALA',
+  UNI: 'ALA',
+  MI: 'ALA',
+  MD: 'ALA',
+  PIV: 'PIV',
+  DC: 'PIV',
+  SD: 'PIV'
 };
 
-export function getRoleLabel(code) {
-  return ROLE_META_MAP[code]?.name || code || 'Sin asignar';
+export function normalizeFutsalRole(code, fallback = 'ALA') {
+  const upper = String(code || '').trim().toUpperCase();
+  const mapped = LEGACY_TO_FUTSAL_ROLE[upper];
+  if (mapped && ROLE_META_MAP[mapped]) return mapped;
+  return ROLE_META_MAP[fallback] ? fallback : 'ALA';
 }
 
-export function getPlayerPriorityChain(player) {
-  if (!player) {
-    return { priorityOrder: ['DC', 'MC', 'DFC', 'MCO'], best: 'DC', second: 'MC', third: 'DFC', fourth: 'MCO', worst: 'POR' };
-  }
-  const rh = player.rolesHierarchy || {};
-  const rawOrder = Array.isArray(rh.priorityOrder) && rh.priorityOrder.length > 0
+export function normalizeFutsalHierarchy(rh = {}, legacyFields = {}) {
+  const rawOrder = Array.isArray(rh?.priorityOrder) && rh.priorityOrder.length > 0
     ? rh.priorityOrder
-    : [rh.best || player.roleBest || 'DC', rh.second || player.roleSecond, rh.third || player.roleThird, rh.fourth || player.roleFourth];
+    : [rh?.best || legacyFields.roleBest || 'PIV', rh?.second || legacyFields.roleSecond, rh?.third || legacyFields.roleThird, rh?.fourth || legacyFields.roleFourth];
 
   const deduped = [];
   for (const code of rawOrder) {
-    if (code && ROLE_META_MAP[code] && !deduped.includes(code)) {
-      deduped.push(code);
+    const norm = code ? normalizeFutsalRole(code, '') : '';
+    if (norm && ROLE_META_MAP[norm] && !deduped.includes(norm)) {
+      deduped.push(norm);
     }
   }
-  const fallbackPool = ['DC', 'MC', 'DFC', 'MCO', 'EI', 'ED', 'LI', 'LD', 'MCD', 'POR'];
+
+  let worst = normalizeFutsalRole(rh?.worst || legacyFields.roleWorst || 'POR', 'POR');
+  const fallbackPool = ['PIV', 'ALI', 'ALD', 'CIE', 'ALA', 'POR'];
   for (const fb of fallbackPool) {
     if (deduped.length >= 4) break;
-    if (!deduped.includes(fb) && fb !== (rh.worst || player.roleWorst)) {
+    if (!deduped.includes(fb) && fb !== worst) {
       deduped.push(fb);
     }
   }
 
-  let worst = rh.worst || player.roleWorst || 'POR';
   if (!ROLE_META_MAP[worst] || deduped.includes(worst)) {
     worst = ALL_TACTICAL_ROLES.find(r => !deduped.includes(r.code))?.code || 'POR';
   }
 
   return {
     priorityOrder: deduped.slice(0, 4),
-    best: deduped[0] || 'DC',
-    second: deduped[1] || 'MC',
-    third: deduped[2] || 'DFC',
-    fourth: deduped[3] || 'MCO',
+    best: deduped[0] || 'PIV',
+    second: deduped[1] || 'ALI',
+    third: deduped[2] || 'ALD',
+    fourth: deduped[3] || 'CIE',
     worst
   };
 }
 
+export const ROLE_EQUIVALENTS = {
+  POR: [],
+  CIE: ['ALA', 'ALI', 'ALD'],
+  ALI: ['ALA', 'ALD', 'CIE', 'PIV'],
+  ALD: ['ALA', 'ALI', 'CIE', 'PIV'],
+  ALA: ['ALI', 'ALD', 'CIE', 'PIV'],
+  PIV: ['ALA', 'ALI', 'ALD']
+};
+
+export function getRoleLabel(code) {
+  const norm = normalizeFutsalRole(code, code);
+  return ROLE_META_MAP[norm]?.name || code || 'Sin asignar';
+}
+
+export function getPlayerPriorityChain(player) {
+  if (!player) {
+    return { priorityOrder: ['PIV', 'ALI', 'ALD', 'CIE'], best: 'PIV', second: 'ALI', third: 'ALD', fourth: 'CIE', worst: 'POR' };
+  }
+  return normalizeFutsalHierarchy(player.rolesHierarchy || {}, player);
+}
+
 export function getPositionPriorityRank(player, targetRole) {
+  const normTarget = normalizeFutsalRole(targetRole, 'ALA');
   const chain = getPlayerPriorityChain(player);
   const rankBonuses = [28, 18, 10, 5];
 
-  const exactIdx = chain.priorityOrder.indexOf(targetRole);
+  const exactIdx = chain.priorityOrder.indexOf(normTarget);
   if (exactIdx !== -1) {
     return {
       rank: exactIdx + 1,
@@ -97,8 +119,8 @@ export function getPositionPriorityRank(player, targetRole) {
     };
   }
 
-  if (chain.worst === targetRole) {
-    const gkExtraPenalty = targetRole === 'POR' ? -24 : 0;
+  if (chain.worst === normTarget) {
+    const gkExtraPenalty = normTarget === 'POR' ? -24 : 0;
     return {
       rank: -1,
       matchType: 'avoid',
@@ -107,7 +129,7 @@ export function getPositionPriorityRank(player, targetRole) {
     };
   }
 
-  const equivs = ROLE_EQUIVALENTS[targetRole] || [];
+  const equivs = ROLE_EQUIVALENTS[normTarget] || [];
   for (let i = 0; i < chain.priorityOrder.length; i++) {
     if (equivs.includes(chain.priorityOrder[i])) {
       return {
@@ -119,7 +141,7 @@ export function getPositionPriorityRank(player, targetRole) {
     }
   }
 
-  if (targetRole === 'POR') {
+  if (normTarget === 'POR') {
     return {
       rank: 99,
       matchType: 'out_of_gk',
@@ -137,6 +159,7 @@ export function getPositionPriorityRank(player, targetRole) {
 }
 
 export function computeStatRoleFit(player, targetRole) {
+  const normTarget = normalizeFutsalRole(targetRole, 'ALA');
   const s = player?.stats || {};
   const pac = Number(s.pac) || 70;
   const sho = Number(s.sho) || 70;
@@ -146,37 +169,22 @@ export function computeStatRoleFit(player, targetRole) {
   const phy = Number(s.phy) || 72;
 
   let weighted = (pac + sho + pas + dri + def + phy) / 6;
-  switch (targetRole) {
+  switch (normTarget) {
     case 'POR':
       weighted = def * 0.44 + phy * 0.28 + pas * 0.16 + pac * 0.12;
       break;
-    case 'DFC':
     case 'CIE':
-      weighted = def * 0.44 + phy * 0.30 + pas * 0.16 + pac * 0.10;
+      weighted = def * 0.40 + pas * 0.24 + phy * 0.22 + pac * 0.14;
       break;
-    case 'LI':
-    case 'LD':
-      weighted = pac * 0.28 + def * 0.30 + pas * 0.22 + phy * 0.20;
+    case 'ALA':
+      weighted = pas * 0.30 + dri * 0.28 + pac * 0.22 + def * 0.12 + sho * 0.08;
       break;
-    case 'MCD':
-      weighted = def * 0.32 + phy * 0.26 + pas * 0.26 + dri * 0.16;
-      break;
-    case 'MC':
-    case 'UNI':
-      weighted = pas * 0.34 + dri * 0.24 + def * 0.16 + phy * 0.14 + pac * 0.12;
-      break;
-    case 'MCO':
-      weighted = pas * 0.32 + dri * 0.32 + sho * 0.22 + pac * 0.14;
-      break;
-    case 'EI':
-    case 'ED':
     case 'ALI':
     case 'ALD':
-      weighted = pac * 0.32 + dri * 0.30 + pas * 0.20 + sho * 0.18;
+      weighted = pac * 0.28 + dri * 0.30 + pas * 0.22 + sho * 0.20;
       break;
-    case 'DC':
     case 'PIV':
-      weighted = sho * 0.38 + phy * 0.22 + pac * 0.22 + dri * 0.18;
+      weighted = sho * 0.36 + phy * 0.26 + dri * 0.22 + pas * 0.16;
       break;
     default:
       break;
@@ -184,8 +192,8 @@ export function computeStatRoleFit(player, targetRole) {
 
   let footBonus = 0;
   const foot = (player?.preferredFoot || '').toLowerCase();
-  const isLeftSlot = targetRole === 'LI' || targetRole === 'EI' || targetRole === 'ALI';
-  const isRightSlot = targetRole === 'LD' || targetRole === 'ED' || targetRole === 'ALD';
+  const isLeftSlot = normTarget === 'ALI';
+  const isRightSlot = normTarget === 'ALD';
   if (foot.includes('ambidiestro')) {
     footBonus = (isLeftSlot || isRightSlot) ? 2.5 : 1;
   } else if (isLeftSlot && foot.includes('zurdo')) {
@@ -400,12 +408,12 @@ export function computeMatchPlan({
   selectedIds = [],
   formationSlots = [],
   matchLogs = [],
-  modality = 'f7',
-  matchDuration = 50,
+  modality = 'futsal',
+  matchDuration = 40,
   strategy = 'balanced'
 }) {
-  const duration = Math.max(10, Math.min(120, Number(matchDuration) || (modality === 'f7' ? 50 : 40)));
-  const slotRoles = formationSlots.map(s => (typeof s === 'string' ? s : s?.role || 'MC'));
+  const duration = Math.max(10, Math.min(120, Number(matchDuration) || 40));
+  const slotRoles = formationSlots.map(s => normalizeFutsalRole(typeof s === 'string' ? s : s?.role, 'ALA'));
   const slotCount = slotRoles.length;
 
   const selectedSet = new Set(selectedIds);

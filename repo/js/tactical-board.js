@@ -1,197 +1,191 @@
 /**
- * Pizarra Táctica Interactiva y Plan de Partido (Fútbol 7)
+ * Pizarra Táctica Interactiva y Plan de Partido (Fútbol Sala · 40x20m)
  * Permite mover jugadores/rivales/balón, dibujar pases rectos y curvos, desmarques,
  * zonas, trazo libre, simular la jugada animada y organizar la estrategia del partido.
  */
 import { store } from './store.js';
 
-const BOARD_STORAGE_KEY = 'futinfo_tactical_board_v2';
+const BOARD_STORAGE_KEY = 'futinfo_tactical_board_futsal_v1';
 
-const DEFAULT_F7_SLOTS = [
-  { role: 'POR', top: 86, left: 50 },
-  { role: 'DFC', top: 66, left: 28 },
-  { role: 'DFC', top: 66, left: 72 },
-  { role: 'MC', top: 46, left: 50 },
-  { role: 'EI', top: 32, left: 18 },
-  { role: 'ED', top: 32, left: 82 },
-  { role: 'DC', top: 18, left: 50 }
+const DEFAULT_FUTSAL_SLOTS = [
+  { role: 'POR', top: 85, left: 50 },
+  { role: 'CIE', top: 67, left: 50 },
+  { role: 'ALI', top: 44, left: 22 },
+  { role: 'ALD', top: 44, left: 78 },
+  { role: 'PIV', top: 20, left: 50 }
 ];
 
 const RIVAL_FORMATIONS = {
-  '1-3-2-1': [
-    { role: 'POR', top: 86, left: 50 },
-    { role: 'LI', top: 67, left: 22 },
-    { role: 'DFC', top: 70, left: 50 },
-    { role: 'LD', top: 67, left: 78 },
-    { role: 'MC', top: 45, left: 34 },
-    { role: 'MC', top: 45, left: 66 },
-    { role: 'DC', top: 21, left: 50 }
+  '1-1-2-1': [
+    { role: 'POR', top: 85, left: 50 },
+    { role: 'CIE', top: 67, left: 50 },
+    { role: 'ALI', top: 44, left: 22 },
+    { role: 'ALD', top: 44, left: 78 },
+    { role: 'PIV', top: 20, left: 50 }
   ],
-  '1-2-3-1': [
-    { role: 'POR', top: 86, left: 50 },
-    { role: 'DFC', top: 68, left: 32 },
-    { role: 'DFC', top: 68, left: 68 },
-    { role: 'EI', top: 43, left: 18 },
-    { role: 'MC', top: 46, left: 50 },
-    { role: 'ED', top: 43, left: 82 },
-    { role: 'DC', top: 20, left: 50 }
+  '1-3-1': [
+    { role: 'POR', top: 85, left: 50 },
+    { role: 'ALI', top: 56, left: 21 },
+    { role: 'CIE', top: 64, left: 50 },
+    { role: 'ALD', top: 56, left: 79 },
+    { role: 'PIV', top: 20, left: 50 }
   ],
-  '1-3-1-2': [
-    { role: 'POR', top: 86, left: 50 },
-    { role: 'LI', top: 67, left: 22 },
-    { role: 'DFC', top: 70, left: 50 },
-    { role: 'LD', top: 67, left: 78 },
-    { role: 'MC', top: 46, left: 50 },
-    { role: 'DC', top: 22, left: 35 },
-    { role: 'DC', top: 22, left: 65 }
+  '1-2-2': [
+    { role: 'POR', top: 85, left: 50 },
+    { role: 'CIE', top: 66, left: 32 },
+    { role: 'ALA', top: 66, left: 68 },
+    { role: 'ALI', top: 24, left: 28 },
+    { role: 'PIV', top: 24, left: 72 }
+  ],
+  '1-4-0': [
+    { role: 'POR', top: 85, left: 50 },
+    { role: 'ALI', top: 48, left: 19 },
+    { role: 'CIE', top: 58, left: 39 },
+    { role: 'ALA', top: 58, left: 61 },
+    { role: 'ALD', top: 48, left: 81 }
   ]
 };
 
 export const TACTICAL_PRESETS = {
   salida: {
     id: 'salida',
-    label: 'Salida de Puerta',
-    shortDesc: 'Centrales abiertos al vértice, laterales altos y apoyo interior del mediocentro.',
+    label: 'Salida 4-0 / Triángulo',
+    shortDesc: 'Cierre y ala abiertos en paralelo con desmarque de ruptura o pared interior en 40x20m.',
     zoneView: 'full',
     showRivals: true,
     notes: {
-      buildUp: 'Portero con balón esperando al primer saltador rival. Centrales abren a las esquinas del área; laterales ganan altura para fijar a los extremos contrarios.',
-      attack: 'Si tapan al mediocentro, balón al costado libre y apoyo de cara al interior. Buscar el 2 vs 1 por banda antes de girar al lado opuesto.',
-      defense: 'Si perdemos en salida, el más cercano acosa 3 segundos mientras el cierre restante protege el pasillo central hacia portería.',
-      setPieces: 'En saque de puerta: opción A corta al central libre; opción B envío tenso al pecho del delantero con caída del MCO a segunda jugada.',
-      rotations: 'Bloques de cambio cada 8-10 minutos manteniendo siempre un central/pivote fresco atrás para sostener la salida.'
+      buildUp: 'Portero saca rápido sobre cierre (CIE) o primer ala (ALI/ALD) creando línea de pase limpia y evitando perder en eje central.',
+      attack: 'Tras primer pase en banda, el pasador corta hacia dentro (puerta atrás) para arrastrar marca y abrir la paralela larga al otro ala o pívot.',
+      defense: 'En Fútbol Sala toda pérdida cuesta una ocasión: repliegue al máximo sprint cerrando primero el pasillo interior hacia nuestra portería.',
+      setPieces: 'En saque de portería desde dentro del área, ofrecer doble apoyo lateral y descarga rápida si el rival salta a presión alta.',
+      rotations: 'Rotar cuarteto cada 4-5 minutos a máxima intensidad sin perder nunca un cierre equilibrado atrás.'
     },
     shapes: [
-      { type: 'pass', x1: 11, y1: 50, x2: 24, y2: 23 },
-      { type: 'pass', x1: 25, y1: 24, x2: 47, y2: 35 },
-      { type: 'curve', x1: 48, y1: 36, x2: 63, y2: 79 },
-      { type: 'run', x1: 31, y1: 81, x2: 58, y2: 83 },
-      { type: 'run', x1: 71, y1: 50, x2: 85, y2: 38 },
-      { type: 'zone', x1: 41, y1: 14, x2: 64, y2: 42 }
+      { type: 'pass', x1: 11, y1: 50, x2: 24, y2: 27 },
+      { type: 'pass', x1: 26, y1: 27, x2: 47, y2: 36 },
+      { type: 'run', x1: 26, y1: 30, x2: 56, y2: 52 },
+      { type: 'curve', x1: 48, y1: 36, x2: 67, y2: 75 },
+      { type: 'zone', x1: 44, y1: 60, x2: 70, y2: 86 }
     ]
   },
   ataque: {
     id: 'ataque',
-    label: 'Ataque Posicional',
-    shortDesc: 'Triángulos por banda, mediapunta entre líneas y llegada al segundo palo.',
+    label: 'Ataque con Pívot (3-1)',
+    shortDesc: 'Circulación rápida exterior hasta filtrar balón tenso al pívot y llegada al segundo palo.',
     zoneView: 'attack',
     showRivals: true,
     notes: {
-      buildUp: 'Circular rápido de lado a lado con máximo 2-3 toques hasta encontrar pasillo interior abierto o banda libre.',
-      attack: 'Cuando el extremo gana línea de fondo o esquina del área, el DC arrastra al primer palo y el extremo opuesto cierra al segundo palo.',
-      defense: 'Mientras atacamos en 3/4, los 2 defensores quedan vigilando por dentro (vigilancia 2 vs 1) preparados para cortar rechaces.',
-      setPieces: 'Si provocamos córner o falta lateral, acelerar si están desordenados o pausar para colocar la jugada ensayada.',
-      rotations: 'Oxigenar extremos y media punta con más recorrido para mantener desequilibrio en 1 vs 1 todo el partido.'
+      buildUp: 'Mover al rival con máximo 2 toques entre cierre y alas hasta que quede libre la línea de pase diagonal u horizontal al pívot.',
+      attack: 'Cuando recibe el PIV de espaldas, las alas acompañan en banda y zona de finalización para disparo de cara o cierre directo al 2º palo.',
+      defense: 'Cierre siempre en vigilancia a la espalda del pívot y atento a cortar la contra si bloquean nuestro tiro.',
+      setPieces: 'Si fuerzan saque de banda alto o córner, activar rápidamente las jugadas de bloqueo antes de que ajusten marcas.',
+      rotations: 'Dar frescura a las alas de ida y vuelta para sostener desborde constante en el 1 vs 1.'
     },
     shapes: [
-      { type: 'pass', x1: 38, y1: 38, x2: 58, y2: 20 },
-      { type: 'pass', x1: 60, y1: 21, x2: 74, y2: 36 },
-      { type: 'curve', x1: 76, y1: 36, x2: 89, y2: 64 },
-      { type: 'run', x1: 69, y1: 68, x2: 88, y2: 65 },
-      { type: 'run', x1: 75, y1: 48, x2: 86, y2: 43 },
-      { type: 'zone', x1: 74, y1: 32, x2: 92, y2: 70 }
+      { type: 'pass', x1: 36, y1: 36, x2: 62, y2: 20 },
+      { type: 'pass', x1: 64, y1: 22, x2: 79, y2: 45 },
+      { type: 'curve', x1: 80, y1: 46, x2: 86, y2: 68 },
+      { type: 'run', x1: 66, y1: 76, x2: 86, y2: 68 },
+      { type: 'zone', x1: 75, y1: 36, x2: 91, y2: 74 }
     ]
   },
   presion: {
     id: 'presion',
-    label: 'Presión 3s',
-    shortDesc: 'Acoso inmediato tras pérdida durante 3 segundos cerrando pases interiores.',
+    label: 'Presión Alta y Robo',
+    shortDesc: 'Orientar salida rival hacia banda en su área de 6m y morder el pase dividido.',
     zoneView: 'full',
     showRivals: true,
     notes: {
-      buildUp: 'Tras robo en campo rival, primer pase vertical al desmarque o cambio de orientación antes de que replieguen.',
-      attack: 'Finalizar jugada rápido en 3-4 pases: evitar pérdidas tontas en la frontal que nos pillen abiertos atrás.',
-      defense: 'Al perderla, los 2 más cercanos saltan al poseedor orientando su salida hacia la línea de banda; el resto cierra líneas interiores.',
-      setPieces: 'En saques de banda rivales en nuestro campo, emparejar fuerte al receptor cercano sin descuidar el giro.',
-      rotations: 'Avisar al banquillo cuando baje la chispa en presión tras pérdida para rotar delanteros y medios frescos.'
+      buildUp: 'Al recuperar alto en pista rival, definir rápido al palo corto o cruzar raso al segundo palo en menos de 4 segundos.',
+      attack: 'Pívot y ala más próximo niegan el giro interior obligando al rival a jugar contra la línea de banda.',
+      defense: 'El cierre salta solo cuando hay pase aéreo o mal control; si superan primera línea, replegar en cuadrado hacia nuestra área de 6m.',
+      setPieces: 'En saque de banda rival en campo propio, emparejar fuerte al hombre más cercano sin descuidar la paralela.',
+      rotations: 'Cambios rápidos cada 3-4 minutos si mantenemos presión alta en toda la pista.'
     },
     shapes: [
-      { type: 'shot', x1: 70, y1: 48, x2: 84, y2: 26 },
-      { type: 'shot', x1: 60, y1: 34, x2: 73, y2: 40 },
-      { type: 'run', x1: 58, y1: 68, x2: 70, y2: 52 },
-      { type: 'zone', x1: 72, y1: 10, x2: 96, y2: 46 }
+      { type: 'shot', x1: 72, y1: 48, x2: 86, y2: 26 },
+      { type: 'shot', x1: 58, y1: 32, x2: 74, y2: 39 },
+      { type: 'run', x1: 54, y1: 68, x2: 69, y2: 52 },
+      { type: 'zone', x1: 72, y1: 10, x2: 95, y2: 46 }
     ]
   },
   contra: {
     id: 'contra',
-    label: 'Bloque y Contra',
-    shortDesc: 'Dos líneas compactas en medio campo + robo + salida vertical al espacio.',
+    label: 'Bloque 2-2 y Contra',
+    shortDesc: 'Defensa compacta en media pista (15m) + robo interior + transición al segundo palo.',
     zoneView: 'full',
     showRivals: true,
     notes: {
-      buildUp: 'Bloque ordenado sin saltar de uno en uno: obligarles a jugar por fuera y robar en nuestro carril medio.',
-      attack: 'En cuanto recuperamos, mirada arriba en 1 segundo: balón al apoyo del mediocentro o ruptura profunda a espalda de su lateral.',
-      defense: 'Distancia de 10-12 metros entre defensa y centro del campo. Prohibido partir el equipo.',
-      setPieces: 'Dejar siempre 1 jugador rápido descolgado arriba en saques de esquina defensivos para lanzar la transición.',
-      rotations: 'Reservar gente veloz en bandas para castigar los espacios finales cuando el rival arriesgue.'
+      buildUp: 'Esperar ordenados en media pista cerrando pasillo interior; prohibido saltar de uno en uno dejando huecos a la espalda.',
+      attack: 'En cuanto robamos, conducción vertical al espacio o pared rápida buscando superioridad 2 vs 1 sobre su portero.',
+      defense: 'Distancia corta entre primera y segunda línea defensiva basculando en bloque con el balón.',
+      setPieces: 'En defensa de córner, el jugador en frontal lanza la transición apenas atrapa o despeja nuestro portero.',
+      rotations: 'Mantener al menos un cierre rápido y un ala explosivo en pista para castigar cada pérdida rival.'
     },
     shapes: [
-      { type: 'zone', x1: 22, y1: 20, x2: 45, y2: 80 },
-      { type: 'pass', x1: 36, y1: 48, x2: 54, y2: 31 },
-      { type: 'pass', x1: 56, y1: 31, x2: 83, y2: 25 },
-      { type: 'run', x1: 66, y1: 46, x2: 86, y2: 28 },
-      { type: 'run', x1: 58, y1: 68, x2: 80, y2: 63 }
+      { type: 'zone', x1: 24, y1: 22, x2: 46, y2: 78 },
+      { type: 'pass', x1: 38, y1: 50, x2: 56, y2: 30 },
+      { type: 'pass', x1: 58, y1: 30, x2: 84, y2: 24 },
+      { type: 'run', x1: 64, y1: 48, x2: 85, y2: 64 }
     ]
   },
   corner_fav: {
     id: 'corner_fav',
-    label: 'Córner a Favor',
-    shortDesc: 'Señal del lanzador: arrastre al 1er palo, remate punto penalti / 2º palo y frontal.',
+    label: 'Córner Pista (2º Palo)',
+    shortDesc: 'Pase atrás a la corona del área (10m) o envío raso al bloqueo y 2º palo (4 segundos).',
     zoneView: 'attack',
     showRivals: true,
     notes: {
-      buildUp: 'Brazo arriba del lanzador = envío tenso al 1er palo; dos brazos = abierta al 2º palo o frontal del área.',
-      attack: 'Un atacante arrastra al 1er palo, dos atacan punto penalti / 2º palo con carrera desde fuera y uno espera el rechace limpio.',
-      defense: 'Siempre 2 cierres atrás en vigilancia 2 vs 1 cerca del círculo central para cortar cualquier contra rival.',
-      setPieces: 'Si tapan la zona central, opción rápida en corto al compañero que ofrece línea lateral para centro con mejor ángulo.',
-      rotations: 'Asegurar que nuestro especialista designado en Córners esté en el césped en tramos clave.'
+      buildUp: '¡Cuenta de 4 segundos en Fútbol Sala! Colocar rápido balón en esquina y ejecutar en bloque.',
+      attack: 'Opción 1: bloqueo del pívot y disparo de primeras del ala en la frontal. Opción 2: balón tenso raso para empujar al 2º palo.',
+      defense: 'Cierre siempre vigilando el rechace cerca de medio campo para evitar puerta vacía o contra rápida.',
+      setPieces: 'Si cubren frontal, finta y toque corto raso al pívot que sale a esquina corta del área de 6m.',
+      rotations: 'Contar siempre con nuestro mejor golpeador exterior en pista en los córners ofensivos.'
     },
     shapes: [
-      { type: 'curve', x1: 95, y1: 93, x2: 82, y2: 44 },
-      { type: 'run', x1: 68, y1: 36, x2: 83, y2: 42 },
-      { type: 'run', x1: 66, y1: 56, x2: 83, y2: 60 },
-      { type: 'run', x1: 52, y1: 50, x2: 66, y2: 50 },
-      { type: 'zone', x1: 77, y1: 36, x2: 91, y2: 64 }
+      { type: 'pass', x1: 95, y1: 92, x2: 66, y2: 44 },
+      { type: 'shot', x1: 66, y1: 44, x2: 95, y2: 49 },
+      { type: 'run', x1: 72, y1: 34, x2: 85, y2: 38 },
+      { type: 'zone', x1: 78, y1: 34, x2: 91, y2: 66 }
     ]
   },
   falta_abp: {
     id: 'falta_abp',
-    label: 'Falta Frontal ABP',
-    shortDesc: 'Disparo directo o amago + pase filtrado al desmarque por detrás de la barrera.',
+    label: 'Falta / Doble Penalti',
+    shortDesc: 'Barrera a 5 metros: pisa-balón de dos perfiles para disparo o pase lateral al 2º palo.',
     zoneView: 'attack',
     showRivals: true,
     notes: {
-      buildUp: 'Dos perfiles junto al balón (zurdo y diestro) para sembrar duda sobre tiro directo o pase interior.',
-      attack: 'Opción 1: golpeo colocado por encima o palo del portero. Opción 2: amago por encima y toque al desmarque por fuera de barrera.',
-      defense: 'Mínimo 2 jugadores cubriendo espalda por si la barrera despeja largo y sale contra rival.',
-      setPieces: 'Un jugador atento al rechace del portero para empujar en segunda acción sin caer en precipitación.',
-      rotations: 'Dar galones al especialista en faltas configurado en Especialistas del Club.'
+      buildUp: 'Pedir distancia oficial de 5 metros y colocar zurdo + diestro para amenazar ambos palos.',
+      attack: 'Pisa-balón suave para romper ángulo de barrera y golpeo potente a media altura, o pase filtrado al ala libre.',
+      defense: 'El cierre queda por detrás de la línea de balón cubriendo el posible despeje rápido rival.',
+      setPieces: 'Si es falta acumulada de 10m (doble penalti), golpeo seco arriba sin dudar.',
+      rotations: 'Designar en pista al especialista de faltas configurado en Especialistas del Club.'
     },
     shapes: [
-      { type: 'shot', x1: 58, y1: 34, x2: 93, y2: 46 },
-      { type: 'pass', x1: 58, y1: 34, x2: 75, y2: 20 },
-      { type: 'run', x1: 65, y1: 20, x2: 84, y2: 25 },
-      { type: 'zone', x1: 78, y1: 18, x2: 91, y2: 36 }
+      { type: 'pass', x1: 60, y1: 34, x2: 63, y2: 40 },
+      { type: 'shot', x1: 63, y1: 40, x2: 95, y2: 47 },
+      { type: 'run', x1: 71, y1: 70, x2: 86, y2: 65 },
+      { type: 'zone', x1: 74, y1: 22, x2: 89, y2: 39 }
     ]
   },
   defensa_abp: {
     id: 'defensa_abp',
-    label: 'Defensa Balón Parado',
-    shortDesc: 'Marcaje mixto: 1 en primer palo + 3 en zona de área +frontal + punta descolgado.',
+    label: 'Portero-Jugador / ABP',
+    shortDesc: 'Rombo o cuadrado compacto delante de 6 metros basculando al lado de balón (5v4 / córner).',
     zoneView: 'buildup',
     showRivals: true,
     notes: {
-      buildUp: 'Al recuperar portero o despejar limpio, abrir rápido hacia nuestras bandas para lanzar salida limpia.',
-      attack: 'Dejar siempre 1 delantero adelantado cerca del centro del campo para fijar dos rivales atrás.',
-      defense: '1 jugador pegado al 1er palo, 3 defendiendo zona de área pequeña/penalti sin perder de vista balón ni marca, y 1 en la frontal.',
-      setPieces: 'Concentración hasta el segundo despeje; todo el equipo sale en bloque tras alejar el peligro.',
-      rotations: 'Evitar sustituciones justo en el instante previo a defender un córner o falta lateral rival.'
+      buildUp: 'Si robamos ante Portero-Jugador (5v4), disparo inmediato alto hacia la portería rival vacía o pase seguro al ala adelantada.',
+      attack: 'En transición tras robo, asegurar primero la posesión si no hay ángulo limpio hacia portería rival.',
+      defense: 'Defender en rombo/cuadrado justo fuera del área de 6m: negar siempre el pase al centro y al segundo palo.',
+      setPieces: 'En córner en contra, 1 jugador en vértice del área de 6m y otros 3 fijando marcas sin perder visión del balón.',
+      rotations: 'En tramos finales defendiendo 5v4, priorizar jugadores comunicativos y con máxima lectura táctica.'
     },
     shapes: [
-      { type: 'zone', x1: 10, y1: 34, x2: 24, y2: 66 },
-      { type: 'shot', x1: 28, y1: 50, x2: 36, y2: 48 },
-      { type: 'pass', x1: 12, y1: 50, x2: 46, y2: 24 },
-      { type: 'run', x1: 42, y1: 26, x2: 68, y2: 22 }
+      { type: 'zone', x1: 12, y1: 28, x2: 29, y2: 72 },
+      { type: 'pass', x1: 16, y1: 50, x2: 52, y2: 28 },
+      { type: 'run', x1: 48, y1: 28, x2: 78, y2: 44 }
     ]
   }
 };
@@ -242,74 +236,75 @@ function projectToHorizontalPitch(slots, zoneView = 'full', team = 'home', getFo
   });
 }
 
-function defaultHorizontalFormation(zoneView = 'full', team = 'home', getFormationFn = null, awayFormation = '1-3-2-1') {
+function defaultHorizontalFormation(zoneView = 'full', team = 'home', getFormationFn = null, awayFormation = '1-1-2-1') {
   if (team === 'away') {
-    const rivalSlots = RIVAL_FORMATIONS[awayFormation] || RIVAL_FORMATIONS['1-3-2-1'];
+    const rivalSlots = RIVAL_FORMATIONS[awayFormation] || RIVAL_FORMATIONS['1-1-2-1'];
     return projectToHorizontalPitch(rivalSlots, zoneView, 'away', getFormationFn);
   }
-  const conf = typeof getFormationFn === 'function' ? getFormationFn('f7', store.getActiveFormation()) : null;
-  const baseSlots = (conf?.slots?.length ? conf.slots : DEFAULT_F7_SLOTS).slice(0, 7);
+  const conf = typeof getFormationFn === 'function' ? getFormationFn('futsal', store.getActiveFormation()) : null;
+  const baseSlots = (conf?.slots?.length ? conf.slots : DEFAULT_FUTSAL_SLOTS).slice(0, 5);
   return projectToHorizontalPitch(baseSlots, zoneView, 'home', getFormationFn);
 }
 
 function applyPresetCoordinates(presetId, home, away) {
   if (presetId === 'salida') {
     if (home[0]) { home[0].x = 10; home[0].y = 50; }
-    if (home[1]) { home[1].x = 24; home[1].y = 22; }
-    if (home[2]) { home[2].x = 22; home[2].y = 74; }
-    if (home[3]) { home[3].x = 34; home[3].y = 84; }
-    if (home[4]) { home[4].x = 46; home[4].y = 35; }
+    if (home[1]) { home[1].x = 24; home[1].y = 26; }
+    if (home[2]) { home[2].x = 46; home[2].y = 36; }
+    if (home[3]) { home[3].x = 30; home[3].y = 75; }
+    if (home[4]) { home[4].x = 67; home[4].y = 75; }
     return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 12.5, y: 50 };
   }
   if (presetId === 'ataque') {
-    if (home[0]) { home[0].x = 16; home[0].y = 50; }
-    if (home[1]) { home[1].x = 38; home[1].y = 38; }
-    if (home[2]) { home[2].x = 40; home[2].y = 64; }
-    if (home[3]) { home[3].x = 58; home[3].y = 20; }
-    if (home[4]) { home[4].x = 72; home[4].y = 36; }
-    if (home[5]) { home[5].x = 75; home[5].y = 49; }
-    if (home[6]) { home[6].x = 69; home[6].y = 68; }
-    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 59, y: 21 };
+    if (home[0]) { home[0].x = 14; home[0].y = 50; }
+    if (home[1]) { home[1].x = 36; home[1].y = 36; }
+    if (home[2]) { home[2].x = 62; home[2].y = 20; }
+    if (home[3]) { home[3].x = 66; home[3].y = 76; }
+    if (home[4]) { home[4].x = 79; home[4].y = 45; }
+    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 37.5, y: 36 };
   }
   if (presetId === 'presion') {
-    home.forEach((t, i) => { if (i > 0) t.x = Math.min(84, t.x + 18); });
-    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 84, y: 24 };
+    const spots = [
+      { x: 14, y: 50 }, { x: 46, y: 48 }, { x: 70, y: 31 }, { x: 54, y: 69 }, { x: 84, y: 24 }
+    ];
+    home.forEach((t, i) => { const s = spots[i]; if (s) { t.x = s.x; t.y = s.y; } });
+    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 86, y: 26 };
   }
   if (presetId === 'contra') {
-    home.forEach((t, i) => { if (i > 0) t.x = Math.max(20, Math.min(52, t.x - 10)); });
-    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 36, y: 48 };
+    const spots = [
+      { x: 10, y: 50 }, { x: 34, y: 36 }, { x: 34, y: 64 }, { x: 56, y: 30 }, { x: 64, y: 48 }
+    ];
+    home.forEach((t, i) => { const s = spots[i]; if (s) { t.x = s.x; t.y = s.y; } });
+    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 38, y: 50 };
   }
   if (presetId === 'corner_fav') {
     const spots = [
-      { x: 16, y: 50 }, { x: 48, y: 38 }, { x: 48, y: 62 },
-      { x: 66, y: 35 }, { x: 66, y: 58 }, { x: 54, y: 50 }, { x: 95, y: 94 }
+      { x: 15, y: 50 }, { x: 48, y: 46 }, { x: 65, y: 44 }, { x: 72, y: 34 }, { x: 95, y: 92 }
     ];
     home.forEach((t, i) => { const s = spots[i]; if (s) { t.x = s.x; t.y = s.y; } });
-    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 95, y: 93 };
+    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 95, y: 92 };
   }
   if (presetId === 'falta_abp') {
     const spots = [
-      { x: 15, y: 50 }, { x: 42, y: 36 }, { x: 42, y: 64 },
-      { x: 58, y: 34 }, { x: 65, y: 20 }, { x: 75, y: 55 }, { x: 72, y: 42 }
+      { x: 14, y: 50 }, { x: 44, y: 46 }, { x: 60, y: 34 }, { x: 63, y: 41 }, { x: 71, y: 70 }
     ];
     home.forEach((t, i) => { const s = spots[i]; if (s) { t.x = s.x; t.y = s.y; } });
-    if (away[2]) { away[2].x = 76; away[2].y = 39; }
-    if (away[3]) { away[3].x = 76; away[3].y = 43; }
-    if (away[4]) { away[4].x = 76; away[4].y = 47; }
-    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 59, y: 34 };
+    if (away[2]) { away[2].x = 76; away[2].y = 40; }
+    if (away[3]) { away[3].x = 76; away[3].y = 45; }
+    if (away[4]) { away[4].x = 76; away[4].y = 50; }
+    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 60, y: 34 };
   }
   if (presetId === 'defensa_abp') {
     const spots = [
-      { x: 8, y: 50 }, { x: 13, y: 39 }, { x: 18, y: 47 },
-      { x: 18, y: 58 }, { x: 26, y: 50 }, { x: 42, y: 26 }, { x: 20, y: 69 }
+      { x: 10, y: 50 }, { x: 16, y: 37 }, { x: 16, y: 63 }, { x: 25, y: 48 }, { x: 48, y: 28 }
     ];
     home.forEach((t, i) => { const s = spots[i]; if (s) { t.x = s.x; t.y = s.y; } });
-    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 12, y: 92 };
+    return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 80, y: 80 };
   }
   return { id: 'ball', team: 'ball', label: '', subLabel: 'BALÓN', x: 50, y: 50 };
 }
 
-function buildPresetTokens(presetId, getFormationFn = null, awayFormation = '1-3-2-1') {
+function buildPresetTokens(presetId, getFormationFn = null, awayFormation = '1-1-2-1') {
   const preset = TACTICAL_PRESETS[presetId] || TACTICAL_PRESETS.salida;
   const zoneView = preset.zoneView || 'full';
   const home = defaultHorizontalFormation(zoneView, 'home', getFormationFn, awayFormation);
@@ -360,12 +355,14 @@ export class TacticalBoardController {
       const raw = localStorage.getItem(BOARD_STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (parsed && Array.isArray(parsed.tokens) && parsed.tokens.length > 0) {
+        const homeCount = Array.isArray(parsed?.tokens) ? parsed.tokens.filter(t => t.team === 'home').length : 0;
+        const awayCount = Array.isArray(parsed?.tokens) ? parsed.tokens.filter(t => t.team === 'away').length : 0;
+        if (parsed && homeCount === 5 && awayCount === 5) {
           return {
             zoneView: parsed.zoneView || 'full',
             activePresetId: TACTICAL_PRESETS[parsed.activePresetId] ? parsed.activePresetId : 'salida',
             activeTool: parsed.activeTool || 'move',
-            awayFormation: RIVAL_FORMATIONS[parsed.awayFormation] ? parsed.awayFormation : '1-3-2-1',
+            awayFormation: RIVAL_FORMATIONS[parsed.awayFormation] ? parsed.awayFormation : '1-1-2-1',
             showRivals: parsed.showRivals !== false,
             showLanes: !!parsed.showLanes,
             showStepNumbers: parsed.showStepNumbers !== false,
@@ -387,7 +384,9 @@ export class TacticalBoardController {
 
   createFreshState(presetId = 'salida') {
     const preset = TACTICAL_PRESETS[presetId] || TACTICAL_PRESETS.salida;
-    const awayFormation = this.state?.awayFormation || '1-3-2-1';
+    const awayFormation = this.state?.awayFormation && RIVAL_FORMATIONS[this.state.awayFormation]
+      ? this.state.awayFormation
+      : '1-1-2-1';
     const { tokens, zoneView } = buildPresetTokens(presetId, this.getFormationFn, awayFormation);
     return {
       zoneView,
@@ -425,6 +424,9 @@ export class TacticalBoardController {
   applyRemoteBoardState(remote) {
     if (!remote || !Array.isArray(remote.tokens) || remote.tokens.length === 0) return;
     if (this._drag || this._draftShape) return;
+    const homeCount = remote.tokens.filter(t => t.team === 'home').length;
+    const awayCount = remote.tokens.filter(t => t.team === 'away').length;
+    if (homeCount !== 5 || awayCount !== 5) return;
     const remoteTs = remote.updatedAt || 0;
     if (remoteTs && remoteTs <= (this._lastRemoteBoardTs || 0)) return;
     this._lastRemoteBoardTs = remoteTs;
@@ -434,7 +436,7 @@ export class TacticalBoardController {
         zoneView: remote.zoneView || 'full',
         activePresetId: TACTICAL_PRESETS[remote.activePresetId] ? remote.activePresetId : 'salida',
         activeTool: this.state?.activeTool || remote.activeTool || 'move',
-        awayFormation: RIVAL_FORMATIONS[remote.awayFormation] ? remote.awayFormation : '1-3-2-1',
+        awayFormation: RIVAL_FORMATIONS[remote.awayFormation] ? remote.awayFormation : '1-1-2-1',
         showRivals: remote.showRivals !== false,
         showLanes: !!remote.showLanes,
         showStepNumbers: remote.showStepNumbers !== false,
@@ -489,7 +491,7 @@ export class TacticalBoardController {
     this.renderSpecialistsBanner();
     this.renderRosterStrip();
     if (announce && this.app) {
-      this.app.showToast('Siete titular de Fútbol 7 actualizado en la pizarra', 'users');
+      this.app.showToast('Quinteto titular de Fútbol Sala actualizado en la pizarra', 'users');
     }
   }
 
@@ -1066,10 +1068,10 @@ export class TacticalBoardController {
       const tok = this.state.tokens.find(t => t.playerId === p.id);
       const selected = tok && tok.id === this._selectedTokenId;
       return `
-        <button type="button" class="pizarra-roster-chip ${isStarter ? 'is-starter' : 'is-sub'} ${selected ? 'is-selected' : ''}" data-roster-player="${p.id}" title="${p.name} (${p.rolesHierarchy?.best || 'DC'})">
+        <button type="button" class="pizarra-roster-chip ${isStarter ? 'is-starter' : 'is-sub'} ${selected ? 'is-selected' : ''}" data-roster-player="${p.id}" title="${p.name} (${p.rolesHierarchy?.best || 'PIV'})">
           <span class="pizarra-roster-num">#${p.number || 10}</span>
           <span class="pizarra-roster-name">${(p.nickname || p.name?.split(' ')[0] || 'JUG').toUpperCase().slice(0, 10)}</span>
-          <span class="pizarra-roster-role">${isStarter ? (tok?.role || p.rolesHierarchy?.best || 'F7') : 'SUP'}</span>
+          <span class="pizarra-roster-role">${isStarter ? (tok?.role || p.rolesHierarchy?.best || 'FS') : 'SUP'}</span>
         </button>
       `;
     };
@@ -1097,13 +1099,15 @@ export class TacticalBoardController {
   renderFieldMarkingsSvg() {
     const zone = this.state.zoneView || 'full';
 
-    // Franjas de césped Fútbol 7 (viewBox 1000x620)
-    const stripeCount = 12;
-    const stripeW = 1000 / stripeCount;
-    const stripes = Array.from({ length: stripeCount }, (_, i) => {
-      const fill = i % 2 === 0 ? '#234a13' : '#2c5a18';
-      return `<rect x="${i * stripeW}" y="0" width="${stripeW + 0.5}" height="620" fill="${fill}" />`;
+    // Pista azul oficial de Fútbol Sala (pabellón 40x20m, viewBox 1000x620)
+    const courtSurround = `<rect x="0" y="0" width="1000" height="620" fill="#0d294a" />`;
+    const courtFloor = `<rect x="40" y="32" width="920" height="556" rx="4" fill="#15477f" />`;
+    const courtBands = Array.from({ length: 8 }, (_, i) => {
+      const bandW = 920 / 8;
+      const fill = i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)';
+      return `<rect x="${40 + i * bandW}" y="32" width="${bandW}" height="556" fill="${fill}" />`;
     }).join('');
+    const stripes = `${courtSurround}${courtFloor}${courtBands}`;
 
     // 5 Carriles Tácticos (Banda Sup, Pasillo Int Sup, Carril Central, Pasillo Int Inf, Banda Inf)
     let lanesSvg = '';
@@ -1112,62 +1116,69 @@ export class TacticalBoardController {
       lanesSvg = laneYs.map(y =>
         `<line x1="42" y1="${y}" x2="958" y2="${y}" stroke="rgba(255,255,255,0.16)" stroke-width="1.5" stroke-dasharray="9,9" />`
       ).join('') + `
-        <text x="500" y="82" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-family="Barlow Condensed, sans-serif" font-weight="700" font-size="13" letter-spacing="2">BANDA IZQUIERDA</text>
-        <text x="500" y="314" text-anchor="middle" fill="rgba(255,255,255,0.20)" font-family="Barlow Condensed, sans-serif" font-weight="700" font-size="13" letter-spacing="2">CARRIL CENTRAL</text>
-        <text x="500" y="548" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-family="Barlow Condensed, sans-serif" font-weight="700" font-size="13" letter-spacing="2">BANDA DERECHA / ZONA BANQUILLO</text>
+        <text x="500" y="82" text-anchor="middle" fill="rgba(255,255,255,0.24)" font-family="Barlow Condensed, sans-serif" font-weight="700" font-size="13" letter-spacing="2">ALA / BANDA IZQUIERDA</text>
+        <text x="500" y="314" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-family="Barlow Condensed, sans-serif" font-weight="700" font-size="13" letter-spacing="2">PASILLO CENTRAL (CIERRE / PÍVOT)</text>
+        <text x="500" y="548" text-anchor="middle" fill="rgba(255,255,255,0.24)" font-family="Barlow Condensed, sans-serif" font-weight="700" font-size="13" letter-spacing="2">ALA / BANDA DERECHA · ZONA CAMBIOS 5M</text>
       `;
     }
 
     let lines = '';
     if (zone === 'attack') {
       lines = `
-        <rect x="40" y="32" width="920" height="556" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" />
-        <line x1="40" y1="32" x2="40" y2="588" stroke="rgba(255,255,255,0.85)" stroke-width="3" />
-        <path d="M 40,210 A 100,100 0 0,1 40,410" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" />
-        <rect x="740" y="130" width="220" height="360" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" />
-        <rect x="880" y="218" width="80" height="184" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" />
-        <circle cx="825" cy="310" r="4.5" fill="#ffffff" />
-        <path d="M 740,235 A 95,95 0 0,0 740,385" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" />
+        <rect x="40" y="32" width="920" height="556" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3" />
+        <path d="M 40,210 A 100,100 0 0,1 40,410" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="3" />
+        <!-- Área semicircular de 6m reglamentaria Fútbol Sala -->
+        <path d="M 960,126 L 910,126 A 126,126 0 0,0 784,252 L 784,368 A 126,126 0 0,0 910,494 L 960,494" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.92)" stroke-width="3" />
+        <!-- Punto de Penalti 6m + Doble Penalti 10m -->
+        <circle cx="838" cy="310" r="5" fill="#ffffff" />
+        <circle cx="690" cy="310" r="5" fill="#facc15" />
+        <text x="690" y="332" text-anchor="middle" fill="rgba(250,204,21,0.85)" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="12">10M</text>
         <path d="M 960,54 A 22,22 0 0,0 938,32" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" />
         <path d="M 938,588 A 22,22 0 0,0 960,566" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" />
-        <rect x="960" y="252" width="18" height="116" fill="rgba(255,255,255,0.22)" stroke="#ffffff" stroke-width="3" />
-        <text x="64" y="64" fill="rgba(255,255,255,0.6)" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="22" letter-spacing="2">ZONA DE FINALIZACIÓN RIVAL (FÚTBOL 7)</text>
+        <rect x="960" y="254" width="18" height="112" fill="rgba(255,255,255,0.22)" stroke="#ffffff" stroke-width="3" />
+        <text x="64" y="64" fill="rgba(255,255,255,0.72)" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="21" letter-spacing="2">ZONA DE FINALIZACIÓN RIVAL (FÚTBOL SALA · 6M)</text>
       `;
     } else if (zone === 'buildup') {
       lines = `
-        <rect x="40" y="32" width="920" height="556" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" />
-        <path d="M 960,210 A 100,100 0 0,0 960,410" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" />
-        <rect x="40" y="130" width="220" height="360" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" />
-        <rect x="40" y="218" width="80" height="184" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" />
-        <circle cx="175" cy="310" r="4.5" fill="#ffffff" />
-        <path d="M 260,235 A 95,95 0 0,1 260,385" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="3" />
+        <rect x="40" y="32" width="920" height="556" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3" />
+        <path d="M 960,210 A 100,100 0 0,0 960,410" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="3" />
+        <!-- Área semicircular de 6m propia -->
+        <path d="M 40,126 L 90,126 A 126,126 0 0,1 216,252 L 216,368 A 126,126 0 0,1 90,494 L 40,494" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.92)" stroke-width="3" />
+        <circle cx="162" cy="310" r="5" fill="#ffffff" />
+        <circle cx="310" cy="310" r="5" fill="#facc15" />
+        <text x="310" y="332" text-anchor="middle" fill="rgba(250,204,21,0.85)" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="12">10M</text>
         <path d="M 40,54 A 22,22 0 0,0 62,32" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" />
         <path d="M 62,588 A 22,22 0 0,0 40,566" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" />
-        <rect x="22" y="252" width="18" height="116" fill="rgba(255,255,255,0.22)" stroke="#ffffff" stroke-width="3" />
-        <text x="688" y="64" fill="rgba(255,255,255,0.6)" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="22" letter-spacing="2">SALIDA DE BALÓN PROPIA (FÚTBOL 7)</text>
+        <rect x="22" y="254" width="18" height="112" fill="rgba(255,255,255,0.22)" stroke="#ffffff" stroke-width="3" />
+        <text x="640" y="64" fill="rgba(255,255,255,0.72)" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="21" letter-spacing="2">SALIDA DE PISTA PROPIA (FÚTBOL SALA)</text>
       `;
     } else {
       lines = `
-        <rect x="40" y="32" width="920" height="556" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="3" />
-        <line x1="500" y1="32" x2="500" y2="588" stroke="rgba(255,255,255,0.88)" stroke-width="3" />
-        <circle cx="500" cy="310" r="76" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="3" />
+        <rect x="40" y="32" width="920" height="556" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="3" />
+        <line x1="500" y1="32" x2="500" y2="588" stroke="rgba(255,255,255,0.92)" stroke-width="3" />
+        <circle cx="500" cy="310" r="76" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="3" />
         <circle cx="500" cy="310" r="5" fill="#ffffff" />
-        <rect x="40" y="155" width="150" height="310" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="3" />
-        <rect x="40" y="230" width="58" height="160" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="3" />
-        <path d="M 190,248 A 72,72 0 0,1 190,372" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="3" />
-        <circle cx="145" cy="310" r="4" fill="#ffffff" />
-        <rect x="810" y="155" width="150" height="310" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="3" />
-        <rect x="902" y="230" width="58" height="160" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="3" />
-        <path d="M 810,248 A 72,72 0 0,0 810,372" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="3" />
-        <circle cx="855" cy="310" r="4" fill="#ffffff" />
-        <rect x="22" y="260" width="18" height="100" fill="rgba(255,255,255,0.2)" stroke="#ffffff" stroke-width="3" />
-        <rect x="960" y="260" width="18" height="100" fill="rgba(255,255,255,0.2)" stroke="#ffffff" stroke-width="3" />
+        <!-- Semicírculos de 6m Fútbol Sala (izquierda y derecha) -->
+        <path d="M 40,148 L 62,148 A 104,104 0 0,1 166,252 L 166,368 A 104,104 0 0,1 62,472 L 40,472" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.92)" stroke-width="3" />
+        <circle cx="132" cy="310" r="4.5" fill="#ffffff" />
+        <circle cx="222" cy="310" r="4" fill="#facc15" />
+        <path d="M 960,148 L 938,148 A 104,104 0 0,0 834,252 L 834,368 A 104,104 0 0,0 938,472 L 960,472" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.92)" stroke-width="3" />
+        <circle cx="868" cy="310" r="4.5" fill="#ffffff" />
+        <circle cx="778" cy="310" r="4" fill="#facc15" />
+        <!-- Marcas zona de sustituciones 5m en banda inferior -->
+        <line x1="385" y1="578" x2="385" y2="598" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" />
+        <line x1="472" y1="578" x2="472" y2="598" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" />
+        <line x1="528" y1="578" x2="528" y2="598" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" />
+        <line x1="615" y1="578" x2="615" y2="598" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" />
+        <!-- Porterías Futsal 3x2m -->
+        <rect x="22" y="262" width="18" height="96" fill="rgba(255,255,255,0.22)" stroke="#ffffff" stroke-width="3" />
+        <rect x="960" y="262" width="18" height="96" fill="rgba(255,255,255,0.22)" stroke="#ffffff" stroke-width="3" />
         <path d="M 40,50 A 18,18 0 0,0 58,32" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2" />
         <path d="M 58,588 A 18,18 0 0,0 40,570" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2" />
         <path d="M 960,50 A 18,18 0 0,1 942,32" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2" />
         <path d="M 942,588 A 18,18 0 0,1 960,570" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2" />
-        <text x="58" y="60" fill="rgba(255,255,255,0.58)" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="18" letter-spacing="2">NUESTRA PORTERÍA</text>
-        <text x="765" y="60" fill="rgba(255,255,255,0.58)" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="18" letter-spacing="2">ATAQUE HACIA RIVAL</text>
+        <text x="58" y="60" fill="rgba(255,255,255,0.68)" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="18" letter-spacing="2">NUESTRA PORTERÍA · 6M</text>
+        <text x="745" y="60" fill="rgba(255,255,255,0.68)" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="18" letter-spacing="2">ATAQUE HACIA RIVAL · 40×20M</text>
       `;
     }
 
@@ -1312,7 +1323,7 @@ export class TacticalBoardController {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(url);
       const a = document.createElement('a');
-      a.download = `Pizarra_F7_${this.state.activePresetId || 'tactica'}.png`;
+      a.download = `Pizarra_Futsal_${this.state.activePresetId || 'tactica'}.png`;
       a.href = canvas.toDataURL('image/png');
       a.click();
       this.app?.showToast('Imagen PNG de la pizarra descargada', 'download');

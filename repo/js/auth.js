@@ -3,6 +3,7 @@
  */
 import { auth, db, isFirebaseConfigured } from './firebase-config.js';
 import { store } from './store.js';
+import { normalizeFutsalHierarchy } from './lineup-planner.js';
 
 const AUTH_USER_KEY = 'futinfo_fifa_auth_user_v3';
 const LEGACY_ACCOUNTS_KEY = 'futinfo_fifa_accounts_v3';
@@ -241,25 +242,21 @@ class AuthService {
         skillMoves: parseInt(cardData.skillMoves, 10) || existingPlayer.skillMoves || 4,
         weakFoot: parseInt(cardData.weakFoot, 10) || existingPlayer.weakFoot || 4,
         chemStyle: cardData.chemStyle || existingPlayer.chemStyle || 'HUN',
-        rolesHierarchy: (() => {
-          const best = cardData.roleBest || existingPlayer.rolesHierarchy?.best || 'DC';
-          const second = cardData.roleSecond || existingPlayer.rolesHierarchy?.second || 'MC';
-          const third = cardData.roleThird || existingPlayer.rolesHierarchy?.third || 'DFC';
-          const fourth = cardData.roleFourth || existingPlayer.rolesHierarchy?.fourth || 'MCO';
-          const worst = cardData.roleWorst || existingPlayer.rolesHierarchy?.worst || 'POR';
-          const rawOrder = Array.isArray(cardData.priorityOrder) && cardData.priorityOrder.length > 0
+        rolesHierarchy: normalizeFutsalHierarchy({
+          best: cardData.roleBest || existingPlayer.rolesHierarchy?.best || 'PIV',
+          second: cardData.roleSecond || existingPlayer.rolesHierarchy?.second || 'ALI',
+          third: cardData.roleThird || existingPlayer.rolesHierarchy?.third || 'ALD',
+          fourth: cardData.roleFourth || existingPlayer.rolesHierarchy?.fourth || 'CIE',
+          worst: cardData.roleWorst || existingPlayer.rolesHierarchy?.worst || 'POR',
+          priorityOrder: Array.isArray(cardData.priorityOrder) && cardData.priorityOrder.length > 0
             ? cardData.priorityOrder
-            : [best, second, third, fourth];
-          const priorityOrder = rawOrder.filter((v, idx, arr) => v && arr.indexOf(v) === idx);
-          return {
-            best: priorityOrder[0] || best,
-            second: priorityOrder[1] || second,
-            third: priorityOrder[2] || third,
-            fourth: priorityOrder[3] || fourth,
-            worst,
-            priorityOrder
-          };
-        })(),
+            : [
+              cardData.roleBest || existingPlayer.rolesHierarchy?.best || 'PIV',
+              cardData.roleSecond || existingPlayer.rolesHierarchy?.second || 'ALI',
+              cardData.roleThird || existingPlayer.rolesHierarchy?.third || 'ALD',
+              cardData.roleFourth || existingPlayer.rolesHierarchy?.fourth || 'CIE'
+            ]
+        }),
         stats: nextStats
       });
     } else {
@@ -287,10 +284,10 @@ class AuthService {
         chemStyle: cardData.chemStyle || 'HUN',
         studentId: cardData.studentId || '',
         phone: cardData.phone || '',
-        roleBest: cardData.roleBest || 'DC',
-        roleSecond: cardData.roleSecond || 'MC',
-        roleThird: cardData.roleThird || 'DFC',
-        roleFourth: cardData.roleFourth || 'MCO',
+        roleBest: cardData.roleBest || 'PIV',
+        roleSecond: cardData.roleSecond || 'ALI',
+        roleThird: cardData.roleThird || 'ALD',
+        roleFourth: cardData.roleFourth || 'CIE',
         roleWorst: cardData.roleWorst || 'POR',
         priorityOrder: cardData.priorityOrder || undefined,
         pac: parseInt(cardData.pac, 10) || 82,

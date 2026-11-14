@@ -982,27 +982,26 @@ body.hud-canvas {
 
 /* Trapecio de césped FIFA Oficial: Solo Mitad de Cancha Defensiva (Centro Arriba, Área Abajo) */
 .hud-pitch::before {
-  /* Borde perimetral exterior */
+  /* Borde perimetral exterior de pista azul de Fútbol Sala */
   content: "";
   position: absolute;
   inset: -2px -3px -6px -3px;
   clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
-  background: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 8px 0 #13200b;
+  background: rgba(255, 255, 255, 0.52);
+  box-shadow: 0 8px 0 #081c36;
   pointer-events: none;
 }
 
 .hud-pitch::after {
-  /* Césped rayado e iluminación de focos sobre la media cancha */
+  /* Pista azul oficial de pabellón e iluminación cenital sobre la media cancha */
   content: "";
   position: absolute;
   inset: 2px;
   clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
   background:
-    radial-gradient(ellipse 90% 55% at 50% 15%, rgba(255, 255, 255, 0.18) 0%, transparent 75%),
-    radial-gradient(ellipse 70% 45% at 50% 85%, rgba(0, 0, 0, 0.28) 0%, transparent 65%),
-    repeating-linear-gradient(180deg, #2b4b16 0 10%, #365c1c 10% 20%),
-    #2b4b16;
+    radial-gradient(ellipse 90% 55% at 50% 15%, rgba(255, 255, 255, 0.16) 0%, transparent 75%),
+    radial-gradient(ellipse 70% 45% at 50% 85%, rgba(0, 0, 0, 0.25) 0%, transparent 65%),
+    linear-gradient(180deg, #164682 0%, #123b6d 52%, #0f325d 100%);
   pointer-events: none;
 }
 
@@ -1428,13 +1427,12 @@ body.hud-canvas {
   height: 100%;
   max-height: 105px;
   background:
-    radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.12) 0%, transparent 70%),
-    repeating-linear-gradient(180deg, #1b330e 0 20%, #223f13 20% 40%),
-    #1b330e;
-  border: 1.5px solid rgba(240, 190, 42, 0.4);
+    radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.14) 0%, transparent 70%),
+    linear-gradient(180deg, #164682 0%, #123b6d 100%);
+  border: 1.5px solid rgba(240, 190, 42, 0.45);
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.85);
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.72);
 }
 
 /* Línea de medio campo en la parte SUPERIOR */
@@ -1459,28 +1457,29 @@ body.hud-canvas {
   transform: translate(-50%, -50%);
 }
 
-/* Área de penalti en la parte INFERIOR */
+/* Área semicircular de 6m de Fútbol Sala en la parte INFERIOR */
 .mini-pitch-schematic::after {
   content: "";
   position: absolute;
   bottom: 0;
-  left: 18%;
-  right: 18%;
-  height: 28%;
-  border: 1.2px solid rgba(255, 255, 255, 0.6);
+  left: 22%;
+  right: 22%;
+  height: 34%;
+  border: 1.2px solid rgba(255, 255, 255, 0.65);
   border-bottom: 0;
+  border-radius: 999px 999px 0 0 !important;
   pointer-events: none;
 }
 
-/* Área pequeña en la parte INFERIOR */
+/* Marco de portería 3x2m en la parte INFERIOR */
 .mini-pitch-schematic::before {
   content: "";
   position: absolute;
   bottom: 0;
-  left: 34%;
-  right: 34%;
-  height: 12%;
-  border: 1.2px solid rgba(255, 255, 255, 0.6);
+  left: 41%;
+  right: 41%;
+  height: 6%;
+  border: 1.4px solid rgba(255, 255, 255, 0.78);
   border-bottom: 0;
   pointer-events: none;
   z-index: 1;
@@ -2801,10 +2800,9 @@ dialog.fifa-console-modal {
   width: 100%;
   height: 96px;
   background:
-    radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.14) 0%, transparent 70%),
-    repeating-linear-gradient(180deg, #1b330e 0 16.66%, #223f13 16.66% 33.33%),
-    #1b330e;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+    radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.16) 0%, transparent 70%),
+    linear-gradient(180deg, #164682 0%, #123b6d 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   position: relative;
   overflow: hidden;
   margin-bottom: 8px;
@@ -2838,28 +2836,29 @@ dialog.fifa-console-modal {
   border-radius: 50% !important;
 }
 
-/* Área de penalti en la parte INFERIOR */
+/* Área semicircular de 6m de Fútbol Sala en la parte INFERIOR */
 .mini-pitch-box::after {
   content: "";
   position: absolute;
   bottom: 0;
-  left: 18%;
-  right: 18%;
-  height: 28%;
-  border: 1.2px solid rgba(255, 255, 255, 0.6);
+  left: 22%;
+  right: 22%;
+  height: 34%;
+  border: 1.2px solid rgba(255, 255, 255, 0.65);
   border-bottom: 0;
+  border-radius: 999px 999px 0 0 !important;
   pointer-events: none;
 }
 
-/* Área pequeña en la parte INFERIOR */
+/* Marco de portería 3x2m en la parte INFERIOR */
 .mini-pitch-box::before {
   content: "";
   position: absolute;
   bottom: 0;
-  left: 34%;
-  right: 34%;
-  height: 12%;
-  border: 1.2px solid rgba(255, 255, 255, 0.6);
+  left: 41%;
+  right: 41%;
+  height: 6%;
+  border: 1.4px solid rgba(255, 255, 255, 0.78);
   border-bottom: 0;
   pointer-events: none;
   z-index: 1;
