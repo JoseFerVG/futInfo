@@ -292,89 +292,154 @@
     </section>
 
     <!-- ==================== 1B. PIZARRA TÁCTICA Y ESTRATEGIA DE PARTIDO ==================== -->
-    <section id="view-pizarra" class="tab-view hidden space-y-4">
-      <header class="fifa-broadcast-head">
+    <section id="view-pizarra" class="tab-view hidden space-y-3">
+      <header class="fifa-broadcast-head pizarra-studio-head">
         <div class="fifa-broadcast-title-group">
           <div class="fifa-broadcast-live-chyron font-fifa">
-            <span class="fifa-live-dot"></span> PIZARRA DE VESTUARIO • FÚTBOL SALA
+            <span class="fifa-live-dot"></span> ESTUDIO TÁCTICO LIBRE • FÚTBOL SALA
           </div>
-          <h2 class="fifa-broadcast-main-title font-fifa">PIZARRA TÁCTICA Y PLAN DE PARTIDO</h2>
+          <h2 class="fifa-broadcast-main-title font-fifa">PIZARRA TÁCTICA Y LIBRETO DE JUGADAS</h2>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap">
+        <div class="flex items-center gap-1.5 flex-wrap">
           <div class="pizarra-seg-group" role="group" aria-label="Encuadre de pista">
-            <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn active" data-zone="full" aria-pressed="true">PISTA COMPLETA</button>
-            <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn" data-zone="attack" aria-pressed="false">ATAQUE / ABP</button>
-            <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn" data-zone="buildup" aria-pressed="false">SALIDA PROPIA</button>
+            <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn active" data-zone="full" aria-pressed="true">COMPLETA</button>
+            <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn" data-zone="attack" aria-pressed="false">ATAQUE 6M</button>
+            <button type="button" class="pizarra-ctrl-btn pizarra-zone-btn" data-zone="buildup" aria-pressed="false">SALIDA</button>
           </div>
-          <button type="button" id="btn-pizarra-play" class="pizarra-ctrl-btn pizarra-ctrl-btn--emerald" title="Animar secuencia de pases y desmarques">
+          <label for="pizarra-court-theme" class="sr-only">Superficie de pista</label>
+          <select id="pizarra-court-theme" class="pizarra-rival-select font-fifa" title="Superficie visual de la pizarra">
+            <option value="blue">Pista Azul</option>
+            <option value="wood">Parquet</option>
+            <option value="dark">Pizarra Oscura</option>
+          </select>
+          <button type="button" id="btn-pizarra-play" class="pizarra-ctrl-btn pizarra-ctrl-btn--emerald" title="Simular pasos y movimientos en pista">
             <i data-lucide="play" class="w-3.5 h-3.5"></i>
-            <span>SIMULAR JUGADA</span>
+            <span>SIMULAR</span>
           </button>
-          <button type="button" id="btn-pizarra-open-matchplan" class="fifa-broadcast-action-btn" title="Abrir planificador automático de titular y cambios">
+          <button type="button" id="btn-pizarra-open-matchplan" class="fifa-broadcast-action-btn" title="Abrir planificador automático de quinteto y cambios">
             <i data-lucide="calendar-check" class="w-4 h-4"></i>
-            <span>ROTACIONES PARTIDO</span>
+            <span>ROTACIONES</span>
           </button>
         </div>
       </header>
 
-      <!-- 7 FASES REALES DE FÚTBOL SALA -->
-      <div class="pizarra-presets-bar" role="region" aria-label="Fases y jugadas de Fútbol Sala">
+      <!-- SISTEMAS BASE + CREACIÓN LIBRE + MIS JUGADAS -->
+      <div class="pizarra-presets-bar" role="region" aria-label="Libreto y fases de Fútbol Sala">
         <span class="pizarra-bar-label font-fifa flex items-center gap-1.5">
-          <i data-lucide="clipboard-list" class="w-4 h-4 text-amber-400"></i>
-          <span>FASES DEL PARTIDO:</span>
+          <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>JUGADAS:</span>
         </span>
-        <button type="button" class="pizarra-preset-btn active" data-preset="salida" aria-pressed="true">Salida 4-0 / Triángulo</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="ataque" aria-pressed="false">Ataque con Pívot (3-1)</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="presion" aria-pressed="false">Presión Alta y Robo</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="contra" aria-pressed="false">Bloque 2-2 y Contra</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="corner_fav" aria-pressed="false">Córner Pista (2º Palo)</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="falta_abp" aria-pressed="false">Falta / Doble Penalti</button>
-        <button type="button" class="pizarra-preset-btn" data-preset="defensa_abp" aria-pressed="false">Portero-Jugador / ABP</button>
+        <button type="button" id="btn-pizarra-blank" class="pizarra-ctrl-btn pizarra-ctrl-btn--accent" title="Empezar jugada nueva sobre la pista vacía">
+          <i data-lucide="file-plus-2" class="w-3.5 h-3.5"></i>
+          <span>EN BLANCO</span>
+        </button>
+        <button type="button" class="pizarra-preset-btn active" data-preset="salida" aria-pressed="true">Salida 4-0</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="ataque" aria-pressed="false">Ataque 3-1</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="presion" aria-pressed="false">Presión Alta</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="contra" aria-pressed="false">Bloque 2-2</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="corner_fav" aria-pressed="false">Córner 2º Palo</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="falta_abp" aria-pressed="false">Falta / 10m</button>
+        <button type="button" class="pizarra-preset-btn" data-preset="defensa_abp" aria-pressed="false">Defensa 5v4</button>
+        <button type="button" id="btn-pizarra-toggle-save-box" class="pizarra-ctrl-btn pizarra-ctrl-btn--gold ml-auto" title="Guardar este diseño como jugada propia en tu libreto">
+          <i data-lucide="bookmark-plus" class="w-3.5 h-3.5"></i>
+          <span>GUARDAR NUEVA</span>
+        </button>
+      </div>
+
+      <!-- Creador rápido / Biblioteca de jugadas propias -->
+      <div id="pizarra-custom-plays-bar" class="pizarra-custom-bar hidden" role="region" aria-label="Mis jugadas guardadas">
+        <div id="pizarra-save-form-row" class="pizarra-save-form hidden">
+          <label for="pizarra-play-name-input" class="sr-only">Nombre de tu jugada</label>
+          <input type="text" id="pizarra-play-name-input" maxlength="42" placeholder="Nombre de la jugada (ej: Córner bloqueo pívot)..." class="pizarra-inline-input">
+          <button type="button" id="btn-pizarra-confirm-save-play" class="pizarra-ctrl-btn pizarra-ctrl-btn--gold">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            <span>GUARDAR</span>
+          </button>
+          <button type="button" id="btn-pizarra-cancel-save-play" class="pizarra-ctrl-btn">Cancelar</button>
+        </div>
+        <div id="pizarra-custom-plays-list-wrap" class="flex items-center gap-1.5 flex-wrap hidden">
+          <span class="pizarra-bar-label font-fifa text-xs flex items-center gap-1">
+            <i data-lucide="folder-kanban" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>MIS JUGADAS:</span>
+          </span>
+          <div id="pizarra-custom-plays-list" class="flex items-center gap-1.5 flex-wrap"></div>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
-        <!-- COLUMNA PIZARRA INTERACTIVA -->
-        <div id="pizarra-board-column" class="xl:col-span-7 space-y-2.5">
+        <!-- COLUMNA PIZARRA INTERACTIVA LIBRE (8 cols en desktop para pista grande) -->
+        <div id="pizarra-board-column" class="xl:col-span-8 space-y-2">
           <div class="pizarra-toolbar" role="toolbar" aria-label="Herramientas de pizarra táctica">
-            <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Dibujo y fichas">
-              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn active" data-tool="move" aria-pressed="true" title="Arrastrar jugadores y balón">
-                <i data-lucide="move" class="w-3.5 h-3.5"></i>
-                <span>MOVER</span>
+            <!-- Fila 1: Herramientas de dibujo, texto y material -->
+            <div class="flex flex-wrap items-center gap-1" role="group" aria-label="Dibujo y elementos tácticos">
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn active" data-tool="move" aria-pressed="true" title="Mover fichas o pinchar flechas/zonas para editar puntos y curvas">
+                <i data-lucide="mouse-pointer-2" class="w-3.5 h-3.5"></i>
+                <span>MOVER / EDITAR</span>
               </button>
-              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="pass" aria-pressed="false" title="Flecha de pase recto (Oro)">
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="pass" aria-pressed="false" title="Flecha de pase recto">
                 <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
                 <span>PASE</span>
               </button>
-              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="curve" aria-pressed="false" title="Cambio de orientación o centro curvo">
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="curve" aria-pressed="false" title="Pase elevado / curvo (ajustable después con el punto central)">
                 <i data-lucide="spline" class="w-3.5 h-3.5"></i>
                 <span>CURVO</span>
               </button>
-              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="run" aria-pressed="false" title="Desmarque sin balón (Verde)">
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="dribble" aria-pressed="false" title="Conducción / regate con balón (zigzag)">
+                <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                <span>CONDUCIR</span>
+              </button>
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="run" aria-pressed="false" title="Desmarque o carrera sin balón">
                 <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
                 <span>DESMARQUE</span>
               </button>
-              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="shot" aria-pressed="false" title="Tiro a puerta o línea de presión (Rojo)">
-                <i data-lucide="crosshair" class="w-3.5 h-3.5"></i>
-                <span>TIRO / PRESIÓN</span>
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="screen" aria-pressed="false" title="Bloqueo / pantalla en pista (T)">
+                <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                <span>BLOQUEO</span>
               </button>
-              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="zone" aria-pressed="false" title="Resaltar zona táctica o superioridad">
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="shot" aria-pressed="false" title="Tiro a puerta o salto de presión">
+                <i data-lucide="crosshair" class="w-3.5 h-3.5"></i>
+                <span>TIRO</span>
+              </button>
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="zone" aria-pressed="false" title="Resaltar zona clave en pista">
                 <i data-lucide="square-dashed" class="w-3.5 h-3.5"></i>
                 <span>ZONA</span>
               </button>
-              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="free" aria-pressed="false" title="Lápiz libre para marcar detalles">
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="free" aria-pressed="false" title="Trazado a mano alzada">
                 <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-                <span>LIBRE</span>
+                <span>LÁPIZ</span>
               </button>
-              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="erase_one" aria-pressed="false" title="Pincha sobre cualquier flecha o zona para borrarla">
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="text" aria-pressed="false" title="Pincha en la pista para añadir anotación de texto libre">
+                <i data-lucide="type" class="w-3.5 h-3.5"></i>
+                <span>TEXTO</span>
+              </button>
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="cone" aria-pressed="false" title="Pincha para colocar conos de entrenamiento">
+                <i data-lucide="triangle" class="w-3.5 h-3.5"></i>
+                <span>CONO</span>
+              </button>
+              <button type="button" class="pizarra-ctrl-btn pizarra-tool-btn" data-tool="erase_one" aria-pressed="false" title="Pincha sobre cualquier trazo, texto o cono para eliminarlo">
                 <i data-lucide="scissors" class="w-3.5 h-3.5"></i>
-                <span>BORRAR TRAZO</span>
+                <span>BORRAR</span>
               </button>
             </div>
 
             <span role="separator" aria-orientation="vertical" class="pizarra-toolbar-sep"></span>
 
-            <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Opciones de equipo y vista">
+            <!-- Fila 2: Colores libres, estilo, fichas extra y control -->
+            <div class="flex flex-wrap items-center gap-1" role="group" aria-label="Estilo, fichas y utilidades">
+              <div class="pizarra-palette" role="group" aria-label="Color de trazo">
+                <button type="button" class="pizarra-color-swatch active" data-color="auto" title="Color automático según herramienta">AUTO</button>
+                <button type="button" class="pizarra-color-swatch" data-color="#facc15" style="--sw:#facc15" aria-label="Color oro" title="Oro"></button>
+                <button type="button" class="pizarra-color-swatch" data-color="#ffffff" style="--sw:#ffffff" aria-label="Color blanco" title="Blanco"></button>
+                <button type="button" class="pizarra-color-swatch" data-color="#34d399" style="--sw:#34d399" aria-label="Color verde" title="Verde"></button>
+                <button type="button" class="pizarra-color-swatch" data-color="#fb7185" style="--sw:#fb7185" aria-label="Color rojo" title="Rojo"></button>
+                <button type="button" class="pizarra-color-swatch" data-color="#38bdf8" style="--sw:#38bdf8" aria-label="Color azul cielo" title="Azul cielo"></button>
+                <button type="button" class="pizarra-color-swatch" data-color="#fb923c" style="--sw:#fb923c" aria-label="Color naranja" title="Naranja"></button>
+              </div>
+              <button type="button" id="btn-pizarra-dash-toggle" class="pizarra-ctrl-btn" title="Alternar trazo continuo o discontinuo">
+                <i data-lucide="minus" class="w-3.5 h-3.5"></i>
+                <span>TRAZO</span>
+              </button>
               <button type="button" id="btn-pizarra-toggle-rivals" class="pizarra-ctrl-btn active" aria-pressed="true" title="Mostrar u ocultar fichas rivales">
                 <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
                 <span>RIVALES: ON</span>
@@ -386,31 +451,47 @@
                 <option value="1-2-2">Rival 1-2-2</option>
                 <option value="1-4-0">Rival 1-4-0</option>
               </select>
-              <button type="button" id="btn-pizarra-toggle-lanes" class="pizarra-ctrl-btn active" aria-pressed="true" title="Mostrar carriles tácticos en la pista">
+              <button type="button" id="btn-pizarra-add-home" class="pizarra-ctrl-btn" title="Añadir ficha de jugador propio a la pista">
+                <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                <span>+JUG</span>
+              </button>
+              <button type="button" id="btn-pizarra-add-away" class="pizarra-ctrl-btn" title="Añadir ficha rival o barrera extra">
+                <i data-lucide="user-round-plus" class="w-3.5 h-3.5"></i>
+                <span>+RIV</span>
+              </button>
+              <button type="button" id="btn-pizarra-flip" class="pizarra-ctrl-btn" title="Invertir horizontalmente toda la jugada (espejo)">
+                <i data-lucide="flip-horizontal-2" class="w-3.5 h-3.5"></i>
+                <span>ESPEJO</span>
+              </button>
+              <button type="button" id="btn-pizarra-toggle-lanes" class="pizarra-ctrl-btn active" aria-pressed="true" title="Mostrar carriles tácticos en pista">
                 <i data-lucide="columns-3" class="w-3.5 h-3.5"></i>
                 <span>CARRILES</span>
               </button>
-              <button type="button" id="btn-pizarra-toggle-steps" class="pizarra-ctrl-btn active" aria-pressed="true" title="Mostrar orden numérico (1, 2, 3) en jugadas">
+              <button type="button" id="btn-pizarra-toggle-steps" class="pizarra-ctrl-btn active" aria-pressed="true" title="Mostrar números de orden (1, 2, 3)">
                 <i data-lucide="list-ordered" class="w-3.5 h-3.5"></i>
                 <span>1·2·3</span>
               </button>
-              <button type="button" id="btn-pizarra-sync-lineup" class="pizarra-ctrl-btn" title="Cargar nombres y dorsales del quinteto titular actual">
+              <button type="button" id="btn-pizarra-sync-lineup" class="pizarra-ctrl-btn" title="Sincronizar con los 5 titulares del equipo">
                 <i data-lucide="users" class="w-3.5 h-3.5"></i>
                 <span>CARGAR QUINTETO</span>
               </button>
-              <button type="button" id="btn-pizarra-ball-to-selected" class="pizarra-ctrl-btn" title="Colocar balón junto al jugador seleccionado">
+              <button type="button" id="btn-pizarra-ball-to-selected" class="pizarra-ctrl-btn" title="Pasar el balón al jugador seleccionado">
                 <i data-lucide="circle-dot" class="w-3.5 h-3.5"></i>
                 <span>BALÓN</span>
               </button>
-              <button type="button" id="btn-pizarra-undo" class="pizarra-ctrl-btn" title="Deshacer último trazo">
+              <button type="button" id="btn-pizarra-undo" class="pizarra-ctrl-btn" title="Deshacer (Ctrl+Z)">
                 <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
                 <span>DESHACER</span>
               </button>
-              <button type="button" id="btn-pizarra-clear-draw" class="pizarra-ctrl-btn" title="Borrar todas las flechas y zonas">
+              <button type="button" id="btn-pizarra-redo" class="pizarra-ctrl-btn" title="Rehacer (Ctrl+Y)">
+                <i data-lucide="redo-2" class="w-3.5 h-3.5"></i>
+                <span>REHACER</span>
+              </button>
+              <button type="button" id="btn-pizarra-clear-draw" class="pizarra-ctrl-btn" title="Limpiar solo los trazos, textos y conos de este paso">
                 <i data-lucide="eraser" class="w-3.5 h-3.5"></i>
                 <span>LIMPIAR</span>
               </button>
-              <button type="button" id="btn-pizarra-reset" class="pizarra-ctrl-btn" title="Restaurar fase seleccionada">
+              <button type="button" id="btn-pizarra-reset" class="pizarra-ctrl-btn" title="Reiniciar sistema actual">
                 <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                 <span>REINICIAR</span>
               </button>
@@ -427,33 +508,76 @@
 
           <div class="pizarra-phase-banner">
             <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400 flex-shrink-0"></i>
-            <span id="pizarra-phase-summary" class="text-xs font-semibold">Cierre y ala abiertos en paralelo con desmarque de ruptura o pared interior en 40x20m.</span>
+            <span id="pizarra-phase-summary" class="text-xs font-semibold">Mueve libremente fichas, edita curvas con su punto central, añade pasos animados o guarda tu propia jugada.</span>
           </div>
 
-          <div class="pizarra-canvas-wrap">
+          <!-- PISTA INTERACTIVA + EDITOR DE TEXTO IN-CANVAS -->
+          <div class="pizarra-canvas-wrap relative">
             <svg id="pizarra-board-svg" class="pizarra-svg" viewBox="0 0 1000 620" role="img" aria-label="Pizarra táctica interactiva de Fútbol Sala"></svg>
+            <div id="pizarra-text-prompt" class="pizarra-text-prompt hidden" role="dialog" aria-label="Escribir etiqueta en pista">
+              <input type="text" id="pizarra-text-prompt-input" maxlength="26" placeholder="Ej: BLOQUEO / 2º PALO / 4S" class="pizarra-inline-input">
+              <button type="button" id="btn-pizarra-text-apply" class="pizarra-ctrl-btn pizarra-ctrl-btn--gold">OK</button>
+              <button type="button" id="btn-pizarra-text-cancel" class="pizarra-ctrl-btn">X</button>
+            </div>
+          </div>
+
+          <!-- INSPECTOR CONTEXTUAL DE ELEMENTO SELECCIONADO (ficha, flecha, curva, zona, texto o cono) -->
+          <div id="pizarra-selection-bar" class="pizarra-selection-bar hidden" role="region" aria-label="Editar elemento seleccionado"></div>
+
+          <!-- LÍNEA DE TIEMPO / FOTOGRAMAS ANIMADOS (PASO 1, PASO 2...) -->
+          <div id="pizarra-frames-bar" class="pizarra-frames-bar" role="region" aria-label="Pasos animados de la jugada">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="pizarra-bar-label font-fifa flex items-center gap-1">
+                <i data-lucide="film" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>SECUENCIA:</span>
+              </span>
+              <div id="pizarra-frames-list" class="flex items-center gap-1 flex-wrap"></div>
+              <button type="button" id="btn-pizarra-frame-add" class="pizarra-ctrl-btn pizarra-ctrl-btn--gold" title="Añadir nuevo paso manteniendo posiciones para animar movimiento">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>PASO</span>
+              </button>
+              <button type="button" id="btn-pizarra-frame-del" class="pizarra-ctrl-btn" title="Eliminar paso actual">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap ml-auto">
+              <button type="button" id="btn-pizarra-toggle-ghost" class="pizarra-ctrl-btn active" aria-pressed="true" title="Mostrar línea de trayectoria desde el paso anterior">
+                <i data-lucide="footprints" class="w-3.5 h-3.5"></i>
+                <span>RASTRO</span>
+              </button>
+              <select id="pizarra-playback-speed" class="pizarra-rival-select font-fifa" aria-label="Velocidad de simulación">
+                <option value="0.6">0.6x Lento</option>
+                <option value="1" selected>1x Normal</option>
+                <option value="1.5">1.5x Rápido</option>
+              </select>
+              <button type="button" id="btn-pizarra-loop" class="pizarra-ctrl-btn" aria-pressed="false" title="Repetir simulación en bucle">
+                <i data-lucide="repeat" class="w-3.5 h-3.5"></i>
+                <span>BUCLE</span>
+              </button>
+            </div>
           </div>
 
           <div class="pizarra-roster-card">
             <div class="pizarra-roster-title font-fifa">
               <i data-lucide="shirt" class="w-3.5 h-3.5 text-amber-400"></i>
-              <span>CONVOCADOS EN PIZARRA (PULSA PARA DESTACAR FICHAS):</span>
+              <span>CONVOCADOS EN PIZARRA (PULSA PARA SELECCIONAR O REEMPLAZAR FICHA):</span>
             </div>
             <div id="pizarra-roster-strip" class="pizarra-roster-strip"></div>
           </div>
 
           <div class="pizarra-legend">
             <span class="pizarra-legend-item"><i class="pz-dot pz-dot--home"></i> Nosotros</span>
+            <span class="pizarra-legend-item"><i class="pz-dot pz-dot--pj"></i> Portero-Jugador</span>
             <span class="pizarra-legend-item"><i class="pz-dot pz-dot--away"></i> Rival</span>
             <span class="pizarra-legend-item"><i class="pz-line pz-line--pass"></i> Pase / Curvo</span>
             <span class="pizarra-legend-item"><i class="pz-line pz-line--run"></i> Desmarque</span>
-            <span class="pizarra-legend-item"><i class="pz-line pz-line--shot"></i> Tiro / Presión</span>
+            <span class="pizarra-legend-item"><i class="pz-line pz-line--shot"></i> Tiro / Bloqueo</span>
             <span class="pizarra-legend-item"><i class="pz-dot pz-dot--zone"></i> Zona clave</span>
           </div>
         </div>
 
         <!-- COLUMNA GUÍA DE CÓMO FUNCIONA EL PARTIDO -->
-        <div class="xl:col-span-5 space-y-3">
+        <div class="xl:col-span-4 space-y-3">
           <div class="fifa-club-tile pizarra-guide-card">
             <div class="fifa-club-tile-accent"></div>
             <div class="flex items-center justify-between gap-2 mb-2">
@@ -462,7 +586,7 @@
                 <span>ESPECIALISTAS EN BALÓN PARADO</span>
               </h3>
             </div>
-            <div id="pizarra-specialists-summary" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+            <div id="pizarra-specialists-summary" class="grid grid-cols-2 gap-2"></div>
           </div>
 
           <div class="fifa-club-tile pizarra-guide-card space-y-3">
@@ -472,7 +596,7 @@
                 <i data-lucide="book-open-check" class="w-4 h-4 text-amber-400"></i>
                 <span>CÓMO VA A FUNCIONAR EL PARTIDO</span>
               </h3>
-              <p class="text-[11px] text-slate-400 mt-0.5">Consignas editables guardadas al instante para el vestuario y el descanso.</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Consignas editables guardadas al instante en tu jugada y vestuario.</p>
             </div>
 
             <div class="space-y-2.5">
