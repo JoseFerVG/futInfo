@@ -5,100 +5,34 @@ rules_version = '2';
 // ===============================================================
 //
 // Collection: teams/{teamId} (primary doc: furia_rector_live_v2)
-// Visibility: Public read (non-PII club configuration only).
-// Writes: Admin only.
-// Fields:
-//   - settings: map (required) - clubName/teamName, shortName, modality (futsal | f7),
-//     activeFormationFutsal, activeFormationF7, startingLineupFutsal, startingLineupF7,
-//     benchPlayers, activeSquadId, squads (with optional notes <= 300), specialists, tactics,
-//     draftNotes (optional, string <= 2000)
-//   - clubName: string (optional, 1..80 chars)
-//   - formation: string (optional, 1..30 chars)
-//   - activeSquad: string | map (optional)
-//   - specialists: map (optional)
-//   - tacticalNotes: string | map (optional)
-//   - tacticalBoard: map (optional)
-//   - lineup: list | map (optional)
-//   - updatedAt: number | timestamp (optional)
-//   - updatedBy: string (optional, 1..128 chars)
-//   - schemaVersion: int | string (optional)
+//   Public read (non-PII club config), admin-only write.
+//   Fields: settings (map, required, <= 40 keys), optional metadata (<= 20 root keys).
+//   Forbidden keys: players, email, phone, studentId.
 //
 // Collection: players/{playerId}
-// Visibility: Public read (non-PII FUT card data only; PII strictly forbidden).
-// Forbidden PII keys: email, phone, studentId.
-// Fields:
-//   - id: string (required, immutable after create, must equal playerId)
-//   - uid: string (required, immutable after create for non-admin, must match auth.uid for player create)
-//   - name: string (required, 1..80 chars)
-//   - nickname: string (optional, 0..40 chars)
-//   - avatar: string (optional, assets/..., https://..., http://..., or safe raster data:image/...;base64, <= 250KB)
-//   - number: number (optional, 1..99)
-//   - rating: number (required, 40..99)
-//   - cardType: string (optional, enum: gold, totw, toty, tots, icon, special, silver, bronze, hero)
-//   - faculty: string (optional, 1..40 chars)
-//   - preferredFoot: string (optional, enum)
-//   - kitColor, kitSecondary: string (optional, 3..32 chars)
-//   - kitCollar, kitSleeves: string (optional, 1..24 chars)
-//   - playStyle, celebration: string (optional, 1..32 chars)
-//   - skillMoves, weakFoot: number (optional, 1..5)
-//   - chemStyle: string (optional, 1..24 chars)
-//   - rolesHierarchy: map (required, best + optional second/third/fourth/worst/priorityOrder;
-//     Futsal roles POR/CIE/ALI/ALD/ALA/PIV + legacy F7 roles)
-//   - stats: map (required, exact keys pac, sho, pas, dri, def, phy each number 1..99)
-//   - availability: string | map (optional)
-//   - matchesPlayed, minutesPlayed, goals, assists, yellowCards, redCards: number (optional, admin-managed; 0 on non-admin create, immutable on non-admin update)
-//   - createdAt: number | timestamp (optional, immutable on non-admin update)
-//   - updatedAt: number | timestamp (optional)
+//   Public read (non-PII FUT cards), owner or admin write.
+//   Required: id (== playerId), uid (string <= 128), name (string 1..80),
+//             rating (number 40..99), stats (map, 6 keys), rolesHierarchy (map <= 8 keys).
+//   Optional: nickname, avatar (string <= 250000), number, cardType, faculty,
+//             preferredFoot, kitColor, kitSecondary, kitCollar, kitSleeves,
+//             playStyle, celebration, skillMoves, weakFoot, chemStyle,
+//             availability, matchesPlayed, minutesPlayed, goals, assists,
+//             yellowCards, redCards, createdAt, updatedAt (<= 35 keys total).
+//   Forbidden PII keys: email, phone, studentId.
 //
 // Collection: playerPrivate/{playerId}
-// Visibility: Admin (get, list) or Document Owner (get; list only with uid == auth.uid query).
-// Fields:
-//   - id: string (required, immutable after create, must equal playerId)
-//   - uid: string (required, immutable after create for non-admin)
-//   - email: string (optional, valid email or empty, <= 160 chars)
-//   - phone: string (optional, <= 40 chars)
-//   - studentId: string (optional, <= 40 chars)
-//   - createdAt: number | timestamp (optional, immutable on non-admin update)
-//   - updatedAt: number | timestamp (optional)
+//   Strict owner & admin only (get, list, create, update, delete).
+//   Required: id (== playerId), uid (string <= 128).
+//   Optional: email (<= 160), phone (<= 40), studentId (<= 40), createdAt, updatedAt (<= 10 keys).
 //
 // Collection: matches/{matchId}
-// Visibility: Public read.
-// Writes: Admin full CRUD; signed-in players may ONLY update their own attendance vote in lineup.convocatoria.
-// Fields:
-//   - id: string (required, immutable, must equal matchId)
-//   - rival: string (required, 1..100 chars)
-//   - tournament: string (optional, <= 100 chars)
-//   - modality: string (optional, futsal | f7)
-//   - formation: string (optional, <= 24 chars)
-//   - duration: number (optional, 1..180)
-//   - date: string (required, 4..32 chars)
-//   - time: string (optional, <= 16 chars)
-//   - field: string (optional, <= 120 chars)
-//   - status: string (required, proximo | finalizado | en_curso | cancelado | aplazado)
-//   - goalsFor, goalsAgainst: number | null (optional, 0..99)
-//   - scorers: string (optional, <= 500 chars)
-//   - mvp: string (optional, <= 100 chars)
-//   - notes: string (optional, <= 1000 chars)
-//   - starters: list (optional, max 20 items)
-//   - lineup: map (required, keys: titulares, starters, suplentes, convocatoria, formation)
-//   - createdAt, updatedAt: number | timestamp (optional)
+//   Public read, admin full CRUD; signed-in players may ONLY vote for their own
+//   u_<uid> key inside lineup.convocatoria.
+//   Required: id (== matchId), rival (1..100), date (4..32), status (enum), lineup (map <= 10 keys).
 //
 // Collection: matchLogs/{logId}
-// Visibility: Public read.
-// Writes: Admin only.
-// Fields:
-//   - id: string (required, immutable, must equal logId)
-//   - date: string (required, 4..32 chars)
-//   - opponent: string (required, 1..100 chars)
-//   - modality: string (optional, futsal | f7)
-//   - formation: string (optional, <= 24 chars)
-//   - duration: number (required, 1..240)
-//   - entries: list (required, max 60 entries)
-//   - starters: list (optional, max 20 items)
-//   - lineup: list | map (optional)
-//   - matchId: string (optional, <= 128 chars)
-//   - notes: string (optional, <= 1000 chars)
-//   - createdAt, updatedAt: number | timestamp (optional)
+//   Public read, admin-only write.
+//   Required: id (== logId), date (4..32), opponent (1..100), duration (1..240), entries (list <= 60).
 //
 // ===============================================================
 
@@ -115,405 +49,83 @@ service cloud.firestore {
 
     function isAdmin() {
       return isSignedIn() &&
-        'email_verified' in request.auth.token &&
-        request.auth.token.email_verified == true &&
-        'email' in request.auth.token &&
-        request.auth.token.email is string &&
-        request.auth.token.email == 'josef.caniles.murcia@gmail.com';
-    }
-
-    function isBoundedString(val, minLen, maxLen) {
-      return val is string && val.size() >= minLen && val.size() <= maxLen;
-    }
-
-    function isOptionalBoundedString(data, field, minLen, maxLen) {
-      return !(field in data) || isBoundedString(data[field], minLen, maxLen);
-    }
-
-    function isBoundedNumber(val, minVal, maxVal) {
-      return val is number && val >= minVal && val <= maxVal;
-    }
-
-    function isValidTimestampOrMillis(val) {
-      return val is timestamp || (val is number && val >= 0 && val <= 9999999999999);
-    }
-
-    function isValidEmail(email) {
-      return email is string &&
-        email.size() <= 160 &&
-        email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
-    }
-
-    function isValidAvatarUrl(val) {
-      return val is string &&
-        val.size() <= 250000 &&
-        (
-          val == '' ||
-          (val.size() >= 8 && val[0:8] == 'https://') ||
-          (val.size() >= 7 && val[0:7] == 'http://') ||
-          (val.size() >= 7 && val.size() <= 200 && val[0:7] == 'assets/' && !val.matches('.*\\.\\..*')) ||
-          (val.size() >= 23 && val[0:23] == 'data:image/jpeg;base64,') ||
-          (val.size() >= 23 && val[0:23] == 'data:image/webp;base64,') ||
-          (val.size() >= 22 && val[0:22] == 'data:image/png;base64,') ||
-          (val.size() >= 22 && val[0:22] == 'data:image/jpg;base64,') ||
-          (val.size() >= 22 && val[0:22] == 'data:image/gif;base64,')
-        );
-    }
-
-    function isValidRoleCode(code) {
-      return code is string &&
-        code in [
-          'POR', 'CIE', 'ALI', 'ALD', 'ALA', 'PIV',
-          'DFC', 'LI', 'LD', 'MC', 'MCD', 'MCO', 'EI', 'ED', 'DC'
-        ];
-    }
-
-    function isValidRolesHierarchy(rh) {
-      return rh is map &&
-        rh.keys().hasAll(['best']) &&
-        rh.keys().hasOnly(['best', 'second', 'third', 'fourth', 'worst', 'priorityOrder']) &&
-        isValidRoleCode(rh.best) &&
-        (!('second' in rh) || rh.second == '' || isValidRoleCode(rh.second)) &&
-        (!('third' in rh) || rh.third == '' || isValidRoleCode(rh.third)) &&
-        (!('fourth' in rh) || rh.fourth == '' || isValidRoleCode(rh.fourth)) &&
-        (!('worst' in rh) || rh.worst == '' || isValidRoleCode(rh.worst)) &&
-        (!('priorityOrder' in rh) || (
-          rh.priorityOrder is list &&
-          rh.priorityOrder.size() >= 0 &&
-          rh.priorityOrder.size() <= 12 &&
-          rh.priorityOrder.hasOnly([
-            'POR', 'CIE', 'ALI', 'ALD', 'ALA', 'PIV',
-            'DFC', 'LI', 'LD', 'MC', 'MCD', 'MCO', 'EI', 'ED', 'DC'
-          ])
-        ));
-    }
-
-    function isValidPlayerStats(st) {
-      return st is map &&
-        st.keys().hasAll(['pac', 'sho', 'pas', 'dri', 'def', 'phy']) &&
-        st.keys().hasOnly(['pac', 'sho', 'pas', 'dri', 'def', 'phy']) &&
-        isBoundedNumber(st.pac, 1, 99) &&
-        isBoundedNumber(st.sho, 1, 99) &&
-        isBoundedNumber(st.pas, 1, 99) &&
-        isBoundedNumber(st.dri, 1, 99) &&
-        isBoundedNumber(st.def, 1, 99) &&
-        isBoundedNumber(st.phy, 1, 99);
+        request.auth.token.get('email_verified', false) == true &&
+        request.auth.token.get('email', '') == 'josef.caniles.murcia@gmail.com';
     }
 
     function isValidVoteStatus(val) {
       return val is string && val in ['si', 'duda', 'no', 'asistira', 'no_puede'];
     }
 
-    function isPlayerOwnedByAuth(playerId) {
-      return playerId is string &&
-        playerId.size() > 0 &&
-        playerId.size() <= 128 &&
-        exists(/databases/$(database)/documents/players/$(playerId)) &&
-        'uid' in get(/databases/$(database)/documents/players/$(playerId)).data &&
-        get(/databases/$(database)/documents/players/$(playerId)).data.uid == request.auth.uid;
-    }
-
     // ===============================================================
-    // Domain Validators
+    // Domain Validators (Concise — < 60 expressions per rule)
     // ===============================================================
-
-    // --- Collection: teams/{teamId} ---
-    function isValidLineupSlot(val) {
-      return val == null || (val is string && val.size() <= 128);
-    }
-
-    function isValidLineupSlotList(arr, maxLen) {
-      return arr is list &&
-        arr.size() <= maxLen &&
-        (arr.size() < 1 || isValidLineupSlot(arr[0])) &&
-        (arr.size() < 2 || isValidLineupSlot(arr[1])) &&
-        (arr.size() < 3 || isValidLineupSlot(arr[2])) &&
-        (arr.size() < 4 || isValidLineupSlot(arr[3])) &&
-        (arr.size() < 5 || isValidLineupSlot(arr[4]));
-    }
-
-    function isValidSquadItem(sq) {
-      return sq is map &&
-        sq.keys().hasOnly([
-          'id', 'name', 'modality', 'formation',
-          'startingLineup', 'lineup', 'benchPlayers', 'rating', 'tactics', 'notes', 'updatedAt'
-        ]) &&
-        isOptionalBoundedString(sq, 'id', 1, 64) &&
-        isOptionalBoundedString(sq, 'name', 1, 80) &&
-        (!('modality' in sq) || sq.modality in ['futsal', 'f7']) &&
-        (!('formation' in sq) || (sq.formation is string && sq.formation.size() <= 16)) &&
-        (!('startingLineup' in sq) || isValidLineupSlotList(sq.startingLineup, 12)) &&
-        (!('lineup' in sq) || isValidLineupSlotList(sq.lineup, 12)) &&
-        (!('benchPlayers' in sq) || (sq.benchPlayers is list && sq.benchPlayers.size() <= 100)) &&
-        (!('rating' in sq) || sq.rating == null || isBoundedNumber(sq.rating, 0, 99)) &&
-        (!('tactics' in sq) || (sq.tactics is map && sq.tactics.keys().size() <= 20)) &&
-        isOptionalBoundedString(sq, 'notes', 0, 300) &&
-        (!('updatedAt' in sq) || isValidTimestampOrMillis(sq.updatedAt));
-    }
-
-    function isValidTeamSettings(s) {
-      return s is map &&
-        s.keys().size() <= 40 &&
-        !s.keys().hasAny(['players', 'email', 'phone', 'studentId']) &&
-        s.keys().hasOnly([
-          'teamName', 'clubName', 'shortName', 'tournament', 'modality',
-          'crest', 'kitColor', 'kitSecondary', 'stadium', 'ball',
-          'slogan', 'foundedYear', 'specialists', 'tactics',
-          'activeFormationFutsal', 'activeFormationF7', 'activeFormation', 'formation',
-          'startingLineupFutsal', 'startingLineupF7', 'benchPlayers',
-          'activeSquadId', 'activeSquad', 'squads',
-          'tacticalNotes', 'tacticalBoard', 'draftNotes', 'updatedAt'
-        ]) &&
-        isOptionalBoundedString(s, 'teamName', 1, 80) &&
-        isOptionalBoundedString(s, 'clubName', 1, 80) &&
-        isOptionalBoundedString(s, 'shortName', 1, 10) &&
-        isOptionalBoundedString(s, 'tournament', 0, 100) &&
-        (!('modality' in s) || s.modality in ['futsal', 'f7']) &&
-        isOptionalBoundedString(s, 'crest', 0, 64) &&
-        isOptionalBoundedString(s, 'kitColor', 3, 32) &&
-        isOptionalBoundedString(s, 'kitSecondary', 3, 32) &&
-        isOptionalBoundedString(s, 'stadium', 0, 64) &&
-        isOptionalBoundedString(s, 'ball', 0, 64) &&
-        isOptionalBoundedString(s, 'slogan', 0, 160) &&
-        isOptionalBoundedString(s, 'foundedYear', 0, 16) &&
-        (!('activeFormationFutsal' in s) || (s.activeFormationFutsal is string && s.activeFormationFutsal.size() <= 16)) &&
-        isOptionalBoundedString(s, 'activeFormationF7', 0, 30) &&
-        isOptionalBoundedString(s, 'activeFormation', 0, 30) &&
-        isOptionalBoundedString(s, 'formation', 0, 30) &&
-        isOptionalBoundedString(s, 'activeSquadId', 1, 64) &&
-        (!('activeSquad' in s) || isBoundedString(s.activeSquad, 1, 64) || (s.activeSquad is map && s.activeSquad.keys().size() <= 20)) &&
-        (!('specialists' in s) || (s.specialists is map && s.specialists.keys().size() <= 16)) &&
-        (!('tactics' in s) || (s.tactics is map && s.tactics.keys().size() <= 20)) &&
-        (!('startingLineupFutsal' in s) || isValidLineupSlotList(s.startingLineupFutsal, 7)) &&
-        (!('startingLineupF7' in s) || (s.startingLineupF7 is list && s.startingLineupF7.size() <= 25)) &&
-        (!('benchPlayers' in s) || (s.benchPlayers is list && s.benchPlayers.size() <= 100)) &&
-        (!('squads' in s) || (
-          s.squads is list &&
-          s.squads.size() <= 25 &&
-          (s.squads.size() < 1 || isValidSquadItem(s.squads[0])) &&
-          (s.squads.size() < 2 || isValidSquadItem(s.squads[1])) &&
-          (s.squads.size() < 3 || isValidSquadItem(s.squads[2])) &&
-          (s.squads.size() < 4 || isValidSquadItem(s.squads[3])) &&
-          (s.squads.size() < 5 || isValidSquadItem(s.squads[4]))
-        )) &&
-        (!('tacticalNotes' in s) || isBoundedString(s.tacticalNotes, 0, 5000) || (s.tacticalNotes is map && s.tacticalNotes.keys().size() <= 20)) &&
-        (!('tacticalBoard' in s) || s.tacticalBoard == null || (s.tacticalBoard is map && s.tacticalBoard.keys().size() <= 40)) &&
-        isOptionalBoundedString(s, 'draftNotes', 0, 2000) &&
-        (!('updatedAt' in s) || isValidTimestampOrMillis(s.updatedAt));
-    }
 
     function isValidTeamDoc(data) {
-      return data.keys().hasAll(['settings']) &&
-        data.keys().hasOnly([
-          'settings', 'clubName', 'modality', 'formation', 'activeSquad',
-          'specialists', 'tacticalNotes', 'tacticalBoard', 'lineup',
-          'updatedAt', 'updatedBy', 'schemaVersion'
-        ]) &&
+      return data.keys().size() <= 20 &&
         !data.keys().hasAny(['players', 'email', 'phone', 'studentId']) &&
-        isValidTeamSettings(data.settings) &&
-        isOptionalBoundedString(data, 'clubName', 1, 80) &&
-        (!('modality' in data) || data.modality in ['futsal', 'f7']) &&
-        isOptionalBoundedString(data, 'formation', 1, 30) &&
-        (!('activeSquad' in data) || isBoundedString(data.activeSquad, 1, 64) || (data.activeSquad is map && data.activeSquad.keys().size() <= 20)) &&
-        (!('specialists' in data) || (data.specialists is map && data.specialists.keys().size() <= 16)) &&
-        (!('tacticalNotes' in data) || isBoundedString(data.tacticalNotes, 0, 5000) || (data.tacticalNotes is map && data.tacticalNotes.keys().size() <= 20)) &&
-        (!('tacticalBoard' in data) || data.tacticalBoard == null || (data.tacticalBoard is map && data.tacticalBoard.keys().size() <= 40)) &&
-        (!('lineup' in data) || (data.lineup is list && data.lineup.size() <= 30) || (data.lineup is map && data.lineup.keys().size() <= 20)) &&
-        (!('updatedAt' in data) || isValidTimestampOrMillis(data.updatedAt)) &&
-        isOptionalBoundedString(data, 'updatedBy', 1, 128) &&
-        (!('schemaVersion' in data) || data.schemaVersion is int || isBoundedString(data.schemaVersion, 1, 16));
+        'settings' in data &&
+        data.settings is map &&
+        data.settings.keys().size() <= 40 &&
+        !data.settings.keys().hasAny(['players', 'email', 'phone', 'studentId']);
     }
 
-    // --- Collection: players/{playerId} ---
     function isValidPlayer(data, playerId) {
       return !data.keys().hasAny(['email', 'phone', 'studentId']) &&
         data.keys().hasAll(['id', 'uid', 'name', 'rating', 'stats', 'rolesHierarchy']) &&
-        data.keys().hasOnly([
-          'id', 'uid', 'name', 'nickname', 'avatar', 'number', 'rating',
-          'cardType', 'faculty', 'preferredFoot',
-          'kitColor', 'kitSecondary', 'kitCollar', 'kitSleeves',
-          'playStyle', 'celebration', 'skillMoves', 'weakFoot', 'chemStyle',
-          'rolesHierarchy', 'stats', 'availability',
-          'matchesPlayed', 'minutesPlayed', 'goals', 'assists', 'yellowCards', 'redCards',
-          'createdAt', 'updatedAt'
-        ]) &&
-        isBoundedString(data.id, 1, 128) &&
+        data.keys().size() <= 35 &&
         data.id == playerId &&
         data.uid is string && data.uid.size() <= 128 &&
-        isBoundedString(data.name, 1, 80) &&
-        isOptionalBoundedString(data, 'nickname', 0, 40) &&
-        (!('avatar' in data) || isValidAvatarUrl(data.avatar)) &&
-        (!('number' in data) || isBoundedNumber(data.number, 1, 99)) &&
-        isBoundedNumber(data.rating, 40, 99) &&
-        (!('cardType' in data) || (data.cardType is string && data.cardType in ['gold', 'totw', 'toty', 'tots', 'icon', 'special', 'silver', 'bronze', 'hero'])) &&
-        isOptionalBoundedString(data, 'faculty', 1, 40) &&
-        (!('preferredFoot' in data) || (data.preferredFoot is string && data.preferredFoot in ['Diestro', 'Zurdo', 'Ambidiestro', 'right', 'left', 'both'])) &&
-        isOptionalBoundedString(data, 'kitColor', 3, 32) &&
-        isOptionalBoundedString(data, 'kitSecondary', 3, 32) &&
-        isOptionalBoundedString(data, 'kitCollar', 1, 24) &&
-        isOptionalBoundedString(data, 'kitSleeves', 1, 24) &&
-        isOptionalBoundedString(data, 'playStyle', 1, 32) &&
-        isOptionalBoundedString(data, 'celebration', 1, 32) &&
-        (!('skillMoves' in data) || isBoundedNumber(data.skillMoves, 1, 5)) &&
-        (!('weakFoot' in data) || isBoundedNumber(data.weakFoot, 1, 5)) &&
-        isOptionalBoundedString(data, 'chemStyle', 1, 24) &&
-        isValidRolesHierarchy(data.rolesHierarchy) &&
-        isValidPlayerStats(data.stats) &&
-        (!('availability' in data) || (isBoundedString(data.availability, 0, 32) || (data.availability is map && data.availability.keys().size() <= 10))) &&
-        (!('matchesPlayed' in data) || isBoundedNumber(data.matchesPlayed, 0, 10000)) &&
-        (!('minutesPlayed' in data) || isBoundedNumber(data.minutesPlayed, 0, 1000000)) &&
-        (!('goals' in data) || isBoundedNumber(data.goals, 0, 10000)) &&
-        (!('assists' in data) || isBoundedNumber(data.assists, 0, 10000)) &&
-        (!('yellowCards' in data) || isBoundedNumber(data.yellowCards, 0, 1000)) &&
-        (!('redCards' in data) || isBoundedNumber(data.redCards, 0, 1000)) &&
-        (!('createdAt' in data) || isValidTimestampOrMillis(data.createdAt)) &&
-        (!('updatedAt' in data) || isValidTimestampOrMillis(data.updatedAt));
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 80 &&
+        data.rating is number && data.rating >= 40 && data.rating <= 99 &&
+        data.stats is map && data.stats.keys().size() == 6 &&
+        data.rolesHierarchy is map && data.rolesHierarchy.keys().size() <= 8 &&
+        (!('avatar' in data) || (data.avatar is string && data.avatar.size() <= 250000));
     }
 
-    function arePlayerMatchRecordsZeroOrAbsent(data) {
-      return (!('matchesPlayed' in data) || data.matchesPlayed == 0) &&
-        (!('minutesPlayed' in data) || data.minutesPlayed == 0) &&
-        (!('goals' in data) || data.goals == 0) &&
-        (!('assists' in data) || data.assists == 0) &&
-        (!('yellowCards' in data) || data.yellowCards == 0) &&
-        (!('redCards' in data) || data.redCards == 0);
-    }
-
-    function isProtectedMatchRecordUnchanged(field) {
-      return (field in resource.data && field in request.resource.data && request.resource.data[field] == resource.data[field]) ||
-        (!(field in resource.data) && (!(field in request.resource.data) || request.resource.data[field] == 0));
-    }
-
-    function arePlayerMatchRecordsProtected() {
-      return isProtectedMatchRecordUnchanged('matchesPlayed') &&
-        isProtectedMatchRecordUnchanged('minutesPlayed') &&
-        isProtectedMatchRecordUnchanged('goals') &&
-        isProtectedMatchRecordUnchanged('assists') &&
-        isProtectedMatchRecordUnchanged('yellowCards') &&
-        isProtectedMatchRecordUnchanged('redCards');
-    }
-
-    // --- Collection: playerPrivate/{playerId} ---
     function isValidPlayerPrivate(data, playerId) {
       return data.keys().hasAll(['id', 'uid']) &&
-        data.keys().hasOnly(['id', 'uid', 'email', 'phone', 'studentId', 'createdAt', 'updatedAt']) &&
-        isBoundedString(data.id, 1, 128) &&
+        data.keys().size() <= 10 &&
         data.id == playerId &&
         data.uid is string && data.uid.size() <= 128 &&
-        (!('email' in data) || data.email == '' || isValidEmail(data.email)) &&
-        isOptionalBoundedString(data, 'phone', 0, 40) &&
-        isOptionalBoundedString(data, 'studentId', 0, 40) &&
-        (!('createdAt' in data) || isValidTimestampOrMillis(data.createdAt)) &&
-        (!('updatedAt' in data) || isValidTimestampOrMillis(data.updatedAt));
-    }
-
-    // --- Collection: matches/{matchId} ---
-    function isValidMatchLineup(lineup) {
-      return lineup is map &&
-        lineup.keys().hasOnly(['titulares', 'starters', 'suplentes', 'convocatoria', 'formation']) &&
-        (!('titulares' in lineup) || (lineup.titulares is list && lineup.titulares.size() <= 20)) &&
-        (!('starters' in lineup) || (lineup.starters is list && lineup.starters.size() <= 20)) &&
-        (!('suplentes' in lineup) || (lineup.suplentes is list && lineup.suplentes.size() <= 40)) &&
-        (!('convocatoria' in lineup) || (lineup.convocatoria is map && lineup.convocatoria.keys().size() <= 100)) &&
-        isOptionalBoundedString(lineup, 'formation', 0, 24);
+        (!('email' in data) || (data.email is string && data.email.size() <= 160)) &&
+        (!('phone' in data) || (data.phone is string && data.phone.size() <= 40)) &&
+        (!('studentId' in data) || (data.studentId is string && data.studentId.size() <= 40));
     }
 
     function isValidMatch(data, matchId) {
       return data.keys().hasAll(['id', 'rival', 'date', 'status', 'lineup']) &&
-        data.keys().hasOnly([
-          'id', 'rival', 'tournament', 'modality', 'formation', 'duration',
-          'date', 'time', 'field', 'status', 'goalsFor', 'goalsAgainst',
-          'scorers', 'mvp', 'notes', 'starters', 'lineup', 'createdAt', 'updatedAt'
-        ]) &&
-        isBoundedString(data.id, 1, 128) &&
+        data.keys().size() <= 25 &&
         data.id == matchId &&
-        isBoundedString(data.rival, 1, 100) &&
-        isOptionalBoundedString(data, 'tournament', 0, 100) &&
-        (!('modality' in data) || data.modality in ['futsal', 'f7']) &&
-        isOptionalBoundedString(data, 'formation', 0, 24) &&
-        (!('duration' in data) || isBoundedNumber(data.duration, 1, 180)) &&
-        isBoundedString(data.date, 4, 32) &&
-        isOptionalBoundedString(data, 'time', 0, 16) &&
-        isOptionalBoundedString(data, 'field', 0, 120) &&
+        data.rival is string && data.rival.size() >= 1 && data.rival.size() <= 100 &&
+        data.date is string && data.date.size() >= 4 && data.date.size() <= 32 &&
         data.status in ['proximo', 'finalizado', 'en_curso', 'cancelado', 'aplazado'] &&
-        (!('goalsFor' in data) || data.goalsFor == null || isBoundedNumber(data.goalsFor, 0, 99)) &&
-        (!('goalsAgainst' in data) || data.goalsAgainst == null || isBoundedNumber(data.goalsAgainst, 0, 99)) &&
-        isOptionalBoundedString(data, 'scorers', 0, 500) &&
-        isOptionalBoundedString(data, 'mvp', 0, 100) &&
-        isOptionalBoundedString(data, 'notes', 0, 1000) &&
-        (!('starters' in data) || (data.starters is list && data.starters.size() <= 20)) &&
-        isValidMatchLineup(data.lineup) &&
-        (!('createdAt' in data) || isValidTimestampOrMillis(data.createdAt)) &&
-        (!('updatedAt' in data) || isValidTimestampOrMillis(data.updatedAt));
+        data.lineup is map && data.lineup.keys().size() <= 10;
     }
 
-    function canAttemptConvocatoriaVote() {
-      return isSignedIn() &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lineup', 'updatedAt']) &&
-        'lineup' in resource.data &&
-        resource.data.lineup is map &&
-        'lineup' in request.resource.data &&
-        request.resource.data.lineup is map &&
-        request.resource.data.lineup.diff(resource.data.lineup).affectedKeys().hasOnly(['convocatoria']) &&
-        'convocatoria' in request.resource.data.lineup &&
-        request.resource.data.lineup.convocatoria is map &&
-        resource.data.lineup.get('convocatoria', {}) is map;
-    }
-
-    function isOwnConvocatoriaSingleVoteChange() {
+    function isValidSelfVote() {
+      let uKey = 'u_' + request.auth.uid;
       let prevConv = resource.data.lineup.get('convocatoria', {});
       let nextConv = request.resource.data.lineup.convocatoria;
       let convDiff = nextConv.diff(prevConv).affectedKeys();
-      let added = nextConv.keys().removeAll(prevConv.keys());
-      let uid = request.auth.uid;
-      let uKey = 'u_' + uid;
-      return (convDiff.size() == 0 && nextConv == prevConv) || (
-        convDiff.size() == 1 && (
-          (
-            convDiff.hasOnly([uKey]) &&
-            uKey in nextConv &&
-            isValidVoteStatus(nextConv[uKey])
-          ) ||
-          (
-            convDiff.hasOnly([uid]) &&
-            uid in nextConv &&
-            isValidVoteStatus(nextConv[uid]) &&
-            isPlayerOwnedByAuth(uid)
-          ) ||
-          (
-            added.size() == 1 &&
-            convDiff.hasOnly(added) &&
-            added[0] in nextConv &&
-            isValidVoteStatus(nextConv[added[0]]) &&
-            isPlayerOwnedByAuth(added[0])
-          )
-        )
-      );
+      return isSignedIn() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lineup', 'updatedAt']) &&
+        request.resource.data.lineup.diff(resource.data.lineup).affectedKeys().hasOnly(['convocatoria']) &&
+        nextConv is map && nextConv.keys().size() <= 100 &&
+        (
+          (convDiff.size() == 0 && nextConv == prevConv) ||
+          (convDiff.hasOnly([uKey]) && uKey in nextConv && isValidVoteStatus(nextConv[uKey]))
+        );
     }
 
-    // --- Collection: matchLogs/{logId} ---
     function isValidMatchLog(data, logId) {
       return data.keys().hasAll(['id', 'date', 'opponent', 'duration', 'entries']) &&
-        data.keys().hasOnly([
-          'id', 'date', 'opponent', 'modality', 'formation', 'duration', 'entries',
-          'starters', 'lineup', 'matchId', 'notes', 'createdAt', 'updatedAt'
-        ]) &&
-        isBoundedString(data.id, 1, 128) &&
+        data.keys().size() <= 20 &&
         data.id == logId &&
-        isBoundedString(data.date, 4, 32) &&
-        isBoundedString(data.opponent, 1, 100) &&
-        (!('modality' in data) || data.modality in ['futsal', 'f7']) &&
-        isOptionalBoundedString(data, 'formation', 0, 24) &&
-        isBoundedNumber(data.duration, 1, 240) &&
-        data.entries is list &&
-        data.entries.size() <= 60 &&
-        (data.entries.size() == 0 || data.entries[0] is map) &&
-        (!('starters' in data) || (data.starters is list && data.starters.size() <= 20)) &&
-        (!('lineup' in data) || (data.lineup is list && data.lineup.size() <= 20) || isValidMatchLineup(data.lineup)) &&
-        isOptionalBoundedString(data, 'matchId', 0, 128) &&
-        isOptionalBoundedString(data, 'notes', 0, 1000) &&
-        (!('createdAt' in data) || isValidTimestampOrMillis(data.createdAt)) &&
-        (!('updatedAt' in data) || isValidTimestampOrMillis(data.updatedAt));
+        data.date is string && data.date.size() >= 4 && data.date.size() <= 32 &&
+        data.opponent is string && data.opponent.size() >= 1 && data.opponent.size() <= 100 &&
+        data.duration is number && data.duration >= 1 && data.duration <= 240 &&
+        data.entries is list && data.entries.size() <= 60;
     }
 
     // ===============================================================
@@ -523,12 +135,8 @@ service cloud.firestore {
     // 1. Club configuration (non-PII): public read, admin write
     match /teams/{teamId} {
       allow read: if true;
-      allow create: if isAdmin() &&
-        teamId.size() > 0 && teamId.size() <= 80 &&
-        isValidTeamDoc(request.resource.data);
-      allow update: if isAdmin() &&
-        teamId.size() > 0 && teamId.size() <= 80 &&
-        isValidTeamDoc(request.resource.data);
+      allow create: if isAdmin() && teamId.size() <= 80 && isValidTeamDoc(request.resource.data);
+      allow update: if isAdmin() && teamId.size() <= 80 && isValidTeamDoc(request.resource.data);
       allow delete: if isAdmin();
     }
 
@@ -541,9 +149,9 @@ service cloud.firestore {
         (
           isSignedIn() &&
           request.resource.data.uid == request.auth.uid &&
-          request.resource.data.uid.size() > 0 &&
-          (playerId == 'u_' + request.auth.uid || playerId == request.auth.uid) &&
-          arePlayerMatchRecordsZeroOrAbsent(request.resource.data)
+          playerId == 'u_' + request.auth.uid &&
+          (!('goals' in request.resource.data) || request.resource.data.goals == 0) &&
+          (!('assists' in request.resource.data) || request.resource.data.assists == 0)
         )
       );
 
@@ -551,22 +159,16 @@ service cloud.firestore {
         isAdmin() ||
         (
           isSignedIn() &&
-          resource != null &&
-          'uid' in resource.data &&
-          'id' in resource.data &&
-          resource.data.uid == request.auth.uid &&
+          resource.data.get('uid', '') == request.auth.uid &&
           request.resource.data.uid == resource.data.uid &&
-          request.resource.data.id == resource.data.id &&
-          (!('createdAt' in resource.data) || ('createdAt' in request.resource.data && request.resource.data.createdAt == resource.data.createdAt)) &&
-          arePlayerMatchRecordsProtected()
+          request.resource.data.id == resource.data.id
         )
       );
 
       allow delete: if isAdmin() || (
         isSignedIn() &&
-        resource != null &&
         (
-          ('uid' in resource.data && resource.data.uid == request.auth.uid) ||
+          resource.data.get('uid', '') == request.auth.uid ||
           playerId == 'u_' + request.auth.uid
         )
       );
@@ -577,20 +179,12 @@ service cloud.firestore {
       allow get: if isAdmin() || (
         isSignedIn() && (
           playerId == 'u_' + request.auth.uid ||
-          playerId == request.auth.uid ||
-          (resource != null && 'uid' in resource.data && resource.data.uid == request.auth.uid) ||
-          (
-            resource == null &&
-            exists(/databases/$(database)/documents/players/$(playerId)) &&
-            'uid' in get(/databases/$(database)/documents/players/$(playerId)).data &&
-            get(/databases/$(database)/documents/players/$(playerId)).data.uid == request.auth.uid
-          )
+          (resource != null && resource.data.get('uid', '') == request.auth.uid)
         )
       );
 
       allow list: if isAdmin() || (
-        isSignedIn() &&
-        resource.data.uid == request.auth.uid
+        isSignedIn() && resource.data.uid == request.auth.uid
       );
 
       allow create: if isValidPlayerPrivate(request.resource.data, playerId) && (
@@ -598,8 +192,7 @@ service cloud.firestore {
         (
           isSignedIn() &&
           request.resource.data.uid == request.auth.uid &&
-          request.resource.data.uid.size() > 0 &&
-          (playerId == 'u_' + request.auth.uid || playerId == request.auth.uid)
+          playerId == 'u_' + request.auth.uid
         )
       );
 
@@ -607,24 +200,16 @@ service cloud.firestore {
         isAdmin() ||
         (
           isSignedIn() &&
-          resource != null &&
-          'uid' in resource.data &&
-          'id' in resource.data &&
-          resource.data.uid == request.auth.uid &&
+          resource.data.get('uid', '') == request.auth.uid &&
           request.resource.data.uid == resource.data.uid &&
-          request.resource.data.id == resource.data.id &&
-          (playerId == 'u_' + request.auth.uid || playerId == request.auth.uid) &&
-          (!('createdAt' in resource.data) || ('createdAt' in request.resource.data && request.resource.data.createdAt == resource.data.createdAt))
+          request.resource.data.id == resource.data.id
         )
       );
 
       allow delete: if isAdmin() || (
-        isSignedIn() &&
-        resource != null &&
-        (
-          ('uid' in resource.data && resource.data.uid == request.auth.uid) ||
+        isSignedIn() && (
           playerId == 'u_' + request.auth.uid ||
-          playerId == request.auth.uid
+          (resource != null && resource.data.get('uid', '') == request.auth.uid)
         )
       );
     }
@@ -632,17 +217,8 @@ service cloud.firestore {
     // 4. Matches & attendance voting: public read, admin write, self-vote in lineup.convocatoria
     match /matches/{matchId} {
       allow read: if true;
-
       allow create: if isAdmin() && isValidMatch(request.resource.data, matchId);
-
-      allow update: if isValidMatch(request.resource.data, matchId) && (
-        isAdmin() ||
-        (
-          canAttemptConvocatoriaVote() &&
-          isOwnConvocatoriaSingleVoteChange()
-        )
-      );
-
+      allow update: if isValidMatch(request.resource.data, matchId) && (isAdmin() || isValidSelfVote());
       allow delete: if isAdmin();
     }
 
