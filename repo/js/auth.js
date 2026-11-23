@@ -201,19 +201,31 @@ class AuthService {
   async completePlayerCard(cardData) {
     if (!this.currentUser) throw new Error('Debes iniciar sesión con Google primero.');
 
-    const cleanEmail = (this.currentUser.email || '').toLowerCase();
-    const uid = this.currentUser.id || '';
+    const fbUser = auth?.currentUser || null;
+    if (this.currentUser.isFirebase && isFirebaseConfigured() && !fbUser) {
+      throw new Error('Tu sesión de Google ha caducado o aún no se ha conectado. Cierra sesión y vuelve a entrar con Google.');
+    }
+
+    const cleanEmail = (fbUser?.email || this.currentUser.email || '').toLowerCase().trim();
+    const uid = fbUser?.uid || this.currentUser.id || '';
+    const canonicalId = uid ? `u_${uid}` : null;
     const existingPlayer = store.getPlayers().find(p =>
+      (canonicalId && p.id === canonicalId) ||
+      (uid && p.uid === uid) ||
       (this.currentUser.playerId && p.id === this.currentUser.playerId) ||
-      (uid && (p.uid === uid || p.id === `u_${uid}`)) ||
       (p.email && cleanEmail && p.email.toLowerCase() === cleanEmail)
     );
 
-    const avatarUrl = cardData.avatar || this.currentUser.photoURL || existingPlayer?.avatar || 'assets/club_logo.png';
-    const isBrandNew = !existingPlayer;
+    const avatarUrl = cardData.avatar || fbUser?.photoURL || this.currentUser.photoURL || existingPlayer?.avatar || 'assets/club_logo.png';
+    const isBrandNew = !existingPlayer || (canonicalId && existingPlayer.id !== canonicalId);
+
+    // Si había una carta local heredada con ID antiguo (no u_<uid>), limpiarla localmente para usar el ID canónico u_<uid>
+    if (existingPlayer && canonicalId && existingPlayer.id !== canonicalId) {
+      store.revertUnsavedLocalPlayer(existingPlayer.id);
+    }
 
     let targetPlayer;
-    if (existingPlayer) {
+    if (existingPlayer && (!canonicalId || existingPlayer.id === canonicalId)) {
       const nextStats = {
         pac: parseInt(cardData.pac, 10) || existingPlayer.stats?.pac || 80,
         sho: parseInt(cardData.sho, 10) || existingPlayer.stats?.sho || 80,

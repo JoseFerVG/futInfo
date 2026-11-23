@@ -113,10 +113,6 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid != null;
     }
 
-    function isAuthenticated() {
-      return isSignedIn();
-    }
-
     function isAdmin() {
       return isSignedIn() &&
         'email_verified' in request.auth.token &&
@@ -124,41 +120,6 @@ service cloud.firestore {
         'email' in request.auth.token &&
         request.auth.token.email is string &&
         request.auth.token.email == 'josef.caniles.murcia@gmail.com';
-    }
-
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    function isDocOwner() {
-      return isSignedIn() &&
-        resource != null &&
-        'uid' in resource.data &&
-        resource.data.uid == request.auth.uid;
-    }
-
-    function uidUnchanged() {
-      return !('uid' in request.resource.data) ||
-        request.resource.data.uid == request.auth.uid;
-    }
-
-    function uidNotModified() {
-      return !('uid' in request.resource.data) ||
-        (resource != null &&
-          'uid' in resource.data &&
-          request.resource.data.uid == resource.data.uid);
-    }
-
-    function hasRequiredFields(fields) {
-      return request.resource.data.keys().hasAll(fields);
-    }
-
-    function hasOnlyAllowedFields(fields) {
-      return request.resource.data.keys().hasOnly(fields);
-    }
-
-    function areImmutableFieldsUnchanged(fields) {
-      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
     }
 
     function isBoundedString(val, minLen, maxLen) {
@@ -188,9 +149,9 @@ service cloud.firestore {
         val.size() <= 250000 &&
         (
           val == '' ||
-          val.matches('^https://.*') ||
-          val.matches('^http://.*') ||
-          (val.matches('^assets/[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*$') && !val.matches('.*\\.\\..*')) ||
+          (val.size() >= 8 && val[0:8] == 'https://') ||
+          (val.size() >= 7 && val[0:7] == 'http://') ||
+          (val.size() >= 7 && val.size() <= 200 && val[0:7] == 'assets/' && !val.matches('.*\\.\\..*')) ||
           (val.size() >= 23 && val[0:23] == 'data:image/jpeg;base64,') ||
           (val.size() >= 23 && val[0:23] == 'data:image/webp;base64,') ||
           (val.size() >= 22 && val[0:22] == 'data:image/png;base64,') ||

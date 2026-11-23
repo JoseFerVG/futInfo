@@ -783,29 +783,35 @@ export class TeamStore {
       throw new Error('Falta crear la base de datos Cloud Firestore (default) en el proyecto futinfo-382e8. Sin ella no se puede guardar en la nube.');
     }
 
-    const uid = explicitUid || player.uid || fbAuth?.currentUser?.uid || '';
-    const pubDoc = this._toPublicPlayerDoc({ ...player, uid });
+    const fbUser = fbAuth?.currentUser || null;
+    if (!fbUser || !fbUser.uid) {
+      throw new Error('Sesión de Google no activa en Firebase Auth. Cierra sesión y vuelve a entrar con Google.');
+    }
+
+    const uid = fbUser.uid;
+    const docId = `u_${uid}`;
+    const pubDoc = this._toPublicPlayerDoc({ ...player, id: docId, uid });
     const privDoc = sanitizeForFirestore({
-      id: player.id,
+      id: docId,
       uid,
-      email: String(player.email || fbAuth?.currentUser?.email || '').slice(0, 140),
+      email: String(fbUser.email || player.email || '').slice(0, 140),
       phone: String(player.phone || '').slice(0, 40),
       studentId: String(player.studentId || '').slice(0, 40),
       updatedAt: Date.now()
     });
 
+    let stage = 'players';
     try {
       const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-      this._deletedPlayerIds.delete(player.id);
-      await setDoc(doc(this._db, 'players', player.id), pubDoc, { merge: true });
-      this._publicPlayersMap.set(player.id, pubDoc);
+      this._deletedPlayerIds.delete(docId);
+      await setDoc(doc(this._db, 'players', docId), pubDoc, { merge: true });
+      this._publicPlayersMap.set(docId, pubDoc);
 
-      if (uid) {
-        await setDoc(doc(this._db, 'playerPrivate', player.id), privDoc, { merge: true });
-        this._privatePlayersMap.set(player.id, privDoc);
-      }
+      stage = 'playerPrivate';
+      await setDoc(doc(this._db, 'playerPrivate', docId), privDoc, { merge: true });
+      this._privatePlayersMap.set(docId, privDoc);
 
-      this._pendingAddIds.delete(player.id);
+      this._pendingAddIds.delete(docId);
       this._rebuildMergedPlayers();
       this.saveLocal();
       this.setCloudStatus({
@@ -823,7 +829,8 @@ export class TeamStore {
     } catch (err) {
       const info = this._classifyFirestoreError(err);
       this.setCloudStatus(info);
-      throw new Error(info.message);
+      console.error(`[Firestore:upsertPlayerCloud:${stage}]`, err?.code, err?.message, { docId, uid });
+      throw new Error(`${info.message} (colección: ${stage}, código: ${err?.code || 'error'})`);
     }
   }
 
