@@ -10,7 +10,8 @@ rules_version = '2';
 // Fields:
 //   - settings: map (required) - clubName/teamName, shortName, modality (futsal | f7),
 //     activeFormationFutsal, activeFormationF7, startingLineupFutsal, startingLineupF7,
-//     benchPlayers, activeSquadId, squads, specialists, tactics
+//     benchPlayers, activeSquadId, squads (with optional notes <= 300), specialists, tactics,
+//     draftNotes (optional, string <= 2000)
 //   - clubName: string (optional, 1..80 chars)
 //   - formation: string (optional, 1..30 chars)
 //   - activeSquad: string | map (optional)
@@ -260,21 +261,32 @@ service cloud.firestore {
       return val == null || (val is string && val.size() <= 128);
     }
 
+    function isValidLineupSlotList(arr, maxLen) {
+      return arr is list &&
+        arr.size() <= maxLen &&
+        (arr.size() < 1 || isValidLineupSlot(arr[0])) &&
+        (arr.size() < 2 || isValidLineupSlot(arr[1])) &&
+        (arr.size() < 3 || isValidLineupSlot(arr[2])) &&
+        (arr.size() < 4 || isValidLineupSlot(arr[3])) &&
+        (arr.size() < 5 || isValidLineupSlot(arr[4]));
+    }
+
     function isValidSquadItem(sq) {
       return sq is map &&
         sq.keys().hasOnly([
           'id', 'name', 'modality', 'formation',
-          'startingLineup', 'lineup', 'benchPlayers', 'rating', 'tactics', 'updatedAt'
+          'startingLineup', 'lineup', 'benchPlayers', 'rating', 'tactics', 'notes', 'updatedAt'
         ]) &&
         isOptionalBoundedString(sq, 'id', 1, 64) &&
         isOptionalBoundedString(sq, 'name', 1, 80) &&
         (!('modality' in sq) || sq.modality in ['futsal', 'f7']) &&
         (!('formation' in sq) || (sq.formation is string && sq.formation.size() <= 16)) &&
-        (!('startingLineup' in sq) || (sq.startingLineup is list && sq.startingLineup.size() <= 12 && (sq.startingLineup.size() == 0 || isValidLineupSlot(sq.startingLineup[0])))) &&
-        (!('lineup' in sq) || (sq.lineup is list && sq.lineup.size() <= 12 && (sq.lineup.size() == 0 || isValidLineupSlot(sq.lineup[0])))) &&
+        (!('startingLineup' in sq) || isValidLineupSlotList(sq.startingLineup, 12)) &&
+        (!('lineup' in sq) || isValidLineupSlotList(sq.lineup, 12)) &&
         (!('benchPlayers' in sq) || (sq.benchPlayers is list && sq.benchPlayers.size() <= 100)) &&
         (!('rating' in sq) || sq.rating == null || isBoundedNumber(sq.rating, 0, 99)) &&
         (!('tactics' in sq) || (sq.tactics is map && sq.tactics.keys().size() <= 20)) &&
+        isOptionalBoundedString(sq, 'notes', 0, 300) &&
         (!('updatedAt' in sq) || isValidTimestampOrMillis(sq.updatedAt));
     }
 
@@ -289,14 +301,14 @@ service cloud.firestore {
           'activeFormationFutsal', 'activeFormationF7', 'activeFormation', 'formation',
           'startingLineupFutsal', 'startingLineupF7', 'benchPlayers',
           'activeSquadId', 'activeSquad', 'squads',
-          'tacticalNotes', 'tacticalBoard', 'updatedAt'
+          'tacticalNotes', 'tacticalBoard', 'draftNotes', 'updatedAt'
         ]) &&
         isOptionalBoundedString(s, 'teamName', 1, 80) &&
         isOptionalBoundedString(s, 'clubName', 1, 80) &&
         isOptionalBoundedString(s, 'shortName', 1, 10) &&
         isOptionalBoundedString(s, 'tournament', 0, 100) &&
         (!('modality' in s) || s.modality in ['futsal', 'f7']) &&
-        isOptionalBoundedString(s, 'crest', 1, 64) &&
+        isOptionalBoundedString(s, 'crest', 0, 64) &&
         isOptionalBoundedString(s, 'kitColor', 3, 32) &&
         isOptionalBoundedString(s, 'kitSecondary', 3, 32) &&
         isOptionalBoundedString(s, 'stadium', 0, 64) &&
@@ -311,7 +323,7 @@ service cloud.firestore {
         (!('activeSquad' in s) || isBoundedString(s.activeSquad, 1, 64) || (s.activeSquad is map && s.activeSquad.keys().size() <= 20)) &&
         (!('specialists' in s) || (s.specialists is map && s.specialists.keys().size() <= 16)) &&
         (!('tactics' in s) || (s.tactics is map && s.tactics.keys().size() <= 20)) &&
-        (!('startingLineupFutsal' in s) || (s.startingLineupFutsal is list && s.startingLineupFutsal.size() <= 7 && (s.startingLineupFutsal.size() == 0 || isValidLineupSlot(s.startingLineupFutsal[0])))) &&
+        (!('startingLineupFutsal' in s) || isValidLineupSlotList(s.startingLineupFutsal, 7)) &&
         (!('startingLineupF7' in s) || (s.startingLineupF7 is list && s.startingLineupF7.size() <= 25)) &&
         (!('benchPlayers' in s) || (s.benchPlayers is list && s.benchPlayers.size() <= 100)) &&
         (!('squads' in s) || (
@@ -324,7 +336,8 @@ service cloud.firestore {
           (s.squads.size() < 5 || isValidSquadItem(s.squads[4]))
         )) &&
         (!('tacticalNotes' in s) || isBoundedString(s.tacticalNotes, 0, 5000) || (s.tacticalNotes is map && s.tacticalNotes.keys().size() <= 20)) &&
-        (!('tacticalBoard' in s) || (s.tacticalBoard is map && s.tacticalBoard.keys().size() <= 25)) &&
+        (!('tacticalBoard' in s) || s.tacticalBoard == null || (s.tacticalBoard is map && s.tacticalBoard.keys().size() <= 40)) &&
+        isOptionalBoundedString(s, 'draftNotes', 0, 2000) &&
         (!('updatedAt' in s) || isValidTimestampOrMillis(s.updatedAt));
     }
 
@@ -343,7 +356,7 @@ service cloud.firestore {
         (!('activeSquad' in data) || isBoundedString(data.activeSquad, 1, 64) || (data.activeSquad is map && data.activeSquad.keys().size() <= 20)) &&
         (!('specialists' in data) || (data.specialists is map && data.specialists.keys().size() <= 16)) &&
         (!('tacticalNotes' in data) || isBoundedString(data.tacticalNotes, 0, 5000) || (data.tacticalNotes is map && data.tacticalNotes.keys().size() <= 20)) &&
-        (!('tacticalBoard' in data) || (data.tacticalBoard is map && data.tacticalBoard.keys().size() <= 25)) &&
+        (!('tacticalBoard' in data) || data.tacticalBoard == null || (data.tacticalBoard is map && data.tacticalBoard.keys().size() <= 40)) &&
         (!('lineup' in data) || (data.lineup is list && data.lineup.size() <= 30) || (data.lineup is map && data.lineup.keys().size() <= 20)) &&
         (!('updatedAt' in data) || isValidTimestampOrMillis(data.updatedAt)) &&
         isOptionalBoundedString(data, 'updatedBy', 1, 128) &&
@@ -493,24 +506,26 @@ service cloud.firestore {
       let added = nextConv.keys().removeAll(prevConv.keys());
       let uid = request.auth.uid;
       let uKey = 'u_' + uid;
-      return convDiff.size() == 1 && (
-        (
-          convDiff.hasOnly([uKey]) &&
-          uKey in nextConv &&
-          isValidVoteStatus(nextConv[uKey])
-        ) ||
-        (
-          convDiff.hasOnly([uid]) &&
-          uid in nextConv &&
-          isValidVoteStatus(nextConv[uid]) &&
-          isPlayerOwnedByAuth(uid)
-        ) ||
-        (
-          added.size() == 1 &&
-          convDiff.hasOnly(added) &&
-          added[0] in nextConv &&
-          isValidVoteStatus(nextConv[added[0]]) &&
-          isPlayerOwnedByAuth(added[0])
+      return (convDiff.size() == 0 && nextConv == prevConv) || (
+        convDiff.size() == 1 && (
+          (
+            convDiff.hasOnly([uKey]) &&
+            uKey in nextConv &&
+            isValidVoteStatus(nextConv[uKey])
+          ) ||
+          (
+            convDiff.hasOnly([uid]) &&
+            uid in nextConv &&
+            isValidVoteStatus(nextConv[uid]) &&
+            isPlayerOwnedByAuth(uid)
+          ) ||
+          (
+            added.size() == 1 &&
+            convDiff.hasOnly(added) &&
+            added[0] in nextConv &&
+            isValidVoteStatus(nextConv[added[0]]) &&
+            isPlayerOwnedByAuth(added[0])
+          )
         )
       );
     }
@@ -589,8 +604,10 @@ service cloud.firestore {
       allow delete: if isAdmin() || (
         isSignedIn() &&
         resource != null &&
-        'uid' in resource.data &&
-        resource.data.uid == request.auth.uid
+        (
+          ('uid' in resource.data && resource.data.uid == request.auth.uid) ||
+          playerId == 'u_' + request.auth.uid
+        )
       );
     }
 

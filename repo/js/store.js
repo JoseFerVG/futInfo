@@ -373,25 +373,16 @@ export class TeamStore {
 
   deduplicatePlayers(list) {
     if (!Array.isArray(list) || list.length === 0) return [];
-    const seenEmails = new Set();
-    const seenNames = new Set();
     const seenIds = new Set();
+    const seenUids = new Set();
     const cleanList = [];
 
     for (const p of list) {
       if (!p) continue;
       if (p.id && seenIds.has(p.id)) continue;
 
-      const email = (p.email || '').toLowerCase().trim();
-      if (email && email.includes('@')) {
-        if (seenEmails.has(email)) continue;
-        seenEmails.add(email);
-      }
-
-      const name = (p.name || '').toLowerCase().trim();
-      const nickname = (p.nickname || '').toLowerCase().trim();
-      const nameKey = `${name}_${nickname}`;
-      if (name && seenNames.has(nameKey)) continue;
+      const uid = (p.uid || '').trim();
+      if (uid && seenUids.has(uid)) continue;
 
       if (!p.kitColor) p.kitColor = '#f8fafc';
       if (!p.kitSecondary) p.kitSecondary = '#f0be2a';
@@ -408,7 +399,7 @@ export class TeamStore {
       if (!p.chemStyle) p.chemStyle = 'HUN';
 
       if (p.id) seenIds.add(p.id);
-      if (name) seenNames.add(nameKey);
+      if (uid) seenUids.add(uid);
       cleanList.push(p);
     }
 
@@ -463,7 +454,6 @@ export class TeamStore {
   }
 
   _canWriteTeamSettings() {
-    if (this._isAdminSession) return true;
     const u = fbAuth?.currentUser;
     return Boolean(u && u.emailVerified && (u.email || '').toLowerCase().trim() === ADMIN_EMAIL);
   }
@@ -616,11 +606,12 @@ export class TeamStore {
           });
         }
         if (!snap.exists()) return;
+        // Evitar sobrescribir cambios locales pendientes mientras se confirman en servidor
+        if (snap.metadata.hasPendingWrites) return;
         const remote = snap.data();
         const remoteTs = remote?.updatedAt || 0;
-        if (remoteTs && remoteTs < this._lastCloudTs) return;
 
-        this._lastCloudTs = remoteTs;
+        this._lastCloudTs = Math.max(this._lastCloudTs, remoteTs);
         this._isApplyingRemote = true;
         try {
           // Compatibilidad con documentos antiguos si aún no hay docs individuales en `players`
@@ -633,7 +624,7 @@ export class TeamStore {
             this._rebuildMergedPlayers();
           }
           if (remote.settings && typeof remote.settings === 'object') {
-            this.settings = { ...this.settings, ...remote.settings };
+            this.settings = { ...JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), ...remote.settings };
             this._enforceFutsalSettings();
           }
           if (remote.tacticalBoard && typeof remote.tacticalBoard === 'object') {
@@ -805,6 +796,7 @@ export class TeamStore {
 
     try {
       const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      this._deletedPlayerIds.delete(player.id);
       await setDoc(doc(this._db, 'players', player.id), pubDoc, { merge: true });
       this._publicPlayersMap.set(player.id, pubDoc);
 
@@ -814,6 +806,8 @@ export class TeamStore {
       }
 
       this._pendingAddIds.delete(player.id);
+      this._rebuildMergedPlayers();
+      this.saveLocal();
       this.setCloudStatus({
         state: 'connected',
         code: 'ok',
@@ -939,7 +933,9 @@ export class TeamStore {
   }
 
   async pushCloudState() {
-    if (!this._db || this.cloudStatus.state === 'missing_db' || !this._canWriteTeamSettings()) return;
+    if (!this._db || this.cloudStatus.state === 'missing_db' || !this._canWriteTeamSettings()) {
+      return { ok: false, skipped: true };
+    }
     try {
       const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
       const ts = Date.now();
@@ -957,10 +953,12 @@ export class TeamStore {
         lastSyncAt: ts,
         message: 'Base de datos compartida activa en tiempo real.'
       });
+      return { ok: true, updatedAt: ts };
     } catch (err) {
       const info = this._classifyFirestoreError(err);
       this.setCloudStatus(info);
       console.warn("[Firestore] No se pudo guardar configuración del club:", info.message);
+      return { ok: false, error: info.message };
     }
   }
 
@@ -982,17 +980,16 @@ export class TeamStore {
   addPlayer(data) {
     const cleanUid = (data.uid || '').trim();
     const cleanEmail = (data.email || '').toLowerCase().trim();
-    const cleanName = (data.name || '').toLowerCase().trim();
 
-    // Comprobar si ya existe un jugador con este UID, ID, email o nombre exacto
+    // Comprobar si ya existe un jugador con este UID, ID o email (NUNCA por nombre para no colisionar compañeros homónimos)
     const existing = this.players.find(p =>
       (data.id && p.id === data.id) ||
       (cleanUid && (p.uid === cleanUid || p.id === `u_${cleanUid}`)) ||
-      (cleanEmail && p.email && p.email.toLowerCase().trim() === cleanEmail) ||
-      (cleanName && p.name && p.name.toLowerCase().trim() === cleanName)
+      (cleanEmail && p.email && p.email.toLowerCase().trim() === cleanEmail)
     );
 
     if (existing) {
+      this._deletedPlayerIds.delete(existing.id);
       return this.updatePlayer(existing.id, data);
     }
 
@@ -1047,11 +1044,22 @@ export class TeamStore {
       redCards: 0
     };
 
+    this._deletedPlayerIds.delete(newPlayer.id);
     this._pendingAddIds.add(newPlayer.id);
     this.players.push(newPlayer);
-    this._placeNewPlayerInLineups(newPlayer.id);
+    if (this._canWriteTeamSettings()) {
+      this._placeNewPlayerInLineups(newPlayer.id);
+    }
     this.notify();
     return newPlayer;
+  }
+
+  revertUnsavedLocalPlayer(id) {
+    if (!id) return;
+    this._pendingAddIds.delete(id);
+    this.players = this.players.filter(p => p.id !== id);
+    this.saveLocal();
+    this._emitListenersOnly();
   }
 
   _placeNewPlayerInLineups(playerId) {
@@ -1333,6 +1341,18 @@ export class TeamStore {
     this.saveLocal();
     this.notify();
     return newSquad;
+  }
+
+  renameSquad(squadId, newName) {
+    const cleanName = String(newName || '').trim().slice(0, 42);
+    if (!cleanName) return false;
+    const squads = this.getSquads();
+    const target = squads.find(s => s.id === squadId);
+    if (!target) return false;
+    target.name = cleanName;
+    this.saveLocal();
+    this.notify();
+    return true;
   }
 
   deleteSquad(squadId) {

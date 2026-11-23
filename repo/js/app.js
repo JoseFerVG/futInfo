@@ -240,6 +240,12 @@ class FutApp {
     this._lastClosedPopover = null;
     this._justDraggedUntil = 0;
     this.albumSquadFilter = 'all';
+    this.draftSearchQuery = '';
+    this.draftRoleFilter = 'all';
+    this.draftStatusFilter = 'all';
+    this.draftSortBy = 'ovr-desc';
+    this.draftCompareIds = new Set();
+    this.draftTargetSlot = null;
     this._lastRoleValues = { best: 'PIV', second: 'ALI', third: 'ALD', fourth: 'CIE', worst: 'POR' };
     this._matchPlanState = {
       selectedIds: null,
@@ -269,9 +275,6 @@ class FutApp {
       const hasRedirectOnboarding = await authService.bindFirebaseAuthListener();
       await store.initCloudSync(fb.db, fb.health);
       const curUser = authService.getCurrentUser();
-      if (curUser?.isFirebase) {
-        store.syncPrivatePlayerData({ uid: curUser.id, email: curUser.email }, curUser.role === 'admin');
-      }
       if (hasRedirectOnboarding && curUser && (curUser.isNew || !curUser.playerId)) {
         setTimeout(() => this.openPlayerSetupModal(curUser), 180);
       }
@@ -763,6 +766,35 @@ class FutApp {
         setupBanner.classList.remove('hidden');
       }
     }
+
+    const draftSyncBadge = document.getElementById('draft-sync-badge');
+    const draftSyncLbl = document.getElementById('draft-sync-label');
+    if (draftSyncBadge && draftSyncLbl) {
+      draftSyncBadge.classList.remove('is-warn', 'is-error');
+      if (status.state === 'connected') {
+        draftSyncLbl.textContent = authService.isAdmin() ? 'NUBE ACTIVA · MODO ENTRENADOR' : 'NUBE ACTIVA · SOLO LECTURA';
+      } else if (status.state === 'initializing' || status.state === 'offline') {
+        draftSyncBadge.classList.add('is-warn');
+        draftSyncLbl.textContent = badgeText;
+      } else {
+        draftSyncBadge.classList.add('is-error');
+        draftSyncLbl.textContent = badgeText;
+      }
+    }
+  }
+
+  requireAdminAction(actionLabel = 'modificar la alineación oficial') {
+    if (authService.isAdmin() && store._canWriteTeamSettings()) return true;
+    const curUser = authService.getCurrentUser();
+    if (!curUser) {
+      this.showToast(`Inicia sesión como entrenador para ${actionLabel}`, 'lock');
+      document.getElementById('login-dialog')?.showModal();
+    } else if (!authService.isAdmin()) {
+      this.showToast(`Solo el entrenador puede ${actionLabel}. Tú puedes editar tu carta FUT.`, 'shield-alert');
+    } else {
+      this.showToast('Esperando confirmación de sesión de Google… intenta de nuevo en un segundo.', 'clock');
+    }
+    return false;
   }
 
   async retryCloudConnection() {
@@ -956,15 +988,20 @@ class FutApp {
   }
 
   selectFormation(formId) {
+    if (!this.requireAdminAction('cambiar la formación')) {
+      this.populateFormationsSelect();
+      return;
+    }
     store.setFormation(formId);
     const sel = document.getElementById('select-active-formation');
     if (sel) sel.value = formId;
 
     this.renderPitch();
+    this.renderDraftRoom();
     this.updateTacticsAdviceCard(formId);
     this.renderFormationsVisualGrid();
     futAudio.playSuccess();
-    this.showToast(`Formación cambiada a ${formId}`, 'shield');
+    this.showToast(`Formación cambiada a ${formId} y sincronizada en la nube`, 'shield');
   }
 
   renderSquadsVisualGrid() {
@@ -1047,6 +1084,10 @@ class FutApp {
   }
 
   selectSquad(squadId) {
+    if (!this.requireAdminAction('cambiar la plantilla activa')) {
+      this.populateSquadsSelect();
+      return;
+    }
     const success = store.loadSquadPreset(squadId);
     if (!success) return;
 
@@ -1054,6 +1095,7 @@ class FutApp {
     this.updateModalityButtons(currentSquad.modality);
     this.populateFormationsSelect();
     this.renderPitch();
+    this.renderDraftRoom();
     this.renderSquadsVisualGrid();
     this.renderFormationsVisualGrid();
     futAudio.playSuccess();
@@ -1061,6 +1103,7 @@ class FutApp {
   }
 
   saveCurrentSquadPrompt() {
+    if (!this.requireAdminAction('crear nuevas plantillas')) return;
     const dlg = document.getElementById('squad-create-dialog');
     const inp = document.getElementById('squad-create-name');
     if (!dlg || !inp) return;
@@ -1094,6 +1137,7 @@ class FutApp {
   }
 
   autoOptimizeSquad() {
+    if (!this.requireAdminAction('auto-alinear el quinteto')) return;
     const settings = store.getSettings();
     const activeFormation = store.getActiveFormation();
     const formationConfig = getFormationConfig(settings.modality, activeFormation);
@@ -1128,6 +1172,7 @@ class FutApp {
   }
 
   resetSquadPositions() {
+    if (!this.requireAdminAction('restablecer posiciones')) return;
     store.resetStartingLineup();
     document.getElementById('squad-actions-dialog')?.close();
     this.renderPitch();
@@ -1433,7 +1478,7 @@ class FutApp {
       }
 
       // 2. Control L1 / R1 de pestañas de consola (Teclas Q y E)
-      const tabs = ['pitch', 'pizarra', 'album', 'partidos', 'ajustes'];
+      const tabs = ['pitch', 'draft', 'pizarra', 'album', 'partidos', 'ajustes'];
       const currentIdx = tabs.indexOf(this.currentTab || 'pitch');
 
       if (e.key === 'q' || e.key === 'Q' || e.key === 'PageUp') {
@@ -1602,6 +1647,7 @@ class FutApp {
     // Modales setup
     this.setupModals();
     this.setupForms();
+    this.bindDraftEvents();
   }
 
   updateModalityButtons(mod) {
@@ -1878,6 +1924,7 @@ class FutApp {
 
     const performDropSwap = (source, targetSlot, targetBenchCard, targetBenchDock) => {
       if (!source) return false;
+      if (!this.requireAdminAction('reorganizar titulares y banquillo')) return false;
       if (targetSlot) {
         const targetSlotIdx = parseInt(targetSlot.dataset.slotIndex, 10);
         if (isNaN(targetSlotIdx)) return false;
@@ -2155,14 +2202,21 @@ class FutApp {
           const rawUrl = loadEvt.target.result;
           const img = new Image();
           img.onload = () => {
-            const maxDim = 280;
-            const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.max(1, Math.round(img.width * scale));
-            canvas.height = Math.max(1, Math.round(img.height * scale));
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const compressed = canvas.toDataURL('image/jpeg', 0.84);
+            let maxDim = 260;
+            let quality = 0.82;
+            let compressed = '';
+            for (let attempt = 0; attempt < 4; attempt++) {
+              const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.max(1, Math.round(img.width * scale));
+              canvas.height = Math.max(1, Math.round(img.height * scale));
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              compressed = canvas.toDataURL('image/jpeg', quality);
+              if (compressed.length <= 180000) break;
+              maxDim = Math.round(maxDim * 0.78);
+              quality = Math.max(0.5, quality - 0.12);
+            }
             const imgEl = document.getElementById('setup-user-avatar');
             const urlInput = document.getElementById('setup-avatar-url');
             if (imgEl) imgEl.src = compressed;
@@ -2171,11 +2225,7 @@ class FutApp {
             this.showToast('Foto de perfil cargada y optimizada', 'camera');
           };
           img.onerror = () => {
-            const imgEl = document.getElementById('setup-user-avatar');
-            const urlInput = document.getElementById('setup-avatar-url');
-            if (imgEl) imgEl.src = rawUrl;
-            if (urlInput) urlInput.value = rawUrl;
-            this.renderSetupLiveCardPreview();
+            this.showToast('Formato de imagen no compatible. Prueba con JPG, PNG o WebP.', 'alert-triangle');
           };
           img.src = rawUrl;
         };
@@ -2223,6 +2273,8 @@ class FutApp {
         number: parseInt(document.getElementById('setup-number').value, 10) || 10,
         faculty: document.getElementById('setup-faculty').value,
         preferredFoot: document.getElementById('setup-foot').value,
+        phone: document.getElementById('setup-phone')?.value?.trim() || '',
+        studentId: document.getElementById('setup-student-id')?.value?.trim() || '',
         cardType: document.getElementById('setup-card-type')?.value || 'gold',
         kitColor: clubSettings.kitColor || '#f8fafc',
         kitSecondary: clubSettings.kitSecondary || '#f0be2a',
@@ -2484,6 +2536,8 @@ class FutApp {
       setVal('setup-number', existing.number || 10);
       setVal('setup-faculty', existing.faculty || 'inf');
       setVal('setup-foot', existing.preferredFoot || 'Diestro');
+      setVal('setup-phone', existing.phone || '');
+      setVal('setup-student-id', existing.studentId || '');
       this.setSetupSkinSelection(existing.cardType || 'gold');
       setVal('setup-celebration', existing.celebration || 'siuuu');
       setVal('setup-skill-moves', existing.skillMoves || 4);
@@ -2517,6 +2571,8 @@ class FutApp {
       setVal('setup-number', 10);
       setVal('setup-faculty', 'inf');
       setVal('setup-foot', 'Diestro');
+      setVal('setup-phone', '');
+      setVal('setup-student-id', '');
       this.setSetupSkinSelection('gold');
       setVal('setup-celebration', 'siuuu');
       setVal('setup-skill-moves', 4);
@@ -3079,13 +3135,18 @@ class FutApp {
     this.populateFormationsSelect();
     this.renderHeaderAndSettings();
     this.renderPitch();
+    this.renderDraftRoom();
     this.renderAlbumCards();
     this.renderMatches();
     this.renderClubHub();
     this.updateAdminVisibility();
+    this.updateFirebaseBadge(store.getCloudStatus());
 
+    const totalPlayers = store.getPlayers().length;
     const count = document.getElementById('tab-player-count');
-    if (count) count.textContent = store.getPlayers().length;
+    if (count) count.textContent = totalPlayers;
+    const draftCount = document.getElementById('tab-draft-count');
+    if (draftCount) draftCount.textContent = totalPlayers;
   }
 
   renderHeaderAndSettings() {
@@ -3217,20 +3278,14 @@ class FutApp {
     this.fitPitchCardScale(inlinePitchEl, projected, false);
     requestAnimationFrame(() => this.fitPitchCardScale(inlinePitchEl, projected, false));
 
-    // Banquillo (Deduplicación estricta para garantizar 0 duplicados)
+    // Banquillo (Deduplicación estricta únicamente por ID para no ocultar compañeros con mismo nombre)
     const startingIds = new Set(activeStarters.map(p => p.id));
-    const seenBenchNames = new Set(activeStarters.map(p => (p.nickname || p.name || '').toLowerCase().trim()));
-    const seenBenchEmails = new Set(activeStarters.map(p => (p.email || '').toLowerCase().trim()).filter(Boolean));
+    const seenBenchIds = new Set();
     const bench = [];
 
     for (const p of allPlayers) {
-      if (startingIds.has(p.id)) continue;
-      const email = (p.email || '').toLowerCase().trim();
-      const name = (p.nickname || p.name || '').toLowerCase().trim();
-      if (email && seenBenchEmails.has(email)) continue;
-      if (name && seenBenchNames.has(name)) continue;
-      if (email) seenBenchEmails.add(email);
-      if (name) seenBenchNames.add(name);
+      if (!p?.id || startingIds.has(p.id) || seenBenchIds.has(p.id)) continue;
+      seenBenchIds.add(p.id);
       bench.push(p);
     }
 
@@ -3839,18 +3894,12 @@ class FutApp {
     const allPlayers = store.getPlayers();
     const activeStarting = starting.filter(Boolean);
     const startingIds = new Set(activeStarting.map(p => p.id));
-    const seenBenchNames = new Set(activeStarting.map(p => (p.nickname || p.name || '').toLowerCase().trim()));
-    const seenBenchEmails = new Set(activeStarting.map(p => (p.email || '').toLowerCase().trim()).filter(Boolean));
+    const seenBenchIds = new Set();
     const bench = [];
 
     for (const p of allPlayers) {
-      if (startingIds.has(p.id)) continue;
-      const email = (p.email || '').toLowerCase().trim();
-      const name = (p.nickname || p.name || '').toLowerCase().trim();
-      if (email && seenBenchEmails.has(email)) continue;
-      if (name && seenBenchNames.has(name)) continue;
-      if (email) seenBenchEmails.add(email);
-      if (name) seenBenchNames.add(name);
+      if (!p?.id || startingIds.has(p.id) || seenBenchIds.has(p.id)) continue;
+      seenBenchIds.add(p.id);
       bench.push(p);
     }
 
@@ -3994,6 +4043,11 @@ class FutApp {
     if (this._swapPendingFrom) {
       const pending = this._swapPendingFrom;
       this._swapPendingFrom = null;
+      if (!this.requireAdminAction('cambiar titulares')) {
+        this.selectedStarterIndex = null;
+        this.renderPitch();
+        return;
+      }
       if (pending.type === 'starter') {
         if (pending.index === index) {
           this.selectedStarterIndex = null;
@@ -4073,6 +4127,12 @@ class FutApp {
 
     const subDrawerOpen = document.getElementById('fut-sub-drawer')?.classList.contains('drawer-open');
     if ((subDrawerOpen || this._swapPendingFrom?.type === 'starter') && this.selectedStarterIndex !== null) {
+      if (!this.requireAdminAction('sustituir jugadores')) {
+        this._swapPendingFrom = null;
+        this.selectedStarterIndex = null;
+        this.closeSubDrawer();
+        return;
+      }
       const targetIdx = this.selectedStarterIndex;
       const starting = store.getStartingLineup();
       const replaced = starting[targetIdx];
@@ -5496,6 +5556,487 @@ class FutApp {
     this.renderAlbumCards();
     futAudio.playSuccess();
     this.showToast(`Minutos de "${opponent}" guardados para equilibrar próximas alineaciones`, 'save');
+  }
+
+  // ==================== SALA DE DRAFT Y QUINTETOS EN LA NUBE ====================
+  bindDraftEvents() {
+    document.getElementById('btn-draft-share-link')?.addEventListener('click', () => {
+      this.copyClubInviteLink();
+    });
+
+    document.getElementById('btn-draft-auto-best')?.addEventListener('click', () => {
+      this.autoOptimizeSquad();
+      this.renderDraftRoom();
+    });
+
+    document.getElementById('btn-draft-force-save')?.addEventListener('click', async () => {
+      if (!this.requireAdminAction('guardar el Draft en la nube')) return;
+      const res = await store.pushCloudState();
+      if (res?.ok) {
+        futAudio.playSuccess();
+        this.showToast('¡Draft, quintetos y configuración sincronizados en Cloud Firestore!', 'check-circle-2');
+      } else {
+        this.showToast(res?.error || 'No se pudo sincronizar con Cloud Firestore', 'alert-triangle');
+      }
+    });
+
+    document.getElementById('btn-draft-new-squad')?.addEventListener('click', () => {
+      this.saveCurrentSquadPrompt();
+    });
+
+    document.getElementById('btn-draft-rename-squad')?.addEventListener('click', () => {
+      this.renameActiveSquadPrompt();
+    });
+
+    document.getElementById('btn-draft-clear-lineup')?.addEventListener('click', () => {
+      if (!this.requireAdminAction('vaciar el quinteto activo')) return;
+      store.setStartingLineup([null, null, null, null, null]);
+      this.draftTargetSlot = 0;
+      this.renderPitch();
+      this.renderDraftRoom();
+      this.showToast('Quinteto vaciado. Selecciona jugadores abajo para draftearlos.', 'rotate-ccw');
+    });
+
+    document.getElementById('draft-formation-select')?.addEventListener('change', (e) => {
+      this.selectFormation(e.target.value);
+    });
+
+    document.getElementById('draft-search-input')?.addEventListener('input', (e) => {
+      this.draftSearchQuery = e.target.value || '';
+      this.renderDraftRoom();
+    });
+
+    document.querySelectorAll('#draft-role-filters .hud-filter-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#draft-role-filters .hud-filter-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.draftRoleFilter = btn.dataset.draftRole || 'all';
+        futAudio.playNav();
+        this.renderDraftRoom();
+      });
+    });
+
+    document.getElementById('draft-status-filter')?.addEventListener('change', (e) => {
+      this.draftStatusFilter = e.target.value || 'all';
+      this.renderDraftRoom();
+    });
+
+    document.getElementById('draft-sort-select')?.addEventListener('change', (e) => {
+      this.draftSortBy = e.target.value || 'ovr-desc';
+      this.renderDraftRoom();
+    });
+
+    document.getElementById('btn-draft-clear-compare')?.addEventListener('click', () => {
+      this.draftCompareIds.clear();
+      this.renderDraftRoom();
+    });
+  }
+
+  async copyClubInviteLink() {
+    const url = window.location.origin + window.location.pathname;
+    try {
+      await navigator.clipboard.writeText(url);
+      futAudio.playSuccess();
+      this.showToast('Enlace del club copiado. Compártelo por WhatsApp con el equipo.', 'copy');
+    } catch {
+      this.showToast(`Comparte este enlace con el equipo: ${url}`, 'share-2');
+    }
+  }
+
+  renameActiveSquadPrompt() {
+    if (!this.requireAdminAction('renombrar quintetos')) return;
+    const sq = store.getActiveSquad();
+    if (!sq) return;
+    const nextName = window.prompt('Nuevo nombre para este quinteto/equipo:', sq.name || 'Quinteto');
+    if (nextName && nextName.trim()) {
+      if (store.renameSquad(sq.id, nextName.trim())) {
+        futAudio.playSuccess();
+        this.showToast(`Quinteto renombrado a "${nextName.trim()}"`, 'check-circle-2');
+        this.renderAll();
+      }
+    }
+  }
+
+  draftPlayerToSlot(playerId, slotIndex = null) {
+    if (!this.requireAdminAction('draftear jugadores al quinteto')) return;
+    const starting = store.getStartingLineup();
+    let targetIdx = slotIndex;
+    if (targetIdx === null || targetIdx === undefined || Number.isNaN(targetIdx)) {
+      if (this.draftTargetSlot !== null && this.draftTargetSlot >= 0 && this.draftTargetSlot < 5) {
+        targetIdx = this.draftTargetSlot;
+      } else {
+        const emptyIdx = starting.findIndex(p => !p);
+        targetIdx = emptyIdx !== -1 ? emptyIdx : 4;
+      }
+    }
+    store.swapStartingPlayer(targetIdx, playerId);
+    const nextEmpty = store.getStartingLineup().findIndex(p => !p);
+    this.draftTargetSlot = nextEmpty !== -1 ? nextEmpty : null;
+    futAudio.playCardSwap();
+    const p = store.getPlayerById(playerId);
+    const role = this.getActiveSlotRole(targetIdx);
+    this.showToast(`${p?.nickname || p?.name || 'Jugador'} drafteado en ${role} (guardando en nube…)`, 'user-check');
+    this.renderPitch();
+    this.renderDraftRoom();
+  }
+
+  removeDraftSlot(slotIndex) {
+    if (!this.requireAdminAction('quitar jugadores del quinteto')) return;
+    store.swapStartingPlayer(slotIndex, null);
+    this.draftTargetSlot = slotIndex;
+    futAudio.playNav();
+    this.showToast('Jugador enviado al banquillo', 'arrow-down-circle');
+    this.renderPitch();
+    this.renderDraftRoom();
+  }
+
+  toggleDraftCompare(playerId) {
+    if (this.draftCompareIds.has(playerId)) {
+      this.draftCompareIds.delete(playerId);
+    } else {
+      if (this.draftCompareIds.size >= 3) {
+        this.showToast('Puedes comparar hasta 3 jugadores a la vez', 'scale');
+        return;
+      }
+      this.draftCompareIds.add(playerId);
+    }
+    this.renderDraftRoom();
+  }
+
+  renderDraftComparePanel() {
+    const panel = document.getElementById('draft-compare-panel');
+    const grid = document.getElementById('draft-compare-grid');
+    if (!panel || !grid) return;
+
+    const compared = [...this.draftCompareIds].map(id => store.getPlayerById(id)).filter(Boolean);
+    if (compared.length < 2) {
+      panel.classList.add('hidden');
+      grid.innerHTML = '';
+      return;
+    }
+
+    panel.classList.remove('hidden');
+    const statKeys = ['pac', 'sho', 'pas', 'dri', 'def', 'phy'];
+    const bestByStat = {};
+    statKeys.forEach(k => {
+      bestByStat[k] = Math.max(...compared.map(p => Number(p.stats?.[k]) || 0));
+    });
+    const bestOvr = Math.max(...compared.map(p => Number(p.rating) || 0));
+
+    grid.innerHTML = compared.map(p => {
+      const chain = getPlayerPriorityChain(p);
+      const fac = FACULTIES.find(f => f.id === p.faculty) || FACULTIES[0];
+      return `
+        <div class="draft-compare-card space-y-2.5">
+          <div class="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <img src="${p.avatar || 'assets/club_logo.png'}" alt="" class="w-10 h-10 rounded-full object-cover border border-amber-400/60 bg-slate-900">
+              <div class="min-w-0">
+                <div class="font-fifa text-lg font-black uppercase truncate">#${p.number || 10} ${p.nickname || p.name}</div>
+                <div class="text-[10px] text-slate-400 truncate">${fac.short} · ${p.preferredFoot || 'Diestro'}</div>
+              </div>
+            </div>
+            <span class="font-fifa text-2xl font-black px-2 py-0.5 ${p.rating === bestOvr ? 'bg-amber-400 text-slate-950' : 'bg-slate-800 text-amber-300'}">${p.rating}</span>
+          </div>
+          <div class="grid grid-cols-6 gap-1 text-center">
+            ${statKeys.map(k => {
+              const val = Number(p.stats?.[k]) || 70;
+              const isMax = val === bestByStat[k];
+              return `<div class="draft-stat-chip ${isMax ? 'is-elite' : ''}"><span>${k.toUpperCase()}</span><b>${val}</b></div>`;
+            }).join('')}
+          </div>
+          <div class="text-[11px] font-bold text-slate-300 flex flex-wrap gap-1">
+            <span class="px-1.5 py-0.5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-300">1º ${chain.best}</span>
+            <span class="px-1.5 py-0.5 bg-sky-950/60 border border-sky-500/40 text-sky-300">2º ${chain.second}</span>
+            <span class="px-1.5 py-0.5 bg-slate-800 text-slate-300">3º ${chain.third}</span>
+            <span class="px-1.5 py-0.5 bg-rose-950/60 border border-rose-500/40 text-rose-300">Evitar: ${chain.worst}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderDraftRoom() {
+    const squadsWrap = document.getElementById('draft-squads-tabs');
+    const slotsGrid = document.getElementById('draft-slots-grid');
+    const listWrap = document.getElementById('draft-players-list');
+    const formSel = document.getElementById('draft-formation-select');
+    if (!slotsGrid || !listWrap) return;
+
+    const isAdmin = authService.isAdmin();
+    const squads = store.getSquads();
+    const activeSquadId = store.getActiveSquadId();
+    const activeFormation = store.getActiveFormation();
+    const formCfg = getFormationConfig('futsal', activeFormation);
+    const starting = store.getStartingLineup();
+    const allPlayers = store.getPlayers();
+    const starterSlotById = new Map();
+    starting.forEach((p, idx) => {
+      if (p?.id) starterSlotById.set(p.id, idx);
+    });
+
+    // 1. Squads tabs
+    if (squadsWrap) {
+      squadsWrap.innerHTML = squads.map(sq => {
+        const active = sq.id === activeSquadId;
+        const canDel = isAdmin && squads.length > 1;
+        return `
+          <div class="draft-squad-tab font-fifa ${active ? 'is-active' : ''}" data-draft-squad="${sq.id}">
+            <span>${sq.name}</span>
+            <small class="opacity-75">(${sq.formation || '1-1-2-1'})</small>
+            ${canDel ? `<button type="button" class="draft-squad-tab-del" data-draft-del-squad="${sq.id}" title="Eliminar quinteto"><i data-lucide="x" class="w-3 h-3"></i></button>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      squadsWrap.querySelectorAll('[data-draft-squad]').forEach(el => {
+        el.addEventListener('click', (e) => {
+          if (e.target.closest('[data-draft-del-squad]')) return;
+          this.selectSquad(el.dataset.draftSquad);
+        });
+      });
+      squadsWrap.querySelectorAll('[data-draft-del-squad]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!this.requireAdminAction('eliminar quintetos')) return;
+          const sid = btn.dataset.draftDelSquad;
+          const sq = squads.find(s => s.id === sid);
+          this.openConfirmModal({
+            title: 'Eliminar Quinteto',
+            message: `¿Seguro que quieres eliminar "${sq?.name || 'este quinteto'}"?`,
+            confirmLabel: 'Eliminar',
+            onConfirm: () => {
+              if (store.deleteSquad(sid)) {
+                this.renderAll();
+                this.showToast('Quinteto eliminado', 'trash-2');
+              }
+            }
+          });
+        });
+      });
+    }
+
+    // 2. Formation select
+    if (formSel) {
+      const forms = Object.values(TACTICAL_FORMATIONS.futsal);
+      formSel.innerHTML = forms.map(f => `<option value="${f.id}" ${f.id === activeFormation ? 'selected' : ''}>${f.name}</option>`).join('');
+      formSel.value = activeFormation;
+      formSel.disabled = !isAdmin;
+    }
+
+    // 3. KPIs
+    const activeStarters = starting.filter(Boolean);
+    const avgOvr = store.calculateTeamChemistryAndRating().rating;
+    const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setTxt('draft-kpi-total', allPlayers.length);
+    setTxt('draft-kpi-starters', `${activeStarters.length} / 5`);
+    setTxt('draft-kpi-ovr', avgOvr > 0 ? avgOvr : '--');
+    setTxt('draft-kpi-bench', Math.max(0, allPlayers.length - activeStarters.length));
+
+    // 4. 5-Slot Active Draft Board
+    slotsGrid.innerHTML = formCfg.slots.map((slot, idx) => {
+      const p = starting[idx];
+      const isTarget = this.draftTargetSlot === idx;
+      if (!p) {
+        return `
+          <div class="draft-slot-card is-empty ${isTarget ? 'is-target' : ''}" data-draft-target-slot="${idx}">
+            <div class="draft-slot-head">
+              <span class="draft-slot-role font-fifa">${slot.role}</span>
+              <span class="text-[10px] font-bold uppercase text-slate-400">Puesto ${idx + 1}</span>
+            </div>
+            <div class="py-3 text-center space-y-1">
+              <div class="text-xs font-bold text-slate-400">Vacante</div>
+              ${isAdmin ? `<button type="button" class="text-[10px] font-black uppercase text-amber-400 hover:underline cursor-pointer" data-select-target-slot="${idx}">${isTarget ? '● Puesto activo' : 'Seleccionar hueco'}</button>` : ''}
+            </div>
+          </div>
+        `;
+      }
+      const rankInfo = getPositionPriorityRank(p, slot.role);
+      const fitTone = rankInfo.rank === 1
+        ? 'text-emerald-400'
+        : (rankInfo.matchType === 'avoid' ? 'text-rose-400' : 'text-amber-300');
+      return `
+        <div class="draft-slot-card ${isTarget ? 'is-target' : ''}" data-draft-target-slot="${idx}">
+          <div class="draft-slot-head">
+            <span class="draft-slot-role font-fifa">${slot.role}</span>
+            <span class="font-fifa text-xl font-black text-amber-400">${p.rating}</span>
+          </div>
+          <div class="flex items-center gap-2 min-w-0">
+            <img src="${p.avatar || 'assets/club_logo.png'}" alt="" class="w-9 h-9 rounded-full object-cover border border-amber-400/50 bg-slate-900 flex-shrink-0">
+            <div class="min-w-0">
+              <div class="font-fifa text-base font-black uppercase truncate leading-tight">#${p.number || 10} ${p.nickname || p.name}</div>
+              <div class="text-[10px] font-bold ${fitTone} truncate">${rankInfo.label}</div>
+            </div>
+          </div>
+          ${isAdmin ? `
+            <div class="flex items-center justify-between gap-1 pt-1 border-t border-white/10">
+              <button type="button" class="text-[10px] font-black uppercase text-sky-400 hover:underline cursor-pointer" data-select-target-slot="${idx}">${isTarget ? '● Sustituir aquí' : 'Elegir hueco'}</button>
+              <button type="button" class="text-[10px] font-black uppercase text-rose-400 hover:underline cursor-pointer" data-remove-draft-slot="${idx}">Quitar</button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+
+    slotsGrid.querySelectorAll('[data-select-target-slot]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.selectTargetSlot, 10);
+        this.draftTargetSlot = (this.draftTargetSlot === idx) ? null : idx;
+        this.renderDraftRoom();
+      });
+    });
+    slotsGrid.querySelectorAll('[data-remove-draft-slot]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.removeDraftSlot(parseInt(btn.dataset.removeDraftSlot, 10));
+      });
+    });
+
+    // 5. Compare panel
+    this.renderDraftComparePanel();
+
+    // 6. Filter & Sort Registered Players Pool
+    let filtered = [...allPlayers];
+    const q = (this.draftSearchQuery || '').toLowerCase().trim();
+    if (q) {
+      filtered = filtered.filter(p => {
+        const fac = FACULTIES.find(f => f.id === p.faculty);
+        return (
+          (p.name || '').toLowerCase().includes(q) ||
+          (p.nickname || '').toLowerCase().includes(q) ||
+          String(p.number || '').includes(q) ||
+          (fac?.name || '').toLowerCase().includes(q) ||
+          (fac?.short || '').toLowerCase().includes(q) ||
+          (isAdmin && (p.email || '').toLowerCase().includes(q))
+        );
+      });
+    }
+
+    if (this.draftRoleFilter && this.draftRoleFilter !== 'all') {
+      const rf = this.draftRoleFilter;
+      filtered = filtered.filter(p => {
+        const chain = getPlayerPriorityChain(p);
+        return chain.best === rf || chain.second === rf;
+      });
+    }
+
+    if (this.draftStatusFilter === 'drafted') {
+      filtered = filtered.filter(p => starterSlotById.has(p.id));
+    } else if (this.draftStatusFilter === 'available') {
+      filtered = filtered.filter(p => !starterSlotById.has(p.id));
+    }
+
+    const sortBy = this.draftSortBy || 'ovr-desc';
+    filtered.sort((a, b) => {
+      if (sortBy === 'ovr-desc') return (b.rating || 0) - (a.rating || 0);
+      if (sortBy === 'dorsal-asc') return (a.number || 99) - (b.number || 99);
+      if (sortBy === 'name-asc') return (a.nickname || a.name || '').localeCompare(b.nickname || b.name || '');
+      const statMatch = sortBy.match(/^(pac|sho|pas|dri|def|phy)-desc$/);
+      if (statMatch) {
+        const k = statMatch[1];
+        return (Number(b.stats?.[k]) || 0) - (Number(a.stats?.[k]) || 0);
+      }
+      return 0;
+    });
+
+    if (allPlayers.length === 0) {
+      listWrap.innerHTML = `
+        <div class="fifa-club-tile text-center py-10 space-y-3">
+          <i data-lucide="users" class="w-10 h-10 text-amber-400 mx-auto opacity-80"></i>
+          <h4 class="font-fifa text-2xl font-bold uppercase text-white">AÚN NO HAY JUGADORES REGISTRADOS EN LA NUBE</h4>
+          <p class="text-xs text-slate-400 max-w-md mx-auto">Comparte el enlace del club con tu equipo para que cada uno entre con Google y cree su carta FUT. Aparecerán aquí al instante para draftearlos.</p>
+          <button type="button" onclick="window.futApp.copyClubInviteLink()" class="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider cursor-pointer">
+            Copiar Enlace para el Equipo
+          </button>
+        </div>
+      `;
+      this.refreshIcons();
+      return;
+    }
+
+    if (filtered.length === 0) {
+      listWrap.innerHTML = `<div class="fifa-club-tile text-center py-6 text-xs text-slate-400">Ningún jugador registrado coincide con los filtros del Draft.</div>`;
+      return;
+    }
+
+    const statKeys = ['pac', 'sho', 'pas', 'dri', 'def', 'phy'];
+    listWrap.innerHTML = filtered.map(p => {
+      const assignedSlotIdx = starterSlotById.has(p.id) ? starterSlotById.get(p.id) : -1;
+      const assignedRole = assignedSlotIdx >= 0 ? formCfg.slots[assignedSlotIdx]?.role : null;
+      const chain = getPlayerPriorityChain(p);
+      const fac = FACULTIES.find(f => f.id === p.faculty) || FACULTIES[0];
+      const isCompared = this.draftCompareIds.has(p.id);
+      const contactLine = isAdmin
+        ? [p.email, p.phone, p.studentId].filter(Boolean).join(' · ')
+        : '';
+
+      return `
+        <article class="draft-player-row ${assignedSlotIdx >= 0 ? 'is-drafted' : ''}">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" class="draft-compare-chk w-4 h-4 accent-amber-400 cursor-pointer" data-compare-id="${p.id}" ${isCompared ? 'checked' : ''} title="Marcar para comparar cara a cara">
+            <div class="w-10 h-10 flex items-center justify-center bg-slate-950 border border-amber-400/50 font-fifa text-2xl font-black text-amber-400">${p.rating || 75}</div>
+          </div>
+
+          <div class="flex items-center gap-2.5 min-w-0">
+            <img src="${p.avatar || 'assets/club_logo.png'}" alt="" class="w-10 h-10 rounded-full object-cover border border-white/20 bg-slate-900 flex-shrink-0">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-fifa text-lg font-black uppercase leading-none">#${p.number || 10} ${p.nickname || p.name}</span>
+                ${assignedRole ? `<span class="px-1.5 py-0.5 text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">TITULAR · ${assignedRole}</span>` : `<span class="px-1.5 py-0.5 text-[10px] font-bold uppercase bg-slate-800 text-slate-400">BANQUILLO</span>`}
+              </div>
+              <div class="text-[11px] text-slate-400 truncate">${p.name} · ${fac.short} · ${p.preferredFoot || 'Diestro'}</div>
+              ${contactLine ? `<div class="text-[10px] text-cyan-300/90 font-mono truncate">${contactLine}</div>` : ''}
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1 flex-wrap">
+            ${statKeys.map(k => {
+              const v = Number(p.stats?.[k]) || 70;
+              const cls = v >= 85 ? 'is-elite' : (v >= 75 ? 'is-good' : '');
+              return `<div class="draft-stat-chip ${cls}"><span>${k.toUpperCase()}</span><b>${v}</b></div>`;
+            }).join('')}
+          </div>
+
+          <div class="flex items-center gap-1 flex-wrap text-[10px] font-black font-fifa">
+            <span class="px-1.5 py-0.5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-300">1º ${chain.best}</span>
+            <span class="px-1.5 py-0.5 bg-sky-950/60 border border-sky-500/40 text-sky-300">2º ${chain.second}</span>
+            <span class="px-1.5 py-0.5 bg-slate-800 text-slate-300">3º ${chain.third}</span>
+            <span class="px-1.5 py-0.5 bg-rose-950/60 border border-rose-500/40 text-rose-300">✕ ${chain.worst}</span>
+          </div>
+
+          <div class="flex items-center gap-1 flex-wrap justify-end">
+            ${isAdmin ? `
+              ${formCfg.slots.map((sl, idx) => `
+                <button type="button" class="draft-slot-quick-btn font-fifa ${assignedSlotIdx === idx ? 'is-active' : ''}" data-draft-assign-player="${p.id}" data-draft-assign-slot="${idx}" title="Draftear a ${sl.role}">
+                  ${sl.role}
+                </button>
+              `).join('')}
+              ${assignedSlotIdx >= 0 ? `<button type="button" class="draft-slot-quick-btn !border-rose-500/40 !text-rose-300" data-draft-unassign-slot="${assignedSlotIdx}" title="Pasar al banquillo">BANQ</button>` : ''}
+            ` : ''}
+            <button type="button" class="pizarra-ctrl-btn !py-1 !px-2" onclick="window.futApp.inspectPlayer('${p.id}')" title="Ver ficha completa">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    listWrap.querySelectorAll('.draft-compare-chk').forEach(chk => {
+      chk.addEventListener('change', () => {
+        this.toggleDraftCompare(chk.dataset.compareId);
+      });
+    });
+    listWrap.querySelectorAll('[data-draft-assign-player]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.draftPlayerToSlot(btn.dataset.draftAssignPlayer, parseInt(btn.dataset.draftAssignSlot, 10));
+      });
+    });
+    listWrap.querySelectorAll('[data-draft-unassign-slot]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.removeDraftSlot(parseInt(btn.dataset.draftUnassignSlot, 10));
+      });
+    });
+
+    this.refreshIcons();
   }
 }
 

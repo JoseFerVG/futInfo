@@ -90,6 +90,7 @@
 
   <nav class="hud-tabs" aria-label="Secciones">
     <button data-tab="pitch" class="tab-btn fifa-tab-btn active">PLANTILLAS</button>
+    <button data-tab="draft" class="tab-btn fifa-tab-btn">DRAFT <span class="hud-tab-count" id="tab-draft-count">0</span></button>
     <button data-tab="pizarra" class="tab-btn fifa-tab-btn">PIZARRA</button>
     <button data-tab="album" class="tab-btn fifa-tab-btn">ÁLBUM <span class="hud-tab-count" id="tab-player-count">0</span></button>
     <button data-tab="partidos" class="tab-btn fifa-tab-btn">JORNADAS</button>
@@ -289,6 +290,153 @@
         </div>
       </article>
 
+    </section>
+
+    <!-- ==================== 1A. SALA DE DRAFT Y QUINTETOS EN LA NUBE ==================== -->
+    <section id="view-draft" class="tab-view hidden space-y-4">
+      <header class="fifa-broadcast-head">
+        <div class="fifa-broadcast-title-group">
+          <div class="fifa-broadcast-live-chyron font-fifa">
+            <span class="fifa-live-dot"></span> SALA DE DRAFT • SINCRONIZACIÓN MULTI-DISPOSITIVO EN TIEMPO REAL
+          </div>
+          <h2 class="fifa-broadcast-main-title font-fifa">DRAFT DEL EQUIPO Y QUINTETOS</h2>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <span id="draft-sync-badge" class="draft-sync-pill font-fifa">
+            <i data-lucide="cloud" class="w-3.5 h-3.5"></i>
+            <span id="draft-sync-label">CONECTANDO…</span>
+          </span>
+          <button type="button" id="btn-draft-share-link" class="pizarra-ctrl-btn" title="Copiar enlace del club para enviarlo al equipo por WhatsApp">
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+            <span>COPIAR ENLACE EQUIPO</span>
+          </button>
+          <button type="button" id="btn-draft-auto-best" class="admin-only pizarra-ctrl-btn pizarra-ctrl-btn--gold" title="Rellenar automáticamente el mejor quinteto según stats y prioridades">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span>AUTO-DRAFTEAR 5</span>
+          </button>
+          <button type="button" id="btn-draft-force-save" class="admin-only fifa-broadcast-action-btn" title="Guardar y sincronizar el Draft y todos los quintetos en Cloud Firestore">
+            <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+            <span>GUARDAR EN LA NUBE</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- BARRA DE GESTIÓN DE QUINTETOS / EQUIPOS GUARDADOS -->
+      <div class="draft-squads-bar fifa-club-tile !p-3.5 space-y-3">
+        <div class="fifa-club-tile-accent"></div>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-fifa text-sm font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+              <span>QUINTETOS GUARDADOS:</span>
+            </span>
+            <div id="draft-squads-tabs" class="flex items-center gap-1.5 flex-wrap"></div>
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap">
+            <label for="draft-formation-select" class="text-[10px] font-black uppercase tracking-wider text-slate-400">Esquema:</label>
+            <select id="draft-formation-select" class="bg-slate-950 border border-slate-700 text-xs font-bold text-white px-2.5 py-1.5 focus:border-amber-400"></select>
+            <button type="button" id="btn-draft-new-squad" class="admin-only pizarra-ctrl-btn pizarra-ctrl-btn--gold" title="Crear un nuevo quinteto / equipo para draftear">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>NUEVO QUINTETO</span>
+            </button>
+            <button type="button" id="btn-draft-rename-squad" class="admin-only pizarra-ctrl-btn" title="Renombrar quinteto activo">
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+              <span>RENOMBRAR</span>
+            </button>
+            <button type="button" id="btn-draft-clear-lineup" class="admin-only pizarra-ctrl-btn" title="Vaciar los 5 puestos del quinteto activo para draftear desde cero">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span>VACIAR 5</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- RESUMEN KPI + 5 SLOTS TITULARES DEL QUINTETO ACTIVO -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="draft-kpi-strip">
+          <div class="draft-kpi-pill">
+            <span class="draft-kpi-lbl">REGISTRADOS EN NUBE</span>
+            <strong id="draft-kpi-total" class="draft-kpi-val font-fifa">0</strong>
+          </div>
+          <div class="draft-kpi-pill">
+            <span class="draft-kpi-lbl">TITULARES DRAFTEADOS</span>
+            <strong id="draft-kpi-starters" class="draft-kpi-val font-fifa text-emerald-400">0 / 5</strong>
+          </div>
+          <div class="draft-kpi-pill">
+            <span class="draft-kpi-lbl">MEDIA DEL QUINTETO</span>
+            <strong id="draft-kpi-ovr" class="draft-kpi-val font-fifa text-amber-400">--</strong>
+          </div>
+          <div class="draft-kpi-pill">
+            <span class="draft-kpi-lbl">DISPONIBLES / BANQUILLO</span>
+            <strong id="draft-kpi-bench" class="draft-kpi-val font-fifa text-cyan-400">0</strong>
+          </div>
+        </div>
+
+        <div id="draft-slots-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+          <!-- Render dinámico de los 5 puestos titulares -->
+        </div>
+      </div>
+
+      <!-- COMPARADOR CARA A CARA (visible al marcar 2+ jugadores) -->
+      <div id="draft-compare-panel" class="hidden fifa-club-tile !p-4 space-y-3">
+        <div class="fifa-club-tile-accent"></div>
+        <div class="flex items-center justify-between gap-2">
+          <h3 class="font-fifa text-xl font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="scale" class="w-4 h-4"></i>
+            <span>COMPARADOR DE JUGADORES DEL DRAFT</span>
+          </h3>
+          <button type="button" id="btn-draft-clear-compare" class="pizarra-ctrl-btn">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            <span>LIMPIAR COMPARADOR</span>
+          </button>
+        </div>
+        <div id="draft-compare-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+      </div>
+
+      <!-- BARRA DE FILTROS DEL POOL DE JUGADORES REGISTRADOS -->
+      <div class="hud-filter-bar fifa-album-filter-bar flex flex-col lg:flex-row gap-2.5 items-stretch lg:items-center justify-between p-2.5">
+        <div class="relative flex-1 min-w-[200px]">
+          <label for="draft-search-input" class="sr-only">Buscar jugador registrado</label>
+          <i data-lucide="search" class="w-4 h-4 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input type="text" id="draft-search-input" placeholder="Buscar por nombre, apodo, dorsal, facultad o correo..." autocomplete="off" class="w-full bg-slate-950/90 border border-slate-700/70 pl-9 pr-3 py-2 text-xs text-white placeholder-slate-400 font-bold focus:outline-none focus:border-amber-400">
+        </div>
+
+        <div class="flex items-center flex-wrap gap-1.5" id="draft-role-filters">
+          <button type="button" class="hud-filter-pill active" data-draft-role="all">TODOS</button>
+          <button type="button" class="hud-filter-pill" data-draft-role="POR">POR</button>
+          <button type="button" class="hud-filter-pill" data-draft-role="CIE">CIE</button>
+          <button type="button" class="hud-filter-pill" data-draft-role="ALI">ALI</button>
+          <button type="button" class="hud-filter-pill" data-draft-role="ALD">ALD</button>
+          <button type="button" class="hud-filter-pill" data-draft-role="ALA">ALA</button>
+          <button type="button" class="hud-filter-pill" data-draft-role="PIV">PIV</button>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <label for="draft-status-filter" class="sr-only">Estado en quinteto</label>
+          <select id="draft-status-filter" class="bg-slate-950/90 border border-slate-700/70 text-[11px] font-bold text-slate-200 py-2 px-2.5 uppercase tracking-wider focus:border-amber-400">
+            <option value="all">TODOS LOS REGISTRADOS</option>
+            <option value="available">DISPONIBLES / BANQUILLO</option>
+            <option value="drafted">YA EN QUINTETO TITULAR</option>
+          </select>
+          <label for="draft-sort-select" class="sr-only">Ordenar jugadores</label>
+          <select id="draft-sort-select" class="bg-slate-950/90 border border-slate-700/70 text-[11px] font-bold text-slate-200 py-2 px-2.5 uppercase tracking-wider focus:border-amber-400">
+            <option value="ovr-desc">MEDIA (OVR) ↓</option>
+            <option value="pac-desc">RITMO (PAC) ↓</option>
+            <option value="sho-desc">TIRO (SHO) ↓</option>
+            <option value="pas-desc">PASE (PAS) ↓</option>
+            <option value="dri-desc">REGATE (DRI) ↓</option>
+            <option value="def-desc">DEFENSA (DEF) ↓</option>
+            <option value="phy-desc">FÍSICO (PHY) ↓</option>
+            <option value="dorsal-asc">DORSAL ↑</option>
+            <option value="name-asc">NOMBRE A-Z</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- POOL COMPLETO DE JUGADORES REGISTRADOS PARA DRAFTEAR -->
+      <div id="draft-players-list" class="space-y-2">
+        <!-- Render dinámico de todos los jugadores registrados -->
+      </div>
     </section>
 
     <!-- ==================== 1B. PIZARRA TÁCTICA Y ESTRATEGIA DE PARTIDO ==================== -->
@@ -1190,6 +1338,18 @@
               <option value="Zurdo">Zurdo</option>
               <option value="Ambidiestro">Ambidiestro</option>
             </select>
+          </div>
+        </div>
+
+        <!-- DATOS PRIVADOS DE CONTACTO (SOLO VISIBLES PARA TI Y EL ENTRENADOR) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-900/70 border border-slate-800">
+          <div>
+            <label for="setup-phone" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">Teléfono / WhatsApp <span class="text-slate-500 font-normal">(Opcional · Privado)</span></label>
+            <input type="tel" id="setup-phone" name="phone" maxlength="32" autocomplete="tel" placeholder="Ej: 600 123 456" class="w-full bg-slate-950 border border-slate-700 px-3 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500">
+          </div>
+          <div>
+            <label for="setup-student-id" class="block text-[10px] font-black text-slate-300 uppercase tracking-wider mb-1 cursor-pointer">DNI / Expediente UMU <span class="text-slate-500 font-normal">(Opcional · Privado)</span></label>
+            <input type="text" id="setup-student-id" name="studentId" maxlength="32" autocomplete="off" placeholder="Para inscripción oficial" class="w-full bg-slate-950 border border-slate-700 px-3 py-1.5 text-xs text-white font-bold focus:ring-1 focus:ring-amber-500">
           </div>
         </div>
 

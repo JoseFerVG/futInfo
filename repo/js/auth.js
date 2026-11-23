@@ -233,6 +233,8 @@ class AuthService {
         cardType: cardData.cardType || existingPlayer.cardType || 'gold',
         faculty: cardData.faculty || existingPlayer.faculty,
         preferredFoot: cardData.preferredFoot || existingPlayer.preferredFoot,
+        phone: cardData.phone !== undefined ? cardData.phone : (existingPlayer.phone || ''),
+        studentId: cardData.studentId !== undefined ? cardData.studentId : (existingPlayer.studentId || ''),
         kitColor: cardData.kitColor || existingPlayer.kitColor || '#f0be2a',
         kitSecondary: cardData.kitSecondary || existingPlayer.kitSecondary || '#111827',
         kitCollar: cardData.kitCollar || existingPlayer.kitCollar || 'round',
@@ -299,13 +301,17 @@ class AuthService {
       });
     }
 
+    const prevSnapshot = existingPlayer ? JSON.parse(JSON.stringify(existingPlayer)) : null;
+
     // Si es una sesión real de Firebase, EXIGIR guardado confirmado en Cloud Firestore (no mentir con guardado solo local)
     if (this.currentUser.isFirebase && isFirebaseConfigured() && targetPlayer) {
       try {
         await store.upsertPlayerCloud(targetPlayer, uid);
       } catch (cloudErr) {
         if (isBrandNew) {
-          store.deletePlayer(targetPlayer.id);
+          store.revertUnsavedLocalPlayer(targetPlayer.id);
+        } else if (prevSnapshot) {
+          store.updatePlayer(prevSnapshot.id, prevSnapshot);
         }
         throw new Error(`NO se guardó en la base de datos compartida del club: ${cloudErr.message}`);
       }
