@@ -2273,8 +2273,6 @@ class FutApp {
         number: parseInt(document.getElementById('setup-number').value, 10) || 10,
         faculty: document.getElementById('setup-faculty').value,
         preferredFoot: document.getElementById('setup-foot').value,
-        phone: document.getElementById('setup-phone')?.value?.trim() || '',
-        studentId: document.getElementById('setup-student-id')?.value?.trim() || '',
         cardType: document.getElementById('setup-card-type')?.value || 'gold',
         kitColor: clubSettings.kitColor || '#f8fafc',
         kitSecondary: clubSettings.kitSecondary || '#f0be2a',
@@ -2536,8 +2534,6 @@ class FutApp {
       setVal('setup-number', existing.number || 10);
       setVal('setup-faculty', existing.faculty || 'inf');
       setVal('setup-foot', existing.preferredFoot || 'Diestro');
-      setVal('setup-phone', existing.phone || '');
-      setVal('setup-student-id', existing.studentId || '');
       this.setSetupSkinSelection(existing.cardType || 'gold');
       setVal('setup-celebration', existing.celebration || 'siuuu');
       setVal('setup-skill-moves', existing.skillMoves || 4);
@@ -2571,8 +2567,6 @@ class FutApp {
       setVal('setup-number', 10);
       setVal('setup-faculty', 'inf');
       setVal('setup-foot', 'Diestro');
-      setVal('setup-phone', '');
-      setVal('setup-student-id', '');
       this.setSetupSkinSelection('gold');
       setVal('setup-celebration', 'siuuu');
       setVal('setup-skill-moves', 4);
